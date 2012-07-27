@@ -1,0 +1,6 @@
+lib/
+libs/
+target/
+src_managed/
+project/boot/
+project/plugins/project
