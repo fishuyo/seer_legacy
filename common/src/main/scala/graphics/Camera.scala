@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.PerspectiveCamera
 /**
 * Camera
 */
+
+object Cam extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)
+
 object Camera extends Camera(Vec3(0,0,2),0.f)
 
 class Camera( var position:Vec3=Vec3(0,0,2), az:Float=0.f ) {

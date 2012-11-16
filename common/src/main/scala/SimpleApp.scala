@@ -1,6 +1,7 @@
 package com.fishuyo
 
 import graphics._
+import io._
 
 import com.badlogic.gdx.utils.GdxNativesLoader
 //import com.badlogic.gdx.backends.lwjgl._
@@ -15,37 +16,16 @@ object SimpleAppSize {
   val aspect = width * 1.f / height
 }
 
-/*object SimpleAppRun {
-  def apply() = {
 
-    try GdxNativesLoader.load()
-    catch { case e:Exception => println(e) }
-
-    val app = new SimpleDesktopApp( new SimpleApp )
-    app.run
-  }
-}
-
-class SimpleDesktopApp( val app: ApplicationListener ){
-  def run = {
-    val cfg = new LwjglApplicationConfiguration()
-    cfg.title = "seer"
-    cfg.useGL20 = false
-    cfg.width = SimpleAppSize.width
-    cfg.height = SimpleAppSize.height
-    new LwjglApplication( app, cfg )
-  }
-}*/
-
-class SimpleApp extends ApplicationListener {
+class SimpleAppListener extends ApplicationListener {
 
   var width = SimpleAppSize.width
   var height = SimpleAppSize.height
   var aspect = SimpleAppSize.aspect
 
   var scene = GLScene
-  var camera = new PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)
-  val input = new InputMultiplexer
+  var camera = Cam //new PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)
+  val input = Inputs //new InputMultiplexer
 
   def create(){
     //input.addProcessor( KeyboardNavInput )
@@ -62,7 +42,7 @@ class SimpleApp extends ApplicationListener {
     scene.step(timeStep)
     Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT )
     camera.update
-    camera.apply(Gdx.graphics.getGL10)
+    camera.apply(Gdx.graphics.getGL11)
     scene.draw
   }
   def resize(width: Int, height:Int){

@@ -29,6 +29,10 @@ object TreeNode {
   }
 }
 
+class TreeRoot extends GLAnimatable {
+  //var root: TreeNode = 
+}
+
 class TreeNode extends GLAnimatable {
 
   var pos = Vec3(0)

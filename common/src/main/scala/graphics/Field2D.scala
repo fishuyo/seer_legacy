@@ -8,6 +8,10 @@ import javax.media.opengl._
 import com.jogamp.common.nio.Buffers
 import java.nio.FloatBuffer
 
+import com.badlogic.gdx._
+import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.glutils._
+
 object Field2D {
   def apply(width:Int, height:Int ) = new Field2D { w=width; h=height; }
 }
@@ -16,9 +20,10 @@ class Field2D extends GLAnimatable {
 
   var go = false
   var data:FloatBuffer = _
+  //var data: FloatTextureData = _
   var w:Int = _
   var h:Int = _
-  if( w > 0 && h > 0 ) data = Buffers.newDirectFloatBuffer(w*h)
+  //if( w > 0 && h > 0 ) data = Buffers.newDirectFloatBuffer(w*h)
 
   def apply( i:Int ) = data.get(i)
   def apply( x:Int, y:Int ) = data.get( w*y + x)
@@ -29,7 +34,13 @@ class Field2D extends GLAnimatable {
     data.get( w*y + x );
   }
 
-  def allocate( x:Int, y:Int ) = { w=x; h=y; data = Buffers.newDirectFloatBuffer( w*h ); }
+  def allocate( x:Int, y:Int ) = {
+    w=x; h=y;
+    data = Buffers.newDirectFloatBuffer( w*h );
+    //if( pixmap != null) pixmap.dispose()
+    //pixmap = new Pixmap(w,h,Pixmap.Format.Intensity)
+  }
+  
   def set( i:Int, v:Float ) = data.put( i, v )
   def set( x:Int, y:Int, v:Float) = data.put( w*y + x, v)
   def set( v:Float ) = for( i <- ( 0 until w*h )) data.put( i, v )
@@ -89,6 +100,18 @@ class Field2D extends GLAnimatable {
     glDisable(GL_TEXTURE_2D); 
   
   }
+  override def draw(){
+    update
+
+    gl.glEnable(GL10.GL_TEXTURE_2D);
+    gli.begin(GL2.GL_QUADS);
+    gli.texCoord(0.0f, 0.0f); gli.vertex(-1.0f, -1.0f, 0.0f);
+    gli.texCoord(0.0f, 1.0f); gli.vertex(-1.0f, 1.0f,  0.0f);
+    gli.texCoord(1.0f, 1.0f); gli.vertex(1.0f, 1.0f, 0.0f);
+    gli.texCoord(1.0f, 0.0f); gli.vertex(1.0f, -1.0f, 0.0f);
+    gli.end();
+    gl.glDisable(GL10.GL_TEXTURE_2D);
+  }
   override def step( dt: Float ) = { if( go ) sstep(dt) }
   def sstep( dt: Float ) = {}
 
@@ -105,6 +128,19 @@ class Field2D extends GLAnimatable {
     glTexEnvf(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_DECAL);
     glEnable(GL_TEXTURE_2D);
 
+  }
+  def update = {
+    import GL10._
+
+    Gdx.gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    Gdx.gl.glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0, GL_LUMINANCE, GL_FLOAT, data);
+
+    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
+    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
+    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    Gdx.gl10.glTexEnvf(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_DECAL);
+    Gdx.gl.glEnable(GL_TEXTURE_2D);
   }
 
 }

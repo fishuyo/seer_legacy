@@ -26,6 +26,7 @@ trait GLThis {
   def gli = GLImmediate.renderer
   def gl = Gdx.gl
   def gl10 = Gdx.gl10
+  def gl11 = Gdx.gl11
   def gl20 = Gdx.gl20 //graphics.getGL20
 }
 

@@ -12,6 +12,10 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 
+import com.badlogic.gdx.InputMultiplexer
+
+object Inputs extends InputMultiplexer
+
 object NavInput extends NavInput(Camera)
 
 class NavInput( var cam:Camera=Camera ) extends KeyMouseListener {

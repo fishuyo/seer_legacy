@@ -8,11 +8,15 @@ import graphics._
 import javax.media.opengl._
 import scala.collection.mutable.ListBuffer
 
+import com.badlogic.gdx._
 import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.glutils.VertexBufferObject
 
 object Fabric extends GLAnimatable {
 
   var g = -10.f
+  var gv = Vec3(0.f,-10.f,0.f)
   var fabrics = List[Fabric]( new Fabric )
 
   def apply( p: Vec3, w: Float, h: Float, d: Float, m:String="xy") = new Fabric(p,w,h,d,m)
@@ -33,6 +37,8 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
   val nx = (width / dist).toInt
   val ny = (height / dist).toInt
 
+  val links = 2*nx*ny - nx - ny
+
   for( j <- ( 0 until ny ); i <- ( 0 until nx)){
 
     var x=0.f; var y=0.f; var p:VParticle = null
@@ -46,15 +52,23 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
 
     if( i != 0 ) p.linkTo( particles(particles.length-1) )
     if( j != 0 ) p.linkTo( particles( (j-1) * nx + i) )
-    if( (mode == "xz" || mode == "zx") && j > ny/2 - 5 && j < ny/2 + 5 && i < nx/2 +5 && i>nx/2-5) p.pinTo( p.pos )
+    if( (mode == "xz" || mode == "zx") && j > ny/4 && j < 3*ny/4 && i < 3*nx/4 && i>nx/4) p.pinTo( p.pos )
     else if( (mode != "xz" && mode != "zx") && j == 0 ) p.pinTo( p.pos )
     particles += p
   }
   
   var xt=0.f
 
+  var vertices = new Array[Float](3*2*links)
+  var vbo:VertexBufferObject = null //new VertexBufferObject( false, 2*links, VertexAttribute.Position )
+
   override def step( dt: Float ) = {
 
+    if( Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)){
+      Fabric.gv.x = Gdx.input.getAccelerometerY
+      Fabric.gv.y = -Gdx.input.getAccelerometerX
+      Fabric.gv.z = -Gdx.input.getAccelerometerZ
+    }
     //val ts = .015f
     //val steps = ( (dt+xt) / ts ).toInt
     //xt = dt - steps * ts
@@ -67,7 +81,17 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
 
   }
 
-  override def draw() = particles.foreach( _.draw() )
+  override def draw() {
+    if( vbo == null ) vbo = new VertexBufferObject( false, 2*links, VertexAttribute.Position )
+    var i = 0;
+    particles.foreach( (p) => i = p.draw(vertices, i) )
+    gl11.glColor4f(1.f,1.f,1.f,1.f)
+    gl.glLineWidth( 1.f )
+    vbo.setVertices( vertices, 0, vertices.length )
+    vbo.bind
+    gl11.glDrawArrays( GL10.GL_LINES, 0, vertices.length)
+    
+  }
   override def onDraw( gl: GL2) = particles.foreach( _.onDraw(gl) )
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )
 
@@ -79,8 +103,7 @@ object VParticle {
   def apply( p:Vec3, d: Float, s: Float = 1.f ) = new VParticle { pos = p; lPos = p; dist = d; stiff = s; } 
 }
 
-class VParticle extends GLAnimatable {
-
+class VParticle extends GLAnimatable{
   var pos = Vec3(0)
   var lPos = Vec3(0)
   var accel = Vec3(0)
@@ -96,12 +119,18 @@ class VParticle extends GLAnimatable {
 
   var links = List[VParticle]()
 
-  override def draw() = {
-    gl10.glColor4f(1.f,1.f,1.f,1.f)
-    gl.glLineWidth( thick )
-    gli.begin( GL10.GL_LINES )
-    links.foreach( (n) => { gli.vertex(pos.x, pos.y, pos.z); gli.vertex( n.pos.x, n.pos.y, n.pos.z ) } )
-    gli.end
+  def draw(v: Array[Float], idx:Int) : Int = {
+    //gl10.glColor4f(1.f,1.f,1.f,1.f)
+    //gl.glLineWidth( thick )
+    //gli.begin( GL10.GL_LINES )
+    var i = idx
+    links.foreach( (n) => { //gli.vertex(pos.x, pos.y, pos.z); gli.vertex( n.pos.x, n.pos.y, n.pos.z ) } )
+    //gli.end
+     v(i) = pos.x; v(i+1) = pos.y; v(i+2) = pos.z
+     v(i+3) = n.pos.x; v(i+4) = n.pos.y; v(i+5) = n.pos.z
+     i += 6
+    })
+    return i
   }
   override def onDraw( gl: GL2 ) = {
     gl.glColor3f(1.f,1.f,1.f)
@@ -114,7 +143,7 @@ class VParticle extends GLAnimatable {
   override def step( dt: Float ) = {
 
     if( !pinned ){
-      accel += Vec3( 0, Fabric.g, 0 )
+      accel += Fabric.gv
 
       //verlet integration
       val v = pos - lPos
