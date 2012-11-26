@@ -4,7 +4,7 @@ package graphics
 import maths._
 
 import scala.collection.mutable.ListBuffer
-import javax.media.opengl._
+//import javax.media.opengl._
 
 /**
 * Singleton scene object to contain list of scene drawables
@@ -24,7 +24,7 @@ class GLScene {
   //def push( s: SoundSource) = { sounds += s; objects += s }
 
   def step( dt: Float ) = animatable.foreach( _.step(dt) )
-  def onDraw( gl: GL2 ) = drawable.foreach( _.onDraw(gl) )
+  //def onDraw( gl: GL2 ) = drawable.foreach( _.onDraw(gl) )
   def draw() = drawable.foreach( _.draw() )
   //def pick( r: Ray ) = pickable.foreach( _.pick(r) )
   

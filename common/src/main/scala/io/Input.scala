@@ -4,7 +4,7 @@ package io
 
 import graphics._
 import maths._
-import ray._
+//import ray._
 
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -16,9 +16,9 @@ import com.badlogic.gdx.InputMultiplexer
 
 object Inputs extends InputMultiplexer
 
-object NavInput extends NavInput(Camera)
+//object NavInput extends NavInput(Camera)
 
-class NavInput( var cam:Camera=Camera ) extends KeyMouseListener {
+/*class NavInput( var cam:Camera=Camera ) extends KeyMouseListener {
 
   var moving = 0
   var looking = 0
@@ -157,4 +157,4 @@ trait KeyMouseListener extends KeyListener with MouseListener with MouseMotionLi
   def keyReleased( e: KeyEvent ) = {}
   def keyTyped( e: KeyEvent ) = {}
 
-}
+}*/

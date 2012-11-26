@@ -4,13 +4,14 @@ package graphics
 
 import maths._
 
-import javax.media.opengl._
-import com.jogamp.common.nio.Buffers
+//import javax.media.opengl._
+//import com.jogamp.common.nio.Buffers
 import java.nio.FloatBuffer
 
 import com.badlogic.gdx._
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.glutils._
+import com.badlogic.gdx.utils.BufferUtils
 
 object Field2D {
   def apply(width:Int, height:Int ) = new Field2D { w=width; h=height; }
@@ -36,7 +37,7 @@ class Field2D extends GLAnimatable {
 
   def allocate( x:Int, y:Int ) = {
     w=x; h=y;
-    data = Buffers.newDirectFloatBuffer( w*h );
+    data = BufferUtils.newFloatBuffer( w*h );
     //if( pixmap != null) pixmap.dispose()
     //pixmap = new Pixmap(w,h,Pixmap.Format.Intensity)
   }
@@ -85,7 +86,7 @@ class Field2D extends GLAnimatable {
     }
   }
 
-  override def onDraw( gl: GL2 ) = {
+  /*override def onDraw( gl: GL2 ) = {
     import GL._; import gl._
     
     updateTexture( GLContext.getCurrent.getGL.getGL2 );
@@ -99,23 +100,23 @@ class Field2D extends GLAnimatable {
     glEnd();
     glDisable(GL_TEXTURE_2D); 
   
-  }
+  }*/
   override def draw(){
     update
 
     gl.glEnable(GL10.GL_TEXTURE_2D);
-    gli.begin(GL2.GL_QUADS);
+    gli.begin(GL10.GL_TRIANGLE_STRIP);
     gli.texCoord(0.0f, 0.0f); gli.vertex(-1.0f, -1.0f, 0.0f);
     gli.texCoord(0.0f, 1.0f); gli.vertex(-1.0f, 1.0f,  0.0f);
-    gli.texCoord(1.0f, 1.0f); gli.vertex(1.0f, 1.0f, 0.0f);
     gli.texCoord(1.0f, 0.0f); gli.vertex(1.0f, -1.0f, 0.0f);
+    gli.texCoord(1.0f, 1.0f); gli.vertex(1.0f, 1.0f, 0.0f);
     gli.end();
     gl.glDisable(GL10.GL_TEXTURE_2D);
   }
   override def step( dt: Float ) = { if( go ) sstep(dt) }
   def sstep( dt: Float ) = {}
 
-  def updateTexture( gl: GL2 ) = {
+  /*def updateTexture( gl: GL2 ) = {
     import GL._; import gl._
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -128,18 +129,18 @@ class Field2D extends GLAnimatable {
     glTexEnvf(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_DECAL);
     glEnable(GL_TEXTURE_2D);
 
-  }
+  }*/
   def update = {
-    import GL10._
+    import GL10._; import GL11._
 
     Gdx.gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     Gdx.gl.glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0, GL_LUMINANCE, GL_FLOAT, data);
 
-    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL2.GL_CLAMP);
-    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL2.GL_CLAMP);
+    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    Gdx.gl10.glTexEnvf(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_DECAL);
+    Gdx.gl10.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     Gdx.gl.glEnable(GL_TEXTURE_2D);
   }
 
@@ -151,7 +152,7 @@ class Vec3Field2D extends GLAnimatable {
   var data:FloatBuffer = _
   var w:Int = _
   var h:Int = _
-  if( w > 0 && h > 0 ) data = Buffers.newDirectFloatBuffer(3*w*h)
+  if( w > 0 && h > 0 ) data = BufferUtils.newFloatBuffer(3*w*h)
 
   def apply( i:Int ) = Vec3(data.get(3*i),data.get(3*i+1),data.get(3*i+2))
   def apply( x:Int, y:Int ) = Vec3( data.get( 3*(w*y + x)),  data.get( 3*(w*y + x)+1),  data.get( 3*(w*y + x)+2 ))
@@ -163,7 +164,7 @@ class Vec3Field2D extends GLAnimatable {
     this( x,y );
   }
 
-  def allocate( x:Int, y:Int ) = { w=x; h=y; data = Buffers.newDirectFloatBuffer( 3*w*h ); }
+  def allocate( x:Int, y:Int ) = { w=x; h=y; data = BufferUtils.newFloatBuffer( 3*w*h ); }
   def set( i:Int, v:Vec3 ) = { data.put( 3*i, v.x );  data.put( 3*i+1, v.y ); data.put( 3*i+2, v.z ) }
   def set( x:Int, y:Int, v:Vec3) : Unit = set( w*y + x, v)
   def set( a: Array[Float] ) = {
@@ -207,7 +208,8 @@ class Vec3Field2D extends GLAnimatable {
     }
   }
 
-  override def onDraw( gl: GL2 ) = {
+  override def draw() = {}
+  /*override def onDraw( gl: GL2 ) = {
     import GL._; import gl._
     
     updateTexture( GLContext.getCurrent.getGL.getGL2 );
@@ -221,11 +223,11 @@ class Vec3Field2D extends GLAnimatable {
     glEnd();
     glDisable(GL_TEXTURE_2D); 
   
-  }
+  }*/
   override def step( dt: Float ) = { if( go ) sstep(dt) }
   def sstep( dt: Float ) = {}
 
-  def updateTexture( gl: GL2 ) = {
+  /*def updateTexture( gl: GL2 ) = {
     import GL._; import gl._
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -238,6 +240,6 @@ class Vec3Field2D extends GLAnimatable {
     glTexEnvf(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_DECAL);
     glEnable(GL_TEXTURE_2D);
 
-  }
+  }*/
 
 }

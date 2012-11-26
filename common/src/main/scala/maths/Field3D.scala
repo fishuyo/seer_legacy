@@ -5,7 +5,7 @@ package maths
 import graphics._
 import spatial._
 
-import javax.media.opengl._
+//import javax.media.opengl._
 
 class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c,halfsize) with GLAnimatable {
 
@@ -50,7 +50,8 @@ class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c
     (c - Vec3(halfsize)) + Vec3(x,y,z)*dn + Vec3(dn/2)
   }
 
-  override def onDraw(gl:GL2) = {
+  override def draw() = {}
+  /*override def onDraw(gl:GL2) = {
     gl.glColor4f(1.f,1.f,1.f,.3f)
     gl.glLineWidth(1.f)
     gl.glBegin( GL.GL_LINES )
@@ -61,7 +62,7 @@ class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c
         gl.glVertex3f(d.x,d.y,d.z)
       }
     gl.glEnd
-  }
+  }*/
 
 
 }

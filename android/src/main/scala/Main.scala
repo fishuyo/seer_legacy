@@ -24,10 +24,10 @@ class Main extends AndroidApplication {
 
 class TreeSceneInit {
 
-  var trees = TreeNode( Vec3(0), .1f ) :: List() //:: TreeNode( Vec3(3.f,0,0), .3f ) :: TreeNode( Vec3( 6.f,0,0), .3f) :: TreeNode( Vec3(9.f,0,0), .1f) :: List()
+  var trees = new TreeRoot(TreeNode( Vec3(0), .1f )) :: List() //:: TreeNode( Vec3(3.f,0,0), .3f ) :: TreeNode( Vec3( 6.f,0,0), .3f) :: TreeNode( Vec3(9.f,0,0), .1f) :: List()
   var fabrics = Fabric( Vec3(0), 1.f,1.f,.08f,"xz") ::List()//:: Fabric( Vec3(3.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(6.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(9.f,0,0),1.f,1.f,.05f,"xz") :: List()
 
-  trees(0).branch( 6, 45.f, .8f, 0)
+  trees(0).node.branch( 6, 45.f, .8f, 0)
   //trees(1).branch( 5, 10.f, .9f, 0)
   //trees(2).branch( 10, 20.f, .5f, 0)
   //trees(3).branch( 8, 20.f, .5f, 0)

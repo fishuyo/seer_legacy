@@ -5,7 +5,7 @@ import maths._
 import graphics._
 import trees._
 
-import java.awt.event._
+//import java.awt.event._
 
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer
 import com.badlogic.gdx.graphics.GL10
@@ -56,23 +56,5 @@ class Suck extends GLAnimatable {
     
 }
 
-object Input extends io.KeyMouseListener {
 
-  var g = true
-
-  override def keyPressed( e: KeyEvent ){
-    val k = e.getKeyCode
-    k match {
-      case KeyEvent.VK_G => 
-        g = !g
-        if(g) Fabric.g = -10.f else Fabric.g = 0.f
-        println( "Gravity: " + Fabric.g )
-
-      case _ => null
-    }
-
-  }
-
-
-}
 

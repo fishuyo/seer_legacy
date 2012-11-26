@@ -5,18 +5,22 @@ package trees
 import maths._
 import graphics._
 
-import javax.media.opengl._
+//import javax.media.opengl._
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.GL10
 
 object Trees extends GLAnimatable {
 
   var g = -10.f
+  var gv = Vec3(0,-10.f,0)
 
   var trees = TreeNode(Vec3(0), .1f) :: List()
   trees(0).branch( 6, 45.f, .8f, 0 )
   override def step( dt: Float ) = trees.foreach( _.step(dt) )
-  override def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
+  //override def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
   override def draw() = trees.foreach( _.draw() )
 
 }
@@ -24,13 +28,42 @@ object Trees extends GLAnimatable {
 object TreeNode {
   def apply( p:Vec3, d: Float ) = new TreeNode { pos = p; lPos = p; dist = d; pinned = true; } 
   def apply( p:TreeNode, ang: Float, d: Float, stif: Float =.5f ) = {
-    val v = Vec3( math.cos( ang * math.Pi/180.f ), math.sin( ang * math.Pi/180.f ), util.Random.nextFloat * 2.f - 1.f ) * d + p.pos
+    val z_offset = util.Random.nextFloat * 2.f - 1.f
+    val v = Vec3( math.cos( ang * math.Pi/180.f ), math.sin( ang * math.Pi/180.f ), 0.f ) * d + p.pos
     new TreeNode { parent = Some(p); pos = v; lPos = v; dist = d; stiff = stif; angles.z = ang; }
   }
 }
 
-class TreeRoot extends GLAnimatable {
-  //var root: TreeNode = 
+class TreeRoot( val node:TreeNode ) extends GLAnimatable {
+  var size = 0
+  var vertices:Array[Float] = null
+  var mesh:Mesh = null
+
+  override def draw() = {
+    if( size != node.size){
+      size = node.size
+      vertices = new Array[Float](3*2*size)
+      mesh = new Mesh(false,2*size,0,VertexAttribute.Position)
+    }
+    var idx = 0;
+    node.draw(vertices, idx)
+    gl11.glColor4f(1.f,1.f,1.f,1.f)
+    gl.glLineWidth( 2.f )
+
+    mesh.setVertices(vertices)
+    mesh.render( GL10.GL_LINES)
+
+  }
+  override def step(dt:Float) = {
+    if( Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)){
+      Trees.gv.x = Gdx.input.getAccelerometerY
+      Trees.gv.y = -Gdx.input.getAccelerometerX
+      //Trees.gv.z = -Gdx.input.getAccelerometerZ
+    }
+
+    for( s <- (0 until 1) ) node.solveConstraints()
+    node.step(dt)
+  }
 }
 
 class TreeNode extends GLAnimatable {
@@ -47,20 +80,29 @@ class TreeNode extends GLAnimatable {
   var tearThresh = 1.f
   var thick = 1.f
   var pinned = false
+  var size = 0;
 
   var parent:Option[TreeNode] = None
   var children = List[TreeNode]()
 
-  override def draw() = {
-    gl10.glColor4f(1.f,1.f,1.f,1.f)
-    gl.glLineWidth( thick )
-    gli.begin( GL10.GL_LINES )
-    children.foreach( (n) => { gli.vertex(pos.x, pos.y, pos.z); gli.vertex( n.pos.x, n.pos.y, n.pos.z ) } )
-    gli.end
-
-    children.foreach( (n) => n.draw() )
+  def draw( v:Array[Float], idx:Int ):Int = {
+    //gl10.glColor4f(1.f,1.f,1.f,1.f)
+    //gl.glLineWidth( thick )
+    //gli.begin( GL10.GL_LINES )
+    //children.foreach( (n) => { gli.vertex(pos.x, pos.y, pos.z); gli.vertex( n.pos.x, n.pos.y, n.pos.z ) } )
+    //gli.end
+    var i = idx
+    children.foreach( (n) => {
+    //gli.end
+     v(i) = pos.x; v(i+1) = pos.y; v(i+2) = pos.z
+     v(i+3) = n.pos.x; v(i+4) = n.pos.y; v(i+5) = n.pos.z
+     i += 6
+     i = n.draw(v,i)
+    })
+    i
+    //children.foreach( (n) => n.draw(v,i) )
   }
-  override def onDraw( gl: GL2 ) = {
+  /*override def onDraw( gl: GL2 ) = {
     gl.glColor3f(1.f,1.f,1.f)
     gl.glLineWidth( thick )
     gl.glBegin( GL.GL_LINES )
@@ -68,12 +110,12 @@ class TreeNode extends GLAnimatable {
     gl.glEnd
 
     children.foreach( (n) => n.onDraw(gl) )
-  }
+  }*/
 
   override def step( dt: Float ) = {
 
     if( !pinned ){
-      accel += Vec3( 0, Trees.g, 0 )
+      accel += Trees.gv //Vec3( 0, Trees.g, 0 )
 
       //verlet integration
       val v = pos - lPos
@@ -102,8 +144,8 @@ class TreeNode extends GLAnimatable {
 
       //tear here
 
-      pos += d * w * diff
-      n.pos -= d * n.w * diff
+      pos = pos + d * w * diff
+      n.pos = n.pos - d * n.w * diff
 
       //todo angle constraints
     })
@@ -117,12 +159,14 @@ class TreeNode extends GLAnimatable {
     pinned = true
   }
 
-  def branch( depth: Int, angle: Float=10.f, ratio: Float=.9f, t:Int=0 ) : Unit = {
+  def branch( depth: Int, angle: Float=10.f, ratio: Float=.9f, t:Int=0 ) : Int = {
 
     thick = depth.toFloat
-    if( depth == 0 ) return
-    children = TreeNode( this, angles.z - angle, dist * ratio ) :: TreeNode( this, angles.z + angle, dist * ratio ) :: children
-    children.foreach( _.branch( depth - 1) );
+    if( depth == 0 ) return 0
+    children = TreeNode( this, angles.z - angle, dist * ratio*ratio ) :: TreeNode(this, angles.z, dist*ratio) ::TreeNode( this, angles.z + angle, dist * ratio*ratio ) :: List[TreeNode]() //children
+    size = 3;
+    children.foreach( (n) => size += n.branch( depth - 1, angle, ratio) );
+    size
   }
 
   def writePoints( file: String ) = {}

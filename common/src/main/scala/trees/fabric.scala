@@ -5,7 +5,7 @@ package trees
 import maths._
 import graphics._
 
-import javax.media.opengl._
+//import javax.media.opengl._
 import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx._
@@ -22,7 +22,7 @@ object Fabric extends GLAnimatable {
   def apply( p: Vec3, w: Float, h: Float, d: Float, m:String="xy") = new Fabric(p,w,h,d,m)
 
   override def step( dt: Float ) = fabrics.foreach( _.step(dt) )
-  override def onDraw( gl: GL2 ) = fabrics.foreach( _.onDraw(gl) )
+  //override def onDraw( gl: GL2 ) = fabrics.foreach( _.onDraw(gl) )
   override def draw( ) = fabrics.foreach( _.draw() )
 
 
@@ -60,14 +60,15 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
   var xt=0.f
 
   var vertices = new Array[Float](3*2*links)
-  var vbo:VertexBufferObject = null //new VertexBufferObject( false, 2*links, VertexAttribute.Position )
+  //var vbo:VertexBufferObject = null //new VertexBufferObject( false, 2*links, VertexAttribute.Position )
+  var mesh:Mesh = null
 
   override def step( dt: Float ) = {
 
     if( Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)){
-      Fabric.gv.x = Gdx.input.getAccelerometerY
-      Fabric.gv.y = -Gdx.input.getAccelerometerX
-      Fabric.gv.z = -Gdx.input.getAccelerometerZ
+      Fabric.gv.x = -Gdx.input.getAccelerometerX
+      Fabric.gv.y = -Gdx.input.getAccelerometerY
+      //Fabric.gv.z = -Gdx.input.getAccelerometerZ
     }
     //val ts = .015f
     //val steps = ( (dt+xt) / ts ).toInt
@@ -82,17 +83,20 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
   }
 
   override def draw() {
-    if( vbo == null ) vbo = new VertexBufferObject( false, 2*links, VertexAttribute.Position )
+    //if( vbo == null ) vbo = new VertexBufferObject( false, 2*links, VertexAttribute.Position )
+    if( mesh == null) mesh = new Mesh(false,2*links,0,VertexAttribute.Position)
     var i = 0;
     particles.foreach( (p) => i = p.draw(vertices, i) )
     gl11.glColor4f(1.f,1.f,1.f,1.f)
     gl.glLineWidth( 1.f )
-    vbo.setVertices( vertices, 0, vertices.length )
-    vbo.bind
-    gl11.glDrawArrays( GL10.GL_LINES, 0, vertices.length)
+    //vbo.setVertices( vertices, 0, vertices.length )
+    //vbo.bind
+    //gl11.glDrawArrays( GL10.GL_LINES, 0, vertices.length)
+    mesh.setVertices(vertices)
+    mesh.render( GL10.GL_LINES)
     
   }
-  override def onDraw( gl: GL2) = particles.foreach( _.onDraw(gl) )
+  //override def onDraw( gl: GL2) = particles.foreach( _.onDraw(gl) )
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )
 
   def addField( f: VecField3D ) = field = f
@@ -132,13 +136,13 @@ class VParticle extends GLAnimatable{
     })
     return i
   }
-  override def onDraw( gl: GL2 ) = {
+  /*override def onDraw( gl: GL2 ) = {
     gl.glColor3f(1.f,1.f,1.f)
     gl.glLineWidth( thick )
     gl.glBegin( GL.GL_LINES )
     links.foreach( (n) => { gl.glVertex3f(pos.x, pos.y, pos.z); gl.glVertex3f( n.pos.x, n.pos.y, n.pos.z ) } )
     gl.glEnd
-  }
+  }*/
 
   override def step( dt: Float ) = {
 

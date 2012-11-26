@@ -6,7 +6,7 @@ import AndroidKeys._
 object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq (
     version := "0.1",
-    scalaVersion := "2.9.1",
+    scalaVersion := "2.9.2",
     resolvers ++= Seq(
       "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/",
       "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
@@ -15,15 +15,16 @@ object Settings {
     ),
     libraryDependencies ++= Seq(
       //"org.scala-lang" % "scala-compiler" % "2.9.1",
-      "com.nativelibs4java" % "scalacl" % "0.2",
-      "com.nativelibs4java" % "javacl" % "1.0.0-RC2",
-      "xuggle" % "xuggle-xuggler" % "5.4"
+      "com.nativelibs4java" % "scalacl" % "0.2"
+      //"com.nativelibs4java" % "javacl" % "1.0.0-RC2",
+      //"xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
       //"net.sf.bluecove" % "bluecove" % "2.1.0",
       //"net.sf.bluecove" % "bluecove-gpl" % "2.1.0"
     ),
     autoCompilerPlugins := true,
     addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"),
+    scalacOptions += "-Xexperimental",
     updateLibgdxTask
     //fork in Compile := true
    )
@@ -37,7 +38,7 @@ object Settings {
     AndroidMarketPublish.settings ++ Seq (
       platformName in Android := "android-10",
       keyalias in Android := "change-me",
-      mainAssetsPath in Android := file("common/src/main/resources")
+      mainAssetsPath in Android := file("android/src/main/assets") //file("common/src/main/resources")
       //proguardOption in Android := proguard_options,
       //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
       //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }

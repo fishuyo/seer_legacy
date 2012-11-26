@@ -14,6 +14,7 @@ object Vec3 {
 
 class Vec3( var x: Float, var y: Float, var z: Float ){
   def set(v:Vec3) = { x=v.x; y=v.y; z=v.z }
+  def set(a:Float,b:Float,c:Float) = { x=a; y=b; z=c; }
   def +(v: Vec3) = Vec3( x+v.x, y+v.y, z+v.z )
   def +=(v: Vec3) = { x+=v.x; y+=v.y; z+=v.z }
   def -(v: Vec3) = Vec3( x-v.x, y-v.y, z-v.z )

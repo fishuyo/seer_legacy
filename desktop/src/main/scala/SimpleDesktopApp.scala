@@ -10,6 +10,8 @@ import com.badlogic.gdx.InputMultiplexer
 
 object SimpleAppRun {
   var nativesLoaded = false
+  loadLibs()
+  val app = new SimpleAppListener()
 
   def loadLibs() = {
     println("loading native libraries..")
@@ -19,8 +21,8 @@ object SimpleAppRun {
   }
   def apply() = {
     if( !nativesLoaded ) loadLibs()
-    val app = new SimpleDesktopApp( new SimpleAppListener )
-    app.run
+    val _app = new SimpleDesktopApp( app )
+    _app.run
   }
 }
 

@@ -3,7 +3,7 @@ package com.fishuyo
 package graphics
 import maths._
 
-import javax.media.opengl._
+//import javax.media.opengl._
 import com.badlogic.gdx.graphics.PerspectiveCamera
 
 /**
@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera
 
 object Cam extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)
 
-object Camera extends Camera(Vec3(0,0,2),0.f)
+/*object Camera extends Camera(Vec3(0,0,2),0.f)
 
 class Camera( var position:Vec3=Vec3(0,0,2), az:Float=0.f ) {
 
@@ -86,5 +86,5 @@ class Camera( var position:Vec3=Vec3(0,0,2), az:Float=0.f ) {
     if( azimuth > 180.f ) azimuth = -180.f
     if( azimuth < -180.f ) azimuth = 180.f
   }
-}
+}*/
  

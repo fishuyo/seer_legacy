@@ -5,17 +5,18 @@ import maths._
 
 import javax.swing._
 
-import javax.media.opengl._
-import javax.media.opengl.awt._
-import javax.media.opengl.glu._
-import com.jogamp.opengl.util._
-import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
+// import javax.media.opengl._
+// import javax.media.opengl.awt._
+// import javax.media.opengl.glu._
+// import com.jogamp.opengl.util._
+// import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer10
 
 package object salami {
   trait GL10 extends com.badlogic.gdx.graphics.GL10
+  trait GL20 extends com.badlogic.gdx.graphics.GL20
 }
 
 object GLImmediate {
@@ -31,7 +32,6 @@ trait GLThis {
 }
 
 trait GLDrawable extends GLThis {
-  def onDraw( gl: GL2 ){}
   def draw(){}
 }
 trait GLAnimatable extends GLDrawable {
@@ -39,7 +39,7 @@ trait GLAnimatable extends GLDrawable {
 }
 class GLLight {}
 
-object GLDraw {
+/*object GLDraw {
 
   def sphere( r:Float =1.0f ) = {
 
@@ -108,5 +108,5 @@ object GLDraw {
   def rect = {
 
   }
-}
+}*/
 

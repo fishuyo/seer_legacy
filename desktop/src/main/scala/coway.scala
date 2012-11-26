@@ -4,11 +4,11 @@ package examples.conwayD
 
 import graphics._
 import maths._
-import ray._
+//import ray._
 
 import java.awt.event._
 import java.nio._
-import com.jogamp.common.nio.Buffers
+//import com.jogamp.common.nio.Buffers
 
 import com.fishuyo.io._
 

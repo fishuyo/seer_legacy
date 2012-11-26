@@ -3,25 +3,22 @@ package com.fishuyo
 package live
 
 import dynamic._
-
-
-package com.fishuyo
-package examples.conwayD
-
 import graphics._
 import maths._
-import ray._
+//import ray._
+import io._
 
 import java.awt.event._
 import java.nio._
-import com.jogamp.common.nio.Buffers
-
-import com.fishuyo.io._
+//import com.jogamp.common.nio.Buffers
 
 import com.badlogic.gdx._
 import com.badlogic.gdx.math._
 //import com.badlogic.gdx.collision._
 
+object Print{
+  def apply( s:String ) = println(s)
+}
 object MyInput extends InputAdapter {
 
   override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
@@ -30,11 +27,7 @@ object MyInput extends InputAdapter {
     val y = screenY
     println( x + " " + y )
     
-    // val o = Cam.position
-    // val v = Cam.projectPoint( x, y )
-    // println( v )
-    
-    val r = Cam.getPickRay(screenX,screenY) //new Ray( o, v-o )
+    val r = Cam.getPickRay(screenX,screenY)
     val xx = ((r.getEndPoint(1.f).x + 1.f) * Main.n/2).toInt  
     val yy = ((r.getEndPoint(1.f).y + 1.f) * Main.n/2).toInt 
     println( xx + " " + yy )
@@ -47,17 +40,22 @@ object MyInput extends InputAdapter {
   }
 
   override def keyTyped( c: Char) = {
-    if( c == '\n' ) Main.field.sstep(0)
+    c match {
+      case '\n' => Main.field.sstep(0)
+      case 'r' => Main.live.reload
+      case _ => false
+    }
     true
   }
 }
 
 object Main extends App {
 
-  val live = new Ruby("live.rb")
+  val live = new Ruby("src/main/scala/live/live.rb")
+
 	live.init()
 
-  val n = live.size() //100;
+  val n:Int = live.size().asInstanceOf[Long].toInt //100;
   val field = new LiveField
   field.allocate(n,n)
   live.data(field)
