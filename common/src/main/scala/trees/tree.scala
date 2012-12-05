@@ -6,6 +6,7 @@ import maths._
 import graphics._
 
 //import javax.media.opengl._
+import java.nio.FloatBuffer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -39,19 +40,21 @@ class TreeRoot( val node:TreeNode ) extends GLAnimatable {
   var vertices:Array[Float] = null
   var mesh:Mesh = null
 
-  override def draw() = {
+  override def draw(){
     if( size != node.size){
       size = node.size
       vertices = new Array[Float](3*2*size)
       mesh = new Mesh(false,2*size,0,VertexAttribute.Position)
     }
+    if( size == 0) return
     var idx = 0;
     node.draw(vertices, idx)
-    gl11.glColor4f(1.f,1.f,1.f,1.f)
+    //node.draw(mesh.getVerticesBuffer, idx)
+    //gl11.glColor4f(1.f,1.f,1.f,1.f)
     gl.glLineWidth( 2.f )
 
     mesh.setVertices(vertices)
-    mesh.render( GL10.GL_LINES)
+    mesh.render( Shader(), GL10.GL_LINES)
 
   }
   override def step(dt:Float) = {
@@ -61,8 +64,8 @@ class TreeRoot( val node:TreeNode ) extends GLAnimatable {
       //Trees.gv.z = -Gdx.input.getAccelerometerZ
     }
 
-    for( s <- (0 until 1) ) node.solveConstraints()
-    node.step(dt)
+    //for( s <- (0 until 1) ) node.solveConstraints()
+    //node.step(dt)
   }
 }
 
@@ -96,6 +99,8 @@ class TreeNode extends GLAnimatable {
     //gli.end
      v(i) = pos.x; v(i+1) = pos.y; v(i+2) = pos.z
      v(i+3) = n.pos.x; v(i+4) = n.pos.y; v(i+5) = n.pos.z
+     //v.put(i,pos.x); v.put(i+1,pos.y); v.put(i+2,pos.z)
+     //v.put(i+3,n.pos.x); v.put(i+4,n.pos.y); v.put(i+5,n.pos.z)
      i += 6
      i = n.draw(v,i)
     })

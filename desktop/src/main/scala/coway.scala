@@ -28,7 +28,7 @@ object MyInput extends InputAdapter {
     // val v = Cam.projectPoint( x, y )
     // println( v )
     
-    val r = Cam.getPickRay(screenX,screenY) //new Ray( o, v-o )
+    val r = Camera.getPickRay(screenX,screenY) //new Ray( o, v-o )
     val xx = ((r.getEndPoint(1.f).x + 1.f) * Main.n/2).toInt  
     val yy = ((r.getEndPoint(1.f).y + 1.f) * Main.n/2).toInt 
     println( xx + " " + yy )

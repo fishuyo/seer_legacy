@@ -13,14 +13,15 @@ object SimpleAppRun {
   loadLibs()
   val app = new SimpleAppListener()
 
-  def loadLibs() = {
+  def loadLibs(){
+    if (nativesLoaded) return
     println("loading native libraries..")
     try GdxNativesLoader.load()
     catch { case e:Exception => println(e) } 
     nativesLoaded = true
   }
   def apply() = {
-    if( !nativesLoaded ) loadLibs()
+    loadLibs()
     val _app = new SimpleDesktopApp( app )
     _app.run
   }
@@ -30,7 +31,7 @@ class SimpleDesktopApp( val app: ApplicationListener ){
   def run = {
     val cfg = new LwjglApplicationConfiguration()
     cfg.title = "seer"
-    cfg.useGL20 = false
+    cfg.useGL20 = true
     cfg.width = SimpleAppSize.width
     cfg.height = SimpleAppSize.height
     new LwjglApplication( app, cfg )

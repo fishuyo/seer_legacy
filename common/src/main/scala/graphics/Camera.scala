@@ -2,6 +2,7 @@
 package com.fishuyo
 package graphics
 import maths._
+import spatial._
 
 //import javax.media.opengl._
 import com.badlogic.gdx.graphics.PerspectiveCamera
@@ -10,7 +11,20 @@ import com.badlogic.gdx.graphics.PerspectiveCamera
 * Camera
 */
 
-object Cam extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)
+object Camera extends Camera
+class Camera extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f) {
+
+  var nav = new Nav()
+  near = .05f
+
+  def step( dt:Float ) = {
+    nav.step(dt)
+    position.set(nav.pos.x, nav.pos.y, nav.pos.z)
+    direction.set(nav.mUF.x, nav.mUF.y, nav.mUF.z)
+    up.set(nav.mUU.x, nav.mUU.y, nav.mUU.z)
+  }
+
+}
 
 /*object Camera extends Camera(Vec3(0,0,2),0.f)
 

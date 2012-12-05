@@ -6,6 +6,7 @@ import maths._
 import graphics._
 
 //import javax.media.opengl._
+import java.nio.FloatBuffer
 import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx._
@@ -87,6 +88,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
     if( mesh == null) mesh = new Mesh(false,2*links,0,VertexAttribute.Position)
     var i = 0;
     particles.foreach( (p) => i = p.draw(vertices, i) )
+    //particles.foreach( (p) => i = p.draw(mesh.getVerticesBuffer, i) )
     gl11.glColor4f(1.f,1.f,1.f,1.f)
     gl.glLineWidth( 1.f )
     //vbo.setVertices( vertices, 0, vertices.length )
@@ -132,6 +134,8 @@ class VParticle extends GLAnimatable{
     //gli.end
      v(i) = pos.x; v(i+1) = pos.y; v(i+2) = pos.z
      v(i+3) = n.pos.x; v(i+4) = n.pos.y; v(i+5) = n.pos.z
+     //v.put(i,pos.x); v.put(i+1,pos.y); v.put(i+2,pos.z)
+     //v.put(i+3,n.pos.x); v.put(i+4,n.pos.y); v.put(i+5,n.pos.z)
      i += 6
     })
     return i

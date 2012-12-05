@@ -13,6 +13,7 @@ object Quat {
   val acc_max = 1.000001
   val acc_min = 0.999999
   def apply( w:Float, x:Float, y:Float, z:Float ) = new Quat(w,x,y,z)
+  def apply() = new Quat(1,0,0,0)
 }
 
 class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
@@ -38,7 +39,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
   def mag() = math.sqrt( magSq() )
   def normalize() = {
     val m = magSq()
-    if( m*m < Quat.eps ) identity()
+    if( m*m < Quat.eps ) Quat().setIdentity()
     else if( m > Quat.acc_max || m < Quat.acc_min ) this * (1.0f / math.sqrt( m ))
     else this
   }
@@ -49,7 +50,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
   def recip = conj / magSq   
 
   def zero() = {w=0;x=0;y=0;z=0;this}
-  def identity() = {w=1;x=0;y=0;z=0;this}
+  def setIdentity() = {w=1;x=0;y=0;z=0;this}
 
   def fromAxisX( ang: Float ) = {w=math.cos(ang*.5f);x=math.sin(ang*.5f);y=0;z=0}
   def fromAxisY( ang: Float ) = {w=math.cos(ang*.5f);x=0;y=math.sin(ang*.5f);z=0}
@@ -61,11 +62,26 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     y = axis.y * sin2a
     z = axis.z * sin2a
   }
-  def fromEuler( eu:(Float,Float,Float) ) = { //eu = Vec3( az, el, ba )
+  // from euler angles ( elevation, azimuth, bank )
+  def fromEuler( eu:Vec3 ) : Quat = fromEuler((eu.x,eu.y,eu.z))
+  def fromEuler( eu:(Float,Float,Float) ) : Quat= { //eu = Vec3( el, az, ba )
     val c1 = math.cos(eu._1*.5f); val c2 = math.cos(eu._2*.5f); val c3 = math.cos(eu._3*.5f)   
     val s1 = math.sin(eu._1*.5f); val s2 = math.sin(eu._2*.5f); val s3 = math.sin(eu._3*.5f) 
-    val tw = c1*c2; val tx = c1*s2; val ty = s1*c2; val tz = -s1*s2
+    val tw = c2*c1; val tx = c2*s1; val ty = s2*c1; val tz = -s2*s1
     w = tw*c3 - tz*s3; x = tx*c3 + ty*s3; y = ty*c3 - tx*s3; z = tw*s3 + tz*c3
+    this
+  }
+
+  //local unit vectors
+  def toX() = Vec3(1.0 - 2.0*y*y - 2.0*z*z, 2.0*x*y + 2.0*z*w, 2.0*x*z - 2.0*y*w)
+  def toY() = Vec3(2.0*x*y - 2.0*z*w, 1.0 - 2.0*x*x + 2.0*z*z, 2.0*y*z + 2.0*x*w)
+  def toZ() = Vec3(2.0*x*z + 2.0*y*w, 2.0*y*z - 2.0*x*w, 1.0 - 2.0*x*x - 2.0*y*y)
+
+  def toEuler() : (Float,Float,Float) = {
+    val az = math.asin( -2.0 * (x*z - w*y))
+    val el = math.atan2( 2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
+    val bank = math.atan2( 2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
+    (el,az,bank)
   }
 
   def slerp(q:Quat, d:Float): Quat = {
