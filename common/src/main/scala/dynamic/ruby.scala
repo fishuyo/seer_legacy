@@ -4,15 +4,25 @@ import javax.script._
 import java.io._
  
  class Ruby(script:String) extends scala.Dynamic {
- 	val file = new File(script)
-  var engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
-  engine.eval(new FileReader(file));
+  val file = new File(script)
+  var engine:ScriptEngine with Invocable = null
+  reload()
+  /*try{
+   	file = new File(script)
+    engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
+    engine.eval(new FileReader(file));
+  } catch { case e:Exception => println(e) }*/
       
   def language() = "Ruby"
 
   def reload() = {
-  	engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
-  	engine.eval(new FileReader(file));
+    try{
+  	 engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
+  	 engine.eval(new FileReader(file));
+    } catch { 
+      case e:Exception => println(e)
+    }
+
   }
          
   def applyDynamic(name: String)(args: Any*) =

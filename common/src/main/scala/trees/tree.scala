@@ -4,6 +4,8 @@ package trees
 
 import maths._
 import graphics._
+import spatial._
+import util._
 
 //import javax.media.opengl._
 import java.nio.FloatBuffer
@@ -18,40 +20,98 @@ object Trees extends GLAnimatable {
   var g = -10.f
   var gv = Vec3(0,-10.f,0)
 
-  var trees = TreeNode(Vec3(0), .1f) :: List()
-  trees(0).branch( 6, 45.f, .8f, 0 )
-  override def step( dt: Float ) = trees.foreach( _.step(dt) )
+  //var trees = TreeNode(Vec3(0), .1f) :: List()
+  //trees(0).branch( 6, 45.f, .8f, 0 )
+  //override def step( dt: Float ) = trees.foreach( _.step(dt) )
   //override def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
-  override def draw() = trees.foreach( _.draw() )
+  //override def draw() = trees.foreach( _.draw() )
 
 }
 
-object TreeNode {
-  def apply( p:Vec3, d: Float ) = new TreeNode { pos = p; lPos = p; dist = d; pinned = true; } 
-  def apply( p:TreeNode, ang: Float, d: Float, stif: Float =.5f ) = {
-    val z_offset = util.Random.nextFloat * 2.f - 1.f
-    val v = Vec3( math.cos( ang * math.Pi/180.f ), math.sin( ang * math.Pi/180.f ), 0.f ) * d + p.pos
-    new TreeNode { parent = Some(p); pos = v; lPos = v; dist = d; stiff = stif; angles.z = ang; }
-  }
-}
+object Tree {
+  def apply(pos:Vec3=Vec3(0)) = new Tree(){ root.pose.pos = pos; }
 
-class TreeRoot( val node:TreeNode ) extends GLAnimatable {
+}
+class Tree() extends GLAnimatable {
+  var root = TreeNode()
+
+  val sLength = Randf(1.f,1.f,true)
+  val sRatio = Randf(.8f,.8f,true)
+  val bLength = Randf(1.f,1.f,true)
+  val bRatio = Randf(.6f,.6f,true)
+  val sThick = Randf(1.f,1.f,true)
+  val taper = Randf(.9f,.9f,true)
+  val sAngle = RandVec3( Vec3(0,0,0), Vec3(0,0,0), true)
+  val bAngle = RandVec3( Vec3(0,10.f.toRadians,0), Vec3(0,10.f.toRadians,0), true)
+
+  def set(r:Randf, s:Float=1.f) = (v:Float) => {r.set(v*s); dirty=true}
+  def setMin( r:Randf, s:Float=1.f) = (v:Float) => {r.min = v*s; dirty=true}
+  def setMax( r:Randf, s:Float=1.f) = (v:Float) => {r.max = v*s; dirty=true}
+  def setMinMax( r:Randf, s:Float=1.f) = (v1:Float,v2:Float) => {r.min = v1*s; r.max = v2*s; dirty=true}
+  var dirty = true
+
+  var seed:Long = scala.util.Random.nextLong
+  var mseed:Long = 0
+  var reseed = true
+  def setReseed(b:Boolean) = reseed = b
+  def setSeed() = (f:Float) => {mseed = (100*f).toLong; dirty = true}
+
+  var bDepth:Int = 8
+  def setDepth(i:Int) = bDepth = i
+
+  val branchNum = Chooser(Array(0,1,2),Array(0.f,0,1.f))
+
   var size = 0
   var vertices:Array[Float] = null
   var mesh:Mesh = null
 
+  var animating = false
+  def setAnimate(b:Boolean) = animating = b
+
+  def branch(depth:Int=bDepth):Int = { if(reseed) Randf.gen.setSeed(seed+mseed); root.dist=sLength(); branch(root,depth) }
+
+  def branch( n: TreeNode, depth:Int):Int = {
+    var branches = List[TreeNode]()
+
+    if( depth == 0 ) return 0
+
+    //current branch continuation
+    var dist = n.dist * sRatio()
+    var quat = (n.pose.quat * Quat().fromEuler(sAngle())).normalize
+    var pos = n.pose.pos - quat.toZ()*dist
+    var stem = TreeNode( Pose(pos,quat), dist, n.thick * sThick() )
+
+    //branch n times
+    var sign = -1
+    val count = branchNum()
+    for( i <- (0 until count) ){
+      sign *= -1
+      dist = n.dist * bRatio()
+      quat = (quat * Quat().fromEuler(bAngle()*sign)).normalize
+      pos = n.pose.pos - quat.toZ()*dist
+
+      branches = TreeNode( Pose(pos,quat), dist, n.thick * sThick() ) :: branches
+    }
+
+    n.children = stem :: branches
+    n.size = count + 1
+
+    n.children.foreach( (t) => n.size += branch( t, depth - 1) )
+    n.mass = n.size.toFloat
+    n.size
+  }
+
   override def draw(){
-    if( size != node.size){
-      size = node.size
+    if( size != root.size){
+      size = root.size
       vertices = new Array[Float](3*2*size)
       mesh = new Mesh(false,2*size,0,VertexAttribute.Position)
     }
     if( size == 0) return
     var idx = 0;
-    node.draw(vertices, idx)
-    //node.draw(mesh.getVerticesBuffer, idx)
-    //gl11.glColor4f(1.f,1.f,1.f,1.f)
-    gl.glLineWidth( 2.f )
+    root.draw(vertices, idx)
+
+    gl.glLineWidth( 1.f )
 
     mesh.setVertices(vertices)
     mesh.render( Shader(), GL10.GL_LINES)
@@ -64,58 +124,55 @@ class TreeRoot( val node:TreeNode ) extends GLAnimatable {
       //Trees.gv.z = -Gdx.input.getAccelerometerZ
     }
 
-    //for( s <- (0 until 1) ) node.solveConstraints()
-    //node.step(dt)
+    if( dirty ){ branch(); dirty = false }    
+
+    if(animating){
+      for( s <- (0 until 3) ) root.solveConstraints()
+      root.step(dt)
+    }
   }
+}
+
+object TreeNode {
+  def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(math.Pi/2,0,0))), d:Float=1.f, t:Float=1.f ) = new TreeNode { pose = p; lPos = p.pos; dist = d; thick = t } 
+  /*def apply( p:TreeNode, ang: Float, d: Float ) = {
+    
+    val v = Vec3( math.cos( ang * math.Pi/180.f ), math.sin( ang * math.Pi/180.f ), 0.f ) * d + p.pos
+    new TreeNode {  pos = v; lPos = v; dist = d; angles.z = ang; }
+  }*/
 }
 
 class TreeNode extends GLAnimatable {
 
+  var pose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
   var pos = Vec3(0)
   var lPos = Vec3(0)
   var accel = Vec3(0)
   var angles = Vec3(0,0,90.f)
   var mass = 1.f
-  var damp = 10.f
+  var damp = 1000.f
+
   var dist = 1.f
-  var stiff = 1.f
-  var w = 1.f
-  var tearThresh = 1.f
+  
   var thick = 1.f
   var pinned = false
   var size = 0;
 
-  var parent:Option[TreeNode] = None
+  //var parent:Option[TreeNode] = None
   var children = List[TreeNode]()
 
   def draw( v:Array[Float], idx:Int ):Int = {
-    //gl10.glColor4f(1.f,1.f,1.f,1.f)
-    //gl.glLineWidth( thick )
-    //gli.begin( GL10.GL_LINES )
-    //children.foreach( (n) => { gli.vertex(pos.x, pos.y, pos.z); gli.vertex( n.pos.x, n.pos.y, n.pos.z ) } )
-    //gli.end
+
     var i = idx
     children.foreach( (n) => {
-    //gli.end
-     v(i) = pos.x; v(i+1) = pos.y; v(i+2) = pos.z
-     v(i+3) = n.pos.x; v(i+4) = n.pos.y; v(i+5) = n.pos.z
-     //v.put(i,pos.x); v.put(i+1,pos.y); v.put(i+2,pos.z)
-     //v.put(i+3,n.pos.x); v.put(i+4,n.pos.y); v.put(i+5,n.pos.z)
+     v(i) = pose.pos.x; v(i+1) = pose.pos.y; v(i+2) = pose.pos.z
+     v(i+3) = n.pose.pos.x; v(i+4) = n.pose.pos.y; v(i+5) = n.pose.pos.z
      i += 6
      i = n.draw(v,i)
     })
     i
-    //children.foreach( (n) => n.draw(v,i) )
+    
   }
-  /*override def onDraw( gl: GL2 ) = {
-    gl.glColor3f(1.f,1.f,1.f)
-    gl.glLineWidth( thick )
-    gl.glBegin( GL.GL_LINES )
-    children.foreach( (n) => { gl.glVertex3f(pos.x, pos.y, pos.z); gl.glVertex3f( n.pos.x, n.pos.y, n.pos.z ) } )
-    gl.glEnd
-
-    children.foreach( (n) => n.onDraw(gl) )
-  }*/
 
   override def step( dt: Float ) = {
 
@@ -123,13 +180,14 @@ class TreeNode extends GLAnimatable {
       accel += Trees.gv //Vec3( 0, Trees.g, 0 )
 
       //verlet integration
-      val v = pos - lPos
+      val v = pose.pos - lPos
       accel -= v * ( damp / mass )
-      lPos = pos
-      pos = pos + v + accel * ( .5f * dt * dt )
+      lPos = pose.pos
+      pose.pos = pose.pos + v + accel * ( .5f * dt * dt )
 
       accel.zero
     }
+    children.foreach( _.step(dt) )
   }
 
   def applyForce( f: Vec3 ) : Vec3 = {
@@ -142,29 +200,29 @@ class TreeNode extends GLAnimatable {
     children.foreach( (n) => {
 
       n.solveConstraints()
-      val d = pos - n.pos
+      val d = pose.pos - n.pose.pos
       val mag = d.mag
       if( mag == 0.f ) return
-      val diff = (dist - mag) / mag
+      val diff = (n.dist - mag) / mag
 
       //tear here
 
-      pos = pos + d * w * diff
-      n.pos = n.pos - d * n.w * diff
+      pose.pos = pose.pos + d * diff
+      n.pose.pos = n.pose.pos - d * diff
 
       //todo angle constraints
     })
 
-    if( pinned ) pos = lPos;
+    if( pinned ) pose.pos = lPos;
   }
 
-  def pinTo( p: Vec3 ) = {
-    pos = p
+  def pin( p:Vec3 = pose.pos ) = {
+    pose.pos = p
     lPos = p
     pinned = true
   }
 
-  def branch( depth: Int, angle: Float=10.f, ratio: Float=.9f, t:Int=0 ) : Int = {
+  /*def branch( depth: Int, angle: Float=10.f, ratio: Float=.9f, t:Int=0 ) : Int = {
 
     thick = depth.toFloat
     if( depth == 0 ) return 0
@@ -172,7 +230,7 @@ class TreeNode extends GLAnimatable {
     size = 3;
     children.foreach( (n) => size += n.branch( depth - 1, angle, ratio) );
     size
-  }
+  }*/
 
   def writePoints( file: String ) = {}
 

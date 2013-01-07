@@ -10,6 +10,7 @@ import javax.swing._
 // import javax.media.opengl.glu._
 // import com.jogamp.opengl.util._
 // import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
+import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
@@ -23,25 +24,28 @@ package object salami {
 
 object Shader {
   var dirty = false
-  var shader: ShaderProgram = null
-  var vertPath = ""
-  var fragPath = ""
-  def apply(v:String,f:String) = {
-    vertPath = v
-    fragPath = f
+  var indx = 0;
+  var shader:ShaderProgram = null
+  var shaders = new ListBuffer[(String,String,ShaderProgram)]()
+
+  def apply(v:String, f:String, i:Int = -1) = {
+
     val s = new ShaderProgram( Gdx.files.internal(v), Gdx.files.internal(f))
     if( s.isCompiled() ){
-      shader = s
+      val shader = (v,f,s)
+      if( i >= 0) shaders(i) = shader
+      else shaders += shader
     }else{
       println( s.getLog() )
     }
   }
-  def apply(s:ShaderProgram) = shader = s
-  def apply() = shader
+  //def apply(s:ShaderProgram) = shader = s
+  def apply() = { if(shaders.size > indx) shader = shaders(indx)._3; shader }
+  def apply(i:Int) = {indx = i; shader = shaders(i)._3; shader}
   def reload() = dirty = true
   def update() = {
     if( dirty ){
-      this.apply(vertPath,fragPath)
+      shaders.zipWithIndex.foreach{ case((v,f,s),i) => apply(v,f,i) } 
       dirty = false
     }
   }
@@ -136,7 +140,19 @@ object GLPrimitive extends GLThis {
   }
 
   def quad = {
+    val mesh = new Mesh(true,4,6, VertexAttribute.Position, VertexAttribute.TexCoords(0))
+    mesh.setVertices( Array[Float](
+      -1,-1,0,  0,0,
+      1,-1,0,   1,0,
+      1,1,0,    1,1,
+      -1,1,0,   0,1
+    ))
 
+    mesh.setIndices( Array[Short](
+      0,1,2, 0,2,3
+    ))
+    val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+    new GLPrimitive(mesh,draw)
   }
 }
 class GLPrimitive(var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {

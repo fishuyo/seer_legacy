@@ -6,9 +6,11 @@ import audio._
 
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.FPSLogger
 import com.badlogic.gdx.graphics.glutils._
+import com.badlogic.gdx.graphics.Pixmap
 
 import scala.actors.Actor
 import scala.actors.Actor._
@@ -32,6 +34,11 @@ class SimpleAppListener extends ApplicationListener {
   var navInput = new KeyboardNavInput(Camera.nav)
   var audio = Audio
 
+  var fb:FrameBuffer = null
+  var quad:GLPrimitive = null
+  // val t1 = new Texture(width, height, format);
+  // val t2 = new Texture(width, height, format);
+
   val fps = new FPSLogger
   var dtAccum = 0.f
 
@@ -43,14 +50,28 @@ class SimpleAppListener extends ApplicationListener {
     camera.nav.pos.z = 2.f 
     Gdx.gl.glClearColor(0,0,0,0)
 
-    val path = "../common/src/main/scala/graphics/shaders/"
+    val path = "res/shaders/"
+
 
     Shader(path+"simple.vert", path+"simple.frag")
+    Shader(path+"firstPass.vert", path+"firstPass.frag")
+    Shader(path+"secondPass.vert", path+"secondPass.frag")
+    Shader(1)
+
+    // t1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    // t1.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
+    // t2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    // t2.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
 
     audio.start
 
   }
   def render(){
+    if(fb == null){
+      //fb = new FrameBuffer(Pixmap.Format.RGBA4444, width, height, true)
+      //quad = GLPrimitive.quad
+    }
+
     fps.log
     val timeStep = 1.f/30.f
     dtAccum += Gdx.graphics.getDeltaTime()
@@ -60,19 +81,32 @@ class SimpleAppListener extends ApplicationListener {
       dtAccum -= timeStep
     }
     
-    Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT )
+    Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+    Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
 
-    camera.update
-    //camera.apply(Gdx.graphics.getGL11)
     Shader.update
+
+    //fb.begin
+    //fb.getColorBufferTexture.bind(0)
+    //Gdx.gl.glClearColor(1,1,1,0);
+    //Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+    Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+
     Shader().begin
       Shader().setUniformMatrix("u_projectionViewMatrix", camera.combined)
       Shader().setUniformMatrix("u_modelViewMatrix", camera.view)
       Shader().setUniformMatrix("u_normalMatrix", camera.view.toNormalMatrix())
-
       scene.draw
     Shader().end
+    //fb.end
+
+    //Shader(1).begin
+    //  Shader(1).setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+    //  Shader(1).setUniformi("depthTexture",0)
+    //  quad.draw
+    //Shader(1).end
   }
+
   def resize(width: Int, height:Int){
     this.width = width
     this.height = height

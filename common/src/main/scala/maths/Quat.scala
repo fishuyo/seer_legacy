@@ -74,7 +74,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
 
   //local unit vectors
   def toX() = Vec3(1.0 - 2.0*y*y - 2.0*z*z, 2.0*x*y + 2.0*z*w, 2.0*x*z - 2.0*y*w)
-  def toY() = Vec3(2.0*x*y - 2.0*z*w, 1.0 - 2.0*x*x + 2.0*z*z, 2.0*y*z + 2.0*x*w)
+  def toY() = Vec3(2.0*x*y - 2.0*z*w, 1.0 - 2.0*x*x - 2.0*z*z, 2.0*y*z + 2.0*x*w)
   def toZ() = Vec3(2.0*x*z + 2.0*y*w, 2.0*y*z - 2.0*x*w, 1.0 - 2.0*x*x - 2.0*y*y)
 
   def toEuler() : (Float,Float,Float) = {

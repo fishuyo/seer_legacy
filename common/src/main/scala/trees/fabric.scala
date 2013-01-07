@@ -89,13 +89,13 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
     var i = 0;
     particles.foreach( (p) => i = p.draw(vertices, i) )
     //particles.foreach( (p) => i = p.draw(mesh.getVerticesBuffer, i) )
-    gl11.glColor4f(1.f,1.f,1.f,1.f)
+    //gl11.glColor4f(1.f,1.f,1.f,1.f)
     gl.glLineWidth( 1.f )
     //vbo.setVertices( vertices, 0, vertices.length )
     //vbo.bind
     //gl11.glDrawArrays( GL10.GL_LINES, 0, vertices.length)
     mesh.setVertices(vertices)
-    mesh.render( GL10.GL_LINES)
+    mesh.render( Shader(), GL10.GL_LINES)
     
   }
   //override def onDraw( gl: GL2) = particles.foreach( _.onDraw(gl) )
