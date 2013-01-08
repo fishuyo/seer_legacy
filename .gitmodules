@@ -1,3 +1,0 @@
-[submodule "common/src/monido"]
-	path = common/src/monido
-	url = https://github.com/philcali/monido.git
