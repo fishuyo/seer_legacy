@@ -12,11 +12,13 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.glutils._
 //import com.badlogic.gdx.graphics.GL10
 
+import monido._
+
 object MyInput extends InputAdapter {
 
   override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
-    Main.sounds(0).f(screenX*.1f + 40.f) //Scale.note(screenX/10))//*1.0f + 40.f)
-    Main.sounds(1).f(screenY*.1f + 40.f) //Scale.note(screenY/10))//*1.0f + 40.f)
+    Main.osc.f(screenX*1.f + 80.f) //Scale.note(screenX/10))//*1.0f + 40.f)
+    Main.lfo.f(screenY*.01f + 0.f) //Scale.note(screenY/10))//*1.0f + 40.f)
     Main.tree.bAngle.y.setMinMax( .1f, (screenX/10.f).toRadians  )
     Main.tree.sRatio.set( screenY * .5f / 800 + .5f )
     Main.tree.bRatio.set( screenY * .5f / 800 + .3f )
@@ -46,7 +48,9 @@ object Main extends App{
   var trees = new Tree() :: List() //:: TreeNode( Vec3(3.f,0,0), .3f ) :: TreeNode( Vec3( 6.f,0,0), .3f) :: TreeNode( Vec3(9.f,0,0), .1f) :: List()
   var fabrics = Fabric( Vec3(0,-.5f,0), 1.f,1.f,.05f,"xz") ::List()//:: Fabric( Vec3(3.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(6.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(9.f,0,0),1.f,1.f,.05f,"xz") :: List()
 
-  var sounds = new TriangleWave(41.f) :: new TriangleWave(40.f) :: List()
+  var osc = new Tri(41.f)
+  var lfo = new Saw(1.f)
+  var sounds = osc * ((1.f-lfo)*.5f) :: new Sine(440.f,.2f) :: List()
 
 
   trees(0).branch()
@@ -73,6 +77,18 @@ object Main extends App{
   val live = new Ruby("src/main/scala/live/live.rb")
   OSC.listen()
 
+  val monitor = FileMonido("src/main/scala/live/live.rb"){
+    case ModifiedOrCreated(f) => Main.live.reload;
+    case _ => None
+  }
+  FileMonido("res/shaders/firstPass.vert"){
+    case ModifiedOrCreated(f) => Shader.reload;
+    case _ => None
+  }
+  FileMonido("res/shaders/firstPass.frag"){
+    case ModifiedOrCreated(f) => Shader.reload;
+    case _ => None
+  }
   SimpleAppRun()  
 
 }

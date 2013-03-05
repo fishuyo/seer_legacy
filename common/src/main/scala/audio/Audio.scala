@@ -2,8 +2,9 @@
 package com.fishuyo
 package audio
 
-import com.badlogic.gdx._
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.AudioDevice
+import com.badlogic.gdx.audio.AudioRecorder
 
 import scala.actors.Actor
 import scala.actors.Actor._
@@ -24,52 +25,44 @@ object Scale {
   }
 }
 
-trait AudioSource{
-  def audioCallback( in:Array[Float], out:Array[Float], numSamples:Int){}
+trait AudioSource {
+  //def apply():Float = {0.f}
+  def audioIO( in:Array[Float], out:Array[Float], numSamples:Int){}
 }
 
-class TriangleWave(var frequency:Float = 440.f) extends AudioSource {
-  var v = 0.f
-  var inc:Float = 1.f/(1.f/frequency * 44100.f / 4.f)
-
-  def f(f:Float) = {
-    frequency = f
-    var i = 1.f/(1.f/frequency * 44100.f / 4.f)
-    if (inc > 0.f) inc = i
-    else inc = -i
-  }
-
-  override def audioCallback(in:Array[Float], out:Array[Float], numSamples:Int){
-    for( i<- 0 until numSamples){
-      out(i) += v;
-      v += inc;
-      if( v >= 1.f || v <= -1.f) inc *= -1.f
-    }
+object AudioPass extends AudioSource {
+  override def audioIO( in:Array[Float], out:Array[Float], numSamples:Int){
+    Array.copy(in,0,out,0,numSamples)
   }
 }
 
-object Audio extends SimpleAudio(44100, 1024)
+object Audio extends SimpleAudio(44100, 512)
 
 class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=1024) extends Actor {
 
   var gain = .5f;
   var playing = true;
   var device:AudioDevice = null
+  var record:AudioRecorder = null
   val in = new Array[Float](bufferSize)
+  val ins = new Array[Short](bufferSize)
   val out = new Array[Float](bufferSize)
 
   val sources = new ListBuffer[AudioSource]
 
   def act(){
     if( device == null) device = Gdx.audio.newAudioDevice(sampleRate, true)
+    if( record == null) record = Gdx.audio.newAudioRecorder(sampleRate, true)
     self ! Process
     loop{
       react{
         case Process => if( playing ){
 
-            //device.readSamples(in,0,bufferSize)
+            record.read(ins,0,bufferSize)
+            //device.writeSamples(ins,0,bufferSize)
+            for( i <-( 0 until bufferSize)) in(i) = ins(i).toFloat / 32767.0f
 
-            sources.foreach( _.audioCallback(in,out,bufferSize) )
+            sources.foreach( _.audioIO(in,out,bufferSize) )
 
             for( i<-(0 until bufferSize)) out(i) *= gain
             device.writeSamples(out,0,bufferSize)

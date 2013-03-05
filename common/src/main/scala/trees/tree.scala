@@ -44,7 +44,7 @@ class Tree() extends GLAnimatable {
   val sAngle = RandVec3( Vec3(0,0,0), Vec3(0,0,0), true)
   val bAngle = RandVec3( Vec3(0,10.f.toRadians,0), Vec3(0,10.f.toRadians,0), true)
 
-  def set(r:Randf, s:Float=1.f) = (v:Float) => {r.set(v*s); dirty=true}
+  def set(r:Randf, s:Float=1.f) = (v:Seq[Float]) => {r.set(v(0)*s); dirty=true}
   def setMin( r:Randf, s:Float=1.f) = (v:Float) => {r.min = v*s; dirty=true}
   def setMax( r:Randf, s:Float=1.f) = (v:Float) => {r.max = v*s; dirty=true}
   def setMinMax( r:Randf, s:Float=1.f) = (v1:Float,v2:Float) => {r.min = v1*s; r.max = v2*s; dirty=true}

@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer10
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 
 package object salami {
@@ -52,7 +52,7 @@ object Shader {
 }
 
 object GLImmediate {
-  val renderer = new ImmediateModeRenderer10
+  val renderer = new ImmediateModeRenderer20(true,true,2)
 }
 
 trait GLThis {

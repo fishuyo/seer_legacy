@@ -51,18 +51,18 @@ def tree2
 end
 
 
-depth = 8
+depth = 6
 
 tree1()
 
-Tree.setAnimate(true)
+Tree.setAnimate(false)
 Tree.setReseed(true)
 Tree.setDepth(depth)
 Tree.branch(depth)
 
 
-Audio.sources.apply(0).f(40.0)
-Audio.sources.apply(1).f(41.0)
+#Audio.sources.apply(0).f(40.0)
+#Audio.sources.apply(1).f(41.0)
 
 Camera.rotateWorld(0.0)
 
@@ -111,8 +111,11 @@ OSC.bind("/1/fader4", Tree.setSeed() )
 Seer.trees.Fabric.gv.set(0.0,-10.0,0.0)
 Seer.trees.Trees.gv.set(0.0,1.0,0.0)
 
+def hi( v1 )
+ print v1
+end
 
-
+OSC.bind("/hm", lambda{|f| print f[0] })
 
 
 #seer.io.Inputs.removeProcessor( 1 )

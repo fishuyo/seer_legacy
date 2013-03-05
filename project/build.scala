@@ -25,6 +25,7 @@ object Settings {
     autoCompilerPlugins := true,
     addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"),
     scalacOptions += "-Xexperimental",
+    //sourceDirectories in Compile += new File("common/src"),
     updateLibgdxTask
     //fork in Compile := true
    )
