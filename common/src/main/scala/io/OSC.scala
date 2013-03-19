@@ -10,6 +10,7 @@ object OSC{
 	var callbacks = Map[String,(Float*)=>Unit]()
 	//var callbacks2 = Map[String,(Float,Float)=>Unit]()
 
+	def clear() = callbacks.clear()
 	def bind( s:String, f:(Float*)=>Unit) = callbacks += s -> f
 	//def bind( s:String, f:(Float,Float)=>Unit) = callbacks2 += s -> f
 

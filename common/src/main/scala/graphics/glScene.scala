@@ -16,7 +16,7 @@ class GLScene {
   val drawable = new ListBuffer[GLDrawable]
   val animatable = new ListBuffer[GLAnimatable]
   //val pickable = new ListBuffer[GLPickable]
-  val lights = new ListBuffer[GLLight]
+  //val lights = new ListBuffer[GLLight]
 
   def push( o: GLDrawable) = drawable += o
   def push( o: GLAnimatable) = { animatable += o;  drawable += o }

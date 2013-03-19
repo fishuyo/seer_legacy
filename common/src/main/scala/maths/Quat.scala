@@ -7,6 +7,8 @@
 package com.fishuyo
 package maths
 
+import com.badlogic.gdx.math.Quaternion
+import com.badlogic.gdx.math.Matrix4
 
 object Quat {
   val eps = 0.0000001
@@ -32,6 +34,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
   def *=(s: Float) = { w*=s; x*=s; y*=s; z*=s }
   
   def set(q: Quat) = { w=q.w; x=q.x; y=q.y; z=q.z }
+  def set(qw:Float,a:Float,b:Float,c:Float) = { x=a; y=b; z=c; w=qw }
 
   def dot(v: Quat) : Float = w*v.w + x*v.x + y*v.y + z*v.z
   //def cross( v: Quat) = Quat( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
@@ -83,6 +86,9 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     val bank = math.atan2( 2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
     (el,az,bank)
   }
+
+  def toMatrix() = new Matrix4(new Quaternion(x,y,z,w))
+  def toQuaternion() = new Quaternion(x,y,z,w)
 
   def slerp(q:Quat, d:Float): Quat = {
     var (a,b) = (0.f,0.f)

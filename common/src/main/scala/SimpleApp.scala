@@ -72,7 +72,7 @@ class SimpleAppListener extends ApplicationListener {
       //quad = GLPrimitive.quad
     }
 
-    fps.log
+    //fps.log
     val timeStep = 1.f/30.f
     dtAccum += Gdx.graphics.getDeltaTime()
     while( dtAccum > timeStep ){
@@ -93,9 +93,11 @@ class SimpleAppListener extends ApplicationListener {
     Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
 
     Shader().begin
-      Shader().setUniformMatrix("u_projectionViewMatrix", camera.combined)
-      Shader().setUniformMatrix("u_modelViewMatrix", camera.view)
-      Shader().setUniformMatrix("u_normalMatrix", camera.view.toNormalMatrix())
+      // Shader().setUniformMatrix("u_projectionViewMatrix", camera.combined)
+      // Shader().setUniformMatrix("u_modelViewMatrix", camera.view)
+      // Shader().setUniformMatrix("u_normalMatrix", camera.view.toNormalMatrix())
+      Shader.matrixClear()
+      Shader.setMatrices()
       scene.draw
     Shader().end
     //fb.end

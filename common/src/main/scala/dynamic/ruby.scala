@@ -2,31 +2,38 @@ package com.fishuyo.dynamic
 
 import javax.script._
 import java.io._
+
+import monido._
  
  class Ruby(script:String) extends scala.Dynamic {
+  var loaded = false
   val file = new File(script)
   var engine:ScriptEngine with Invocable = null
   reload()
-  /*try{
-   	file = new File(script)
-    engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
-    engine.eval(new FileReader(file));
-  } catch { case e:Exception => println(e) }*/
+  //if(loaded) this.once()
       
   def language() = "Ruby"
+
+  val monitor = FileMonido(script){
+    case ModifiedOrCreated(f) => reload;
+    case _ => None
+  }
 
   def reload() = {
     try{
   	 engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
-  	 engine.eval(new FileReader(file));
+  	 engine.eval(new FileReader(file))
+     loaded = true
+     //this.onLoad()
     } catch { 
       case e:Exception => println(e)
     }
-
   }
          
-  def applyDynamic(name: String)(args: Any*) =
-    engine.invokeFunction(name, args.map(_.asInstanceOf[AnyRef]) : _*)
+  def applyDynamic(name: String)(args: Any*) = {
+    try { engine.invokeFunction(name, args.map(_.asInstanceOf[AnyRef]) : _*) }
+    catch { case e:Exception => println(e) }
+  }
                    
   def typed[T] = error("nope")
  }

@@ -2,6 +2,7 @@
 package com.fishuyo
 package graphics
 import maths._
+import spatial._
 
 import javax.swing._
 
@@ -15,41 +16,12 @@ import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.math.Matrix4
 
-package object salami {
+/*package object salami {
   trait GL10 extends com.badlogic.gdx.graphics.GL10
   trait GL20 extends com.badlogic.gdx.graphics.GL20
-}
-
-object Shader {
-  var dirty = false
-  var indx = 0;
-  var shader:ShaderProgram = null
-  var shaders = new ListBuffer[(String,String,ShaderProgram)]()
-
-  def apply(v:String, f:String, i:Int = -1) = {
-
-    val s = new ShaderProgram( Gdx.files.internal(v), Gdx.files.internal(f))
-    if( s.isCompiled() ){
-      val shader = (v,f,s)
-      if( i >= 0) shaders(i) = shader
-      else shaders += shader
-    }else{
-      println( s.getLog() )
-    }
-  }
-  //def apply(s:ShaderProgram) = shader = s
-  def apply() = { if(shaders.size > indx) shader = shaders(indx)._3; shader }
-  def apply(i:Int) = {indx = i; shader = shaders(i)._3; shader}
-  def reload() = dirty = true
-  def update() = {
-    if( dirty ){
-      shaders.zipWithIndex.foreach{ case((v,f,s),i) => apply(v,f,i) } 
-      dirty = false
-    }
-  }
-}
+}*/
 
 object GLImmediate {
   val renderer = new ImmediateModeRenderer20(true,true,2)
@@ -69,14 +41,13 @@ trait GLDrawable extends GLThis {
 trait GLAnimatable extends GLDrawable {
   def step( dt: Float){}
 }
-class GLLight {}
 
 object GLPrimitive extends GLThis {
 
   def sphere( r:Float =1.0f ) = {
 
   }
-  def cube( p:Vec3 = Vec3(0), s:Vec3=Vec3(1), c:RGB = RGB.green, wire:Boolean=false ) = {
+  def cube( p:Pose = new Pose(), s:Vec3=Vec3(1), c:RGB = RGB.green ) = {
     val mesh = new Mesh(true,24,36, VertexAttribute.Position, VertexAttribute.Normal)
     mesh.setVertices( Array[Float](
       -1,1,1,   0,0,1,
@@ -120,23 +91,12 @@ object GLPrimitive extends GLThis {
     ))
 
     val draw = () => {
-      //gl.glLineWidth(2.0f);
-      //if( wire ) gl10.glPolygonMode(GL10.GL_FRONT_AND_BACK, GL10.GL_LINE);
-      //else gl10.glPolygonMode(GL10.GL_FRONT_AND_BACK, GL10.GL_FILL );
-
-      //gl10.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT_AND_DIFFUSE, Array(c.r, c.g, c.b, 0.f), 0 );
-      //gl.glEnable( GL10.GL_LIGHTING )
-
-      //gl10.glPushMatrix()
-      //gl10.glTranslatef (p.x, p.y, p.z); // viewing transformation
-      //val scale = s / 2.0f;
-      //gl10.glScalef (scale.x, scale.y, scale.z);      // modeling transformation
 
       // draw the cube
       mesh.render(Shader(), GL10.GL_TRIANGLES)
       //gl10.glPopMatrix()
     }
-    new GLPrimitive(mesh,draw)
+    new GLPrimitive(p,s,mesh,draw)
   }
 
   def quad = {
@@ -152,11 +112,17 @@ object GLPrimitive extends GLThis {
       0,1,2, 0,2,3
     ))
     val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
-    new GLPrimitive(mesh,draw)
+    new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
 }
-class GLPrimitive(var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
+class GLPrimitive(var p:Pose, var s:Vec3, var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
   override def draw(){
+    val scale = s / 2.f
+    //val sm = new Matrix4().scl(scale.x,scale.y,scale.z)
+    val m = new Matrix4().translate(p.pos.x,p.pos.y,p.pos.z).rotate(p.quat.toQuaternion()).scale(scale.x,scale.y,scale.z)
+    Shader.matrixClear()
+    Shader.matrixTransform(m)
+    Shader.setMatrices()
     drawFunc()
   }
 }

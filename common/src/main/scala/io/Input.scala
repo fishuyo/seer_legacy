@@ -7,11 +7,13 @@ import maths._
 import spatial._
 //import ray._
 
-import java.awt.event.KeyEvent
-import java.awt.event.KeyListener
-import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
-import java.awt.event.MouseMotionListener
+// import java.awt.event.KeyEvent
+// import java.awt.event.KeyListener
+// import java.awt.event.MouseEvent
+// import java.awt.event.MouseListener
+// import java.awt.event.MouseMotionListener
+
+import scala.collection.mutable.Map
 
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputAdapter
@@ -19,7 +21,32 @@ import com.badlogic.gdx.Input.Keys
 
 object Inputs extends InputMultiplexer
 
-//object NavInput extends NavInput(Camera)
+object Keyboard extends InputAdapter {
+	var charCallbacks = Map[Char,()=>Unit]()
+	var charUpCallbacks = Map[Char,()=>Unit]()
+	var callbacks = Map[String,()=>Unit]()
+	def non()() = {}
+
+	def clear() = { charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear(); Inputs.removeProcessor(this) }
+	def use() = Inputs.addProcessor(this)
+	def bind( s:String, f:()=>Unit) = {
+		if( s.length == 1) charCallbacks += s.charAt(0) -> f
+		else callbacks += s -> f
+	}
+	def bindUp( s:String, f:()=>Unit) = {
+		if( s.length == 1) charUpCallbacks += s.charAt(0) -> f
+		//else callbacks += s -> f
+	}
+	override def keyTyped(k:Char) = {
+		charCallbacks.getOrElse(k, non()_)()
+		false
+	}
+	override def keyUp(k:Int) = {
+		val c = (k+68).toChar
+		charUpCallbacks.getOrElse(c, non()_)()
+		false
+	}
+}
 
 class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
 

@@ -105,7 +105,7 @@ class Field2D extends GLAnimatable {
     update
 
     gl.glEnable(GL10.GL_TEXTURE_2D);
-    gli.begin(GL10.GL_TRIANGLE_STRIP);
+    gli.begin(Camera.combined, GL10.GL_TRIANGLE_STRIP);
     gli.texCoord(0.0f, 0.0f); gli.vertex(-1.0f, -1.0f, 0.0f);
     gli.texCoord(0.0f, 1.0f); gli.vertex(-1.0f, 1.0f,  0.0f);
     gli.texCoord(1.0f, 0.0f); gli.vertex(1.0f, -1.0f, 0.0f);
@@ -140,7 +140,7 @@ class Field2D extends GLAnimatable {
     Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     Gdx.gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    Gdx.gl10.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    //Gdx.gl10.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     Gdx.gl.glEnable(GL_TEXTURE_2D);
   }
 

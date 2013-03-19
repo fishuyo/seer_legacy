@@ -8,12 +8,12 @@ import maths._
 //import ray._
 import io._
 
-import java.awt.event._
+//import java.awt.event._
 import java.nio._
 //import com.jogamp.common.nio.Buffers
 
 import com.badlogic.gdx._
-import com.badlogic.gdx.math._
+//import com.badlogic.gdx.math._
 //import com.badlogic.gdx.collision._
 
 object Print{
@@ -50,15 +50,15 @@ object MyInput extends InputAdapter {
 }
 
 object Main extends App {
+  SimpleAppRun.loadLibs()
 
   val live = new Ruby("src/main/scala/live/live.rb")
 
-	live.init()
-
-  val n:Int = live.size().asInstanceOf[Long].toInt //100;
+  var n = 100
   val field = new LiveField
   field.allocate(n,n)
-  live.data(field)
+  
+  //live.data(field)
 
   GLScene.push( field )
   Inputs.addProcessor(MyInput)
