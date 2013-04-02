@@ -48,7 +48,7 @@ class TransTrack(val port:Int=7008) extends Actor{
 			      if( debug ) println(data)
 			      
 			      data.split(" ") match {
-			        case Array("point",i,x,y,z) => pointEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat) )
+			        case Array("point",i,x,y,z,a,b,c,w) => pointEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat) )
 			        case Array("rigid_body",i,x,y,z,a,b,c,w) => rigidEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat, a.toFloat, b.toFloat, c.toFloat, w.toFloat) )
 			        case Array("bone",i,x,y,z,a,b,c,w) => boneEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat, a.toFloat, b.toFloat, c.toFloat, w.toFloat) )
 			        case _ => if(debug) println("non tracker data received from: " + packet.getAddress)

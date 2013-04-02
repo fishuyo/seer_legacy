@@ -12,6 +12,7 @@ import javax.swing._
 // import com.jogamp.opengl.util._
 // import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.Queue
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
@@ -115,8 +116,12 @@ object GLPrimitive extends GLThis {
     new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
 }
+
+
 class GLPrimitive(var p:Pose, var s:Vec3, var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
+  var color = Vec3(1.f)
   override def draw(){
+    Shader.setColor(color,1.f)
     val scale = s / 2.f
     //val sm = new Matrix4().scl(scale.x,scale.y,scale.z)
     val m = new Matrix4().translate(p.pos.x,p.pos.y,p.pos.z).rotate(p.quat.toQuaternion()).scale(scale.x,scale.y,scale.z)
@@ -126,4 +131,45 @@ class GLPrimitive(var p:Pose, var s:Vec3, var mesh:Mesh, val drawFunc:()=>Unit) 
     drawFunc()
   }
 }
+
+class Plot2D( var size:Int, var range:Float ) extends GLDrawable {
+  var color = Vec3(1.f)
+  var pose = Pose()
+  var scale = Vec3(1.f)
+  val mesh = new Mesh(false,size,0, VertexAttribute.Position)
+  var data = Queue[Float]()
+  data.enqueue(new Array[Float](size):_*)
+  val vertices = new Array[Float](size*3)
+  var dirty = true
+
+  def apply(f:Float) = {
+    data.enqueue(f)
+    data.dequeue()
+    for( i<-(0 until size)){
+      vertices(3*i) = (i - size/2) / size.toFloat
+      vertices(3*i+1) = data(i) / range
+      vertices(3*i+2) = 0.f
+    }
+    dirty = true
+  }
+
+  override def draw(){ 
+    if( dirty ){
+      mesh.setVertices( vertices )
+      dirty = false
+    }
+    Shader.setColor(color,1.f)
+    val s = scale / 2.f
+    val p = pose
+    //val sm = new Matrix4().scl(scale.x,scale.y,scale.z)
+    val m = new Matrix4().translate(p.pos.x,p.pos.y,p.pos.z).rotate(p.quat.toQuaternion()).scale(s.x,s.y,s.z)
+    Shader.matrixClear()
+    Shader.matrixTransform(m)
+    Shader.setMatrices()
+    mesh.render(Shader(), GL10.GL_LINE_STRIP)
+  }
+
+}
+
+
 

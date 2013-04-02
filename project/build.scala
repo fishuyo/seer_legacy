@@ -15,7 +15,8 @@ object Settings {
     ),
     libraryDependencies ++= Seq(
       //"org.scala-lang" % "scala-compiler" % "2.9.1",
-      "com.nativelibs4java" % "scalacl" % "0.2"
+      "com.nativelibs4java" % "scalacl" % "0.2",
+      "de.sciss" %% "scalaosc" % "1.1.+"
       //"com.nativelibs4java" % "javacl" % "1.0.0-RC2",
       //"xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",

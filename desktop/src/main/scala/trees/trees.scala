@@ -50,7 +50,7 @@ object Main extends App{
 
   var osc = new Tri(41.f)
   var lfo = new Saw(1.f)
-  var sounds = osc * ((1.f-lfo)*.5f) :: new Sine(440.f,.2f) :: List()
+  var sounds = osc * ((1.f-lfo)*.5f) :: List()
 
 
   trees(0).branch()

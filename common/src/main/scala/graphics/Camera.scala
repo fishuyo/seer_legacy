@@ -47,6 +47,8 @@ class Camera extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f) {
   }
   def rotateWorld(speed:Float) = dw = speed
 
+  def setFOV(f:Float) = fieldOfView = f
+
 }
 
  

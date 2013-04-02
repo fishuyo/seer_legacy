@@ -41,6 +41,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   override def toString() = "[" + x + " " + y + " " + z + "]"
 
   def lerp( v:Vec3, d:Float ) = this + (v-this)*d
+  def lerpTo( v:Vec3, d:Float) = this.set(this.lerp(v,d))
   
 }
 

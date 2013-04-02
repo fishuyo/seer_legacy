@@ -117,6 +117,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     val quat = Quat(a*w+b*q.w, a*x+b*q.x, a*y+b*q.y, a*z+b*q.z)
     quat.normalize
   }
+  def slerpTo(q:Quat, d:Float) = this.set( this.slerp(q,d))
   
   override def toString() = "[" + w + " " + x + " " + y + " " + z + "]"
 }

@@ -2,6 +2,7 @@
 attribute vec4 a_position;
 attribute vec4 a_normal;
 
+uniform vec4 u_color;
 uniform mat4 u_projectionViewMatrix;
 uniform mat4 u_modelViewMatrix;
 uniform mat4 u_normalMatrix;
@@ -12,6 +13,7 @@ varying float depth;
 varying vec3 normal;
 varying vec3 eye;
 varying vec3 lightPosition;
+varying vec4 color;
 
 
 void main()
@@ -27,6 +29,8 @@ void main()
 
   // pass the light position through
   lightPosition = vec3(10.0,10.0,10.0);
+
+  color = u_color;
 
   gl_Position = u_projectionViewMatrix * a_position;
 }

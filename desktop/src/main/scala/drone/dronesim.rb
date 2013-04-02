@@ -4,9 +4,11 @@ Seer = Java::com.fishuyo
 Key = Seer.io.Keyboard
 
 drone = Seer.dronesim.Main.drone
-drone.drone.s.set(1.0,1.0,1.0)
+#drone.drone.s.set(1.0,1.0,1.0  )
 #drone.drone.p.pos.set(0,0,0)
 #drone.velocity.set(0,0,0)
+
+#drone.plot.color.set(4.8,5.3,1.3)
 
 x=0
 z=0
@@ -35,9 +37,10 @@ Key.bind("p",lambda{
 	end
 })
 
-drone.moveTo(-5.0,1.0,0.0,0.0)
-
-Seer.graphics.Shader[1]
+drone.moveTo(3.0,1.0,1.0,0.0)
+drone.setMoveSpeed(5.0)
+drone.setMaxEuler(0.6)
+#Seer.graphics.Shader[1]
 
 
 

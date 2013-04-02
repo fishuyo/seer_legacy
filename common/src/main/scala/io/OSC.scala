@@ -23,6 +23,7 @@ object OSC{
 	  def f(s:String)(v:Float*) = {println(s)}
 	  //rcv.dump( Dump.Both )
 	  rcv.action = {
+	  	//case (Message( "/colors", i1:Int, i2:Int, i3:Int), _) => callbacks.getOrElse("/color",f("/color")_)(Seq[Float](i1/255.f,i2/255.f,i3/255.f):_*)
 	    case (Message( name, vals @ _* ), _) =>
 	      callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Float]]:_*)
 

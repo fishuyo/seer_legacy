@@ -39,7 +39,7 @@ object ObjParser extends JavaTokenParsers {
     println ( parse( statement, line ))
   }
 
-  def apply( filename: String ) : GLPrimitive = {
+  def apply( filename: String, mode:String="lines", normalize:Boolean=true ) : GLPrimitive = {
 
     val obj = new TriangleMesh()
     val file = Source.fromFile( filename )
@@ -57,9 +57,9 @@ object ObjParser extends JavaTokenParsers {
     })
     file.close
 
-		obj.normalize
+		if( normalize ) obj.normalize
 
-		val mesh = new Mesh(true,obj.vertices.length,obj.indices.length, VertexAttribute.Position, VertexAttribute.Normal)
+		val mesh = new Mesh(true, obj.vertices.length, obj.indices.length, VertexAttribute.Position, VertexAttribute.Normal)
 		val vertices = new Array[Float](3*2*obj.vertices.length)
 		for( i<-(0 until obj.vertices.length)){
 			vertices(6*i) = obj.vertices(i).x
@@ -72,7 +72,12 @@ object ObjParser extends JavaTokenParsers {
 		val indices = obj.indices.toArray
 		mesh.setVertices(vertices)
 		mesh.setIndices(indices)
-		val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+
+		var draw = () => { mesh.render(Shader(), GL10.GL_LINES)}
+		mode match {
+			case "triangles" => draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+			case _ => 
+		}
     new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
 }

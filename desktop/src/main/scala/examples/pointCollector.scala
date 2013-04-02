@@ -101,7 +101,7 @@ class Particle( pos :Vec3=Vec3(0), var vel:Vec3=Vec3(0) ) extends Vec3(pos.x,pos
           p.set( p.lerp(this + vel * .01f, .99f ))
           p.vel = p.vel.lerp( vel, .99f)
         }
-        println("line")
+        //println("line")
       }
       case "curve" => f = (p:Particle)=>{
         p.set( p.lerp(this + vel *.01f, .7f))
@@ -145,7 +145,7 @@ object ParticleCollector extends GLAnimatable {
   var maxParticles = 100000
   var numParticles = 5000
 
-  var particles = generateParticles(numParticles)
+  var particles = new ListBuffer[Particle]() //generateParticles(numParticles)
   var collection = new ListBuffer[Particle]()
   var octree = Octree( Vec3(0), 2.f)
 
@@ -153,20 +153,21 @@ object ParticleCollector extends GLAnimatable {
   var field = new VecField3D( n )
   for( z<-(0 until n); y<-(0 until n); x<-(0 until n)){
     val cen = field.centerOfBin(x,y,z).normalize
-    //field.set(x,y,z, Vec3(0) )
+    field.set(x,y,z, Vec3(0) )
     //field.set(x,y,z, cen * -.1f)
     //field.set(x,y,z, Vec3(x,y,z).normalize * .1f)
     //field.set(x,y,z, Vec3( -cen.z + -cen.x*.1f, -cen.y, cen.x ).normalize * .1f )
     //field.set(x,y,z, Vec3( math.sin(cen.x*3.14f), 0, math.cos(cen.z*3.14f) ).normalize * .1f)  
     //field.set(x,y,z, Vec3( cen.x, y/10.f, cen.z).normalize * .1f )
     //field.set(x,y,z, Vec3(0,.1f,0) )
-    field.set(x,y,z, (Vec3(0,1,0)-cen).normalize * .1f )
+    //field.set(x,y,z, (Vec3(0,1,0)-cen).normalize * .1f )
   }
 
   var mesh:Mesh = _
   var vertices:Array[Float] = _
   var meshCol:Mesh = _
   var verticesCol:Array[Float] = _
+  var color = Vec3(2.f)
 
     if( mesh == null){
       vertices = new Array[Float](3*numParticles)
@@ -261,14 +262,14 @@ object ParticleCollector extends GLAnimatable {
         }
       }
 
-      if( p.y < -1.f) p.vel.y *= -1.f
+      if( p.y < 0.f) p.vel.y *= -1.f
       if( p.mag > 4.0f ){
         particles -= p;
         //particles += Particle()
       }
       
     })
-    if( count != collection.size ) println ("Particles Collected: " + collection.size )
+    //if( count != collection.size ) println ("Particles Collected: " + collection.size )
    
 
   }
@@ -281,6 +282,7 @@ object ParticleCollector extends GLAnimatable {
       meshCol = new Mesh(false,maxParticles,0,VertexAttribute.Position)
     }
  
+    Shader.setColor( color, 1.f)
     meshCol.setVertices(verticesCol, 0, 3*collection.length)
     meshCol.render( Shader(), GL10.GL_POINTS)
 

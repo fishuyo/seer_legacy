@@ -9,6 +9,8 @@ import dynamic._
 import audio._
 import drone._
 
+import examples.dla3d._
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.glutils._
@@ -18,25 +20,87 @@ object Main extends App{
 
   SimpleAppRun.loadLibs()
 
+  GLScene.push( ParticleCollector )
+  var p = new Particle(Vec3(.01,0,.01),Vec3(1,0,1).normalize)
+  p.setAlignment("line")
+  ParticleCollector.insertPoint(p)
+  p = new Particle(Vec3(-.01,0,.01),Vec3(-1,0,1).normalize)
+  p.setAlignment("line")
+  ParticleCollector.insertPoint(p)
+  p = new Particle(Vec3(0,0,-.01),Vec3(0,0,-1).normalize)
+  p.setAlignment("line")
+  ParticleCollector.insertPoint(p)
+
   var bones = new Array[GLPrimitive](34)
-  for( i <- (0 until 34)) bones(i) = GLPrimitive.cube(Pose(), Vec3(.01f))
+  var ppos = new Array[Vec3](34)
+  var sines = new Array[Gen](34)
+  for( i <- (0 until 34)){
+		bones(i) = GLPrimitive.cube(Pose(), Vec3(.01f))
+		sines(i) = new Sine(80.f,0.f)
+	}
   bones.foreach( GLScene.push( _ ))
+  sines.foreach( Audio.push( _ ))
+
+
+
+
+  var drone = new ParticleDrone
+  GLScene.push( drone )
+
+  val ground = ObjParser("src/main/scala/drone/ground.obj")
+  ground.s.set(100.f,1.f,100.f)
+  GLScene.push(ground)
+  // val ground2 = ObjParser("src/main/scala/drone/groundrough.obj")
+  // ground2.p.pos.set(0.f,0.f,-200.f)
+  // ground2.s.set(100.f,1.f,100.f)
+  // GLScene.push(ground2)
+  // val ground3 = ObjParser("src/main/scala/drone/landscapealiendecimated.obj","triangles",false)
+  // //ground.s.set(100.f,1.f,100.f)
+  // GLScene.push(ground3)
 
 
   val live = new Ruby("src/main/scala/bones/bones.rb")
 
-	TransTrack.bind("point", (i:Int, f:Array[Float])=>{
+	// TransTrack.bind("point", (i:Int, f:Array[Float])=>{
 
-		if (i > 0 && i < 34){
-			bones(i).p.pos.set(f(0),f(1),f(2))
-			//bones(i).p.quat.set(f[6],f[3],f[4],f[5])
-		}
-	})
+	// 	if (i > 0 && i < 34){
+	// 		bones(i).p.pos.set(f(0),f(1),f(2))
+	// 		//bones(i).p.quat.set(f[6],f[3],f[4],f[5])
+	// 	}
+	// })
 
   TransTrack.start()
+  OSC.listen()
 
+  //Trackpad.connect()
+  
   SimpleAppRun()  
 
+}
+
+class ParticleDrone extends FakeDrone {
+	override def step(dt:Float){
+		super.step(dt)
+
+		import util._
+		val x = Randf( drone.p.pos.x -.25f, drone.p.pos.x + .25f,true)
+		val z = Randf( drone.p.pos.z -.25f, drone.p.pos.z + .25f,true)
+		val vs = Randf(.05f,.2f)
+		val vt = RandVec3(Vec3(-.05f,0.f,-.05f),Vec3(.05f,0.f,.05f))
+
+		val pc = ParticleCollector
+    if( pc.collection.size < pc.maxParticles - pc.numParticles ){
+    	for( i<-(0 until 100)){
+				val p = Vec3(x(),drone.p.pos.y-.2f,z())
+				val v = drone.p.uu() * -thrust * vs() + vt()
+	      val newp = new Particle(p,v)
+	      //newp.setAlignment("line")
+	      if( pc.particles.size >= pc.numParticles) pc.particles.remove(0)
+	      pc.particles += newp
+    	}
+    }
+
+	}
 }
 
 

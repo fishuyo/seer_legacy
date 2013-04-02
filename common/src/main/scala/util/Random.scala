@@ -16,7 +16,7 @@ class Randf( var min:Float=0.f, var max:Float=1.f, var gaus:Boolean=false){
 	def apply():Float = {
 		if( min == max ) return min
 		if( gaus ){
-			Randf.gen.nextGaussian.toFloat / (10.f) * (max-min) + (max-min)/2
+			(Randf.gen.nextGaussian.toFloat / (10.f) + .5f) * (max-min) + min
 		}else{
 			Randf.gen.nextFloat * (max-min) + min
 		}

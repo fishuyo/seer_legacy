@@ -13,7 +13,8 @@ import com.badlogic.gdx.graphics.GL10
 class FakeDrone extends GLAnimatable {
 
 	var destCube = GLPrimitive.cube(Pose(), Vec3(.02f,.02f,.02f))
-	var drone = ObjParser("src/main/scala/drone/drone.obj") //GLPrimitive.cube(Pose(), Vec3(0.5f,.05f,.5f))
+	//var drone = ObjParser("src/main/scala/drone/drone.obj")
+  var drone = GLPrimitive.cube(Pose(), Vec3(0.5f,.05f,.5f))
 	var velocity = Vec3()
 	var acceleration = Vec3()
 	var thrust = 0.f
@@ -23,6 +24,8 @@ class FakeDrone extends GLAnimatable {
 	var flying = false
 	var navigating = false
 	var takingOff = false
+  var physics = true
+  def setPhysics(b:Boolean) = physics = b
 
 	//controller .4
 	var pose = Pose()
@@ -34,12 +37,14 @@ class FakeDrone extends GLAnimatable {
   var t0:Long = 0
   var (t,time1,time2,d0,neg) = (Vec3(),Vec3(),Vec3(),Vec3(),Array[Boolean](false,false,false))
   var expected_a = Vec3()
+  var expected_v = Vec3()
   var (kp,kd,kdd) = (Vec3(1.85,8.55,1.85),Vec3(.75),Vec3(1))
 
    // control input (% of maximum)(delta relates to angVel and to jerk)
   var control = Vec3()
   var rot = 0.f
   var maxEuler = .6f  //(0 - .52 rad)
+  def setMaxEuler(f:Float) = maxEuler = f
   var maxVert = 1000   //(200-2000 mm/s)
   var maxRot = 3.0f    //(.7 - 6.11 rad/s)
 
@@ -52,9 +57,24 @@ class FakeDrone extends GLAnimatable {
 
 	var posThresh = .1f; var yawThresh = 10.f
 	var moveSpeed = 1.f
+  def setMoveSpeed(f:Float) = moveSpeed = f
 	var vmoveSpeed = 1.f
 	var rotSpeed = 1.f
 	var smooth = false
+
+  // Plots
+  var plot = new Plot2D(100, 15.f)
+  plot.pose.pos = Vec3(0.f, 2.f, 0.f)
+  var plot2 = new Plot2D(100, 15.f)
+  plot2.pose.pos = Vec3(0.f, 2.f, 0.f)
+  plot2.color = Vec3(2.f,0.f,0.f)
+
+  var plot3 = new Plot2D(100, 15.f)
+  plot3.pose.pos = Vec3(2.f, 2.f, 0.f)
+  var plot4 = new Plot2D(100, 15.f)
+  plot4.pose.pos = Vec3(2.f, 2.f, 0.f)
+  plot4.color = Vec3(2.f,0.f,0.f)
+
 
 
 	def eval(state:(Float,Float),dt:Float,dstate:(Float,Float)) = {
@@ -69,27 +89,38 @@ class FakeDrone extends GLAnimatable {
 
 		val angles = drone.p.quat.toEuler()
 
-		if( takingOff && p.y < 1.5f){
-			thrust = 20.f
+		if( takingOff && p.y < 0.5f){
+			thrust = 12.f
 		} else if( takingOff ){
 			thrust = 9.8f
 			takingOff = false
 		}
 
-		acceleration.set( drone.p.uu()*thrust )
+    if(physics){
+  		acceleration.set( drone.p.uu()*thrust )
 
-		drone.p.pos += velocity*dt
-		velocity += (acceleration+g)*dt - velocity*.5f*dt 
+  		drone.p.pos += velocity*dt
+  		velocity += (acceleration+g)*dt - velocity*.5f*dt 
 
-		if( p.y < 0.f){
-			drone.p.pos.y = 0.f
-			vel.set(0.f,0.f,0.f)
-		}
+  		if( p.y < 0.f){
+  			drone.p.pos.y = 0.f
+  			vel.set(0.f,0.f,0.f)
+  		}
+    }
+
+    plot(acceleration.x)
+    plot2(expected_a.x)
+    plot3(velocity.x)
+    plot4(expected_v.x)
 
 	}
 	override def draw(){
 		destCube.draw()
 		drone.draw()
+    plot.draw()
+    plot2.draw()
+    plot3.draw()
+    plot4.draw()
 	}
 
 	def move(lr:Float,fb:Float,ud:Float,rot:Float){
@@ -119,7 +150,7 @@ class FakeDrone extends GLAnimatable {
 		takingOff = true
 	}
 	def land() = { flying = false; takingOff=false; thrust = 5.f}
-	def hover() = { drone.p.quat.setIdentity(); vel.set(0,0,0)}
+	def hover() = { drone.p.quat.setIdentity(); velocity.set(0,0,0)}
 
 	//def dynamic(f:(Unit)=>Unit} = dynaMove = f
 	//var dynaMove = ()=>{}
@@ -172,11 +203,11 @@ class FakeDrone extends GLAnimatable {
   //
   def moveStep2(x:Float,y:Float,z:Float,qx:Float,qy:Float,qz:Float,qw:Float){
 
-    if( !flying || !navigating ) return
+    if( !flying || !navigating ){ navmove(0.f,0.f,0.f,0.f); return }
 
     // calculate time since last step
     val t1 = System.currentTimeMillis()
-    val dt = (t1 - t0) / 1000.f
+    val dt = 1/30.f //(t1 - t0) / 1000.f
     t0 = t1
     //println("dt: "+dt)
 
@@ -209,6 +240,7 @@ class FakeDrone extends GLAnimatable {
         } else if( math.abs(dir(i)) < posThresh){    // if close enough in x or z stop moving
           t(i) = 0.f
           expected_a(i) = 0.f
+          //this.hover()
 
         } else if( t(i) == 0.f ){ //calculate new trajectory
           d0(i) = pose.pos(i)
@@ -217,15 +249,23 @@ class FakeDrone extends GLAnimatable {
           val times = solver(math.abs(dir(i)))
           time1(i) = times._1
           time2(i) = times._2
-          println( "new trajectory!!!!!!!!!!!! " + i + " " + times._1 + " " + times._2)
+          println( "new trajectory!!!!!!!!!!!! " + i + " " + times._1 + " " + times._2 )
           t(i) += dt
         }else{
           val d = dcurve(time1(i),time2(i),neg(i))(t(i))
           val dd = vcurve(time1(i),time2(i),neg(i))(t(i))
+          expected_v(i) = dd
           val ddd = acurve(time1(i),time2(i),neg(i))(t(i))
-          expected_a(i) = ddd //kp(i)*((d+d0(i))-pose.pos(i)) + kd(i)*(dd-vel(i)) + kdd(i)*(ddd-a(i))
+          //println( ddd )
+          expected_a(i) = kp(i)*((d+d0(i))-pose.pos(i)) + kd(i)*(dd-velocity(i)) + kdd(i)*(ddd-acceleration(i))
           t(i) += dt
-          if(t(i) > time2(i) + time1(i)) t(i) = 0.f
+          if(t(i) > (time2(i) + time1(i))){
+            t(i) = 0.f
+            expected_a(i) = 0.f
+            navigating = false
+            //move(0.f,0.f,0.f,0.f)
+            //this.hover()
+          }
         }
 
       }
@@ -248,7 +288,7 @@ class FakeDrone extends GLAnimatable {
       else if( rot < -1.f) rot = -1.f
 
       navmove(control.x,control.y,control.z,rot)
-    }
+    }else { navmove(0.f,0.f,0.f,0.f)}
   }
 
 	// step 1

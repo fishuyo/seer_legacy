@@ -57,6 +57,7 @@ class SimpleAppListener extends ApplicationListener {
     Shader(path+"firstPass.vert", path+"firstPass.frag")
     Shader(path+"secondPass.vert", path+"secondPass.frag")
     Shader(1)
+    Shader.monitor(1)
 
     // t1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     // t1.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
@@ -81,6 +82,7 @@ class SimpleAppListener extends ApplicationListener {
       dtAccum -= timeStep
     }
     
+    Gdx.gl.glClearColor(Shader.bg._1,Shader.bg._2,Shader.bg._3,Shader.bg._4)
     Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
     Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
 
