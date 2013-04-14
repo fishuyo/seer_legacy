@@ -48,7 +48,7 @@ object Main extends App{
   GLScene.push( drone )
 
   val ground = ObjParser("src/main/scala/drone/ground.obj")
-  ground.s.set(100.f,1.f,100.f)
+  ground.scale.set(100.f,1.f,100.f)
   GLScene.push(ground)
   // val ground2 = ObjParser("src/main/scala/drone/groundrough.obj")
   // ground2.p.pos.set(0.f,0.f,-200.f)
@@ -83,16 +83,16 @@ class ParticleDrone extends FakeDrone {
 		super.step(dt)
 
 		import util._
-		val x = Randf( drone.p.pos.x -.25f, drone.p.pos.x + .25f,true)
-		val z = Randf( drone.p.pos.z -.25f, drone.p.pos.z + .25f,true)
+		val x = Randf( drone.pose.pos.x -.25f, drone.pose.pos.x + .25f,true)
+		val z = Randf( drone.pose.pos.z -.25f, drone.pose.pos.z + .25f,true)
 		val vs = Randf(.05f,.2f)
 		val vt = RandVec3(Vec3(-.05f,0.f,-.05f),Vec3(.05f,0.f,.05f))
 
 		val pc = ParticleCollector
     if( pc.collection.size < pc.maxParticles - pc.numParticles ){
     	for( i<-(0 until 100)){
-				val p = Vec3(x(),drone.p.pos.y-.2f,z())
-				val v = drone.p.uu() * -thrust * vs() + vt()
+				val p = Vec3(x(),drone.pose.pos.y-.2f,z())
+				val v = drone.pose.uu() * -thrust * vs() + vt()
 	      val newp = new Particle(p,v)
 	      //newp.setAlignment("line")
 	      if( pc.particles.size >= pc.numParticles) pc.particles.remove(0)

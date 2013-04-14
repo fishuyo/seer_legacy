@@ -4,6 +4,8 @@ Vec3 = Seer.maths.Vec3
 Camera = Seer.graphics.Camera
 Audio = Seer.audio.Audio
 OSC = Seer.io.OSC
+Pad = Seer.io.Trackpad
+Pad.connect()
 
 Tree = Seer.examples.trees.Main.tree
 
@@ -51,7 +53,7 @@ def tree2
 end
 
 
-depth = 6
+depth = 8
 
 tree0()
 
@@ -120,8 +122,32 @@ OSC.bind("/hm", lambda{|f| print f[0] })
 
 #seer.io.Inputs.removeProcessor( 1 )
 
-
-
+mx=0.0
+my=0.0
+mz=0.0
+rz=0.0
+rx=0.0
+Pad.clear()
+Pad.bind( lambda{|i,f|
+	t = Java::com.fishuyo.examples.trees.Main.tree
+	if i == 2
+		mx = mx + f[2]*0.05  
+		mz = mz + f[3]*-0.05
+	elsif i == 3
+		mx = mx + f[2]*0.05  
+		my = my + f[3]*0.05
+	elsif i == 4
+		rz = rz + f[3]*0.05
+		rx = rx + f[2]*0.05
+	end
+	t.bAngle.y.setMinMax( 0.05, mx,false )
+    t.sRatio.set( mz )
+    t.bRatio.set( my )
+    t.sAngle.x.set( rx )
+    t.sAngle.z.set( rz )
+    #t.branch(depth)
+    t.refresh()
+})
 
 
 

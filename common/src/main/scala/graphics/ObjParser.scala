@@ -49,7 +49,7 @@ object ObjParser extends JavaTokenParsers {
         case Success( s, _ ) => s match {
           case Vertex(x,y,z) => obj.vertices += Vec3(x,y,z)
           case Normal(x,y,z) => obj.normals += Vec3(x,y,z) 
-          case Face(u,v,w) => obj.addFace(u,v,w)
+          case Face(u,v,w) => obj.addFace((u-1).toShort,(v-1).toShort,(w-1).toShort)
           case _ => None
         }
         case x => println( x )

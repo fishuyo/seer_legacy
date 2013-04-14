@@ -8,6 +8,7 @@ class LoopBuffer( var maxSize:Int = 0) {
   var (rPos, wPos) = (0,0)
   var (rMin, rMax) = (0,0) //read limiters
   var times = 0
+  var speed = 1.f
 
   //resize sample buffer, default doubles current buffer size
   def resize(size:Int){
@@ -55,6 +56,12 @@ class LoopBuffer( var maxSize:Int = 0) {
     curSize += numSamples;
   }
 
+  def readSampleAt(s:Float) = {
+    val i = s.toInt
+    val f = s - i
+    samples(i)*(1.f-f) + samples(i+1)*f
+  }
+
   //read sample data at r_head, between r_min and r_max
   def read( out:Array[Float], numSamples:Int, gain:Float=1.f){
     if( rPos < rMin || rPos >= rMax){ rPos = rMin; times+=1; }
@@ -79,32 +86,35 @@ class LoopBuffer( var maxSize:Int = 0) {
   }
 
   def readR( out:Array[Float], numSamples:Int, gain:Float=1.f ){
-    if( rPos < rMin || rPos >= rMax){ rPos = rMax-1; times+=1; }
-    val underlap = rPos + 1 - numSamples - rMin
-    
-    if( underlap <= -(rMax-rMin) ) return
-    var idx = rPos
-    
-    if(underlap < 0){
-      for( i <- (0 to rPos)){
-        out(i) = samples(idx) * gain
-        idx -= 1
-      }
-      idx = rMax - 1
-      for( i <- (rPos+1 until numSamples)){
-        out(i) = samples(idx) * gain
-        idx -= 1
-      }
+    this.synchronized{
+      if( rPos < rMin || rPos >= rMax){ rPos = rMax-1; times+=1; }
+      val underlap = rPos + 1 - numSamples - rMin
       
-      rPos = rMax - 1 + underlap
-      times+=1;
+      if( underlap <= -(rMax-rMin) ) return
+      var idx = rPos
       
-    }else{
-      for( i <- (0 until numSamples)){
-        out(i) = samples(idx) * gain
-        idx -= 1
+      println( underlap + " " + rPos + " " + rMin + " " + rMax)
+      if(underlap < 0){
+        for( i <- (0 until numSamples + underlap)){
+          out(i) = samples(idx) * gain
+          idx -= 1
+        }
+        idx = rMax - 1
+        for( i <- (numSamples+underlap until numSamples)){
+          out(i) = samples(idx) * gain
+          idx -= 1
+        }
+        
+        rPos = rMax - 1 + underlap
+        times+=1;
+        
+      }else{
+        for( i <- (0 until numSamples)){
+          out(i) = samples(idx) * gain
+          idx -= 1
+        }
+        rPos -= numSamples
       }
-      rPos -= numSamples
     }
   }
   
@@ -136,7 +146,7 @@ class LoopBuffer( var maxSize:Int = 0) {
     if( offset < rMin || offset >= rMax) offset = rMax-1;
     val underlap = offset + 1 - numSamples - rMin;
     
-    //assert( underlap > -(int)(rMax-rMin) );
+    if( underlap <= -(rMax-rMin) ) return
     var idx = offset
     
     if(underlap < 0){
@@ -181,7 +191,19 @@ class LoopBuffer( var maxSize:Int = 0) {
 
   //read between b1 and b2, uses smaller value as min (in samples)
   def setBounds( b1:Int, b2:Int){
-
+    this.synchronized{
+      var (min,max) = (0,0)
+      if(b1 < b2){
+        min = b1
+        max = b2
+      }else{
+        min = b2
+        max = b1
+      }
+      if( min < 0 ) min = 0
+      if( max > curSize ) max = curSize-1
+      rMin = min; rMax = max
+    }
   }
 
 }
@@ -234,7 +256,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   var onSync = ()=>{}
 
   
-  override def audioIO( in:Array[Float], out:Array[Float], count:Int ) = {
+  override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, count:Int ) = {
     var lPos = 0
     val l = (1.f - pan )
     val r = pan
@@ -272,7 +294,10 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
       //   out[0][i] += iobuffer[i] * l;
       //   out[1][i] += iobuffer[i] * r;
       // }
-      for( i <- (0 until count)) out(i) += iobuffer(i)
+      for( i <- (0 until count)){
+        out(0)(i) += iobuffer(i)*l
+        out(1)(i) += iobuffer(i)*r
+      }
       
       if( sync < b.times) onSync()
       if( times > 0 && b.times >= times ){

@@ -28,6 +28,13 @@ class Looper extends AudioSource {
 		else loops(i).play(times)
 	}
 	def stop(i:Int) = loops(i).stop
+	def togglePlay(i:Int){
+		if(!loops(i).playing){
+    	loops(i).play
+		}else{
+      loops(i).stop()
+		}
+	}
 	def stack(i:Int) = loops(i).stack
 	def reverse(i:Int) = loops(i).reverse
 	def rewind(i:Int) = loops(i).rewind
@@ -45,14 +52,21 @@ class Looper extends AudioSource {
 	}
 	def setGain(i:Int,f:Float) = loops(i).gain = f
 	def setDecay(i:Int,f:Float) = loops(i).decay = f
+	def setPan(i:Int,f:Float) = loops(i).pan = f
+	def setBounds(i:Int,min:Float,max:Float) = {
+		val b1 = min*loops(i).b.curSize
+		val b2 = max*loops(i).b.curSize
+		if (min > max) reverse(i)
+		loops(i).b.setBounds(b1.toInt,b2.toInt)
+	}
 
 	def switchTo(i:Int) = {
 		play(master,1);
 		loops(master).onDone = ()=>{loops(i).play; loops(master).onDone=non; master=i}
 	}
 
-	override def audioIO( in:Array[Float], out:Array[Float], numSamples:Int){
+	override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
 
-		loops.foreach( _.audioIO(in,out,numSamples) )
+		loops.foreach( _.audioIO(in,out,numOut,numSamples) )
 	}
 }

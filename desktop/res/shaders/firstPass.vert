@@ -1,6 +1,7 @@
 
 attribute vec4 a_position;
 attribute vec4 a_normal;
+attribute vec4 a_color;
 
 uniform vec4 u_color;
 uniform mat4 u_projectionViewMatrix;
@@ -31,6 +32,7 @@ void main()
   lightPosition = vec3(10.0,10.0,10.0);
 
   color = u_color;
+  color = a_color;
 
   gl_Position = u_projectionViewMatrix * a_position;
 }

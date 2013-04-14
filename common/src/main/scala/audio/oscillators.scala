@@ -6,8 +6,9 @@ class Gen extends AudioSource {
 	def apply() = gen()
 	var gen = ()=>{0.f}
 
-	override def audioIO(in:Array[Float], out:Array[Float], numSamples:Int){
-    for( i <- 0 until numSamples) out(i) += this()
+	override def audioIO(in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+    for( c<-(0 until numOut))
+      for( i <- 0 until numSamples) out(c)(i) += this()
   }
 
 	def *(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() * o() }} }

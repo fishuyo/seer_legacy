@@ -49,6 +49,7 @@ class Tree() extends GLAnimatable {
   def setMax( r:Randf, s:Float=1.f) = (v:Float) => {r.max = v*s; dirty=true}
   def setMinMax( r:Randf, s:Float=1.f) = (v1:Float,v2:Float) => {r.min = v1*s; r.max = v2*s; dirty=true}
   var dirty = true
+  def refresh() = dirty = true
 
   var seed:Long = scala.util.Random.nextLong
   var mseed:Long = 0

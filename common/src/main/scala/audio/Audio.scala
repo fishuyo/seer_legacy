@@ -27,18 +27,18 @@ object Scale {
 
 trait AudioSource {
   //def apply():Float = {0.f}
-  def audioIO( in:Array[Float], out:Array[Float], numSamples:Int){}
+  def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){}
 }
 
 object AudioPass extends AudioSource {
-  override def audioIO( in:Array[Float], out:Array[Float], numSamples:Int){
-    Array.copy(in,0,out,0,numSamples)
+  override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+    for( i<-(0 until numOut)) Array.copy(in,0,out(i),0,numSamples)
   }
 }
 
-object Audio extends SimpleAudio(44100, 512)
+object Audio extends SimpleAudio(44100, 512, false)
 
-class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=1024) extends Actor {
+class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boolean=false) extends Actor {
 
   var gain = .5f;
   var playing = true;
@@ -46,26 +46,38 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=1024) extends Act
   var record:AudioRecorder = null
   val in = new Array[Float](bufferSize)
   val ins = new Array[Short](bufferSize)
-  val out = new Array[Float](bufferSize)
+  val channels = if(mono) 1 else 2
+  val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
+  val out_interleaved = new Array[Float](bufferSize*channels)
 
   val sources = new ListBuffer[AudioSource]
 
   def act(){
-    if( device == null) device = Gdx.audio.newAudioDevice(sampleRate, true)
+    if( device == null) device = Gdx.audio.newAudioDevice(sampleRate, mono)
     if( record == null) record = Gdx.audio.newAudioRecorder(sampleRate, true)
     self ! Process
     loop{
       react{
         case Process => if( playing ){
 
+            // from input device, convert to float
             record.read(ins,0,bufferSize)
-            //device.writeSamples(ins,0,bufferSize)
             for( i <-( 0 until bufferSize)) in(i) = ins(i).toFloat / 32767.0f
 
-            sources.foreach( _.audioIO(in,out,bufferSize) )
+            // zero output buffers
+            for( c<-(0 until channels))
+              for( i<-(0 until bufferSize)) out(c)(i) = 0.f
 
-            for( i<-(0 until bufferSize)) out(i) *= gain
-            device.writeSamples(out,0,bufferSize)
+            // call audio callbacks
+            sources.foreach( _.audioIO(in,out,channels,bufferSize) )
+
+            // copy output buffers to interleaved
+            for( i<-(0 until bufferSize)){
+              for( c<-(0 until channels)){
+                out_interleaved(channels*i + c) = out(c)(i)*gain
+              }
+            }
+            device.writeSamples(out_interleaved,0,bufferSize*channels)
             self ! Process
           }
         case Stop => playing = false

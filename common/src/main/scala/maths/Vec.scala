@@ -4,12 +4,27 @@ package maths
 
 object Vec3 {
 
+  def apply() = new Vec3(0,0,0)
+  def apply(v:Vec3) = new Vec3(v.x,v.y,v.z)
   def apply( v: Float=0.f) = new Vec3( v, v, v)
   def apply( vv: Double) = { val v=vv.toFloat; new Vec3( v, v, v) }
   def apply( x: Float, y: Float, z: Float) = new Vec3(x,y,z)
   def apply( x: Double, y: Double, z: Double) =  new Vec3(x.toFloat,y.toFloat,z.toFloat) 
 
   def unapply( v: Vec3): Some[(Float,Float,Float)] = Some((v.x,v.y,v.z))
+
+  implicit object Vec3Numeric extends math.Numeric[Vec3] {
+    def plus(x: Vec3, y: Vec3) = x+y
+    def minus(x: Vec3, y: Vec3) = x-y
+    def times(x: Vec3, y: Vec3) = x*y
+    def negate(x: Vec3): Vec3 = -x
+    def fromInt(x: Int) = Vec3(x)
+    def toInt(x: Vec3) = x.mag().toInt
+    def toLong(x: Vec3) = x.mag().toLong
+    def toFloat(x: Vec3) = x.mag()
+    def toDouble(x: Vec3) = x.mag().toDouble
+    def compare(x:Vec3,y:Vec3) = (x.mag() - y.mag()).toInt
+  }
 }
 
 class Vec3( var x: Float, var y: Float, var z: Float ){
@@ -44,5 +59,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   def lerpTo( v:Vec3, d:Float) = this.set(this.lerp(v,d))
   
 }
+
+
 
 

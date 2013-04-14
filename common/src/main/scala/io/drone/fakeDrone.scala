@@ -75,6 +75,8 @@ class FakeDrone extends GLAnimatable {
   plot4.pose.pos = Vec3(2.f, 2.f, 0.f)
   plot4.color = Vec3(2.f,0.f,0.f)
 
+  var trace = new Trace3D(100)
+
 
 
 	def eval(state:(Float,Float),dt:Float,dstate:(Float,Float)) = {
@@ -83,11 +85,11 @@ class FakeDrone extends GLAnimatable {
 
 	override def step(dt:Float){
 
-		val p = drone.p.pos
-		val q = drone.p.quat
+		val p = drone.pose.pos
+		val q = drone.pose.quat
 		moveStep2(p.x, p.y, p.z, q.x,q.y,q.z,q.w )
 
-		val angles = drone.p.quat.toEuler()
+		val angles = q.toEuler()
 
 		if( takingOff && p.y < 0.5f){
 			thrust = 12.f
@@ -97,13 +99,13 @@ class FakeDrone extends GLAnimatable {
 		}
 
     if(physics){
-  		acceleration.set( drone.p.uu()*thrust )
+  		acceleration.set( drone.pose.uu()*thrust )
 
-  		drone.p.pos += velocity*dt
+  		drone.pose.pos += velocity*dt
   		velocity += (acceleration+g)*dt - velocity*.5f*dt 
 
   		if( p.y < 0.f){
-  			drone.p.pos.y = 0.f
+  			drone.pose.pos.y = 0.f
   			vel.set(0.f,0.f,0.f)
   		}
     }
@@ -113,6 +115,8 @@ class FakeDrone extends GLAnimatable {
     plot3(velocity.x)
     plot4(expected_v.x)
 
+    trace(p)
+
 	}
 	override def draw(){
 		destCube.draw()
@@ -121,22 +125,23 @@ class FakeDrone extends GLAnimatable {
     plot2.draw()
     plot3.draw()
     plot4.draw()
+    trace.draw()
 	}
 
 	def move(lr:Float,fb:Float,ud:Float,rot:Float){
 		if(!flying) return
 		navigating = false
-		drone.p.quat.fromEuler(fb*maxEuler,0.f,-lr*maxEuler)
-		thrust = (9.8f + ud)/drone.p.uu().y
+		drone.pose.quat.fromEuler(fb*maxEuler,0.f,-lr*maxEuler)
+		thrust = (9.8f + ud)/drone.pose.uu().y
 	}
 	def navmove(lr:Float,fb:Float,ud:Float,rot:Float){
-		drone.p.quat.fromEuler(fb*maxEuler,0.f,-lr*maxEuler)
-		thrust = (9.8f + ud)/drone.p.uu().y
+		drone.pose.quat.fromEuler(fb*maxEuler,0.f,-lr*maxEuler)
+		thrust = (9.8f + ud)/drone.pose.uu().y
 	}
 
 	def moveTo(x:Float,y:Float,z:Float,w:Float){
 
-		destCube.p.pos.set(x,y,z)
+		destCube.pose.pos.set(x,y,z)
     dest = Pose(Vec3(x,y,z),Quat())
     destYaw = w;
     while( destYaw < -180.f ) destYaw += 360.f
@@ -150,7 +155,7 @@ class FakeDrone extends GLAnimatable {
 		takingOff = true
 	}
 	def land() = { flying = false; takingOff=false; thrust = 5.f}
-	def hover() = { drone.p.quat.setIdentity(); velocity.set(0,0,0)}
+	def hover() = { drone.pose.quat.setIdentity(); velocity.set(0,0,0)}
 
 	//def dynamic(f:(Unit)=>Unit} = dynaMove = f
 	//var dynaMove = ()=>{}
@@ -203,11 +208,11 @@ class FakeDrone extends GLAnimatable {
   //
   def moveStep2(x:Float,y:Float,z:Float,qx:Float,qy:Float,qz:Float,qw:Float){
 
-    if( !flying || !navigating ){ navmove(0.f,0.f,0.f,0.f); return }
+    if( !flying || !navigating ){ return } //navmove(0.f,0.f,0.f,0.f); return }
 
     // calculate time since last step
     val t1 = System.currentTimeMillis()
-    val dt = 1/30.f //(t1 - t0) / 1000.f
+    val dt = (t1 - t0) / 1000.f
     t0 = t1
     //println("dt: "+dt)
 
@@ -257,7 +262,7 @@ class FakeDrone extends GLAnimatable {
           expected_v(i) = dd
           val ddd = acurve(time1(i),time2(i),neg(i))(t(i))
           //println( ddd )
-          expected_a(i) = kp(i)*((d+d0(i))-pose.pos(i)) + kd(i)*(dd-velocity(i)) + kdd(i)*(ddd-acceleration(i))
+          expected_a(i) = kp(i)*((d+d0(i))-pose.pos(i)) + kd(i)*(dd-v(i)) + kdd(i)*(ddd-a(i))
           t(i) += dt
           if(t(i) > (time2(i) + time1(i))){
             t(i) = 0.f
@@ -288,7 +293,7 @@ class FakeDrone extends GLAnimatable {
       else if( rot < -1.f) rot = -1.f
 
       navmove(control.x,control.y,control.z,rot)
-    }else { navmove(0.f,0.f,0.f,0.f)}
+    } //else { navmove(0.f,0.f,0.f,0.f)}
   }
 
 	// step 1
