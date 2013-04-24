@@ -7,21 +7,42 @@ class Gen extends AudioSource {
 	var gen = ()=>{0.f}
 
 	override def audioIO(in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
-    for( c<-(0 until numOut))
-      for( i <- 0 until numSamples) out(c)(i) += this()
+    for( i <- 0 until numSamples){
+      val s = this()
+      out(0)(i) += s/2.f
+      out(1)(i) += s/2.f
+    }
   }
 
 	def *(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() * o() }} }
 	def +(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() + o() }} }
 	def -(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() - o() }} }
 	def unary_-(o:Gen) = new Gen(){ gen = ()=>{ -o() }}
+
+  def ->(o:Osc) = {val that=this; new Gen(){ gen = ()=>{ o.f(that()); o() }} }
   
+}
+class SSine(var freq:Float = 440.f, var amp:Float=1.f) extends AudioSource {
+  var phase = 0.f
+  val pi2 = 2*math.Pi
+  override def audioIO(in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+  for( c<-(0 until numOut))
+    for( i <- 0 until numSamples){
+      out(c)(i) += math.sin(phase*pi2).toFloat * amp
+      phase += freq / 44100.f
+      phase %= 1
+    }
+  }
+
+  def f(f:Float) = freq = f
+  def a(f:Float) = amp = f
 }
 
 class Osc(var frequency:Float = 440.f, var amp:Float = 1.f) extends Gen{
   var phase = 0.f
   override def apply() = {
     phase += frequency / 44100.f
+    phase %= 1
     gen() * amp
   }
 
@@ -49,6 +70,8 @@ class Saw(f:Float=440.f, a:Float=1.f) extends Osc(f,a){
     out
   }
 }
+
+//class Val(var)
 
 class KarplusStrong(f:Float=440.f, var blend:Float=.99f, var damping:Float=.5f) extends Osc(f,1.f){
   /*val buf = Array[Float]()

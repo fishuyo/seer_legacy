@@ -1,55 +1,31 @@
 require 'java'
-Seer = Java::com.fishuyo
-Vec3 = Seer.maths.Vec3
-Camera = Seer.graphics.Camera
-Audio = Seer.audio.Audio
-OSC = Seer.io.OSC
-Pad = Seer.io.Trackpad
-Pad.connect()
 
-Tree = Seer.examples.trees.Main.tree
+$Seer = Java::com.fishuyo
+Seer = $Seer
+$Vec3 = $Seer.maths.Vec3
+$Camera = $Seer.graphics.Camera
+$Audio = $Seer.audio.Audio
+$OSC = $Seer.io.OSC
+$Pad = $Seer.io.Trackpad
 
-Tree.root.pose.pos.set(0,-0.5,0)
-Tree.root.pin(Tree.root.pose.pos)
+$tree = $Seer.examples.trees.Main.tree
+tree = $tree
+
+$tree.root.pose.pos.set(0,-0.5,0)
+$tree.root.pin($tree.root.pose.pos)
 
 def tree0
-	Tree.branchNum.setChoices([0,1,2].to_java :int)
-	Tree.branchNum.setProb([0.0,0.0,1.0].to_java :float)
-	Tree.sLength.setMinMax(0.5,0.5,false)
+	$tree.branchNum.setChoices([0,1,2].to_java :int)
+	$tree.branchNum.setProb([0.0,0.0,1.0].to_java :float)
+	$tree.sLength.setMinMax(0.5,0.5,false)
 
-	Tree.bAngle.z.setMinMax(0.0,0.0,false)
-	Tree.bAngle.y.setMinMax(0.0,1.2,true)
-	Tree.bAngle.x.setMinMax(0.0,0.0,false)
+	$tree.bAngle.z.setMinMax(0.0,0.0,false)
+	$tree.bAngle.y.setMinMax(0.0,1.2,true)
+	$tree.bAngle.x.setMinMax(0.0,0.0,false)
 
-	Tree.sAngle.z.setMinMax(1.0,1.0,false)
-	Tree.sAngle.y.setMinMax(0.0,0.0,false)
-	Tree.sAngle.x.setMinMax(0.0,0.0,false)
-end
-def tree1
-	Tree.branchNum.setChoices([0,1,2].to_java :int)
-	Tree.branchNum.setProb([0.0,0.0,1.0].to_java :float)
-	Tree.sLength.setMinMax(0.5,0.5,false)
-
-	Tree.bAngle.z.setMinMax(0.1,0.1,false)
-	Tree.bAngle.y.setMinMax(-1.0,1.0,false)
-	Tree.bAngle.x.setMinMax(0.0,0.0,false)
-
-	Tree.sAngle.z.setMinMax(-2.0,2.0,false)
-	Tree.sAngle.y.setMinMax(-0.2,0.2,false)
-	Tree.sAngle.x.setMinMax(-0.2,0.2,false)
-end
-def tree2
-	Tree.branchNum.setChoices([0,1,2].to_java :int)
-	Tree.branchNum.setProb([0.5,0.25,0.25].to_java :float)
-	Tree.sLength.setMinMax(0.5,0.5,false)
-
-	Tree.bAngle.z.setMinMax(0.1,1.0,false)
-	Tree.bAngle.y.setMinMax(0.1,1.0,false)
-	Tree.bAngle.x.setMinMax(0.0,0.2,false)
-
-	Tree.sAngle.z.setMinMax(0.7,0.1,false)
-	Tree.sAngle.y.setMinMax(-0.2,0.2,false)
-	Tree.sAngle.x.setMinMax(-0.2,0.2,false)
+	$tree.sAngle.z.setMinMax(1.0,1.0,false)
+	$tree.sAngle.y.setMinMax(0.0,0.0,false)
+	$tree.sAngle.x.setMinMax(0.0,0.0,false)
 end
 
 
@@ -57,79 +33,27 @@ depth = 8
 
 tree0()
 
-Tree.setAnimate(false)
-Tree.setReseed(true)
-Tree.setDepth(depth)
-Tree.branch(depth)
+$tree.setAnimate(false)
+$tree.setReseed(true)
+$tree.setDepth(depth)
+$tree.branch(depth)
+
+$Camera.rotateWorld(1.0)
+
+$Seer.trees.Fabric.gv.set(0.0,-10.0,0.0)
+$Seer.trees.Trees.gv.set(0.0,1.0,0.0)
 
 
-#Audio.sources.apply(0).f(40.0)
-#Audio.sources.apply(1).f(41.0)
-
-Camera.rotateWorld(1.0)
-
-OSC.bind("/1/fader1", Tree.set(Tree.sLength,2.0))
-
-OSC.bind("/2/fader1", Tree.setMin(Tree.sRatio,2.0))
-OSC.bind("/2/fader2", Tree.setMax(Tree.sRatio,2.0))
-OSC.bind("/2/fader3", Tree.setMin(Tree.sAngle.z,10.0))
-OSC.bind("/2/fader4", Tree.setMax(Tree.sAngle.z,10.0))
-OSC.bind("/2/fader5", Tree.setMin(Tree.sAngle.y,1.0))
-OSC.bind("/2/fader6", Tree.setMax(Tree.sAngle.y,1.0))
-OSC.bind("/2/fader7", Tree.setMin(Tree.sAngle.x,1.0))
-OSC.bind("/2/fader8", Tree.setMax(Tree.sAngle.x,1.0))
-
-OSC.bind("/3/fader1", Tree.setMin(Tree.bRatio,2.0))
-OSC.bind("/3/fader2", Tree.setMax(Tree.bRatio,2.0))
-OSC.bind("/3/fader3", Tree.setMin(Tree.bAngle.z,10.0))
-OSC.bind("/3/fader4", Tree.setMax(Tree.bAngle.z,10.0))
-OSC.bind("/3/fader5", Tree.setMin(Tree.bAngle.y,1.0))
-OSC.bind("/3/fader6", Tree.setMax(Tree.bAngle.y,1.0))
-OSC.bind("/3/fader7", Tree.setMin(Tree.bAngle.x,1.0))
-OSC.bind("/3/fader8", Tree.setMax(Tree.bAngle.x,1.0))
-
-OSC.bind("/2/multifader2/1", Tree.setMin(Tree.sRatio,2.0))
-OSC.bind("/2/multifader2/2", Tree.setMax(Tree.sRatio,2.0))
-OSC.bind("/2/multifader2/3", Tree.setMin(Tree.sAngle.z,10.0))
-OSC.bind("/2/multifader2/4", Tree.setMax(Tree.sAngle.z,10.0))
-OSC.bind("/2/multifader2/5", Tree.setMin(Tree.sAngle.y,1.0))
-OSC.bind("/2/multifader2/6", Tree.setMax(Tree.sAngle.y,1.0))
-OSC.bind("/2/multifader2/7", Tree.setMin(Tree.sAngle.x,1.0))
-OSC.bind("/2/multifader2/8", Tree.setMax(Tree.sAngle.x,1.0))
-
-OSC.bind("/2/multifader3/1", Tree.setMin(Tree.bRatio,2.0))
-OSC.bind("/2/multifader3/2", Tree.setMax(Tree.bRatio,2.0))
-OSC.bind("/2/multifader3/3", Tree.setMin(Tree.bAngle.z,10.0))
-OSC.bind("/2/multifader3/4", Tree.setMax(Tree.bAngle.z,10.0))
-OSC.bind("/2/multifader3/5", Tree.setMin(Tree.bAngle.y,1.0))
-OSC.bind("/2/multifader3/6", Tree.setMax(Tree.bAngle.y,1.0))
-OSC.bind("/2/multifader3/7", Tree.setMin(Tree.bAngle.x,1.0))
-OSC.bind("/2/multifader3/8", Tree.setMax(Tree.bAngle.x,1.0))
-
-OSC.bind("/1/fader4", Tree.setSeed() )
-#seer.graphics.Shader.apply(1)
-
-
-Seer.trees.Fabric.gv.set(0.0,-10.0,0.0)
-Seer.trees.Trees.gv.set(0.0,1.0,0.0)
-
-def hi( v1 )
- print v1
-end
-
-OSC.bind("/hm", lambda{|f| print f[0] })
-
-
-#seer.io.Inputs.removeProcessor( 1 )
-
+### Trackpad state ###
 mx=0.0
 my=0.0
 mz=0.0
 rz=0.0
 rx=0.0
-Pad.clear()
-Pad.bind( lambda{|i,f|
-	t = Java::com.fishuyo.examples.trees.Main.tree
+$Pad.clear()
+$Pad.connect()
+$Pad.bind( lambda{|i,f|
+	t = tree #Seer.examples.trees.Main.tree
 	if i == 2
 		mx = mx + f[2]*0.05  
 		mz = mz + f[3]*-0.05
@@ -150,21 +74,6 @@ Pad.bind( lambda{|i,f|
 })
 
 
+def step(dt)
 
-
-
-
-
-
-
-
-
-
-def size
-	return 200
-end
-def init
-	print 'hello'
-end
-def data( field )
 end

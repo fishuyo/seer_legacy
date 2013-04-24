@@ -77,7 +77,7 @@ class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
 			case Keys.Q => nav.angVel.z = w
 			case Keys.E => nav.angVel.z = -w
 
-			case Keys.NUM_1 => nav.moveToOrigin
+			//case Keys.NUM_1 => nav.moveToOrigin
 			case _ => false
 		}
 		false

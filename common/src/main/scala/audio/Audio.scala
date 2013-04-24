@@ -40,6 +40,8 @@ object Audio extends SimpleAudio(44100, 512, false)
 
 class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boolean=false) extends Actor {
 
+  var t0 = 0.f
+  var dt = 0.f
   var gain = .5f;
   var playing = true;
   var device:AudioDevice = null
@@ -59,7 +61,9 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boo
     loop{
       react{
         case Process => if( playing ){
-
+            val t1 = System.currentTimeMillis()
+            dt = (t1 - t0) / 1000.f
+            t0 = t1
             // from input device, convert to float
             record.read(ins,0,bufferSize)
             for( i <-( 0 until bufferSize)) in(i) = ins(i).toFloat / 32767.0f

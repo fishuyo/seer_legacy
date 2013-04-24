@@ -119,6 +119,58 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
   }
   def slerpTo(q:Quat, d:Float) = this.set( this.slerp(q,d))
   
+  def rotate(v:Vec3) = {
+      // dst = ((q * quat(v)) * q^-1)
+      // faster & simpler:
+      // we know quat(v).w == 0
+      val p = Quat(
+        -x*v.x - y*v.y - z*v.z,
+         w*v.x + y*v.z - z*v.y,
+         w*v.y - x*v.z + z*v.x,
+         w*v.z + x*v.y - y*v.x
+      )
+      // faster & simpler:
+      // we don't care about the w component
+      // and we know that conj() is simply (w, -x, -y, -z):
+      Vec3(
+        p.x*w - p.w*x + p.z*y - p.y*z,
+        p.y*w - p.w*y + p.x*z - p.z*x,
+        p.z*w - p.w*z + p.y*x - p.x*y
+      )
+    //  p *= conj();  // p * q^-1
+    //  return Vec<3,T>(p.x, p.y, p.z);
+  }
+
+  def getRotationTo(src:Vec3, dst:Vec3):Quat = {
+    val q = Quat()
+    
+    val d = src dot dst
+    if (d >= 1.f) {
+      // vectors are the same
+      return q;
+    }
+    if (d < -0.999999999f) {
+      // vectors are nearly opposing
+      // pick an axis to rotate around
+      var axis = Vec3(0, 1, 0) cross src
+      // if colinear, pick another:
+      if (axis.magSq() < 0.00000000001f) {
+        axis = Vec3(0, 0, 1) cross src
+      }
+      //axis.normalize();
+      q.fromAxisAngle(math.Pi, axis);
+    } else {
+      val s = math.sqrt((d+1.f)*2.f)
+      val invs = 1./s
+      val c = src cross dst
+      q.x = c(0) * invs;
+      q.y = c(1) * invs;
+      q.z = c(2) * invs;
+      q.w = s * 0.5;
+    }
+    return q.normalize();
+  }
+
   override def toString() = "[" + w + " " + x + " " + y + " " + z + "]"
 }
 

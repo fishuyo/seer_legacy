@@ -32,7 +32,7 @@ void main()
   lightPosition = vec3(10.0,10.0,10.0);
 
   color = u_color;
-  color = a_color;
+  //color = a_color;
 
   gl_Position = u_projectionViewMatrix * a_position;
 }

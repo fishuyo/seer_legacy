@@ -26,11 +26,12 @@ import monido._
      loaded = true
      //this.onLoad()
     } catch { 
-      case e:Exception => println(e)
+      case e:Exception => loaded = false; println(e)
     }
   }
          
-  def applyDynamic(name: String)(args: Any*) = {
+  def applyDynamic(name: String)(args: Any*){
+    if( !loaded ) return
     try { engine.invokeFunction(name, args.map(_.asInstanceOf[AnyRef]) : _*) }
     catch { case e:Exception => println(e) }
   }

@@ -2,8 +2,12 @@
 package com.fishuyo
 package audio
 
-class Looper extends AudioSource {
+import graphics._
+import maths.Vec3
+
+class Looper extends AudioSource with GLDrawable {
 	var loops = List[Loop]()
+	var plots = List[AudioDisplay]()
 	for( i<-(0 until 8)) newLoop
 	
 	var master = 0
@@ -22,7 +26,15 @@ class Looper extends AudioSource {
 		mode = s
 	}
 
-	def newLoop() = loops = new Loop(10.f) :: loops
+	def newLoop() = {
+		val l = new Loop(10.f)
+		loops = l :: loops
+		val p = new AudioDisplay(500)
+		p.pose.pos = Vec3( -0.75f*(plots.size%4)+1.5f,  -0.75f+0.75f*(plots.size/4), 0.f)
+		p.color = Vec3(0,1.f,0)
+		plots = p :: plots
+	}
+
 	def play(i:Int, times:Int=0) = {
 		if( times == 0) loops(i).play
 		else loops(i).play(times)
@@ -53,11 +65,14 @@ class Looper extends AudioSource {
 	def setGain(i:Int,f:Float) = loops(i).gain = f
 	def setDecay(i:Int,f:Float) = loops(i).decay = f
 	def setPan(i:Int,f:Float) = loops(i).pan = f
+	def setSpeed(i:Int,f:Float) = loops(i).b.speed = f
 	def setBounds(i:Int,min:Float,max:Float) = {
 		val b1 = min*loops(i).b.curSize
 		val b2 = max*loops(i).b.curSize
-		if (min > max) reverse(i)
+		loops(i).reverse( min > max)
 		loops(i).b.setBounds(b1.toInt,b2.toInt)
+		plots(i).setCursor(0,b1.toInt)
+		plots(i).setCursor(1,b2.toInt)
 	}
 
 	def switchTo(i:Int) = {
@@ -68,5 +83,14 @@ class Looper extends AudioSource {
 	override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
 
 		loops.foreach( _.audioIO(in,out,numOut,numSamples) )
+	}
+
+	override def draw(){
+		for( i<-(0 until plots.size)){
+			val p = plots(i)
+			p.setSamples(loops(i).b.samples,0,loops(i).b.curSize)
+			p.setCursor(2,loops(i).b.rPos.toInt)
+			p.draw()
+		}
 	}
 }

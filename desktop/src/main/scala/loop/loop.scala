@@ -6,34 +6,25 @@ import io._
 import dynamic._
 import audio._
 
-import monido._
+import scala.collection.mutable.ListBuffer
 
-object Main extends App{
+object Main extends App with GLAnimatable{
 
   SimpleAppRun.loadLibs()
+  GLScene.push(this)
   
-  var looper = new Looper //List[Loop]()
-  //for( i<-(0 until 8)) loops = new Loop(10.f) :: loops
+  var looper = new Looper
 
-  //loops.foreach( s => Audio.push( s ))
   Audio.push( looper )
+  GLScene.push( looper )
 
   val live = new Ruby("src/main/scala/loop/loop.rb")
-  OSC.listen()
 
-  val monitor = FileMonido("src/main/scala/loop/loop.rb"){
-    case ModifiedOrCreated(f) => Main.live.reload;
-    case _ => None
-  }
-  FileMonido("res/shaders/firstPass.vert"){
-    case ModifiedOrCreated(f) => Shader.reload;
-    case _ => None
-  }
-  FileMonido("res/shaders/firstPass.frag"){
-    case ModifiedOrCreated(f) => Shader.reload;
-    case _ => None
-  }
   SimpleAppRun()  
+
+  override def step(dt:Float){
+    live.step(dt)
+  }
 
 }
 

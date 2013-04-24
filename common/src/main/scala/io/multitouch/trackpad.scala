@@ -18,7 +18,8 @@ object Trackpad extends Observer{
   val callbacks = new ListBuffer[Callback]()
   val callbacksEach = new ListBuffer[Callback]()
 
-  val down = ListBuffer.fill(20)(false)
+
+  var down = ListBuffer[(Int,Vec3)]()
   val pos = new Array[Vec3](20)
 
   var connected = false
@@ -51,15 +52,22 @@ object Trackpad extends Observer{
           val dx = f.getXVelocity();
           val dy = f.getYVelocity();
 
+
           state match {
-            case FingerState.PRESSED => down(id) = true
-            case FingerState.RELEASED => down(id) = false
+            case FingerState.PRESSED =>           
+                val indx = down.indexWhere( _._1 == id );
+                if( indx != -1) down(indx) = ((id,Vec3(x,y,0.f))) else down += ((id,Vec3(x,y,0.f)))
+                
+            case FingerState.RELEASED => down = down.filterNot( _._1 == id )
             case _ => false
           }
-          pos(id) = Vec3(x,y,0.f)
+          // pos(id) = Vec3(x,y,0.f)
 
-          val indices = down.zipWithIndex.collect{ case (true,i) => i }
-          val p = indices.map( pos(_) )
+          // val indices = down.zipWithIndex.collect{ case (true,i) => i }
+          // val p = indices.map( pos(_) )
+
+          val p = down.map( _._2 )
+
           val centroid = p.sum / p.length
 
           val coords = p.flatMap( (v:Vec3) => List(v.x,v.y) )

@@ -25,7 +25,10 @@ object Shader {
   var color = (1.f,1.f,1.f,1.f)
 
   def setBgColor(c:Vec3, a:Float) = bg = (c.x,c.y,c.z,a)
-  def setColor(c:Vec3, a:Float) = color = (c.x,c.y,c.z,a)
+  def setColor(c:Vec3, a:Float) = {
+    color = (c.x,c.y,c.z,a)
+    this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+  }
   def matrixTransform( m:Matrix4 ) = Matrix4.mul(modelMatrix.`val`, m.`val`)
   def matrixClear() = modelMatrix.idt()
 
@@ -36,8 +39,9 @@ object Shader {
   	Matrix4.mul( modelViewMatrix.`val`, modelMatrix.`val`)
   	this().setUniformMatrix("u_projectionViewMatrix", projModelViewMatrix)
   	this().setUniformMatrix("u_modelViewMatrix", modelViewMatrix)
-    this().setUniformf("u_color", color._1, color._2, color._3, color._4)
   	//this().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+    this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+
   }
 
 

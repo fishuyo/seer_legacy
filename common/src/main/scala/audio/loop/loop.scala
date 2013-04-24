@@ -5,7 +5,7 @@ class LoopBuffer( var maxSize:Int = 0) {
   
   var samples = new Array[Float](maxSize)
   var curSize = 0
-  var (rPos, wPos) = (0,0)
+  var (rPos, wPos) = (0.f,0)
   var (rMin, rMax) = (0,0) //read limiters
   var times = 0
   var speed = 1.f
@@ -32,7 +32,7 @@ class LoopBuffer( var maxSize:Int = 0) {
         rPos = rMin;
         times+=1;
     }
-    val s = samples(rPos)
+    val s = readSampleAt(rPos)
     rPos += 1
     s
   }
@@ -42,7 +42,7 @@ class LoopBuffer( var maxSize:Int = 0) {
         rPos = rMax-1;
         times+=1;
     }
-    val s = samples(rPos)
+    val s = readSampleAt(rPos)
     rPos -= 1
     s
   }
@@ -58,123 +58,181 @@ class LoopBuffer( var maxSize:Int = 0) {
 
   def readSampleAt(s:Float) = {
     val i = s.toInt
+    val i2 = if( i == rMax-1) 0 else i+1
     val f = s - i
-    samples(i)*(1.f-f) + samples(i+1)*f
+    samples(i)*(1.f-f) + samples(i2)*f
+  }
+
+  def addSampleAt(s:Float,v:Float) = {
+    val i = s.toInt
+    val i2 = if( i == rMax-1) 0 else i+1
+    val f = s - i
+    samples(i) += v*(1.f-f)
+    samples(i2) += v*f
   }
 
   //read sample data at r_head, between r_min and r_max
   def read( out:Array[Float], numSamples:Int, gain:Float=1.f){
     if( rPos < rMin || rPos >= rMax){ rPos = rMin; times+=1; }
-    val overlap = rPos + numSamples - rMax;
-    
-    if( overlap >= (rMax-rMin) ) return;
-    if(overlap > 0){
-      var i = 0
-      while( i < (numSamples - overlap)){
-        out(i) = samples(rPos+i) * gain
-        i += 1
+
+    var read = 0
+    while( read < numSamples){
+      while( rPos < rMax ){
+        out(read) = readSampleAt(rPos) * gain
+        rPos += speed
+        read += 1
+        if( read == numSamples ) return
       }
-      for( j <- (0 until overlap)) out(i+j) = samples(rMin+j) * gain
-    
-      rPos = overlap
-      times+=1
-      
-    }else{
-      for( i <- (0 until numSamples)) out(i) = samples(rPos+i) * gain
-      rPos += numSamples
+      rPos = rPos - rMax + rMin
     }
+
+    // val overlap = rPos + numSamples - rMax;
+
+    // if( overlap >= (rMax-rMin) ) return;
+    // if(overlap > 0){
+    //   var i = 0
+    //   while( i < (numSamples - overlap)){
+    //     out(i) = samples(rPos+i) * gain
+    //     i += 1
+    //   }
+    //   for( j <- (0 until overlap)) out(i+j) = samples(rMin+j) * gain
+    
+    //   rPos = overlap
+    //   times+=1
+      
+    // }else{
+    //   for( i <- (0 until numSamples)) out(i) = samples(rPos+i) * gain
+    //   rPos += numSamples
+    // }
   }
 
   def readR( out:Array[Float], numSamples:Int, gain:Float=1.f ){
     this.synchronized{
       if( rPos < rMin || rPos >= rMax){ rPos = rMax-1; times+=1; }
-      val underlap = rPos + 1 - numSamples - rMin
-      
-      if( underlap <= -(rMax-rMin) ) return
-      var idx = rPos
-      
-      println( underlap + " " + rPos + " " + rMin + " " + rMax)
-      if(underlap < 0){
-        for( i <- (0 until numSamples + underlap)){
-          out(i) = samples(idx) * gain
-          idx -= 1
+
+      var read = 0
+      while( read < numSamples){
+        while( rPos >= rMin ){
+          out(read) = readSampleAt(rPos) * gain
+          rPos -= speed
+          read += 1
+          if( read == numSamples ) return
         }
-        idx = rMax - 1
-        for( i <- (numSamples+underlap until numSamples)){
-          out(i) = samples(idx) * gain
-          idx -= 1
-        }
-        
-        rPos = rMax - 1 + underlap
-        times+=1;
-        
-      }else{
-        for( i <- (0 until numSamples)){
-          out(i) = samples(idx) * gain
-          idx -= 1
-        }
-        rPos -= numSamples
+        rPos = rPos + rMax - rMin
       }
+    //   val underlap = rPos + 1 - numSamples - rMin
+      
+    //   if( underlap <= -(rMax-rMin) ) return
+    //   var idx = rPos
+      
+    //   println( underlap + " " + rPos + " " + rMin + " " + rMax)
+    //   if(underlap < 0){
+    //     for( i <- (0 until numSamples + underlap)){
+    //       out(i) = samples(idx) * gain
+    //       idx -= 1
+    //     }
+    //     idx = rMax - 1
+    //     for( i <- (numSamples+underlap until numSamples)){
+    //       out(i) = samples(idx) * gain
+    //       idx -= 1
+    //     }
+        
+    //     rPos = rMax - 1 + underlap
+    //     times+=1;
+        
+    //   }else{
+    //     for( i <- (0 until numSamples)){
+    //       out(i) = samples(idx) * gain
+    //       idx -= 1
+    //     }
+    //     rPos -= numSamples
+    //   }
     }
   }
   
-  def addFrom( from:Array[Float], numSamples:Int, off:Int=0 ){
+  def addFrom( from:Array[Float], numSamples:Int, off:Float=0.f ){
     
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMin
-    val overlap = offset + numSamples - rMax
-    
-    //assert( overlap < (int)(rMax-rMin) );
-    if(overlap > 0){
-      var i = 0
-      while( i < numSamples - overlap){
-        samples(offset+i) += from(i)
-        i += 1
+
+    var read = 0
+    while( read < numSamples){
+      while( offset < rMax ){
+        addSampleAt(offset, from(read) )
+        offset += speed
+        read += 1
+        if( read == numSamples ) return
       }
-      for( j <- (0 until overlap)){
-        samples(rMin+j) += from(i+j)
-      }
-      
-    }else{
-      for( i <- (0 until numSamples)){
-        samples(offset+i) += from(i)
-      }
+      offset = offset - rMax + rMin
     }
+
+
+    // val overlap = offset + numSamples - rMax
+    
+    // //assert( overlap < (int)(rMax-rMin) );
+    // if(overlap > 0){
+    //   var i = 0
+    //   while( i < numSamples - overlap){
+    //     samples(offset+i) += from(i)
+    //     i += 1
+    //   }
+    //   for( j <- (0 until overlap)){
+    //     samples(rMin+j) += from(i+j)
+    //   }
+      
+    // }else{
+    //   for( i <- (0 until numSamples)){
+    //     samples(offset+i) += from(i)
+    //   }
+    // }
   }
-  def addFromR( from:Array[Float], numSamples:Int, off:Int ){
+  def addFromR( from:Array[Float], numSamples:Int, off:Float ){
+
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMax-1;
-    val underlap = offset + 1 - numSamples - rMin;
-    
-    if( underlap <= -(rMax-rMin) ) return
-    var idx = offset
-    
-    if(underlap < 0){
-      for( i <- (0 until numSamples + underlap)){
-        if( idx < 0) println("!!!underlap: " + underlap + " i: " + i + " off: " + offset + " rpos: " + rPos)
-        samples(idx) += from(i)
-        idx -= 1
+
+    var read = 0
+    while( read < numSamples){
+      while( offset >= rMin ){
+        addSampleAt(offset, from(read) )
+        offset -= speed
+        read += 1
+        if( read == numSamples ) return
       }
-      idx = rMax-1
-      for( i <- (numSamples + underlap until numSamples)){
-        samples(idx) += from(i)
-        idx -= 1
-      }
-    }else{
-      for( i <- (0 until numSamples)){
-        samples(idx) += from(i)
-        idx -= 1
-      }
+      offset = offset + rMax - rMin
     }
+
+    // val underlap = offset + 1 - numSamples - rMin;
+    
+    // if( underlap <= -(rMax-rMin) ) return
+    // var idx = offset
+    
+    // if(underlap < 0){
+    //   for( i <- (0 until numSamples + underlap)){
+    //     if( idx < 0) println("!!!underlap: " + underlap + " i: " + i + " off: " + offset + " rpos: " + rPos)
+    //     samples(idx) += from(i)
+    //     idx -= 1
+    //   }
+    //   idx = rMax-1
+    //   for( i <- (numSamples + underlap until numSamples)){
+    //     samples(idx) += from(i)
+    //     idx -= 1
+    //   }
+    // }else{
+    //   for( i <- (0 until numSamples)){
+    //     samples(idx) += from(i)
+    //     idx -= 1
+    //   }
+    // }
   }
   
-  def applyGain( gain:Float, numSamples:Int, offset:Int ){
-    var num = numSamples
+  def applyGain( gain:Float, numSamples:Int, offset:Float ){
+    var num = numSamples//*speed
     var off = offset
     if( offset < rMin ) off = rMin
     while( num > 0 ){
       if(off >= rMax) off = rMin
-      samples(off) *= gain 
+      samples(off.toInt) *= gain 
       num -= 1
       off += 1   
     }
@@ -195,10 +253,10 @@ class LoopBuffer( var maxSize:Int = 0) {
       var (min,max) = (0,0)
       if(b1 < b2){
         min = b1
-        max = b2
+        max = b2+1
       }else{
         min = b2
-        max = b1
+        max = b1+1
       }
       if( min < 0 ) min = 0
       if( max > curSize ) max = curSize-1
@@ -245,6 +303,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   def record(){ recording = true; playing = false }
   def stack() =stacking = !stacking 
   def reverse() = reversing = !reversing
+  def reverse(b:Boolean) = reversing = b
   def undo() = {}
   def clear() = {
     b.rMin = 0
@@ -257,7 +316,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
 
   
   override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, count:Int ) = {
-    var lPos = 0
+    var lPos = 0.f
     val l = (1.f - pan )
     val r = pan
     var sync = b.times
@@ -290,10 +349,6 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     }
       
       //up mix to 2 channels
-      // for( int i=0; i < count; i++){
-      //   out[0][i] += iobuffer[i] * l;
-      //   out[1][i] += iobuffer[i] * r;
-      // }
       for( i <- (0 until count)){
         out(0)(i) += iobuffer(i)*l
         out(1)(i) += iobuffer(i)*r
