@@ -11,12 +11,14 @@ object Settings {
       "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/",
       "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
       "Sonatypes OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
-      "ScalaNLP Maven2" at "http://repo.scalanlp.org/repo"
+      "ScalaNLP Maven2" at "http://repo.scalanlp.org/repo",
+      "maven.org" at "http://repo1.maven.org/maven2"
     ),
     libraryDependencies ++= Seq(
       //"org.scala-lang" % "scala-compiler" % "2.9.1",
       "com.nativelibs4java" % "scalacl" % "0.2",
-      "de.sciss" %% "scalaosc" % "1.1.+"
+      "de.sciss" %% "scalaosc" % "1.1.+",
+      "com.github.philcali" % "monido-core_2.9.1" % "0.1.2"
       //"de.sciss" %% "scalaaudiofile" % "1.4.+"
       //"com.nativelibs4java" % "javacl" % "1.0.0-RC2",
       //"xuggle" % "xuggle-xuggler" % "5.4"
