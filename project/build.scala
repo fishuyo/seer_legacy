@@ -18,7 +18,8 @@ object Settings {
       //"org.scala-lang" % "scala-compiler" % "2.9.1",
       "com.nativelibs4java" % "scalacl" % "0.2",
       "de.sciss" %% "scalaosc" % "1.1.+",
-      "com.github.philcali" % "monido-core_2.9.1" % "0.1.2"
+      "com.github.philcali" % "monido-core_2.9.1" % "0.1.2",
+      "org.jruby" % "jruby" % "1.7.3"
       //"de.sciss" %% "scalaaudiofile" % "1.4.+"
       //"com.nativelibs4java" % "javacl" % "1.0.0-RC2",
       //"xuggle" % "xuggle-xuggler" % "5.4"
