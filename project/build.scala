@@ -31,7 +31,8 @@ object Settings {
     addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"),
     scalacOptions += "-Xexperimental",
     //sourceDirectories in Compile += new File("common/src"),
-    updateLibgdxTask
+    updateLibgdxTask,
+    downloadLibsTask
     //fork in Compile := true
    )
 
@@ -50,9 +51,38 @@ object Settings {
       //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
     )
 
+  val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
   val updateLibgdx = TaskKey[Unit]("update-gdx", "Updates libgdx")
 
-  val updateLibgdxTask = updateLibgdx <<= streams map { (s: TaskStreams) =>
+  def doDownloadLibs(s:TaskStreams) = {
+    import Process._
+    import java.io._
+    import java.net.URL
+    
+    // Declare names
+    val baseUrl = "http://fishuyo.com/stuff"
+    val zipName = "GlulogicMT.zip"
+    val zipFile = new java.io.File(zipName)
+
+    // Fetch the file.
+    s.log.info("Pulling %s" format(zipName))
+    val url = new URL("%s/%s" format(baseUrl, zipName))
+    IO.download(url, zipFile)
+
+    // Extract jars into their respective lib folders.
+    val commonDest = file("common/lib")
+    val desktopDest = file("desktop/lib")
+    val commonFilter = new ExactFilter("GlulogicMT.jar")
+    val deskFilter = new ExactFilter("libGlulogicMT.jnilib")
+    IO.unzip(zipFile, commonDest, commonFilter)
+    IO.unzip(zipFile, desktopDest, deskFilter)
+
+    // Destroy the file.
+    zipFile.delete
+    s.log.info("Complete")
+  }
+  
+  def doUpdateLibgdx(s:TaskStreams) = {
     import Process._
     import java.io._
     import java.net.URL
@@ -68,6 +98,8 @@ object Settings {
     val zipFile = new java.io.File(zipName)
     val url = new URL("%s/%s" format(baseUrl, zipName))
     IO.download(url, zipFile)
+
+    s.log.info("Extracting..")
 
     // Extract jars into their respective lib folders.
     val commonDest = file("common/lib")
@@ -96,24 +128,33 @@ object Settings {
     zipFile.delete
     s.log.info("Complete")
   }
+
+  val downloadLibsTask = downloadLibs <<= streams map { (s: TaskStreams) =>
+    doDownloadLibs(s)
+    doUpdateLibgdx(s)
+  }
+
+  val updateLibgdxTask = updateLibgdx <<= streams map { (s: TaskStreams) =>
+    doUpdateLibgdx(s)
+  }
 }
 
 object LibgdxBuild extends Build {
-  val all_common = Project (
+  val common = Project (
     "common",
     file("common"),
     settings = Settings.common
   )
 
-  lazy val desktop = Project (
+  lazy val a_desktop = Project (
     "desktop",
     file("desktop"),
     settings = Settings.desktop
-  ) dependsOn all_common
+  ) dependsOn common
 
   lazy val android = Project (
     "android",
     file("android"),
     settings = Settings.android
-  ) dependsOn all_common
+  ) dependsOn common
 }

@@ -4,6 +4,7 @@ package com.fishuyo
 import io._
 
 import com.badlogic.gdx.utils.GdxNativesLoader
+import com.badlogic.gdx.utils.SharedLibraryLoader
 import com.badlogic.gdx.backends.lwjgl._
 import com.badlogic.gdx._
 import com.badlogic.gdx.graphics.GL20
@@ -18,11 +19,32 @@ object SimpleAppRun {
   val app = new SimpleAppListener()
   Inputs.addProcessor(FullscreenKey)
 
+  def unsafeAddDir(dir: String) = try {
+    val field = classOf[ClassLoader].getDeclaredField("usr_paths")
+    field.setAccessible(true)
+    val paths = field.get(null).asInstanceOf[Array[String]]
+    if(!(paths contains dir)) {
+      field.set(null, paths :+ dir)
+      System.setProperty("java.library.path",
+       System.getProperty("java.library.path") +
+       java.io.File.pathSeparator +
+       dir)
+    }
+  } catch {
+    case _: IllegalAccessException =>
+      error("Insufficient permissions; can't modify private variables.")
+    case _: NoSuchFieldException =>
+      error("JVM implementation incompatible with path hack")
+  }
+
   def loadLibs(){
     if (nativesLoaded) return
     println("loading native libraries..")
-    try GdxNativesLoader.load()
-    catch { case e:Exception => println(e) } 
+    try {
+      GdxNativesLoader.load()
+      unsafeAddDir("lib")
+      //new SharedLibraryLoader("lib/GlulogicMT.jar").load("GlulogicMT")
+    } catch { case e:Exception => println(e) } 
     nativesLoaded = true
   }
   def apply() = {
