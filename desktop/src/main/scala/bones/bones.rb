@@ -15,12 +15,12 @@ M = Seer.bones.Main
 bones = M.bones
 
 ground = M.ground
-ground.s.set(100,100,100)
-ground.p.pos.set(0,24.5,0)
+ground.scale.set(100,100,100)
+ground.pose.pos.set(0,24.5,0)
 
 drone = M.drone
-drone.drone.s.set(1.0,1.0,1.0)
-#drone.drone.p.pos.set(0,0,0)
+#drone.drone.scale.set(1.0,1.0,1.0)
+#drone.drone.pose.pos.set(0,0,0)
 #drone.velocity.set(0,0,0)
 
 x=0
@@ -63,8 +63,8 @@ Track.clear()
 Track.bind("point", lambda{|i,f|
 	o = i# - 655361
 	if o > 0 and o < 34
-		bones[o].s.set(0.05,0.05,0.05)
-		bones[o].p.pos.set(f[0],f[1]+1.0,f[2])
+		bones[o].scale.set(0.05,0.05,0.05)
+		bones[o].pose.pos.set(f[0],f[1]+1.0,f[2])
 		M.sines[o].f(f[1]+1.0*500.0)
 		#amp = (bones[o].p.pos - ppos[o])
 		M.sines[o].a(0.1)
@@ -72,7 +72,7 @@ Track.bind("point", lambda{|i,f|
 		#bones[o].p.quat.set(f[6],f[3],f[4],f[5])
 	end
 })
-drone.setPhysics(false)
+drone.setPhysics(true)
 Track.bind("rigid_body", lambda{|i,f|
 	if i == 1
 		drone.drone.p.pos.set(f[0],f[1]+1.0,f[2])

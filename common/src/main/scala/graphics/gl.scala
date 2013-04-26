@@ -100,6 +100,7 @@ object GLPrimitive extends GLThis {
     }
     new GLPrimitive(p,s,mesh,draw)
   }
+
   def cube( p:Pose = new Pose(), s:Vec3=Vec3(1), c:RGB = RGB.green ) = {
     val mesh = new Mesh(true,24,36, VertexAttribute.Position, VertexAttribute.Normal)
     mesh.setVertices( Array[Float](
@@ -148,6 +149,42 @@ object GLPrimitive extends GLThis {
       // draw the cube
       mesh.render(Shader(), GL10.GL_TRIANGLES)
       //gl10.glPopMatrix()
+    }
+    new GLPrimitive(p,s,mesh,draw)
+  }
+
+  def cylinder(p:Pose=Pose(), s:Vec3=Vec3(1), r1:Float=1.f, r2:Float=1.f, vertCount:Int=60) = {
+    val vert = new ListBuffer[Float]
+    val indx = new ListBuffer[Short]
+
+    val indxCount = vertCount+2
+    var theta = 0.0
+
+    for (j <- (0 until vertCount)){
+      val r = (if( 3*j % 2 == 0) r1 else r2)
+      val x = math.cos(theta).toFloat
+      val y = math.sin(theta).toFloat
+
+      vert += x
+      vert += y
+      vert += (r1-r2) / (s.z) //0.f
+
+      vert += r*x
+      vert += r*y
+      vert += (if( 3*j % 2 == 0) 1.f else -1.f)
+      theta += 2 * math.Pi / (vertCount)
+    }
+
+    for ( j <- (0 until indxCount)) {
+      indx += (j % vertCount).toShort
+    }
+
+    val mesh = new Mesh(true, vert.size/6, indx.size, VertexAttribute.Normal, VertexAttribute.Position)
+    mesh.setVertices(vert.toArray)
+    mesh.setIndices(indx.toArray)
+
+    val draw = () => {
+      mesh.render(Shader(), GL10.GL_TRIANGLE_STRIP)
     }
     new GLPrimitive(p,s,mesh,draw)
   }

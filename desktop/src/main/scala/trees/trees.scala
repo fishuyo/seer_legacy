@@ -16,9 +16,9 @@ object Main extends App with GLAnimatable {
   var trees = new Tree() :: List() //:: TreeNode( Vec3(3.f,0,0), .3f ) :: TreeNode( Vec3( 6.f,0,0), .3f) :: TreeNode( Vec3(9.f,0,0), .1f) :: List()
   var fabrics = Fabric( Vec3(0,-.5f,0), 1.f,1.f,.05f,"xz") ::List()//:: Fabric( Vec3(3.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(6.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(9.f,0,0),1.f,1.f,.05f,"xz") :: List()
 
-  var osc = new Tri(41.f)
-  var lfo = new Saw(1.f)
-  var sounds = osc * ((1.f-lfo)*.5f) :: List()
+  // var osc = new Tri(41.f)
+  // var lfo = new Saw(1.f)
+  // var sounds = osc * ((1.f-lfo)*.5f) :: List()
 
   trees(0).branch()
   var tree = trees(0)
@@ -26,7 +26,7 @@ object Main extends App with GLAnimatable {
   trees.foreach( t => GLScene.push( t ) )
   fabrics.foreach( f => GLScene.push( f ) )
 
-  sounds.foreach( s => Audio.push( s ))
+  //sounds.foreach( s => Audio.push( s ))
 
   //val f = Gdx.files.internal("res/wind.mp3")
   //val wind = Gdx.audio.newMusic(f)

@@ -15,6 +15,7 @@ object Quat {
   val acc_max = 1.000001
   val acc_min = 0.999999
   def apply( w:Float, x:Float, y:Float, z:Float ) = new Quat(w,x,y,z)
+  def apply(q:Quat) = new Quat(q.w,q.x,q.y,q.z)
   def apply() = new Quat(1,0,0,0)
 }
 

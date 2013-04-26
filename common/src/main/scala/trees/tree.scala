@@ -30,9 +30,10 @@ object Trees extends GLAnimatable {
 
 object Tree {
   def apply(pos:Vec3=Vec3(0)) = new Tree(){ root.pose.pos = pos; }
-
 }
+
 class Tree() extends GLAnimatable {
+  
   var root = TreeNode()
 
   val sLength = Randf(1.f,1.f,true)
@@ -80,7 +81,7 @@ class Tree() extends GLAnimatable {
     var dist = n.dist * sRatio()
     var quat = (n.pose.quat * Quat().fromEuler(sAngle())).normalize
     var pos = n.pose.pos - quat.toZ()*dist
-    var stem = TreeNode( Pose(pos,quat), dist, n.thick * sThick() )
+    var stem = TreeNode( Pose(pos,quat), dist, n.thick * n.taper )
 
     //branch n times
     var sign = -1
@@ -91,7 +92,7 @@ class Tree() extends GLAnimatable {
       quat = (quat * Quat().fromEuler(bAngle()*sign)).normalize
       pos = n.pose.pos - quat.toZ()*dist
 
-      branches = TreeNode( Pose(pos,quat), dist, n.thick * sThick() ) :: branches
+      branches = TreeNode( Pose(pos,quat), dist, n.thick * n.taper ) :: branches
     }
 
     n.children = stem :: branches
@@ -110,12 +111,12 @@ class Tree() extends GLAnimatable {
     }
     if( size == 0) return
     var idx = 0;
-    root.draw(vertices, idx)
+    root.draw() //vertices, idx)
 
-    gl.glLineWidth( 1.f )
+    //gl.glLineWidth( 1.f )
 
-    mesh.setVertices(vertices)
-    mesh.render( Shader(), GL10.GL_LINES)
+    //mesh.setVertices(vertices)
+    //mesh.render( Shader(), GL10.GL_LINES)
 
   }
   override def step(dt:Float) = {
@@ -135,7 +136,17 @@ class Tree() extends GLAnimatable {
 }
 
 object TreeNode {
-  def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(math.Pi/2,0,0))), d:Float=1.f, t:Float=1.f ) = new TreeNode { pose = p; lPos = p.pos; dist = d; thick = t } 
+
+	var taper=.8f
+	var glprimitive = GLPrimitive.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
+
+  def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(math.Pi/2,0,0))), d:Float=1.f, t:Float=.2f ) = new TreeNode {
+  	pose = p;
+  	lPos = p.pos; 
+  	dist = d;
+  	thick = t 
+  	//glprimitive = GLPrimitive.cylinder(pose,Vec3(1,1,d), d*thick, d*thick*taper, 10)
+ 	} 
   /*def apply( p:TreeNode, ang: Float, d: Float ) = {
     
     val v = Vec3( math.cos( ang * math.Pi/180.f ), math.sin( ang * math.Pi/180.f ), 0.f ) * d + p.pos
@@ -156,22 +167,27 @@ class TreeNode extends GLAnimatable {
   var dist = 1.f
   
   var thick = 1.f
+  var taper = .8f
   var pinned = false
   var size = 0;
+  //var glprimitive:GLPrimitive = _
 
   //var parent:Option[TreeNode] = None
   var children = List[TreeNode]()
 
-  def draw( v:Array[Float], idx:Int ):Int = {
+  override def draw( ){ //v:Array[Float], idx:Int ):Int = {
 
-    var i = idx
-    children.foreach( (n) => {
-     v(i) = pose.pos.x; v(i+1) = pose.pos.y; v(i+2) = pose.pos.z
-     v(i+3) = n.pose.pos.x; v(i+4) = n.pose.pos.y; v(i+5) = n.pose.pos.z
-     i += 6
-     i = n.draw(v,i)
-    })
-    i
+		TreeNode.glprimitive.pose = pose
+		TreeNode.glprimitive.scale.set(dist*thick,dist*thick,dist)
+		TreeNode.glprimitive.draw();
+    // var i = idx
+     children.foreach( (n) => { n.draw() })//{
+    //  v(i) = pose.pos.x; v(i+1) = pose.pos.y; v(i+2) = pose.pos.z
+    //  v(i+3) = n.pose.pos.x; v(i+4) = n.pose.pos.y; v(i+5) = n.pose.pos.z
+    //  i += 6
+    //  i = n.draw(v,i)
+    // })
+    // i
     
   }
 
@@ -190,6 +206,8 @@ class TreeNode extends GLAnimatable {
     }
     children.foreach( _.step(dt) )
   }
+
+  //def destroy(){ children.foreach( (n) => {n.destroy(); n.glprimitive.mesh.dispose()}) }
 
   def applyForce( f: Vec3 ) : Vec3 = {
     accel += f / mass
