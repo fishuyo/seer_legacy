@@ -171,7 +171,7 @@ object GLPrimitive extends GLThis {
 
       vert += r*x
       vert += r*y
-      vert += (if( 3*j % 2 == 0) 1.f else -1.f)
+      vert += (if( 3*j % 2 == 0) 2.f else 0.f) //-1.f)
       theta += 2 * math.Pi / (vertCount)
     }
 

@@ -16,7 +16,7 @@ $tree.root.pin($tree.root.pose.pos)
 
 def tree0
 	$tree.branchNum.setChoices([0,1,2].to_java :int)
-	$tree.branchNum.setProb([0.0,0.0,1.0].to_java :float)
+	$tree.branchNum.setProb([0.0,1.0,0.0].to_java :float)
 	$tree.sLength.setMinMax(0.5,0.5,false)
 
 	$tree.bAngle.z.setMinMax(0.0,0.0,false)
@@ -29,7 +29,7 @@ def tree0
 end
 
 
-depth = 8
+depth = 10
 
 tree0()
 
@@ -38,7 +38,7 @@ $tree.setReseed(true)
 $tree.setDepth(depth)
 $tree.branch(depth)
 
-$Camera.rotateWorld(1.0)
+$Camera.rotateWorld(0.0)
 
 $Seer.trees.Fabric.gv.set(0.0,-10.0,0.0)
 $Seer.trees.Trees.gv.set(0.0,1.0,0.0)

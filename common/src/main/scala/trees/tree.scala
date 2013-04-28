@@ -178,7 +178,7 @@ class TreeNode extends GLAnimatable {
   override def draw( ){ //v:Array[Float], idx:Int ):Int = {
 
 		TreeNode.glprimitive.pose = pose
-		TreeNode.glprimitive.scale.set(dist*thick,dist*thick,dist)
+		TreeNode.glprimitive.scale.set(dist*thick,dist*thick,dist*1.05f)
 		TreeNode.glprimitive.draw();
     // var i = idx
      children.foreach( (n) => { n.draw() })//{

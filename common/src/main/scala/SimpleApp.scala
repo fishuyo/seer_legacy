@@ -40,6 +40,9 @@ class SimpleAppListener extends ApplicationListener {
   // val t2 = new Texture(width, height, format);
 
   val fps = new FPSLogger
+  var logfps = true
+  def setLogFPS(b:Boolean) = logfps = b
+
   var dtAccum = 0.f
 
   def create(){
@@ -73,7 +76,7 @@ class SimpleAppListener extends ApplicationListener {
       //quad = GLPrimitive.quad
     }
 
-    //fps.log
+    if( logfps ) fps.log
     val timeStep = 1.f/30.f
     dtAccum += Gdx.graphics.getDeltaTime()
     while( dtAccum > timeStep ){
