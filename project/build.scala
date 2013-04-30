@@ -6,7 +6,8 @@ import AndroidKeys._
 object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq (
     version := "0.1",
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.2",
+
     resolvers ++= Seq(
       "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/",
       "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
@@ -14,6 +15,7 @@ object Settings {
       "ScalaNLP Maven2" at "http://repo.scalanlp.org/repo",
       "maven.org" at "http://repo1.maven.org/maven2"
     ),
+
     libraryDependencies ++= Seq(
       //"org.scala-lang" % "scala-compiler" % "2.9.1",
       "com.nativelibs4java" % "scalacl" % "0.2",
@@ -27,6 +29,7 @@ object Settings {
       //"net.sf.bluecove" % "bluecove" % "2.1.0",
       //"net.sf.bluecove" % "bluecove-gpl" % "2.1.0"
     ),
+
     autoCompilerPlugins := true,
     addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"),
     scalacOptions += "-Xexperimental",
