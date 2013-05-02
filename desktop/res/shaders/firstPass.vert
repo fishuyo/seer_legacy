@@ -31,7 +31,11 @@ void main()
   // pass the light position through
   lightPosition = vec3(10.0,10.0,10.0);
 
-  color = u_color;
+  if( a_color != vec4(0.0,0.0,0.0,1.0)){
+    color = a_color;
+  }else{
+    color = u_color;  
+  }
   //color = a_color;
 
   gl_Position = u_projectionViewMatrix * a_position;

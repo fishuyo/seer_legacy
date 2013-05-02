@@ -12,9 +12,10 @@ import com.badlogic.gdx.Gdx
 object Main extends App with GLAnimatable {
 
   SimpleAppRun.loadLibs()
+  GLScene.push(this)
   
   var trees = new Tree() :: List() //:: TreeNode( Vec3(3.f,0,0), .3f ) :: TreeNode( Vec3( 6.f,0,0), .3f) :: TreeNode( Vec3(9.f,0,0), .1f) :: List()
-  var fabrics = Fabric( Vec3(0,-.5f,0), 1.f,1.f,.05f,"xz") ::List()//:: Fabric( Vec3(3.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(6.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(9.f,0,0),1.f,1.f,.05f,"xz") :: List()
+  //var fabrics = Fabric( Vec3(0,-.5f,0), 1.f,1.f,.05f,"xz") ::List()//:: Fabric( Vec3(3.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(6.f,0,0),1.f,1.f,.05f,"xz") :: Fabric( Vec3(9.f,0,0),1.f,1.f,.05f,"xz") :: List()
 
   // var osc = new Tri(41.f)
   // var lfo = new Saw(1.f)
@@ -24,7 +25,11 @@ object Main extends App with GLAnimatable {
   var tree = trees(0)
 
   trees.foreach( t => GLScene.push( t ) )
-  fabrics.foreach( f => GLScene.push( f ) )
+  //fabrics.foreach( f => GLScene.push( f ) )
+
+  val cube = GLPrimitive.cube()
+  cube.pose.pos.set(1,0,0)
+  GLScene.push( cube )
 
   //sounds.foreach( s => Audio.push( s ))
 

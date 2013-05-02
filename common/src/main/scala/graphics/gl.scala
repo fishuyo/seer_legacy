@@ -171,7 +171,7 @@ object GLPrimitive extends GLThis {
 
       vert += r*x
       vert += r*y
-      vert += (if( 3*j % 2 == 0) 2.f else 0.f) //-1.f)
+      vert += (if( 3*j % 2 == 0) 0.f else 2.f) //-1.f)
       theta += 2 * math.Pi / (vertCount)
     }
 
@@ -214,10 +214,12 @@ class GLPrimitive(var pose:Pose, var scale:Vec3, var mesh:Mesh, val drawFunc:()=
     val s = scale / 2.f
     //val sm = new Matrix4().scl(scale.x,scale.y,scale.z)
     val m = new Matrix4().translate(pose.pos.x,pose.pos.y,pose.pos.z).rotate(pose.quat.toQuaternion()).scale(s.x,s.y,s.z)
-    Shader.matrixClear()
+    //Shader.matrixClear()
+    val oldm = new Matrix4(Shader.modelMatrix)
     Shader.matrixTransform(m)
     Shader.setMatrices()
     drawFunc()
+    Shader.modelMatrix = oldm
   }
 }
 

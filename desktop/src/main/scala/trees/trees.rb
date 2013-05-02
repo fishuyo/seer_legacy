@@ -1,5 +1,23 @@
 require 'java'
 
+module M
+  include_package "com.fishuyo.io"
+  include_package "com.fishuyo.maths"
+  include_package "com.fishuyo.spatial"
+  include_package "com.fishuyo.graphics"
+  include_package "com.fishuyo.util"
+  include_package "com.fishuyo.examples.trees"
+end
+
+class Object
+  class << self
+    alias :const_missing_old :const_missing
+    def const_missing c
+      M.const_get c
+    end
+  end
+end
+
 $Seer = Java::com.fishuyo
 Seer = $Seer
 $Vec3 = $Seer.maths.Vec3
@@ -65,15 +83,22 @@ $Pad.bind( lambda{|i,f|
 		rx = rx + f[2]*0.05
 	end
 	t.bAngle.y.setMinMax( 0.05, mx,false )
-    t.sRatio.set( mz )
-    t.bRatio.set( my )
-    t.sAngle.x.set( rx )
-    t.sAngle.z.set( rz )
+	#t.bAngle.y.set(mx)
+    t.sRatio.setMinMax( 0.05, mz, false )
+    #t.sRatio.set( mz )
+    t.bRatio.setMinMax( 0.05, my, false )
+    #t.bRatio.set( my )
+    t.sAngle.x.setMinMax( 0.05, rx, false )
+    #t.sAngle.x.set( rx )
+    t.sAngle.z.setMinMax( 0.05, rz, false )
+    #t.sAngle.z.set( rz )
     #t.branch(depth)
     t.refresh()
 })
 
 
 def step(dt)
+	Main.cube.scale.set(0.1,0.1,0.1)
+	Main.cube.pose.pos.set(Main.tree.root.pose.pos)
 
 end
