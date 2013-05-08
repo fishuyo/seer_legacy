@@ -51,7 +51,7 @@ depth = 10
 
 tree0()
 
-$tree.setAnimate(false)
+$tree.setAnimate(true)
 $tree.setReseed(true)
 $tree.setDepth(depth)
 $tree.branch(depth)
@@ -72,7 +72,9 @@ $Pad.clear()
 $Pad.connect()
 $Pad.bind( lambda{|i,f|
 	t = tree #Seer.examples.trees.Main.tree
-	if i == 2
+	if i == 1
+		t.root.applyForce( Vec3.apply((f[0]-0.5)*1.0*f[4],(f[1]-0.5)*f[4],0))
+	elsif i == 2
 		mx = mx + f[2]*0.05  
 		mz = mz + f[3]*-0.05
 	elsif i == 3
@@ -82,22 +84,27 @@ $Pad.bind( lambda{|i,f|
 		rz = rz + f[3]*0.05
 		rx = rx + f[2]*0.05
 	end
-	t.bAngle.y.setMinMax( 0.05, mx,false )
-	#t.bAngle.y.set(mx)
-    t.sRatio.setMinMax( 0.05, mz, false )
-    #t.sRatio.set( mz )
-    t.bRatio.setMinMax( 0.05, my, false )
-    #t.bRatio.set( my )
-    t.sAngle.x.setMinMax( 0.05, rx, false )
-    #t.sAngle.x.set( rx )
-    t.sAngle.z.setMinMax( 0.05, rz, false )
-    #t.sAngle.z.set( rz )
-    #t.branch(depth)
-    t.refresh()
+
+	if i > 1
+		t.bAngle.y.setMinMax( 0.05, mx,false )
+		#t.bAngle.y.set(mx)
+	    t.sRatio.setMinMax( 0.05, mz, false )
+	    #t.sRatio.set( mz )
+	    t.bRatio.setMinMax( 0.05, my, false )
+	    #t.bRatio.set( my )
+	    t.sAngle.x.setMinMax( 0.05, rx, false )
+	    #t.sAngle.x.set( rx )
+	    t.sAngle.z.setMinMax( 0.05, rz, false )
+	    #t.sAngle.z.set( rz )
+	    #t.branch(depth)
+	    t.refresh()
+	end
 })
 
 
 def step(dt)
+	#puts Main.tree.root.children[0].euler
+
 	Main.cube.scale.set(0.1,0.1,0.1)
 	Main.cube.pose.pos.set(Main.tree.root.pose.pos)
 

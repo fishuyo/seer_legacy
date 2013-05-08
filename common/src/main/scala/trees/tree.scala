@@ -80,9 +80,10 @@ class Tree() extends GLAnimatable {
 
     //current branch continuation
     var dist = n.dist * sRatio()
-    var quat = (n.pose.quat * Quat().fromEuler(sAngle())).normalize
+    val q = Quat().fromEuler(sAngle())
+    var quat = (n.pose.quat * q).normalize
     var pos = n.pose.pos + n.pose.quat.toZ()*n.dist
-    var stem = TreeNode( Pose(pos,quat), dist, n.thick * n.taper )
+    var stem = TreeNode( Pose(pos,quat), dist, n.thick * n.taper, q )
 
     //branch n times
     var sign = -1
@@ -90,10 +91,11 @@ class Tree() extends GLAnimatable {
     for( i <- (0 until count) ){
       sign *= -1
       dist = n.dist * bRatio()
-      quat = (quat * Quat().fromEuler(bAngle()*sign)).normalize
+      val qb = Quat().fromEuler(bAngle()*sign)
+      quat = (quat * qb).normalize
       //pos = n.pose.pos + quat.toZ()*n.dist
 
-      branches = TreeNode( Pose(pos,quat), dist, n.thick * n.taper ) :: branches
+      branches = TreeNode( Pose(pos,quat), dist, n.thick * n.taper, qb ) :: branches
     }
 
     n.children = stem :: branches
@@ -133,8 +135,8 @@ class Tree() extends GLAnimatable {
     if( dirty ){ branch(); dirty = false }    
 
     if(animating){
-      for( s <- (0 until 3) ) root.solveConstraints()
       root.step(dt)
+      root.solveConstraints()
     }
   }
 }
@@ -144,12 +146,24 @@ object TreeNode {
 	var taper=.8f
 	var glprimitive = GLPrimitive.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
 
-  def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(-math.Pi/2,0,0))), d:Float=1.f, t:Float=.2f ) = new TreeNode {
+  def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(-math.Pi/2,0,0))), d:Float=1.f, t:Float=.2f, q:Quat=Quat() ) = new TreeNode {
+  	restPose = Pose(p);
+  	relQuat = q;
   	pose = p;
-  	lPos = p.pos; 
+  	lPose = Pose(p);
+  	//lPos = p.pos; 
   	dist = d;
   	thick = t
-  	mass = d*t*1000.f;
+  	mass = d*t*1.f;
+  	euler = Vec3(0)
+  	lEuler = Vec3(0)
+
+  	r = 1/(dist*dist) * .1f
+    w = Randf(0,3.14f)()
+    f = 1.f/dist * 1.f
+
+    //k = 10.f * thick*thick*thick / (4*dist*dist*dist)
+    k = 10.f * thick/ (4*dist)
   	//glprimitive = GLPrimitive.cylinder(pose,Vec3(1,1,d), d*thick, d*thick*taper, 10)
  	} 
   /*def apply( p:TreeNode, ang: Float, d: Float ) = {
@@ -163,12 +177,16 @@ class TreeNode extends GLAnimatable {
 
   var pose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
   var lPose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
-  var pos = Vec3(0)
-  var lPos = Vec3(0)
+  var restPose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
+  var relQuat = Quat()
+
+  //var pos = Vec3(0)
+  // var lPos = Vec3(0)
   var accel = Vec3(0)
-  var angles = Vec3(0,0,90.f)
+  var euler = Vec3(0.f,0.f,0.f)
+  var lEuler = Vec3(0.f,0.f,0.f)
   var mass = 1.f
-  var damp = 1000.f
+  var damp = 100.f
 
   var dist = 1.f
   
@@ -176,6 +194,11 @@ class TreeNode extends GLAnimatable {
   var taper = .8f
   var pinned = false
   var size = 0;
+
+  var r = 1/(dist*dist) * .1f
+  var w = Randf(0,3.14f)()
+  var f = 1.f/dist * 1.f
+  var k = 10.f * thick*thick*thick / (dist*dist*dist)
   //var glprimitive:GLPrimitive = _
 
   //var parent:Option[TreeNode] = None
@@ -199,7 +222,26 @@ class TreeNode extends GLAnimatable {
 
   override def step( dt: Float ) = {
 
-  	pose.quat = pose.quat * Quat().fromEuler(Vec3(0,0.001f*math.sin(Trees.t),0))
+    children.foreach( _.step(dt) )
+
+
+  	//euler = (restPose.quat.inverse * pose.quat).toEulerVec()
+  	val w = euler - lEuler
+  	var dw = Vec3(accel dot restPose.quat.toX, accel dot restPose.quat.toY, 0)
+  	dw -= w * (damp / mass)
+  	dw -= euler * k
+  	lEuler.set(euler)
+  	euler = euler + w + dw * (.5f*dt*dt)
+
+  	pose.quat = restPose.quat * Quat().fromEuler(euler.x,euler.y,euler.z)
+
+  	accel.zero
+
+
+  	// sinusoid animation
+  	//pose.quat = restPose.quat * Quat().fromEuler(Vec3(r*math.sin(f*Trees.t+w),r*math.sin(f*Trees.t+w),0))
+    
+
     // if( !pinned ){
     //   accel += Trees.gv //Vec3( 0, Trees.g, 0 )
 
@@ -211,22 +253,23 @@ class TreeNode extends GLAnimatable {
 
     //   accel.zero
     // }
-    children.foreach( _.step(dt) )
   }
 
   //def destroy(){ children.foreach( (n) => {n.destroy(); n.glprimitive.mesh.dispose()}) }
 
   def applyForce( f: Vec3 ) : Vec3 = {
     accel += f / mass
-    children.foreach( (n) => n.applyForce( f * 2.f) )
+    children.foreach( (n) => n.applyForce( f ) )
     f
   }
 
   def solveConstraints() : Unit = {
     children.foreach( (n) => {
 
-    	val pos = pose.pos - pose.quat.toZ()*dist
-    	//n.pose.pos = pos
+    	val pos = pose.pos + pose.quat.toZ()*dist
+    	n.pose.pos = pos
+    	n.restPose.quat = pose.quat * n.relQuat
+    	n.pose.quat = n.restPose.quat * Quat().fromEuler(n.euler.x,n.euler.y,n.euler.z)
 
       n.solveConstraints()
       // val d = pose.pos - n.pose.pos
@@ -242,13 +285,13 @@ class TreeNode extends GLAnimatable {
       //todo angle constraints
     })
 
-    if( pinned ) pose.pos = lPos;
+    //if( pinned ) pose.pos = lPos;
   }
 
   def pin( p:Vec3 = pose.pos ) = {
-    pose.pos = p
-    lPos = p
-    pinned = true
+    //pose.pos = p
+    //lPos = p
+    //pinned = true
   }
 
   /*def branch( depth: Int, angle: Float=10.f, ratio: Float=.9f, t:Int=0 ) : Int = {

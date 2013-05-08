@@ -87,6 +87,12 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     val bank = math.atan2( 2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
     (el,az,bank)
   }
+  def toEulerVec() : Vec3 = {
+    val az = math.asin( -2.0 * (x*z - w*y))
+    val el = math.atan2( 2.0 * (y*z + w*x), w*w - x*x - y*y + z*z)
+    val bank = math.atan2( 2.0 * (x*y + w*z), w*w + x*x - y*y - z*z)
+    Vec3(el,az,bank)
+  }
 
   def toMatrix() = new Matrix4(new Quaternion(x,y,z,w))
   def toQuaternion() = new Quaternion(x,y,z,w)
