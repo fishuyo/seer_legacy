@@ -33,17 +33,18 @@ object Shader {
   def matrixClear() = modelMatrix.idt()
 
   def setMatrices() = {
-  	projModelViewMatrix.set(Camera.combined)
-  	modelViewMatrix.set(Camera.view)
-  	Matrix4.mul( projModelViewMatrix.`val`, modelMatrix.`val`)
-  	Matrix4.mul( modelViewMatrix.`val`, modelMatrix.`val`)
-  	this().setUniformMatrix("u_projectionViewMatrix", projModelViewMatrix)
-  	this().setUniformMatrix("u_modelViewMatrix", modelViewMatrix)
-  	//this().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-    this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+    try{
+    	projModelViewMatrix.set(Camera.combined)
+    	modelViewMatrix.set(Camera.view)
+    	Matrix4.mul( projModelViewMatrix.`val`, modelMatrix.`val`)
+    	Matrix4.mul( modelViewMatrix.`val`, modelMatrix.`val`)
+    	this().setUniformMatrix("u_projectionViewMatrix", projModelViewMatrix)
+    	// this().setUniformMatrix("u_modelViewMatrix", modelViewMatrix)
+    	//this().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+      this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+    } catch { case e:Exception => e}
 
   }
-
 
   //load new shader program
   def apply(v:String, f:String, i:Int = -1) = {

@@ -23,6 +23,7 @@ class GLScene {
   //def pushPickable( o: GLPickable) = pickable += o
   //def push( s: SoundSource) = { sounds += s; objects += s }
 
+  def init() = drawable.foreach( _.init() )
   def step( dt: Float ) = animatable.foreach( _.step(dt) )
   //def onDraw( gl: GL2 ) = drawable.foreach( _.onDraw(gl) )
   def draw() = drawable.foreach( _.draw() )

@@ -67,6 +67,8 @@ class SimpleAppListener extends ApplicationListener {
     // t2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     // t2.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
 
+    scene.init()
+
     audio.start
 
   }
