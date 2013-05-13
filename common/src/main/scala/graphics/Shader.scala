@@ -4,6 +4,7 @@ package graphics
 import maths.Vec3
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashMap
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
@@ -16,7 +17,7 @@ object Shader {
   var load = true
   var indx = 0;
   var shader:ShaderProgram = null
-  var shaders = new ListBuffer[(String,String,ShaderProgram)]()
+  var shaders = new HashMap[String,(String,String,ShaderProgram)]()
 
   var projModelViewMatrix = new Matrix4()
   var modelViewMatrix = new Matrix4()
@@ -47,23 +48,22 @@ object Shader {
   }
 
   //load new shader program
-  def apply(v:String, f:String, i:Int = -1) = {
+  def apply(name:String, v:String, f:String) = {
 
     val s = new ShaderProgram( Gdx.files.internal(v), Gdx.files.internal(f))
     if( s.isCompiled() ){
       val shader = (v,f,s)
-      if( i >= 0) shaders(i) = shader
-      else shaders += shader
+      shaders(name) = shader
     }else{
       println( s.getLog() )
     }
   }
 
   // return selected shader
-  def apply() = { if(shaders.size > indx) shader = shaders(indx)._3; shader }
+  def apply() = { if(shader == null) shader = shaders.values.head._3; shader }
 
-  // select shader at index i
-  def apply(i:Int) = {indx = i; shader = shaders(i)._3; shader}
+  // select shader
+  def apply(n:String) = { shader = shaders(n)._3; shader}
   
   // reload shader programs
   def reload() = load = true
@@ -71,17 +71,17 @@ object Shader {
   // called in between frames to reload shader programs
   def update() = {
     if( load ){
-      shaders.zipWithIndex.foreach{ case((v,f,s),i) => apply(v,f,i) } 
+      shaders.foreach{ case(n,(v,f,s)) => apply(n,v,f) } 
       load = false
     }
   }
 
-  def monitor(i:Int) = {
-	  FileMonido(shaders(i)._1){
+  def monitor(name:String) = {
+	  FileMonido(shaders(name)._1){
 	    case ModifiedOrCreated(f) => reload;
 	    case _ => None
 	  }
-	  FileMonido(shaders(i)._2){
+	  FileMonido(shaders(name)._2){
 	    case ModifiedOrCreated(f) => reload;
 	    case _ => None
 	  }

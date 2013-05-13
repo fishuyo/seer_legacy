@@ -22,15 +22,15 @@ object Main extends App with GLAnimatable{
   SimpleAppRun()  
 
   override def init(){
-    Shader("res/shaders/sky.vert", "res/shaders/sky.frag")
-  	Texture("res/bunny.png");
-  	Shader(3)
-  	Shader.monitor(3)
+   //  Shader("res/shaders/sky.vert", "res/shaders/sky.frag")
+  	// Texture("res/bunny.png");
+  	// Shader(3)
+  	// Shader.monitor(3)
   }
   override def draw(){
 
-  	Texture(0).bind()
-  	Shader().setUniformi("u_texture", 0);
+  	// Texture(0).bind()
+  	// Shader().setUniformi("u_texture", 0);
   	cube.draw()
 
   }

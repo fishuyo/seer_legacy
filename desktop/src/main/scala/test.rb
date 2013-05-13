@@ -22,7 +22,7 @@ end
 Keyboard.clear()
 Keyboard.use()
 Keyboard.bind("n", lambda{
-	GLScene.push( GLPrimitive.cylinder(Pose[Main.cube.pose], Vec3.apply(1), 0.1, 0.01, 60) )
+	GLScene.push( GLPrimitive.cube(Pose[Main.cube.pose], Vec3.apply(1) ) )
 })
 
 

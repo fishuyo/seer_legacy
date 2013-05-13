@@ -102,7 +102,7 @@ object GLPrimitive extends GLThis {
     new GLPrimitive(p,s,mesh,draw)
   }
 
-  def cube( p:Pose = new Pose(), s:Vec3=Vec3(1), c:RGB = RGB.green ) = {
+  def cube( p:Pose = new Pose(), s:Vec3=Vec3(1)) = {
     val mesh = new Mesh(true,24,36, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0) )
     mesh.setVertices( Array[Float](
       -1,1,1,   0,0,1, 0,0,
@@ -203,7 +203,7 @@ object GLPrimitive extends GLThis {
       0,1,2, 0,2,3
     ))
     val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
-    new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
+    mesh //new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
 }
 
