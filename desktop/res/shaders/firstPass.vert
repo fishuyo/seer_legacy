@@ -21,7 +21,7 @@ void main()
 {
   // get the depth and eye position
   vec4 transformedVertex = u_projectionViewMatrix * a_position;
-  //v_depth = -transformedVertex.z;
+  //v_depth = transformedVertex.z;
   v_depth = a_position.z;
 
   v_eye = -(u_modelViewMatrix * a_position).xyz;//-transformedVertex.xyz;

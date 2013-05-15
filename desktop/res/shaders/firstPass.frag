@@ -18,7 +18,8 @@ void main()
   vec3 normalShift = (v_normal + vec3(1.0)) * 0.5;
 
   //gl_FragData[0] = color;
-  gl_FragData[0] = vec4(normalShift, depthShift); //color*vec4(normalShift, depthShift);
+  gl_FragData[0] = vec4(normalShift, depthShift);
+  //gl_FragData[0] = v_color*vec4(normalShift, depthShift);
   //gl_FragData[0] = vec4(normal, 1.0);
   //gl_FragData[0] = vec4(vec3(depthShift), 0.9);
   //gl_FragData[1] = vec4(normalize(eye), 1.0);

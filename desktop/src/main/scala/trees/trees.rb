@@ -73,7 +73,7 @@ $Pad.connect()
 $Pad.bind( lambda{|i,f|
 	t = tree #Seer.examples.trees.Main.tree
 	if i == 1
-		t.root.applyForce( Vec3.apply((f[0]-0.5)*1.0*f[4],(f[1]-0.5)*f[4],0))
+		t.root.applyForce( Vec3.apply((f[0]-0.5)*100.0*f[4],0,(f[1]-0.5)*f[4]))
 	elsif i == 2
 		mx = mx + f[2]*0.05  
 		mz = mz + f[3]*-0.05
@@ -93,8 +93,10 @@ $Pad.bind( lambda{|i,f|
 	    t.bRatio.setMinMax( 0.05, my, false )
 	    #t.bRatio.set( my )
 	    t.sAngle.x.setMinMax( 0.05, rx, false )
+	    t.bAngle.x.setMinMax( 0.05, rx, false )
 	    #t.sAngle.x.set( rx )
 	    t.sAngle.z.setMinMax( 0.05, rz, false )
+	    t.bAngle.z.setMinMax( 0.05, rz, false )
 	    #t.sAngle.z.set( rz )
 	    #t.branch(depth)
 	    t.refresh()

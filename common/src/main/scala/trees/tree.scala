@@ -227,7 +227,10 @@ class TreeNode extends GLAnimatable {
 
   	//euler = (restPose.quat.inverse * pose.quat).toEulerVec()
   	val w = euler - lEuler
+  	val ax = accel dot restPose.quat.toX
+  	val ay = accel dot restPose.quat.toY
   	var dw = Vec3(accel dot restPose.quat.toX, accel dot restPose.quat.toY, 0)
+  	
   	dw -= w * (damp / mass)
   	dw -= euler * k
   	lEuler.set(euler)
@@ -241,21 +244,7 @@ class TreeNode extends GLAnimatable {
   	// sinusoid animation
   	//pose.quat = restPose.quat * Quat().fromEuler(Vec3(r*math.sin(f*Trees.t+w),r*math.sin(f*Trees.t+w),0))
     
-
-    // if( !pinned ){
-    //   accel += Trees.gv //Vec3( 0, Trees.g, 0 )
-
-    //   //verlet integration
-    //   val v = pose.pos - lPos
-    //   accel -= v * ( damp / mass )
-    //   lPos = pose.pos
-    //   pose.pos = pose.pos + v + accel * ( .5f * dt * dt )
-
-    //   accel.zero
-    // }
   }
-
-  //def destroy(){ children.foreach( (n) => {n.destroy(); n.glprimitive.mesh.dispose()}) }
 
   def applyForce( f: Vec3 ) : Vec3 = {
     accel += f / mass
@@ -272,17 +261,13 @@ class TreeNode extends GLAnimatable {
     	n.pose.quat = n.restPose.quat * Quat().fromEuler(n.euler.x,n.euler.y,n.euler.z)
 
       n.solveConstraints()
-      // val d = pose.pos - n.pose.pos
-      // val mag = d.mag
-      // if( mag == 0.f ) return
-      // val diff = (n.dist - mag) / mag
+
 
       //tear here
 
       // pose.pos = pose.pos + d * diff
       // n.pose.pos = n.pose.pos - d * diff
 
-      //todo angle constraints
     })
 
     //if( pinned ) pose.pos = lPos;

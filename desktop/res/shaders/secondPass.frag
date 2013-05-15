@@ -41,8 +41,8 @@ void main()
   //normal /= 9.0;
 
   // repackage the normal component
-  normal = normal * 2.0 - vec3(1.0);
-  normal = normalize(normal);
+  //normal = normal * 2.0 - vec3(1.0);
+  //normal = normalize(normal);
  
   // get a diffuse lighting component
   float diffuse = dot(normal, light);
@@ -61,9 +61,9 @@ void main()
 
   if( depth == 0.0 ) depth = 1.0;
 
-  //gl_FragColor = vec4(normal, 1.0);
+  gl_FragColor = vec4(normal, 1.0);
   //gl_FragColor = vec4(vec3(depth), 1.0);
-  gl_FragColor = vec4(vec3(depth)*edge, 1.0);
+  //gl_FragColor = vec4(vec3(depth)*edge, 1.0);
   //gl_FragColor = vec4(vec3(diffuse), 1.0);
   //gl_FragColor = vec4(vec3(1.0)*edge,1.0);
   //gl_FragColor = vec4(normal*edge,1.0);
