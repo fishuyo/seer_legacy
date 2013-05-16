@@ -24,7 +24,7 @@ object Main extends App with GLAnimatable {
   var osc = new Tri(41.f)
   var lfo = new Saw(1.f)
 
-  Audio.push( (lfo + 440.f) -> osc  ) //* ((1.f-lfo)*.5f) )
+  Audio.push( (lfo + osc.f ) -> osc  ) //* ((1.f-lfo)*.5f) )
 
   val live = new Ruby("src/main/scala/synth/synth.rb")
 

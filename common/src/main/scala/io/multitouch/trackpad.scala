@@ -30,6 +30,12 @@ object Trackpad extends Observer{
 	  tpo.addObserver(this)
     connected = true
 	}
+  def disconnect(){
+    if(!connected) return
+    val tpo = TouchpadObservable.getInstance()
+    tpo.deleteObserver(this)
+    connected = false
+  }
 
   // Touchpad Multitouch update event handler, 
   // called on single MT Finger event

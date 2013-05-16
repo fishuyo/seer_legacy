@@ -1,4 +1,8 @@
 
+uniform sampler2D u_texture0;
+uniform sampler2D u_texture1;
+
+varying vec2 v_texCoords;
 varying float v_depth;
 varying vec3 v_normal;
 varying vec3 v_eye;
@@ -9,19 +13,25 @@ void main()
 {
   // these values are set empirically based on the dimensions
   // of the bunny model
-  float near = -1.1;
-  float far = 1.1;
+  float near = 0.0; //-1.1;
+  float far = 4.1;
 
   // get shifted versions for better visualization
   //float depthShift = (v_depth + 1.5)/2.1;
   float depthShift = ((v_depth - near) / (far - near));
   vec3 normalShift = (v_normal + vec3(1.0)) * 0.5;
 
-  //gl_FragData[0] = color;
+  vec3 textureColor = texture2D(u_texture0, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x)).rgb;
+  vec3 textureColor1 = texture2D(u_texture1, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x)).rgb;
+
+  //gl_FragData[0] = v_color;
   gl_FragData[0] = vec4(normalShift, depthShift);
   //gl_FragData[0] = v_color*vec4(normalShift, depthShift);
   //gl_FragData[0] = vec4(normal, 1.0);
   //gl_FragData[0] = vec4(vec3(depthShift), 0.9);
+
+  //gl_FragData[0] = vec4( textureColor, depthShift);
+
   //gl_FragData[1] = vec4(normalize(eye), 1.0);
   //gl_FragData[2] = vec4(normalize(lightPosition), 1.0);
 }

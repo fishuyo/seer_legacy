@@ -20,6 +20,9 @@ import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20
 import com.badlogic.gdx.math.Matrix4
 
+import com.badlogic.gdx.graphics.g3d.loaders.wavefront._
+import com.badlogic.gdx.graphics.g3d.model.still._
+
 /*package object salami {
   trait GL10 extends com.badlogic.gdx.graphics.GL10
   trait GL20 extends com.badlogic.gdx.graphics.GL20
@@ -165,10 +168,15 @@ object GLPrimitive extends GLThis {
       val r = (if( 3*j % 2 == 0) r1 else r2)
       val x = math.cos(theta).toFloat
       val y = math.sin(theta).toFloat
+      val u = (if(3 *j % 2 == 0) 1.f else 0.f)
+      val v = j*1.f / vertCount
 
       vert += x
       vert += y
       vert += (r1-r2) / (s.z) //0.f
+
+      vert += u
+      vert += v
 
       vert += r*x
       vert += r*y
@@ -180,7 +188,7 @@ object GLPrimitive extends GLThis {
       indx += (j % vertCount).toShort
     }
 
-    val mesh = new Mesh(true, vert.size/6, indx.size, VertexAttribute.Normal, VertexAttribute.Position)
+    val mesh = new Mesh(true, vert.size/6, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
     mesh.setVertices(vert.toArray)
     mesh.setIndices(indx.toArray)
 
@@ -205,6 +213,14 @@ object GLPrimitive extends GLThis {
     val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
     mesh //new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
+
+  def fromObj( file:String ) = {
+
+    val stillModel = new ObjLoader().loadObj(Gdx.files.internal(file))
+    val draw = () => { stillModel.render(Shader())}
+    new GLPrimitive(Pose(),Vec3(1.f),null,draw)
+  }
+
 }
 
 

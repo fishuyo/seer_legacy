@@ -65,7 +65,7 @@ $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
 ### Trackpad state ###
 mx=0.0
 my=0.0
-mz=0.0
+mz=0.0 
 rz=0.0
 rx=0.0
 $Pad.clear()
@@ -73,7 +73,7 @@ $Pad.connect()
 $Pad.bind( lambda{|i,f|
 	t = tree #Seer.examples.trees.Main.tree
 	if i == 1
-		t.root.applyForce( Vec3.apply((f[0]-0.5)*100.0*f[4],0,(f[1]-0.5)*f[4]))
+		t.root.applyForce( Vec3.apply((f[0]-0.5)*1.0*f[4],0,(f[1]-0.5)*f[4]))
 	elsif i == 2
 		mx = mx + f[2]*0.05  
 		mz = mz + f[3]*-0.05
@@ -100,14 +100,26 @@ $Pad.bind( lambda{|i,f|
 	    #t.sAngle.z.set( rz )
 	    #t.branch(depth)
 	    t.refresh()
+	    Main.t.root.pose.pos.set(mx,my,mz)
+
+
+	    t.root.accel.zero
+	    t.root.euler.zero
 	end
 })
 
 
 def step(dt)
+	v = Vec3.apply(Camera.nav.pos)
+	v.set(v.z,0,v.x)
+	Main.tree.root.applyForce( (v * 10.0 * Main.rms) )
+	# puts Main.rms
+	Shader.setBgColor( Vec3.apply(1.0,1.0,1.0), 1.0)
+	Shader.setBgColor( Vec3.apply(68.0/255.0,122.0/256.0,222.0/256.0),1.0)
+
 	#puts Main.tree.root.children[0].euler
 
-	Main.cube.scale.set(0.1,0.1,0.1)
-	Main.cube.pose.pos.set(Main.tree.root.pose.pos)
+	# Main.cube.scale.set(0.1,0.1,0.1)
+	# Main.cube.pose.pos.set(Main.tree.root.pose.pos)
 
 end

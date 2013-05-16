@@ -112,7 +112,7 @@ class SimpleAppListener extends ApplicationListener {
     fbo.begin() //FrameBuffer(0).begin();
     Shader("firstPass").begin();
     {
-      Gdx.gl.glClearColor(1,1,1,0)
+      //Gdx.gl.glClearColor(1,1,1,0)
       Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
       Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
 
@@ -172,10 +172,12 @@ class SimpleAppListener extends ApplicationListener {
     if(oldfbo != null) oldfbo.dispose
   }
   def pause(){
-    audio ! Stop
+    //audio ! Stop
+    Trackpad.disconnect()
   }
   def resume(){
-    audio ! Play
+    //audio ! Play
+    Trackpad.connect()
   }
   def dispose(){
     audio.dispose

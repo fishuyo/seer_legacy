@@ -31,8 +31,10 @@ class Osc(var frequency:Float = 440.f, var amp:Float = 1.f) extends Gen{
     gen() * amp
   }
 
+  def f() = {val that=this; new Gen(){ gen = ()=>{ that.frequency }} }
   def f(f:Float) = frequency = f
   def a(f:Float) = amp = f
+
 
 }
 

@@ -36,11 +36,11 @@ down = false
 s = []
 t = []
 Trackpad.bind( lambda{ |i,f| 
-			a = []
-		for ff in f do
-			a.push(ff)
-		end
-				puts a.slice(5,4).join(" ")
+		# 	a = []
+		# for ff in f do
+		# 	a.push(ff)
+		# end
+				#puts a.slice(5,4).join(" ")
 
 	if i == 3
 		if down == false
@@ -60,7 +60,7 @@ Trackpad.bind( lambda{ |i,f|
 		quat2 = $Quat.new(0,0,0,1).getRotationTo(quat1.rotate(s[0]-s[1]),(t[1]-t[0]))
 		q = quat2 * quat1
 
-		looper.plots[0].pose.quat.set(q)
+		looper.plots[l].pose.quat.set(q)
 
 		#looper.setGain(l,2*f[1])
 		#looper.setPan(l,f[0])

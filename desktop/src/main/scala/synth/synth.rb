@@ -38,10 +38,11 @@ $Trackpad.bind( lambda{ |i,f|
 	elsif i == 2	
 		dx += f[2] * 0.1	
 		dy += f[3] * -0.1
-		lfo.f(dx*0.0)
-		lfo.a(dy*0.0)
-		osc.a(0.0)
-		#osc.f(f[1]*0.0)
+		lfo.f(dx*1.0)
+		lfo.a(dy*1.0)
+	elsif i == 1
+		osc.a(f[1]*1.0)
+		osc.f(f[0]*1000.0 + 80.0)
 	else
 	end
 })

@@ -24,12 +24,18 @@ object Shader {
   var modelMatrix = new Matrix4()
   var bg = (0.f,0.f,0.f,1.f)
   var color = (1.f,1.f,1.f,1.f)
+  var alpha = 1.f
 
   def setBgColor(c:Vec3, a:Float) = bg = (c.x,c.y,c.z,a)
   def setColor(c:Vec3, a:Float) = {
     color = (c.x,c.y,c.z,a)
     this().setUniformf("u_color", color._1, color._2, color._3, color._4)
   }
+  def setAlpha(f:Float) = {
+    alpha = f
+    this().setUniformf("u_alpha", alpha)
+  }
+
   def matrixTransform( m:Matrix4 ) = Matrix4.mul(modelMatrix.`val`, m.`val`)
   def matrixClear() = modelMatrix.idt()
 

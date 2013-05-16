@@ -63,7 +63,7 @@ void main()
 
   gl_FragColor = vec4(normal, 1.0);
   //gl_FragColor = vec4(vec3(depth), 1.0);
-  //gl_FragColor = vec4(vec3(depth)*edge, 1.0);
+  gl_FragColor = vec4(vec3(depth)*edge, 1.0);
   //gl_FragColor = vec4(vec3(diffuse), 1.0);
   //gl_FragColor = vec4(vec3(1.0)*edge,1.0);
   //gl_FragColor = vec4(normal*edge,1.0);
