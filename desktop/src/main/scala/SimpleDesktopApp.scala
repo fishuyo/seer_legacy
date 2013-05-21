@@ -13,6 +13,8 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input.Keys
 
 object SimpleAppRun {
+
+  var displayMode:Option[Long] = _
   var fullscreen = false
   var nativesLoaded = false
   loadLibs()
@@ -54,12 +56,26 @@ object SimpleAppRun {
   }
 
   def toggleFullscreen(){
+    var i = -1
+    displayMode match {
+      case Some(v) => i = v.toInt
+      case _ => i = -1
+    }
+    val modes = Gdx.graphics.getDisplayModes
+    //modes.foreach( (x) => println(x.width + " " + x.height ))
+    val deskmode = Gdx.graphics.getDesktopDisplayMode()
+    //println( "desktop: " + deskmode.width + " " + deskmode.height)
+
+    app.pause()
     if( fullscreen ){
       Gdx.graphics.setDisplayMode( SimpleAppSize.width, SimpleAppSize.height, false)
     }else{
-      Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
+      if( i >= 0) Gdx.graphics.setDisplayMode( modes(i))
+      else Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
     }
     fullscreen = !fullscreen
+    app.resume()
+
   }
 }
 
@@ -75,6 +91,7 @@ class SimpleDesktopApp( val app: ApplicationListener ){
 }
 
 object FullscreenKey extends InputAdapter {
+
   override def keyDown(k:Int) = {
     
     k match {

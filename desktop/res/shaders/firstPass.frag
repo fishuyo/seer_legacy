@@ -16,12 +16,17 @@ void main()
   float near = 0.0; //-1.1;
   float far = 4.1;
 
+  //near = -1.1;
+  //far =1.1;
+
   // get shifted versions for better visualization
   //float depthShift = (v_depth + 1.5)/2.1;
   float depthShift = ((v_depth - near) / (far - near));
   vec3 normalShift = (v_normal + vec3(1.0)) * 0.5;
 
-  vec3 textureColor = texture2D(u_texture0, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x)).rgb;
+  //vec3 textureColor = texture2D(u_texture0, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x)).rgb;
+  vec3 textureColor = texture2D(u_texture0, v_texCoords).rgb;
+  
   vec3 textureColor1 = texture2D(u_texture1, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x)).rgb;
 
   //gl_FragData[0] = v_color;
@@ -30,8 +35,11 @@ void main()
   //gl_FragData[0] = vec4(normal, 1.0);
   //gl_FragData[0] = vec4(vec3(depthShift), 0.9);
 
-  //gl_FragData[0] = vec4( textureColor, depthShift);
+  gl_FragData[0] = vec4( textureColor, depthShift);
 
   //gl_FragData[1] = vec4(normalize(eye), 1.0);
   //gl_FragData[2] = vec4(normalize(lightPosition), 1.0);
+
+  //gl_FragData[0] = vec4(1.0);
+
 }

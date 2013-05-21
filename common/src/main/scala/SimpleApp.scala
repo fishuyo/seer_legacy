@@ -46,7 +46,7 @@ class SimpleAppListener extends ApplicationListener {
   def setLogFPS(b:Boolean) = logfps = b
 
   var dtAccum = 0.f
-
+  var paused = false
 
   def create(){
 
@@ -75,6 +75,7 @@ class SimpleAppListener extends ApplicationListener {
 
   }
   def render(){
+    if(paused) return
     if(quad == null){
       //FrameBuffers(width,height)
 
@@ -173,14 +174,17 @@ class SimpleAppListener extends ApplicationListener {
   }
   def pause(){
     //audio ! Stop
+    paused = true
     Trackpad.disconnect()
   }
   def resume(){
     //audio ! Play
+    paused = false
     Trackpad.connect()
   }
   def dispose(){
     audio.dispose
+    Kinect.disconnect()
   }
 
   def toggleFullscreen(){

@@ -1,6 +1,8 @@
 require 'java'
 
 module M
+  include_package "scala"
+  include_package "com.fishuyo"
   include_package "com.fishuyo.io"
   include_package "com.fishuyo.maths"
   include_package "com.fishuyo.spatial"
@@ -100,8 +102,6 @@ $Pad.bind( lambda{|i,f|
 	    #t.sAngle.z.set( rz )
 	    #t.branch(depth)
 	    t.refresh()
-	    Main.t.root.pose.pos.set(mx,my,mz)
-
 
 	    t.root.accel.zero
 	    t.root.euler.zero
@@ -109,10 +109,21 @@ $Pad.bind( lambda{|i,f|
 })
 
 
+Kinect.connect()
+Kinect.startDepth()
+
 def step(dt)
+	pos = Camera.nav.pos + Camera.nav.uf()*1.5
+	pos += Camera.nav.ur()*(1.0)
+	pos += Camera.nav.uu()*0.5
+	Kinect.cube.pose.pos.lerpTo( pos, 0.1)
+	Kinect.cube.pose.quat.slerpTo( Camera.nav.quat, 0.1)
+
+	Main.wind.setVolume(0.0)
+	# SimpleAppRun.displayMode_=(Some.apply(24))
 	v = Vec3.apply(Camera.nav.pos)
 	v.set(v.z,0,v.x)
-	Main.tree.root.applyForce( (v * 10.0 * Main.rms) )
+	# Main.tree.root.applyForce( (v * 10.0 * Main.rms) )
 	# puts Main.rms
 	Shader.setBgColor( Vec3.apply(1.0,1.0,1.0), 1.0)
 	Shader.setBgColor( Vec3.apply(68.0/255.0,122.0/256.0,222.0/256.0),1.0)

@@ -68,6 +68,9 @@ class Tree() extends GLAnimatable {
   var size = 0
   // var vertices:Array[Float] = null
   // var mesh:Mesh = null
+  var textureID = 0;
+  var textureID1 = 1;
+
 
   var animating = false
   def setAnimate(b:Boolean) = animating = b
@@ -110,11 +113,13 @@ class Tree() extends GLAnimatable {
   override def init(){
     val t = Texture("res/bark/bark_20091031_07_256x512_seamless.jpg")
     val t1 = Texture("res/bark/mond.png")
+    textureID = t
+    textureID1 = t1
 
-    t.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    t.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-    t1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    t1.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    Texture(t).setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    Texture(t).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    Texture(t1).setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    Texture(t1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
   }
   override def draw(){
     if( size != root.size){
@@ -125,10 +130,12 @@ class Tree() extends GLAnimatable {
     if( size == 0) return
     var idx = 0;
 
-    Texture(0).bind()
-    Texture(1).bind()
-    Shader().setUniformi("u_texture0", 0);
-    Shader().setUniformi("u_texture1", 1);
+    val t = Texture(textureID).getTextureObjectHandle
+    val t1 = Texture(textureID1).getTextureObjectHandle
+    Texture(textureID).bind(t)
+    Texture(textureID1).bind(t1)
+    Shader().setUniformi("u_texture0", t );
+    Shader().setUniformi("u_texture1", t1 );
 
     root.draw() //vertices, idx)
 
