@@ -2,6 +2,10 @@
 uniform sampler2D u_texture0;
 uniform sampler2D u_texture1;
 
+uniform float u_near;
+uniform float u_far;
+uniform float u_useTexture;
+
 varying vec2 v_texCoords;
 varying float v_depth;
 varying vec3 v_normal;
@@ -21,7 +25,7 @@ void main()
 
   // get shifted versions for better visualization
   //float depthShift = (v_depth + 1.5)/2.1;
-  float depthShift = ((v_depth - near) / (far - near));
+  float depthShift = ((v_depth - u_near) / (u_far - u_near));
   vec3 normalShift = (v_normal + vec3(1.0)) * 0.5;
 
   //vec3 textureColor = texture2D(u_texture0, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x)).rgb;
@@ -41,5 +45,11 @@ void main()
   //gl_FragData[2] = vec4(normalize(lightPosition), 1.0);
 
   //gl_FragData[0] = vec4(1.0);
+
+  if( u_useTexture == 1.0){
+    gl_FragData[0] = vec4( textureColor, depthShift);
+  }else{
+    gl_FragData[0] = vec4(normalShift, depthShift);
+  }
 
 }

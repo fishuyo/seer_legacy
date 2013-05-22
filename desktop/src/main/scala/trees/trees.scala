@@ -28,6 +28,12 @@ object Main extends App with GLAnimatable with AudioSource {
 
   var rms = 0.f
 
+  var volume = Vec3(0)
+  var color = Vec3(1)
+  var day = Vec3(1.f,0,1.f)
+  var useLocalZ = Vec3(1.f)
+  var uniforms = Vec3(0.f,2.f,1.f)
+
   val live = new Ruby("src/main/scala/trees/trees.rb")
 
   SimpleAppRun() 
@@ -49,11 +55,39 @@ object Main extends App with GLAnimatable with AudioSource {
   }
   override def draw(){
     
-    ground.draw()
-    Kinect.draw()
-    tree.draw()
+    if(day.x == 1.f){
+      Shader().setUniformf("u_useLocalZ", 0.f)
+      Shader().setUniformf("u_near", 0.f)
+      Shader().setUniformf("u_far", 4.1f)
+      Shader().setUniformf("u_useTexture", 0.f)
+      ground.draw()
+      Shader().setUniformf("u_useLocalZ", 0.f)
+      Shader().setUniformf("u_near", 0.f)
+      Shader().setUniformf("u_far", 4.1f)
+      Shader().setUniformf("u_useTexture", 1.f)
+      if(day.z == 1.f) Kinect.draw()
+      tree.draw()
+    }else{
+      Shader().setUniformf("u_useLocalZ", 0.f)
+      Shader().setUniformf("u_near", 0.f)
+      Shader().setUniformf("u_far", 4.1f)
+      Shader().setUniformf("u_useTexture", 0.f)
+      ground.draw()
+      Shader().setUniformf("u_useLocalZ", uniforms.z)
+      Shader().setUniformf("u_near", uniforms.x)
+      Shader().setUniformf("u_far", uniforms.y)
+      Shader().setUniformf("u_useTexture", 1.f)
+      //Kinect.draw()
+      tree.draw()
+    }
+  }
+  override def draw2(){
+      // Shader("secondPass").setUniformf("u_edge", 1.)
+    if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
+    else Shader("secondPass").setUniformf("u_depth", 1.f)
   }
   override def step(dt:Float){
+
     live.step(dt)
     Kinect.step(dt)
     tree.step(dt)

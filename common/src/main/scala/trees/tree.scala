@@ -132,10 +132,10 @@ class Tree() extends GLAnimatable {
 
     val t = Texture(textureID).getTextureObjectHandle
     val t1 = Texture(textureID1).getTextureObjectHandle
-    Texture(textureID).bind(t)
+    // Texture(textureID).bind(t)
     Texture(textureID1).bind(t1)
-    Shader().setUniformi("u_texture0", t );
-    Shader().setUniformi("u_texture1", t1 );
+    Shader().setUniformi("u_texture0", t1 );
+    //Shader().setUniformi("u_texture1", t1 );
 
     root.draw() //vertices, idx)
 
@@ -252,7 +252,7 @@ class TreeNode extends GLAnimatable {
   	val w = euler - lEuler
   	val ax = accel dot restPose.quat.toX
   	val ay = accel dot restPose.quat.toY
-  	var dw = Vec3(accel dot restPose.quat.toX, accel dot restPose.quat.toY, 0)
+  	var dw = Vec3(ay, ax, 0)
   	
   	dw -= w * (damp / mass)
   	dw -= euler * k

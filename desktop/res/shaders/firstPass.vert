@@ -9,6 +9,8 @@ uniform mat4 u_projectionViewMatrix;
 uniform mat4 u_modelViewMatrix;
 uniform mat4 u_normalMatrix;
 
+uniform float u_useLocalZ;
+
 //invariant gl_Position;
 
 varying float v_depth;
@@ -25,8 +27,12 @@ void main()
 {
   // get the depth and eye position
   vec4 transformedVertex = u_projectionViewMatrix * a_position;
-  v_depth = transformedVertex.z;
-  //v_depth = a_position.z;
+
+  if( u_useLocalZ == 1.0 ){
+    v_depth = a_position.z;
+  } else {
+    v_depth = transformedVertex.z;
+  }
 
   v_texCoords = a_texCoord0;
 

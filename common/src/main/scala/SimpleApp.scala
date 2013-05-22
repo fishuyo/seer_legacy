@@ -41,6 +41,7 @@ class SimpleAppListener extends ApplicationListener {
   // val t1 = new Texture(width, height, format);
   // val t2 = new Texture(width, height, format);
 
+  var frameCount = 0
   val fps = new FPSLogger
   var logfps = true
   def setLogFPS(b:Boolean) = logfps = b
@@ -90,6 +91,7 @@ class SimpleAppListener extends ApplicationListener {
       scene.step(timeStep)
       camera.step(timeStep)
       dtAccum -= timeStep
+      frameCount +=1 
     }
     
     Gdx.gl.glClearColor(Shader.bg._1,Shader.bg._2,Shader.bg._3,Shader.bg._4)
@@ -135,6 +137,7 @@ class SimpleAppListener extends ApplicationListener {
       Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
       //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
       // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+      scene.draw2()
       quad.render(Shader(), GL10.GL_TRIANGLES)
     }
     Shader().end();

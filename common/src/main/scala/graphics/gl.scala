@@ -43,6 +43,7 @@ trait GLThis {
 trait GLDrawable extends GLThis {
   def init(){}
   def draw(){}
+  def draw2(){}
 }
 trait GLAnimatable extends GLDrawable {
   def step( dt: Float){}

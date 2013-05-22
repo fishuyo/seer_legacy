@@ -27,6 +27,7 @@ class GLScene {
   def step( dt: Float ) = animatable.foreach( _.step(dt) )
   //def onDraw( gl: GL2 ) = drawable.foreach( _.onDraw(gl) )
   def draw() = drawable.foreach( _.draw() )
+  def draw2() = drawable.foreach( _.draw2() )
   //def pick( r: Ray ) = pickable.foreach( _.pick(r) )
   
 }

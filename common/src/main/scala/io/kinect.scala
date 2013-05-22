@@ -5,12 +5,23 @@ package io
 import graphics._
 import maths.Vec3 
 import java.nio.ByteBuffer
+
 import org.openkinect.freenect._
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils._
 
+import org.opencv.core._
+import org.opencv.imgproc.Imgproc
+import org.opencv.highgui.Highgui
+
+import scala.collection.JavaConversions._
+import collection.mutable.ListBuffer
+
 object Kinect extends GLAnimatable {
+
+  type Callback = (Int, Array[Int]) => Any
+  val callbacks = new ListBuffer[Callback]()
 
 	var context:Option[Context] = _
 	var device:Option[Device] = _
@@ -20,6 +31,12 @@ object Kinect extends GLAnimatable {
 	var depthTextureID = 0
 	val cube = GLPrimitive.cube()
 	cube.scale.set(1.f, 480.f/640.f, .1f)
+
+
+	var threshold = .8f
+	def setThreshold(v:Float) = threshold = v
+	var sizeThreshold = 20
+	def setSizeThreshold(v:Int) = sizeThreshold = v
 
 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
 	val videoPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
@@ -65,6 +82,9 @@ object Kinect extends GLAnimatable {
 		override def onFrameReceived(mode:FrameMode, frame:ByteBuffer, timestamp:Int) {
 			// println( "depth wy: " + mode.getWidth + " " + mode.getHeight + " " + mode.format )
 
+			val mat = new Mat(480,640,CvType.CV_8UC1)
+			val bytes = new Array[Byte](640*480)
+
 			for( y<-(0 until 480); x<-(0 until 640)){
 				val i = 2*(640*y + x)
 
@@ -72,7 +92,7 @@ object Kinect extends GLAnimatable {
 				val gb = (frame.get(i+1) & 0xFF).toShort
 				val raw:Int = (gb) << 8 | lb
 				var depth:Float = gamma(raw) // / 2048.f
-				if( depth > .5f) depth = 1.f
+				//if( depth > .5f) depth = 1.f
 
 				case class Color(r:Int,g:Int,b:Int)
 
@@ -88,6 +108,27 @@ object Kinect extends GLAnimatable {
 				val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
 				depthPix.setColor(depth,depth,depth,1.f)
 				depthPix.drawPixel(x,y)
+
+				bytes(640*y+x) = (if(depth < threshold) 255.toByte else 0.toByte )
+			}
+
+			mat.put(0,0, bytes)
+			Highgui.imwrite("depthimage.png",mat)
+
+			val contours = new java.util.ArrayList[MatOfPoint]()
+			Imgproc.findContours(mat, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+
+			var offset = 0
+			for( i<-(0 until contours.length)){
+				val rect = Imgproc.boundingRect(contours(i))
+
+				if( rect.width > sizeThreshold && rect.height > sizeThreshold){
+					val x = rect.x + rect.width/2
+					val y = rect.y + rect.height/2
+					callbacks.foreach(_(i-offset,Array(x,y,rect.width,rect.height)))
+				}else offset += 1
+				
+				//if( rect.width * rect.height > minSize)
 			}
 		}
 	}
@@ -116,4 +157,7 @@ object Kinect extends GLAnimatable {
 	override def step(dt:Float){
 		Texture(depthTextureID).draw(depthPix,0,0)
 	}
+
+	def clear() = { callbacks.clear()}
+  def bind(f:Callback) = callbacks += f
 }

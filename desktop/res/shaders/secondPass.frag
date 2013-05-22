@@ -3,6 +3,9 @@
  precision mediump float;
 #endif
 
+uniform float u_edge;
+uniform float u_depth;
+
 uniform sampler2D u_texture0;
 //uniform sampler2D depthTexture;
 //uniform sampler2D eyeTexture;
@@ -70,4 +73,18 @@ void main()
 
   //gl_FragColor = vec4( color, 1.0);
   //gl_FragColor = vec4(1.0);
+
+  if( u_depth == 1.0){
+    color = vec3(depth);
+  } else{
+    color = normal;
+  }
+
+  //if( u_edge == 1.0 ){
+    color *= edge;
+  //}
+
+  gl_FragColor = vec4(color,1.0);
+
 }
+
