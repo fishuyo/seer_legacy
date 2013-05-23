@@ -33,8 +33,7 @@ object Kinect extends GLAnimatable {
 	cube.scale.set(1.f, 480.f/640.f, .1f)
 
 
-	var threshold = .8f
-	def setThreshold(v:Float) = threshold = v
+	var threshold = Vec3(0.f,0.8f,0.f)
 	var sizeThreshold = 20
 	def setSizeThreshold(v:Int) = sizeThreshold = v
 
@@ -106,14 +105,16 @@ object Kinect extends GLAnimatable {
 					case _ => Color(0,0,0)
 				}
 				val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
-				depthPix.setColor(depth,depth,depth,1.f)
+				val d = (if(depth > threshold.x && depth < threshold.y) 1.f else 0.f)
+				depthPix.setColor(d,d,d,1.f)
+
 				depthPix.drawPixel(x,y)
 
-				bytes(640*y+x) = (if(depth < threshold) 255.toByte else 0.toByte )
+				bytes(640*y+x) = (if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
 			}
 
 			mat.put(0,0, bytes)
-			Highgui.imwrite("depthimage.png",mat)
+			//Highgui.imwrite("depthimage.png",mat)
 
 			val contours = new java.util.ArrayList[MatOfPoint]()
 			Imgproc.findContours(mat, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)

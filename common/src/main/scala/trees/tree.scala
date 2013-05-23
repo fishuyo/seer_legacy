@@ -18,6 +18,8 @@ import com.badlogic.gdx.graphics.GL10
 
 object Trees extends GLAnimatable {
 
+  def setDamp(v:Float) = damp = v
+  var damp = 100.f
 	var t = 0.f
   var g = -10.f
   var gv = Vec3(0,-10.f,0)
@@ -162,6 +164,7 @@ class Tree() extends GLAnimatable {
       root.solveConstraints()
     }
   }
+
 }
 
 object TreeNode {
@@ -254,7 +257,7 @@ class TreeNode extends GLAnimatable {
   	val ay = accel dot restPose.quat.toY
   	var dw = Vec3(ay, ax, 0)
   	
-  	dw -= w * (damp / mass)
+  	dw -= w * (Trees.damp / mass)
   	dw -= euler * k
   	lEuler.set(euler)
   	euler = euler + w + dw * (.5f*dt*dt)
@@ -312,7 +315,29 @@ class TreeNode extends GLAnimatable {
     size
   }*/
 
-  def writePoints( file: String ) = {}
+  // def writePoints( file: String ) = {}
+
+  // def getBoundingBox() = {
+  //   val p1 = pose.pos
+  //   val p2 = pose.pos + pose.quat.toZ()*dist
+  //   val min = 
+  //   root.children.foreach( (n) => {
+  //     val bb = n.getBoundingBox
+
+  //   })
+  //   (min,max)
+  // }
+
+  def getMaxHeight():Float = {
+    val p1 = pose.pos.y
+    val p2 = (pose.pos + pose.quat.toZ()*dist).y
+    var max = (if( p1 < p2) p2 else p1)
+    children.foreach( (n) => {
+      val m = n.getMaxHeight
+      if(m > max) max = m
+    })
+    max
+  }
 
 }
 
