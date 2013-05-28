@@ -19,10 +19,11 @@ object Settings {
       "com.nativelibs4java" % "scalacl" % "0.2",
       "de.sciss" %% "scalaosc" % "1.1.+",
       "com.github.philcali" % "monido-core_2.9.1" % "0.1.2",
-      "org.jruby" % "jruby" % "1.7.3"
+      "org.jruby" % "jruby" % "1.7.3",
+      "net.java.dev.jna" % "jna" % "3.5.2",
       //"de.sciss" %% "scalaaudiofile" % "1.4.+"
       //"com.nativelibs4java" % "javacl" % "1.0.0-RC2",
-      //"xuggle" % "xuggle-xuggler" % "5.4"
+      "xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
       //"net.sf.bluecove" % "bluecove" % "2.1.0",
       //"net.sf.bluecove" % "bluecove-gpl" % "2.1.0"
@@ -61,7 +62,7 @@ object Settings {
     
     // Declare names
     val baseUrl = "http://fishuyo.com/stuff"
-    val zipName = "GlulogicMT.zip"
+    val zipName = "seerLibs.zip"
     val zipFile = new java.io.File(zipName)
 
     // Fetch the file.
@@ -72,8 +73,8 @@ object Settings {
     // Extract jars into their respective lib folders.
     val commonDest = file("common/lib")
     val desktopDest = file("desktop/lib")
-    val commonFilter = new ExactFilter("GlulogicMT.jar")
-    val deskFilter = new ExactFilter("libGlulogicMT.jnilib")
+    val commonFilter = new ExactFilter("GlulogicMT.jar") | new ExactFilter("freenect-0.0.1.jar") | new ExactFilter("opencv-245.jar")
+    val deskFilter = new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("flibopencv_java245.dylib")
     IO.unzip(zipFile, commonDest, commonFilter)
     IO.unzip(zipFile, desktopDest, deskFilter)
 

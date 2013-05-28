@@ -6,11 +6,6 @@ import spatial._
 
 import javax.swing._
 
-// import javax.media.opengl._
-// import javax.media.opengl.awt._
-// import javax.media.opengl.glu._
-// import com.jogamp.opengl.util._
-// import javax.media.opengl.fixedfunc.{GLLightingFunc => L}
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Queue

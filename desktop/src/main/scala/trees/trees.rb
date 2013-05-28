@@ -124,84 +124,84 @@ $Pad.bind( lambda{|i,f|
 # nmove = Vec3.apply(0,0,0)
 # nrot = Vec3.apply(0,0,0)
 
-Kinect.connect()
-Kinect.startDepth()
-Kinect.clear()
-Kinect.bind( lambda{|i,f|
-	#if f[2] < 10 || f[3] < 10 then return end
+#Kinect.connect()
+#Kinect.startDepth()
+# Kinect.clear()
+# Kinect.bind( lambda{|i,f|
+# 	#if f[2] < 10 || f[3] < 10 then return end
 
-	t = Main.tree
-	size = f[2]*f[3]/10000.0
-	x = (f[0] - 320)/320.0
-	y = (f[1] - 240)/-240.0
+# 	t = Main.tree
+# 	size = f[2]*f[3]/10000.0
+# 	x = (f[0] - 320)/320.0
+# 	y = (f[1] - 240)/-240.0
 
-	# print i
-	# print " "
-	# print x
-	# print " "
-	# print y
-	# print " "	
-	# # print f[2]
-	# # print " "
-	# # puts f[3]
-	# puts size
+# 	# print i
+# 	# print " "
+# 	# print x
+# 	# print " "
+# 	# print y
+# 	# print " "	
+# 	# # print f[2]
+# 	# # print " "
+# 	# # puts f[3]
+# 	# puts size
 
-	# if Main.day.x == 1.0
-	# 	ur = Camera.nav.ur()
-	# 	uf = Camera.nav.uf()
-	# 	t.root.applyForce( ur*(-x*size*10))
-	# 	t.root.applyForce( uf*(y*size*10))
-	# 	Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
+# 	# if Main.day.x == 1.0
+# 	# 	ur = Camera.nav.ur()
+# 	# 	uf = Camera.nav.uf()
+# 	# 	t.root.applyForce( ur*(-x*size*10))
+# 	# 	t.root.applyForce( uf*(y*size*10))
+# 	# 	Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
 
-	# 	# return
-	# end
+# 	# 	# return
+# 	# end
 
 
 
-	if i == 0
-		Main.nmove.set(x*4.0, 0, (y+0.5)*1.0+1.0 )
-	elsif i == 1
-		Main.nmove.set(Main.nmove.x+x*4.0, (y+0.7)*1.5+0.5, Main.nmove.z )
-	elsif i == 3
-		mx = f[2]*0.05  
-		my = f[3]*0.05
-	elsif i == 4
-		rz = f[3]*0.05
-		rx = f[2]*0.05
-	end
+# 	if i == 0
+# 		Main.nmove.set(x*4.0, 0, (y+0.5)*1.0+1.0 )
+# 	elsif i == 1
+# 		Main.nmove.set(Main.nmove.x+x*4.0, (y+0.7)*1.5+0.5, Main.nmove.z )
+# 	elsif i == 3
+# 		mx = f[2]*0.05  
+# 		my = f[3]*0.05
+# 	elsif i == 4
+# 		rz = f[3]*0.05
+# 		rx = f[2]*0.05
+# 	end
 
-	# move.lerpTo(nmove, 0.05 )
+# 	# move.lerpTo(nmove, 0.05 )
 	
-	# t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
-	# #t.bAngle.y.set(mx)
- #    t.sRatio.setMinMax( 0.05, Main.move.z, false )
- #    #t.sRatio.set( mz )
- #    t.bRatio.setMinMax( 0.05, my, false )
- #    #t.bRatio.set( my )
- #    t.sAngle.x.setMinMax( 0.05, rx, false )
- #    t.bAngle.x.setMinMax( 0.05, rx, false )
- #    #t.sAngle.x.set( rx )
- #    t.sAngle.z.setMinMax( 0.05, rz, false )
- #    t.bAngle.z.setMinMax( 0.05, rz, false )
- #    #t.sAngle.z.set( rz )
- #    #t.branch(depth)
- #    t.refresh()
+# 	# t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
+# 	# #t.bAngle.y.set(mx)
+#  #    t.sRatio.setMinMax( 0.05, Main.move.z, false )
+#  #    #t.sRatio.set( mz )
+#  #    t.bRatio.setMinMax( 0.05, my, false )
+#  #    #t.bRatio.set( my )
+#  #    t.sAngle.x.setMinMax( 0.05, rx, false )
+#  #    t.bAngle.x.setMinMax( 0.05, rx, false )
+#  #    #t.sAngle.x.set( rx )
+#  #    t.sAngle.z.setMinMax( 0.05, rz, false )
+#  #    t.bAngle.z.setMinMax( 0.05, rz, false )
+#  #    #t.sAngle.z.set( rz )
+#  #    #t.branch(depth)
+#  #    t.refresh()
 
- #    t.root.accel.zero
- #    t.root.euler.zero
+#  #    t.root.accel.zero
+#  #    t.root.euler.zero
 	
-})
+# })
 
 Trees.setDamp(300.0)
 
-Kinect.threshold.set( 0.0, 0.65, 0.0 )
-Kinect.device.get().setTiltAngle(-25.0)
-Kinect.setSizeThreshold( 20 )
+# Kinect.threshold.set( 0.0, 0.65, 0.0 )
+# Kinect.device.get().setTiltAngle(-25.0)
+# Kinect.setSizeThreshold( 20 )
 
 def step(dt)
 	t = Main.tree
 
-	# Main.day.set(1,0,1)
+	Main.day.set(1,0,1)
 
 	if SimpleAppRun.app.frameCount % 10
 		Main.wind.setVolume(Main.volume.x)
@@ -218,7 +218,7 @@ def step(dt)
 
 	gpose = Pose.apply(Vec3.apply(0,-1.3,0),Quat.apply(0.42112392,-0.09659095, 0.18010217, -0.8836787))
 
-	frame = SimpleAppRun.app.frameCount % (2500)
+	frame = 0 #SimpleAppRun.app.frameCount % (2500)
 	#puts frame
 	if frame <= dawnf
 		# Main.ground.pose.quat.slerpTo(gpose.quat, 1/250.0)
@@ -248,7 +248,7 @@ def step(dt)
 
 	Shader.setBgColor(Main.color,1.0)
 
-	if Main.day.x == 1.0
+	if Main.day.x == 0.0
 		Main.move.lerpTo(Main.nmove, 0.05 )
 		Main.rot.lerpTo(Main.nrot, 0.05 )
 
@@ -296,9 +296,11 @@ def step(dt)
 
 end
 
-# Keyboard.clear()
-# Keyboard.use()
-# Keyboard.bind("n", lambda{
-# 	p = Pose.apply(Camera.nav)
-# 	Main.niceViews += p
-# })
+Keyboard.clear()
+Keyboard.use()
+Keyboard.bind("n", lambda{
+	p = Pose.apply(Camera.nav)
+	# Main.niceViews.$plus$eq(p)
+	puts [mx,my,mz,rx,ry,rz] 
+
+})

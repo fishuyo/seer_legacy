@@ -93,7 +93,9 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boo
   }
 
   def dispose(){
+    playing = false
     device.dispose
+    record.dispose
   }
 
   def push(o:AudioSource) = sources += o

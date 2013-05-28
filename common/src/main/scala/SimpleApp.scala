@@ -178,16 +178,16 @@ class SimpleAppListener extends ApplicationListener {
   def pause(){
     //audio ! Stop
     paused = true
-    Trackpad.disconnect()
+    //Trackpad.disconnect()
   }
   def resume(){
     //audio ! Play
     paused = false
-    Trackpad.connect()
+    //Trackpad.connect()
   }
   def dispose(){
     audio.dispose
-    Kinect.disconnect()
+    //Kinect.disconnect()
   }
 
   def toggleFullscreen(){

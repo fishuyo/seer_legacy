@@ -39,8 +39,3 @@ import monido._
   def typed[T] = error("nope")
  }
 
- object Magic {
-
-  def bean() = println("fucking beans man!")
-
- }

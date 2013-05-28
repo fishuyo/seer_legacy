@@ -33,6 +33,8 @@ void main()
   } else {
     v_depth = transformedVertex.z;
   }
+  v_depth = a_position.z;
+
 
   v_texCoords = a_texCoord0;
 

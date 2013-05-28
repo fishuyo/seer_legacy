@@ -28,6 +28,7 @@ object Main extends App with GLAnimatable with AudioSource {
 
   // var niceView = new Pose(Vec3(0.7285795f,0.f, 1.4537674f), Quat(0.9765499f, 0.113466285f, 0.18053834f, -0.029700035f))
   var niceViews = new ListBuffer[Pose]()
+  var niceTrees = new ListBuffer[Array[Float]]()
   niceViews += new Pose(Vec3(0.7285795f,0.f, 1.4537674f), Quat(0.9765499f, 0.113466285f, 0.18053834f, -0.029700035f))
 
   var rms = 0.f

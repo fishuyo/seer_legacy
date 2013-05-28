@@ -64,7 +64,7 @@ Trackpad.bind( lambda{ |i,f|
 
 		#looper.setGain(l,2*f[1])
 		#looper.setPan(l,f[0])
-		looper.setDecay(l,f[0])
+		#looper.setDecay(l,f[0])
 		#looper.setSpeed(l,f[1]*2.0)
 
 
@@ -77,7 +77,9 @@ Trackpad.bind( lambda{ |i,f|
 		looper.setBounds(l,f[5],f[7])
 		
 		down =false
-	else
+	elsif i == 1
+		looper.setPan(l,f[0])
+		# puts f[0]
 		down = false
 	end
 })

@@ -23,8 +23,8 @@ object Kinect extends GLAnimatable {
   type Callback = (Int, Array[Int]) => Any
   val callbacks = new ListBuffer[Callback]()
 
-	var context:Option[Context] = _
-	var device:Option[Device] = _
+	var context:Option[Context] = None
+	var device:Option[Device] = None
 
 	var connected = false
 
