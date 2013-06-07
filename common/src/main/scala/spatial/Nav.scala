@@ -52,6 +52,9 @@ class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ){
   }
 }
 
+object Nav{
+	def apply() = new Nav()
+}
 /** Pose that moves through space */
 class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 	var smooth = 0.f

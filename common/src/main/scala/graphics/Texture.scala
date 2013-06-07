@@ -15,11 +15,11 @@ object Texture{
 		textures += t
 		textures.length - 1
 	}
-	def apply(w:Int,h:Int) = {
-		val t = new Texture(new FloatTextureDataExposed(w,h))
-		textures += t
-		textures.length - 1
-	}
+	// def apply(w:Int,h:Int) = {
+	// 	val t = new Texture(new FloatTextureDataExposed(w,h))
+	// 	textures += t
+	// 	textures.length - 1
+	// }
 	def apply(p:Pixmap) = {
 		val t = new Texture(p)
 		textures += t
@@ -28,7 +28,7 @@ object Texture{
 
   def apply(i:Int) = textures(i)
 
-  def getFloatBuffer(i:Int) = textures(i).getTextureData match { case td:FloatTextureDataExposed => td.getBuffer; case _ => null }
+  // def getFloatBuffer(i:Int) = textures(i).getTextureData match { case td:FloatTextureDataExposed => td.getBuffer; case _ => null }
 }
 
 

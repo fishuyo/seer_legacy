@@ -22,7 +22,7 @@ object Main extends App with GLAnimatable {
   var drone = new FakeDrone
   GLScene.push( drone )
 
-  var ground = GLPrimitive.cube(Pose(), Vec3(.1f,.1f,.1f))
+  var ground = Primitive3D.cube(Pose(), Vec3(.1f,.1f,.1f))
   GLScene.push(ground)
 
 

@@ -5,12 +5,15 @@ import java.io._
 
 import monido._
  
- class Ruby(script:String) extends scala.Dynamic {
+ class Ruby(script:String, var imports:List[String]=List("")) extends scala.Dynamic {
+
   var loaded = false
+
   val file = new File(script)
+
   var engine:ScriptEngine with Invocable = null
+
   reload()
-  //if(loaded) this.once()
       
   def language() = "Ruby"
 
@@ -21,10 +24,34 @@ import monido._
 
   def reload() = {
     try{
-  	 engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
-  	 engine.eval(new FileReader(file))
-     loaded = true
-     //this.onLoad()
+  	  engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
+      val auto_import = """
+        require 'java'
+
+        module M
+          include_package "scala"
+          include_package "com.fishuyo"
+          include_package "com.fishuyo.io"
+          include_package "com.fishuyo.maths"
+          include_package "com.fishuyo.spatial"
+          include_package "com.fishuyo.graphics"
+          include_package "com.fishuyo.util"
+        """ + imports.foldLeft(""){ case (o,s) => o + "\n" + "include_package \"" + s + "\""} + """
+        end
+
+        class Object
+          class << self
+            alias :const_missing_old :const_missing
+            def const_missing c
+              M.const_get c
+            end
+          end
+        end
+      """
+      engine.eval(auto_import) 
+  	  engine.eval(new FileReader(file))
+      loaded = true
+      //this.onLoad()
     } catch { 
       case e:Exception => loaded = false; println(e)
     }
@@ -37,5 +64,6 @@ import monido._
   }
                    
   def typed[T] = error("nope")
+
  }
 

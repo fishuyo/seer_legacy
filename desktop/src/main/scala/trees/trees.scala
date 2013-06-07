@@ -19,7 +19,7 @@ object Main extends App with GLAnimatable with AudioSource {
   GLScene.push(this)
   //GLScene.push(Kinect)
   
-  var ground:GLPrimitive = _
+  var ground:Model = _
   var tree = new Tree() 
  tree.branch()
 
@@ -46,15 +46,15 @@ object Main extends App with GLAnimatable with AudioSource {
   var nmove = Vec3(0.f)
   var nrot = Vec3(0.f)
 
-  val live = new Ruby("src/main/scala/trees/trees.rb")
+  val live = new Ruby("src/main/scala/trees/trees.rb", "com.fishuyo.examples.trees"::"com.fishuyo.trees"::List())
 
   SimpleAppRun() 
 
   override def init(){
-    ground = GLPrimitive.fromObj("src/main/scala/drone/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
+    ground = OBJ("src/main/scala/drone/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
     ground.pose.quat.set(0.42112392f,-0.09659095f, 0.18010217f, -0.8836787f)
     ground.pose.pos.set(0.f,-1.3f,-.0f)
-    ground.scale.set(10.f,10.f,10.f)
+    ground.scale.set(5.f,5.f,5.f)
 
     val f = Gdx.files.internal("res/wind.mp3")
     wind = Gdx.audio.newMusic(f)

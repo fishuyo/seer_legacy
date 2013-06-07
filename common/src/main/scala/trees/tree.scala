@@ -170,7 +170,7 @@ class Tree() extends GLAnimatable {
 object TreeNode {
 
 	var taper=.8f
-	var glprimitive = GLPrimitive.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
+	var glprimitive = Primitive3D.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
 
   def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(-math.Pi/2,0,0))), d:Float=1.f, t:Float=.2f, q:Quat=Quat() ) = new TreeNode {
   	restPose = Pose(p);

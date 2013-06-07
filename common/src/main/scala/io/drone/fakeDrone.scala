@@ -12,9 +12,9 @@ import com.badlogic.gdx.graphics.GL10
 
 class FakeDrone extends GLAnimatable {
 
-	var destCube = GLPrimitive.cube(Pose(), Vec3(.02f,.02f,.02f))
+	var destCube = Primitive3D.cube(Pose(), Vec3(.02f,.02f,.02f))
 	//var drone = ObjParser("src/main/scala/drone/drone.obj")
-  var drone = GLPrimitive.cube(Pose(), Vec3(0.5f,.05f,.5f))
+  var drone = Primitive3D.cube(Pose(), Vec3(0.5f,.05f,.5f))
 	var velocity = Vec3()
 	var acceleration = Vec3()
 	var thrust = 0.f

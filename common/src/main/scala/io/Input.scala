@@ -38,12 +38,16 @@ object Keyboard extends InputAdapter {
 		//else callbacks += s -> f
 	}
 	override def keyTyped(k:Char) = {
-		charCallbacks.getOrElse(k, non()_)()
+		try{
+			charCallbacks.getOrElse(k, non()_)()
+		} catch { case e:Exception => println(e) }
 		false
 	}
 	override def keyUp(k:Int) = {
 		val c = (k+68).toChar
-		charUpCallbacks.getOrElse(c, non()_)()
+		try{
+			charUpCallbacks.getOrElse(c, non()_)()
+		} catch { case e:Exception => println(e) }
 		false
 	}
 }

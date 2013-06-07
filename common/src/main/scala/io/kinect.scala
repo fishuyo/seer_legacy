@@ -29,7 +29,7 @@ object Kinect extends GLAnimatable {
 	var connected = false
 
 	var depthTextureID = 0
-	val cube = GLPrimitive.cube()
+	val cube = Primitive3D.cube()
 	cube.scale.set(1.f, 480.f/640.f, .1f)
 
 
@@ -39,6 +39,10 @@ object Kinect extends GLAnimatable {
 
 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
 	val videoPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
+
+	var bg = new Mat(480,640,CvType.CV_32FC1)
+	var getBG = 20
+	def setBGImage() = { getBG = 20; bg.setTo( new Scalar(0.f)) }
 
 	val gamma = new Array[Float](2048)
 	for (i<-(0 until 2048)){
@@ -82,7 +86,9 @@ object Kinect extends GLAnimatable {
 			// println( "depth wy: " + mode.getWidth + " " + mode.getHeight + " " + mode.format )
 
 			val mat = new Mat(480,640,CvType.CV_8UC1)
-			val bytes = new Array[Byte](640*480)
+			val diff = new Mat(480,640,CvType.CV_8UC1)
+			val depthData = new Array[Byte](640*480)
+			val flo = new Array[Float](640*480)
 
 			for( y<-(0 until 480); x<-(0 until 640)){
 				val i = 2*(640*y + x)
@@ -90,46 +96,99 @@ object Kinect extends GLAnimatable {
 				val lb = (frame.get(i) & 0xFF).toShort
 				val gb = (frame.get(i+1) & 0xFF).toShort
 				val raw:Int = (gb) << 8 | lb
-				var depth:Float = gamma(raw) // / 2048.f
+				var depth:Float = raw / 2048.f //gamma(raw) // / 2048.f
 				//if( depth > .5f) depth = 1.f
 
-				case class Color(r:Int,g:Int,b:Int)
+				// case class Color(r:Int,g:Int,b:Int)
+				// var color = gb match {
+				// 	case 0 => Color(255,255-lb,255-lb)
+				// 	case 1 => Color(255,lb,0)
+				// 	case 2 => Color(255-lb,255,0)
+				// 	case 3 => Color(0,255,lb)
+				// 	case 4 => Color(0,255-lb,255)
+				// 	case 5 => Color(0,0,255-lb)
+				// 	case _ => Color(0,0,0)
+				// }
+				// val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
+				// val d = (if(depth > threshold.x && depth < threshold.y) 1.f else 0.f)
+				// depthPix.setColor(d,d,d,1.f)
 
-				var color = gb match {
-					case 0 => Color(255,255-lb,255-lb)
-					case 1 => Color(255,lb,0)
-					case 2 => Color(255-lb,255,0)
-					case 3 => Color(0,255,lb)
-					case 4 => Color(0,255-lb,255)
-					case 5 => Color(0,0,255-lb)
-					case _ => Color(0,0,0)
+				// depthPix.drawPixel(x,y)
+
+				depthData(640*y+x) = (depth*255.f).toByte //(if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
+				flo(640*y+x) = depth
+			}
+			println ( flo.max )
+
+			mat.put(0,0, depthData)
+			if( getBG > 0 ){
+				Imgproc.accumulateWeighted( mat, bg, .1f) //mat.clone
+				getBG -= 1
+				for( y<-(0 until 480); x<-(0 until 640)){
+					val d = bg.get(y,x)(0).toFloat / 255.f
+					videoPix.setColor(d,d,d,1.f)
+					videoPix.drawPixel(x,y)
 				}
-				val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
-				val d = (if(depth > threshold.x && depth < threshold.y) 1.f else 0.f)
-				depthPix.setColor(d,d,d,1.f)
-
-				depthPix.drawPixel(x,y)
-
-				bytes(640*y+x) = (if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
 			}
 
-			mat.put(0,0, bytes)
+			val tmp = new Mat()
+			val bg8u = new Mat()
+			bg.convertTo(bg8u, CvType.CV_8UC1)
+			Core.absdiff(bg8u,mat,tmp)
+			Imgproc.threshold(tmp,diff,threshold.y,255.f, Imgproc.THRESH_BINARY)
+
+			for( y<-(0 until 480); x<-(0 until 640)){
+				val d = ( if (diff.get(y,x)(0) > 0) depthData(640*y+x).toFloat / 255.f else 0.f )
+				depthPix.setColor(d,d,d,1.f)
+				depthPix.drawPixel(x,y)
+
+			}
+
 			//Highgui.imwrite("depthimage.png",mat)
 
 			val contours = new java.util.ArrayList[MatOfPoint]()
-			Imgproc.findContours(mat, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+			Imgproc.findContours(diff, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
 
 			var offset = 0
 			for( i<-(0 until contours.length)){
-				val rect = Imgproc.boundingRect(contours(i))
+				// val rect = Imgproc.boundingRect(contours(i))
+				// val rect = Imgproc.minAreaRect(contours(i))
 
-				if( rect.width > sizeThreshold && rect.height > sizeThreshold){
-					val x = rect.x + rect.width/2
-					val y = rect.y + rect.height/2
-					callbacks.foreach(_(i-offset,Array(x,y,rect.width,rect.height)))
-				}else offset += 1
-				
-				//if( rect.width * rect.height > minSize)
+				// if( rect.width > sizeThreshold && rect.height > sizeThreshold){
+				// 	val x = rect.x + rect.width/2
+				// 	val y = rect.y + rect.height/2
+				// 	depthPix.setColor(0.f,1.f,0.f,1.f)
+				// 	depthPix.drawRectangle(rect.x,rect.y,rect.width,rect.height)
+				// 	callbacks.foreach(_(i-offset,Array(x,y,rect.width,rect.height)))
+				// }else offset += 1
+
+				if( contours.get(i).size().area() >= 5 ){
+					val mMOP2f = new MatOfPoint2f()
+					contours.get(i).convertTo(mMOP2f, CvType.CV_32FC2);
+					val rotRect = Imgproc.fitEllipse(mMOP2f)
+					if( rotRect.size.width > sizeThreshold && rotRect.size.height > sizeThreshold){
+						val (x,y) = (rotRect.center.x, rotRect.center.y)
+						val (w,h) = (rotRect.size.width/2, rotRect.size.height/2)
+						val cosa = math.cos(rotRect.angle.toRadians)
+						val sina = math.sin(rotRect.angle.toRadians)
+
+						val x1 = cosa*w - sina*h + x
+						val y1 = sina*w + cosa*h + y
+						val x2 = cosa*w + sina*h + x
+						val y2 = sina*w - cosa*h + y
+						val x3 = -cosa*w + sina*h + x
+						val y3 = -sina*w - cosa*h + y
+						val x4 = -cosa*w - sina*h + x
+						val y4 = -sina*w + cosa*h + y
+						depthPix.setColor(0.f,1.f,0.f,1.f)
+						// depthPix.drawRectangle((x-w).toInt,(y-h).toInt,(2*w).toInt,(2*h).toInt)
+						depthPix.drawLine(x1.toInt,y1.toInt,x2.toInt,y2.toInt)
+						depthPix.drawLine(x2.toInt,y2.toInt,x3.toInt,y3.toInt)
+						depthPix.drawLine(x3.toInt,y3.toInt,x4.toInt,y4.toInt)
+						depthPix.drawLine(x1.toInt,y1.toInt,x4.toInt,y4.toInt)
+						//callbacks.foreach(_(i-offset,Array(x,y,rect.width,rect.height)))
+					}else offset += 1
+				}
 			}
 		}
 	}

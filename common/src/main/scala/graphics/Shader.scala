@@ -19,9 +19,9 @@ object Shader {
   var shader:ShaderProgram = null
   var shaders = new HashMap[String,(String,String,ShaderProgram)]()
 
-  var projModelViewMatrix = new Matrix4()
-  var modelViewMatrix = new Matrix4()
-  var modelMatrix = new Matrix4()
+  // var projModelViewMatrix = new Matrix4()
+  // var modelViewMatrix = new Matrix4()
+  // var modelMatrix = new Matrix4()
   var bg = (0.f,0.f,0.f,1.f)
   var color = (1.f,1.f,1.f,1.f)
   var alpha = 1.f
@@ -36,19 +36,19 @@ object Shader {
     this().setUniformf("u_alpha", alpha)
   }
 
-  def matrixTransform( m:Matrix4 ) = Matrix4.mul(modelMatrix.`val`, m.`val`)
-  def matrixClear() = modelMatrix.idt()
+  // def matrixTransform( m:Matrix4 ) = Matrix4.mul(modelMatrix.`val`, m.`val`)
+  // def matrixClear() = modelMatrix.idt()
 
   def setMatrices() = {
     try{
-    	projModelViewMatrix.set(Camera.combined)
-    	modelViewMatrix.set(Camera.view)
-    	Matrix4.mul( projModelViewMatrix.`val`, modelMatrix.`val`)
-    	Matrix4.mul( modelViewMatrix.`val`, modelMatrix.`val`)
-    	this().setUniformMatrix("u_projectionViewMatrix", projModelViewMatrix)
+    	// projModelViewMatrix.set(Camera.combined)
+    	// modelViewMatrix.set(Camera.view)
+    	// Matrix4.mul( projModelViewMatrix.`val`, modelMatrix.`val`)
+    	// Matrix4.mul( modelViewMatrix.`val`, modelMatrix.`val`)
+    	this().setUniformMatrix("u_projectionViewMatrix", MatrixStack() )
     	// this().setUniformMatrix("u_modelViewMatrix", modelViewMatrix)
     	//this().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-      this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+      // this().setUniformf("u_color", color._1, color._2, color._3, color._4)
     } catch { case e:Exception => e}
 
   }

@@ -64,7 +64,7 @@ void main()
 
   if( depth == 0.0 ) depth = 1.0;
 
-  gl_FragColor = vec4(normal, 1.0);
+  //gl_FragColor = vec4(normal, 1.0);
   //gl_FragColor = vec4(vec3(depth), 1.0);
   //gl_FragColor = vec4(vec3(depth)*edge, 1.0);
   //gl_FragColor = vec4(vec3(diffuse), 1.0);
@@ -80,11 +80,11 @@ void main()
     color = normal;
   }
 
-    color = vec3(depth);
+  //color = vec3(depth);
 
-  //if( u_edge == 1.0 ){
+  if( u_edge == 1.0 ){
     color *= edge;
-  //}
+  }
 
   gl_FragColor = vec4(color,1.0);
 

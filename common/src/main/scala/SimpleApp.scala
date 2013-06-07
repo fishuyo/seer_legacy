@@ -81,7 +81,7 @@ class SimpleAppListener extends ApplicationListener {
       //FrameBuffers(width,height)
 
       fbo = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-      quad = GLPrimitive.quad
+      quad = Primitive2D.quad
     }
 
     if( logfps ) fps.log
@@ -119,7 +119,7 @@ class SimpleAppListener extends ApplicationListener {
       Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
       Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
 
-      Shader.matrixClear()
+      MatrixStack.clear()
       Shader.setMatrices()
       scene.draw()
     }
