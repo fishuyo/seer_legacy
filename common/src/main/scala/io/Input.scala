@@ -14,10 +14,13 @@ import spatial._
 // import java.awt.event.MouseMotionListener
 
 import scala.collection.mutable.Map
+import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input.Keys
+
+class Input extends InputAdapter
 
 object Inputs extends InputMultiplexer
 
@@ -51,6 +54,52 @@ object Keyboard extends InputAdapter {
 		false
 	}
 }
+
+object Mouse extends InputAdapter {
+	type Callback = (Int,Int,Int,Int)=>Unit
+	var callbacks = Map[String,List[Callback]]()
+	callbacks += ("up" -> List())
+	callbacks += ("down" -> List())
+	callbacks += ("drag" -> List())
+	callbacks += ("move" -> List())
+	callbacks += ("scroll" -> List())
+
+	def non()() = {}
+
+	def clear() = { callbacks.keys.foreach(callbacks(_) = List()); Inputs.removeProcessor(this) }
+	def use() = Inputs.addProcessor(this)
+
+	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
+
+  override def touchUp( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
+    try { callbacks("up").foreach( _(screenX,screenY,pointer,button) ) }
+    catch { case e:Exception => println(e) }
+    false
+  }
+ 	override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
+    try{ callbacks("down").foreach( _(screenX,screenY,pointer,button) ) }
+    catch { case e:Exception => println(e) }
+    false
+	}
+  override def touchDragged( screenX:Int, screenY:Int, pointer:Int) = {
+    try{ callbacks("drag").foreach( _(screenX,screenY,pointer,0) ) }
+    catch { case e:Exception => println(e) }
+    false
+  }
+
+  // mouse only
+  override def mouseMoved( screenX:Int, screenY:Int ) = {
+    try { callbacks("move").foreach( _(screenX,screenY,0,0) ) }
+    catch { case e:Exception => println(e) }
+    false
+  }
+  override def scrolled( amount:Int) = {
+    try{ callbacks("scroll").foreach( _(amount,0,0,0) ) }
+    catch { case e:Exception => println(e) }
+    false
+  }
+}
+
 
 class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
 

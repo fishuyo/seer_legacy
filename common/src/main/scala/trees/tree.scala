@@ -132,12 +132,14 @@ class Tree() extends GLAnimatable {
     if( size == 0) return
     var idx = 0;
 
-    val t = Texture(textureID).getTextureObjectHandle
-    val t1 = Texture(textureID1).getTextureObjectHandle
-    // Texture(textureID).bind(t)
-    Texture(textureID1).bind(t1)
-    Shader().setUniformi("u_texture0", t1 );
-    //Shader().setUniformi("u_texture1", t1 );
+    // val t = Texture(textureID).getTextureObjectHandle
+    // val t1 = Texture(textureID1).getTextureObjectHandle
+    // // Texture(textureID).bind(t)
+    // Texture(textureID1).bind(t1)
+    // Shader().setUniformi("u_texture0", t1 );
+    // //Shader().setUniformi("u_texture1", t1 );
+
+    Texture.bind(textureID1)
 
     root.draw() //vertices, idx)
 

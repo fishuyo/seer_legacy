@@ -25,7 +25,13 @@ class RGB(val r:Float, val g:Float, val b:Float){
   override def toString() = "( " + r + " " + g + " " + b + " )"
 }
 
+object RGBA{
+  def apply( r:Float, g:Float, b:Float, a:Float=1.f) = new RGBA(r,g,b,a)
+
+}
 class RGBA( r:Float, g:Float, b:Float, val a:Float ) extends RGB(r,g,b){
+  def value = r
+
 	def +(c: RGBA) = new RGBA(r+c.r, g+c.g, b+c.b, a+c.a)
 	override def *(s:Float) = new RGBA(r*s, g*s, b*s, a)
 	def *(c:RGBA) = new RGBA(r*c.r, g*c.g, b*c.b, a*c.a)

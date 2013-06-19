@@ -20,7 +20,10 @@ object Main extends App with GLAnimatable{
 
   val live = new Ruby("src/main/scala/test.rb", "com.fishuyo.examples" :: List())
 
-  val cube = Cube()
+  val cube = Model(Quad())
+  var modelBuilder = Some(parsers.EisenScriptParser(""))
+  var model = Some(Model())
+
   //cube.scale.set(1.f, (2*480.f)/640.f, 1.f)
   GLScene.push(cube)
 
@@ -41,6 +44,7 @@ object Main extends App with GLAnimatable{
   	// Texture(0).bind()
   	// Shader().setUniformi("u_texture0", 0);
   	// cube.draw()
+    live.draw()
 
   }
 

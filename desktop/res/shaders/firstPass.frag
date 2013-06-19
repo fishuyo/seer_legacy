@@ -47,12 +47,12 @@ void main()
   //gl_FragData[0] = vec4(1.0);
 
   if( u_useTexture == 1.0){
-  //  gl_FragData[0] = vec4( textureColor, depthShift);
+    gl_FragData[0] = vec4( textureColor, depthShift);
   }else{
-  //  gl_FragData[0] = vec4(normalShift, depthShift);
+    gl_FragData[0] = vec4(normalShift, depthShift);
   }
   
-  if( v_color != vec4(1.0,0.0,0.0,1.0) ){
+  if( v_color != vec4(0.0,0.0,0.0,1.0) ){
     //gl_FragData[0] = vec4(v_color.xyz, depthShift);
   }
 

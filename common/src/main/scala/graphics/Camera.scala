@@ -49,6 +49,11 @@ class Camera extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f) {
 
   def setFOV(f:Float) = fieldOfView = f
 
+  def ray(x:Int,y:Int) = {
+    val r = this.getPickRay(x,y)
+    Ray( Vec3(r.origin.x,r.origin.y,r.origin.z), Vec3(r.direction.x,r.direction.y,r.direction.z))
+  }
+
 }
 
  

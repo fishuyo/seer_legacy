@@ -21,11 +21,6 @@
 #   end
 # end
 
-def import
-	"com.fishuyo.examples.trees\n"+
-	"com.fishuyo.trees"
-end
-
 $Seer = Java::com.fishuyo
 Seer = $Seer
 $Vec3 = $Seer.maths.Vec3
@@ -68,7 +63,7 @@ $tree.branch(depth)
 
 $Camera.rotateWorld(0.0)
 
-$Seer.trees.Fabric.gv.set(0.0,-10.0,0.0)
+$Seer.trees.Fabric.gv.set(0.0,-5.0,0.0)
 $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
 
 
@@ -130,8 +125,8 @@ $Pad.bind( lambda{|i,f|
 # nmove = Vec3.apply(0,0,0)
 # nrot = Vec3.apply(0,0,0)
 
-Kinect.connect()
-Kinect.startDepth()
+# Kinect.connect()
+# Kinect.startDepth()
 Kinect.clear()
 Kinect.bind( lambda{|i,f|
 	#if f[2] < 10 || f[3] < 10 then return end
@@ -140,7 +135,15 @@ Kinect.bind( lambda{|i,f|
 	size = f[2]*f[3]/10000.0
 	x = (f[0] - 320)/320.0
 	y = (f[1] - 240)/-240.0
+	a = f[4]
+	if a < 90.0
+		a = -a
+	else
+		a = 180.0 - a
+	end
 
+	a = a / 180.0
+	# puts a
 	# print i
 	# print " "
 	# print x
@@ -151,6 +154,8 @@ Kinect.bind( lambda{|i,f|
 	# # print " "
 	# # puts f[3]
 	# puts size
+		
+
 
 	if Main.day.x == 1.0
 		ur = Camera.nav.ur()
@@ -162,16 +167,18 @@ Kinect.bind( lambda{|i,f|
 		return
 	end
 
-
+	# puts i
 	nm = Main.nmove
 	nr = Main.nrot
 	if i == 0
-		Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
-		Main.nrot.set(x*2.0, nr.y, nr.z)
+		Main.nrot.set(0.0,0.0,0.0)
+		Main.nmove.set(a*2,nm.y,nm.z)
+		# Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
+		# Main.nrot.set(x*2.0, nr.y, nr.z)
 	elsif i == 1
-		Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
+		# Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
 	elsif i == 2
-		Main.nrot.set(nr.x,nr.y, x*4.0)
+		# Main.nrot.set(nr.x,nr.y, x*4.0)
 	elsif i == 4
 		rz = f[3]*0.05
 		rx = f[2]*0.05
@@ -199,10 +206,10 @@ Kinect.bind( lambda{|i,f|
 	
 })
 
-Trees.setDamp(70.0)
+Trees.setDamp(150.0)
 
-Kinect.threshold.set( 0.0, 0.675, 0.0 )
-Kinect.device.get().setTiltAngle(0.0)
+Kinect.threshold.set( 0.0, 0.4, 0.0 )
+# Kinect.device.get().setTiltAngle(0.0)
 Kinect.setSizeThreshold( 20 )
 
 def step(dt)
@@ -223,7 +230,7 @@ def step(dt)
 
 	gpose = Pose.apply(Vec3.apply(0,-1.3,0),Quat.apply(0.42112392,-0.09659095, 0.18010217, -0.8836787))
 
-	frame = SimpleAppRun.app.frameCount % (6500)
+	frame = 300 #SimpleAppRun.app.frameCount % (6500)
 	#puts frame
 	if frame <= dawnf
 		Main.nmove.set(1.3, 1.22, 1.2)
@@ -234,8 +241,8 @@ def step(dt)
 
 	elsif frame <= dayf
 		Main.color.lerpTo(blue, 0.01)
-		Main.ground.pose.set(gpose)
-		Main.ground.scale.set(10.0,10.0,10.0)
+		#Main.ground.pose.set(gpose)
+		#Main.ground.scale.set(10.0,10.0,10.0)
 		Main.day.set(1,0,1)
 
 	elsif frame <= duskf
@@ -261,17 +268,17 @@ def step(dt)
 		Main.move.lerpTo(Main.nmove, 0.05 )
 		Main.rot.lerpTo(Main.nrot, 0.05 )
 
-		t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
+		t.bAngle.y.setMinMax( 0.0, Main.move.x,false )
 		#t.bAngle.y.set(mx)
 	    t.sRatio.setMinMax( 0.05, Main.move.z, false )
 	    #t.sRatio.set( mz )
 	    t.bRatio.setMinMax( 0.05, Main.move.y, false )
 	    #t.bRatio.set( my )
-	    t.sAngle.x.setMinMax( 0.05, Main.rot.x, false )
-	    t.bAngle.x.setMinMax( 0.05, Main.rot.x, false )
+	    t.sAngle.x.setMinMax( 0.0, Main.rot.x, false )
+	    t.bAngle.x.setMinMax( 0.0, Main.rot.x, false )
 	    #t.sAngle.x.set( rx )
-	    t.sAngle.z.setMinMax( 0.05, Main.rot.z, false )
-	    t.bAngle.z.setMinMax( 0.05, Main.rot.z, false )
+	    t.sAngle.z.setMinMax( 0.0, Main.rot.z, false )
+	    t.bAngle.z.setMinMax( 0.0, Main.rot.z, false )
 	    #t.sAngle.z.set( rz )
 	    #t.branch(depth)
 	    t.refresh()

@@ -96,7 +96,8 @@ class SimpleAppListener extends ApplicationListener {
     
     Gdx.gl.glClearColor(Shader.bg._1,Shader.bg._2,Shader.bg._3,Shader.bg._4)
     Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-    Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    //Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
     //Gdx.gl.glEnable(GL20.GL_BLEND);
     //Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH);
 
@@ -117,7 +118,7 @@ class SimpleAppListener extends ApplicationListener {
     {
       //Gdx.gl.glClearColor(1,1,1,0)
       Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-      Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+      // Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
 
       MatrixStack.clear()
       Shader.setMatrices()

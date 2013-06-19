@@ -36,6 +36,10 @@ trait GLAnimatable extends GLDrawable {
   def step( dt: Float){}
 }
 
+trait Pickable {
+  def intersect(r:Ray):Vec3
+}
+
 // class Poseable(val p:GlDrawable) extends GLDrawable {
 //   var pose = Pose()
 //   var scale = Vec3(1)
