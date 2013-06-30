@@ -191,10 +191,6 @@ class SimpleAppListener extends ApplicationListener {
     //Kinect.disconnect()
   }
 
-  def toggleFullscreen(){
-
-
-  }
 }
 
 

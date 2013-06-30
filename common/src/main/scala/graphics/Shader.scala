@@ -83,14 +83,16 @@ object Shader {
   }
 
   def monitor(name:String) = {
-	  FileMonido(shaders(name)._1){
-	    case ModifiedOrCreated(f) => reload;
-	    case _ => None
-	  }
-	  FileMonido(shaders(name)._2){
-	    case ModifiedOrCreated(f) => reload;
-	    case _ => None
-	  }
+    try{
+  	  FileMonido(Gdx.files.internal(shaders(name)._1).path()){
+  	    case ModifiedOrCreated(f) => reload;
+  	    case _ => None
+  	  }
+  	  FileMonido(Gdx.files.internal(shaders(name)._2).path()){
+  	    case ModifiedOrCreated(f) => reload;
+  	    case _ => None
+  	  }
+    } catch { case e:Exception => println(e) }
 	}
 
 }

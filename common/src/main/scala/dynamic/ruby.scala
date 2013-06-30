@@ -1,30 +1,33 @@
 package com.fishuyo.dynamic
 
-import javax.script._
+//import javax.script._
 import java.io._
 
+import org.jruby.embed._
 import monido._
  
- class Ruby(script:String, var imports:List[String]=List("")) extends scala.Dynamic {
+ class Ruby(val scriptPath:String, var imports:List[String]=List("")) extends scala.Dynamic {
 
   var loaded = false
 
-  val file = new File(script)
+  val file = new File(scriptPath)
 
-  var engine:ScriptEngine with Invocable = null
+  //var engine:ScriptEngine with Invocable = null
+  var engine:ScriptingContainer = null
 
   reload()
       
   def language() = "Ruby"
 
-  val monitor = FileMonido(script){
+  val monitor = FileMonido(scriptPath){
     case ModifiedOrCreated(f) => reload;
     case _ => None
   }
 
   def reload() = {
     try{
-  	  engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
+  	  //engine = new ScriptEngineManager().getEngineByName("jruby").asInstanceOf[ScriptEngine with Invocable]
+      engine = new ScriptingContainer()
       val auto_import = """
         require 'java'
 
@@ -48,8 +51,11 @@ import monido._
           end
         end
       """
-      engine.eval(auto_import) 
-  	  engine.eval(new FileReader(file))
+      // engine.eval(auto_import) 
+      // engine.eval(new FileReader(file))
+      engine.runScriptlet(auto_import) 
+      engine.runScriptlet(new FileReader(file), "scriptPath" )
+  	  // engine.runScriptlet(PathType.CLASSPATH, scriptPath )
       loaded = true
       //this.onLoad()
     } catch { 
@@ -59,7 +65,8 @@ import monido._
          
   def applyDynamic(name: String)(args: Any*){
     if( !loaded ) return
-    try { engine.invokeFunction(name, args.map(_.asInstanceOf[AnyRef]) : _*) }
+    //try { engine.invokeFunction(name, args.map(_.asInstanceOf[AnyRef]) : _*) }
+    try { engine.callMethod(None, name, args.map(_.asInstanceOf[AnyRef]) : _*) }
     catch { case e:Exception => println(e) }
   }
                    

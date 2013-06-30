@@ -18,7 +18,7 @@ object Main extends App with GLAnimatable{
 
   GLScene.push(this)
 
-  val live = new Ruby("src/main/scala/test.rb", "com.fishuyo.examples" :: List())
+  val live = new Ruby("src/main/scala/examples/test.rb", "com.fishuyo.examples" :: List())
 
   val cube = Model(Quad())
   var modelBuilder = Some(parsers.EisenScriptParser(""))

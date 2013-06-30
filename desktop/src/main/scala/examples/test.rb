@@ -275,3 +275,11 @@ TransTrack.bind("rigid_body", lambda{|i,f|
 })
 TransTrack.setDebug(false)
 TransTrack.start()
+
+Touch.clear()
+Touch.use()
+Touch.bind("pan", lambda {|i,f|
+	puts i
+	puts f[0]
+	puts f[1]
+})

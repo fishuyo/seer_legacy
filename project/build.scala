@@ -1,7 +1,9 @@
 import sbt._
 
 import Keys._
-import AndroidKeys._
+
+import org.scalasbt.androidplugin._
+import org.scalasbt.androidplugin.AndroidKeys._
 
 object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq (
@@ -46,8 +48,8 @@ object Settings {
     AndroidMarketPublish.settings ++ Seq (
       platformName in Android := "android-10",
       keyalias in Android := "change-me",
-      mainAssetsPath in Android := file("android/src/main/assets") //file("common/src/main/resources")
-      //proguardOption in Android := proguard_options,
+      mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
+      proguardOption in Android := "-keep class com.badlogic.gdx.backends.android.** { *; }"//proguard_options,
       //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
       //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
     )
@@ -73,8 +75,8 @@ object Settings {
     // Extract jars into their respective lib folders.
     val commonDest = file("common/lib")
     val desktopDest = file("desktop/lib")
-    val commonFilter = new ExactFilter("GlulogicMT.jar") | new ExactFilter("freenect-0.0.1.jar") | new ExactFilter("opencv-245.jar")
-    val deskFilter = new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("flibopencv_java245.dylib")
+    val commonFilter = new ExactFilter("freenect-0.0.1.jar") | new ExactFilter("opencv-245.jar")
+    val deskFilter = new ExactFilter("GlulogicMT.jar") | new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("flibopencv_java245.dylib")
     IO.unzip(zipFile, commonDest, commonFilter)
     IO.unzip(zipFile, desktopDest, deskFilter)
 
