@@ -23,7 +23,7 @@ object Settings {
       "com.github.philcali" % "monido-core_2.9.1" % "0.1.2",
       "org.jruby" % "jruby" % "1.7.3",
       "net.java.dev.jna" % "jna" % "3.5.2",
-      //"de.sciss" %% "scalaaudiofile" % "1.4.+"
+      "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
       //"com.nativelibs4java" % "javacl" % "1.0.0-RC2",
       "xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",

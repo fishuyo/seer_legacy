@@ -79,9 +79,11 @@ object Trackpad extends Observer{
           val coords = p.flatMap( (v:Vec3) => List(v.x,v.y) )
 
           val data = Array.concat( Array(centroid.x,centroid.y,dx,dy,size), coords.toArray)
-          callbacks.foreach( _(p.length, data) )
 
-          callbacksEach.foreach( _(id,Array(x,y,dx,dy,size,angle)) )
+          try{
+            callbacks.foreach( _(p.length, data) )
+            callbacksEach.foreach( _(id,Array(x,y,dx,dy,size,angle)) )
+          } catch { case e:Exception => println(e) }
 
           // println( "frame="+frame + 
           //                "\ttimestamp=" + timestamp + 

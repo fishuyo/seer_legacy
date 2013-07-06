@@ -10,10 +10,13 @@ import scala.actors.Actor
 import scala.actors.Actor._
 import scala.collection.mutable.ListBuffer
 
+import de.sciss.synth.io._
+
 case class Process
 case class Stop
 case class Play
 case class Gain(g:Float)
+case class Record
 
 object Scale {
   var root = 440.f
@@ -44,6 +47,7 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boo
   var dt = 0.f
   var gain = .5f;
   var playing = true;
+  var recording = false;
   var device:AudioDevice = null
   var record:AudioRecorder = null
   val in = new Array[Float](bufferSize)
@@ -51,6 +55,8 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boo
   val channels = if(mono) 1 else 2
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
   val out_interleaved = new Array[Float](bufferSize*channels)
+
+  var outFile:AudioFile = null
 
   val sources = new ListBuffer[AudioSource]
 
@@ -82,14 +88,42 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boo
               }
             }
             device.writeSamples(out_interleaved,0,bufferSize*channels)
+
+            if(recording) outFile.write(out,0,bufferSize)
+
             self ! Process
           }
-        case Stop => playing = false
-        case Play => playing = true; self ! Process
+        case Stop => playing = false; stopRecording()
+        case Play => playing = true; stopRecording(); self ! Process
         case Gain(g) => gain = g;
+        case Record => if( !recording ){
+          try{
+          val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channels, sampleRate.toDouble, None, 0)
+          val file = Gdx.files.external("loopFiles/recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" ).file()
+          file.mkdirs()
+          outFile = AudioFile.openWrite(file, outSpec)
+          recording = true; }
+          catch { case e:Exception => println(e) }
+        }
 
       }
     }
+  }
+
+  def startRecording() = this ! Record
+  def stopRecording() = {
+    if(recording){
+      recording = false
+      Thread.sleep(100)
+      outFile.close
+    }
+  }
+  def toggleRecording() = {
+    if(recording){
+      recording = false
+      Thread.sleep(100)
+      outFile.close
+    } else this ! Record
   }
 
   def dispose(){

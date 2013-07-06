@@ -28,11 +28,12 @@ Keyboard.bind("x",lambda{ looper.stack(l) })
 Keyboard.bind("t",lambda{ looper.togglePlay(l) })
 Keyboard.bind("v",lambda{ looper.reverse(l) })
 Keyboard.bind("q",lambda{ looper.switchTo(l) })
+Keyboard.bind("l",lambda{ Seer.audio.Audio.toggleRecording() })
 
 Touch.clear()
 Touch.use()
 
-$newPos = Vec3.new(0,0,0)
+$newPos = Vec3.new(0,0,0.5)
 Touch.bind("fling", lambda{|button,v|
 	thresh = 500
 	if v[0] > thresh

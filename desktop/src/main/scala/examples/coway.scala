@@ -72,7 +72,7 @@ object MyInput extends InputAdapter {
   }
 
   override def keyTyped( c: Char) = {
-    if( c == '\n' ) Main.field.sstep(0)
+    if( c == '\n' ) Main.field.step(0)
     true
   }
 
@@ -106,7 +106,7 @@ class ConwayField(w:Int,h:Int) extends Field2D(w,h) {
   var next: FloatBuffer = _ //Array[Float] = _
 
   
-  override def sstep(dt: Float) = {
+  override def step(dt: Float) = {
 
     if( next == null ){
       next = FloatBuffer.allocate( data.capacity ) //data.duplicate //new Array[Float](w*h);

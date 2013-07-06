@@ -38,7 +38,9 @@ import monido._
           include_package "com.fishuyo.maths"
           include_package "com.fishuyo.spatial"
           include_package "com.fishuyo.graphics"
+          include_package "com.fishuyo.audio"
           include_package "com.fishuyo.util"
+          include_package "com.fishuyo.examples"
         """ + imports.foldLeft(""){ case (o,s) => o + "\n" + "include_package \"" + s + "\""} + """
         end
 

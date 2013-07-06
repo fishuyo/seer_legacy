@@ -1,5 +1,6 @@
 
 package com.fishuyo
+package examples.fieldViewer
 package live
 
 import dynamic._
@@ -11,34 +12,36 @@ object Main extends App with GLAnimatable {
   SimpleAppRun.loadLibs()
   GLScene.push(this)
 
-  val live = new JS("src/main/scala/live/live.js")
+  val live = new Ruby("src/main/scala/examples/fieldViewer/conway/live.rb")
+  // val live = new JS("src/main/scala/live/live.js")
 
-  var n = 100
-  var field = new LiveField(n,n)
-
-  GLScene.push( field )
+  var fieldViewer = new FieldViewer(60,60)
+  GLScene.push(fieldViewer)
 
   SimpleAppRun()
 
   override def step(dt:Float) = {
-    if( field.w != n ) field = new LiveField(n,n)
     live.step(dt)
   }
 
 }
 
-class LiveField(w:Int,h:Int) extends Field2D(w,h) {
+class LiveField(ww:Int,hh:Int) extends Field2D(ww,hh) {
   
   var next = Field2D(w,h)
+
+  override def resize(x:Int, y:Int) = {
+    next.resize(x,y)
+    super.resize(x,y)
+  }
   
-  override def sstep(dt: Float) = {
+  override def step(dt: Float) = {
 
     for( y <- (0 until h); x <- (0 until w)){
       
       var count = 0;
       for( j <- (-1 to 1); i <- (-1 to 1)){
         count += getToroidal(x+i,y+j).r.toInt
-        //count += this(x+i,y+j).toInt
       }
       //println( count );
       

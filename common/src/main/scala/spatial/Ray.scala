@@ -1,5 +1,7 @@
 package com.fishuyo
-package maths
+package spatial
+
+import maths.Vec3
 
 object Ray{
 	def apply(o:Vec3,d:Vec3) = new Ray(o,d)

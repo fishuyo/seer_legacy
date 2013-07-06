@@ -58,7 +58,7 @@ object Keyboard extends InputAdapter {
 }
 
 object Mouse extends InputAdapter {
-	type Callback = (Int,Int,Int,Int)=>Unit
+	type Callback = (Array[Int])=>Unit
 	var callbacks = Map[String,List[Callback]]()
 	callbacks += ("up" -> List())
 	callbacks += ("down" -> List())
@@ -74,29 +74,29 @@ object Mouse extends InputAdapter {
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
   override def touchUp( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
-    try { callbacks("up").foreach( _(screenX,screenY,pointer,button) ) }
+    try { callbacks("up").foreach( _(Array(screenX,screenY,pointer,button)) ) }
     catch { case e:Exception => println(e) }
     false
   }
  	override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
-    try{ callbacks("down").foreach( _(screenX,screenY,pointer,button) ) }
+    try{ callbacks("down").foreach( _(Array(screenX,screenY,pointer,button)) ) }
     catch { case e:Exception => println(e) }
     false
 	}
   override def touchDragged( screenX:Int, screenY:Int, pointer:Int) = {
-    try{ callbacks("drag").foreach( _(screenX,screenY,pointer,0) ) }
+    try{ callbacks("drag").foreach( _(Array(screenX,screenY,pointer)) ) }
     catch { case e:Exception => println(e) }
     false
   }
 
   // mouse only
   override def mouseMoved( screenX:Int, screenY:Int ) = {
-    try { callbacks("move").foreach( _(screenX,screenY,0,0) ) }
+    try { callbacks("move").foreach( _(Array(screenX,screenY)) ) }
     catch { case e:Exception => println(e) }
     false
   }
   override def scrolled( amount:Int) = {
-    try{ callbacks("scroll").foreach( _(amount,0,0,0) ) }
+    try{ callbacks("scroll").foreach( _(Array(amount)) ) }
     catch { case e:Exception => println(e) }
     false
   }

@@ -33,6 +33,12 @@ object Texture{
   	textures(i)
   }
 
+  def remove(i:Int) = {
+  	val t = textures(i)
+  	textures.remove(i)
+  	t.dispose()
+  }
+
   def bind(i:Int) = {
   	val t = textures(i)
   	val id = t.getTextureObjectHandle

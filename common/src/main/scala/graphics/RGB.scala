@@ -22,6 +22,8 @@ class RGB(val r:Float, val g:Float, val b:Float){
 	def *(c:RGB) = new RGB(r*c.r, g*c.g, b*c.b)
 	def /(s: Float) = this * (1/s)
 
+  def toGray() = (r+g+b)/3.f // not correct way :p
+
   override def toString() = "( " + r + " " + g + " " + b + " )"
 }
 
