@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Mesh
 
-import scala.actors.Actor
-import scala.actors.Actor._
+// import scala.actors.Actor
+// import scala.actors.Actor._
 
 object SimpleAppSize {
   val width = 800
@@ -72,7 +72,8 @@ class SimpleAppListener extends ApplicationListener {
 
     scene.init()
 
-    audio.start
+    audio.main ! Connect
+    audio.main ! Process
 
   }
   def render(){
@@ -187,7 +188,7 @@ class SimpleAppListener extends ApplicationListener {
     //Trackpad.connect()
   }
   def dispose(){
-    audio.dispose
+    audio.main ! "dispose"
     //Kinect.disconnect()
   }
 

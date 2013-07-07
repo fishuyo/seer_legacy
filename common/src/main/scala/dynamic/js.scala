@@ -1,5 +1,6 @@
 package com.fishuyo.dynamic
 
+import scala.language.dynamics
 import javax.script._
 import java.io._
 

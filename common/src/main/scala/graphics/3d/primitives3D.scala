@@ -35,14 +35,14 @@ class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles
   var drawFunc = () => {}
 
   for ( lat <- (0 to bands)){
-    var theta = lat * Math.Pi / bands
-    var sinTheta = Math.sin(theta)
-    var cosTheta = Math.cos(theta)
+    var theta = lat * math.Pi / bands
+    var sinTheta = math.sin(theta)
+    var cosTheta = math.cos(theta)
 
     for (long <- (0 to bands)){
-      var phi = long * 2 * Math.Pi / bands
-      var sinPhi = Math.sin(phi)
-      var cosPhi = Math.cos(phi)
+      var phi = long * 2 * math.Pi / bands
+      var sinPhi = math.sin(phi)
+      var cosPhi = math.cos(phi)
       var x = cosPhi * sinTheta
       var y = cosTheta
       var z = sinPhi * sinTheta

@@ -7,6 +7,10 @@ import io._
 import dynamic._
 import audio._
 
+import scala.concurrent.duration._
+import akka.util.Timeout
+import akka.pattern.ask
+
 import scala.collection.mutable.ListBuffer
 
 object Main extends App with GLAnimatable {
@@ -16,7 +20,7 @@ object Main extends App with GLAnimatable {
 
   var sines = ListBuffer[Osc]()
   for( i<-(0 until 10)) sines += new Sine(0.f)
-  sines.foreach( s => Audio.push( s ))
+  sines.foreach( s => Audio.main ! Push( s ))
 
   var display = Array(new AudioDisplay(512), new AudioDisplay(512))
   display(0).pose.pos.set(-1,0,0)
@@ -26,12 +30,18 @@ object Main extends App with GLAnimatable {
 
   Audio.push( (lfo + osc.f ) -> osc  ) //* ((1.f-lfo)*.5f) )
 
-  val live = new Ruby("src/main/scala/synth/synth.rb")
+  val live = new Ruby("src/main/scala/examples/synth/synth.rb")
 
-  SimpleAppRun() 
+  SimpleAppRun()
 
   override def step(dt:Float){
+
+    // implicit val timeout = Timeout(5 seconds)
+
     live.step(dt)
+
+    //val f = Audio.main ? OutBuffer
+    //f.zipWithIndex.foreach( (i,a) => display(i).setSamples(a) )
 
     display(0).setSamples(Audio.out(0))
     display(1).setSamples(Audio.out(1))

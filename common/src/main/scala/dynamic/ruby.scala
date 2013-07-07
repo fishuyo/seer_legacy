@@ -3,6 +3,7 @@ package com.fishuyo.dynamic
 //import javax.script._
 import java.io._
 
+import scala.language.dynamics
 import org.jruby.embed._
 import monido._
  

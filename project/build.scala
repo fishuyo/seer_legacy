@@ -8,8 +8,9 @@ import org.scalasbt.androidplugin.AndroidKeys._
 object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq (
     version := "0.1",
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.2",
     resolvers ++= Seq(
+      "typesafe" at "http://repo.typesafe.com/typesafe/releases/",
       "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/",
       "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
       "Sonatypes OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
@@ -17,10 +18,11 @@ object Settings {
       "maven.org" at "http://repo1.maven.org/maven2"
     ),
     libraryDependencies ++= Seq(
-      //"org.scala-lang" % "scala-compiler" % "2.9.1",
-      "com.nativelibs4java" % "scalacl" % "0.2",
+      "com.typesafe.akka" %% "akka-actor" % "2.2.0-RC2",
+      "org.scala-lang" % "scala-actors" % "2.10.2",
+      // "com.nativelibs4java" % "scalacl" % "0.2",
       "de.sciss" %% "scalaosc" % "1.1.+",
-      "com.github.philcali" % "monido-core_2.9.1" % "0.1.2",
+      //"com.github.philcali" % "monido-core_2.9.1" % "0.1.2",
       "org.jruby" % "jruby" % "1.7.3",
       "net.java.dev.jna" % "jna" % "3.5.2",
       "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
@@ -31,7 +33,7 @@ object Settings {
       //"net.sf.bluecove" % "bluecove-gpl" % "2.1.0"
     ),
     autoCompilerPlugins := true,
-    addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"),
+    //addCompilerPlugin("com.nativelibs4java" % "scalacl-compiler-plugin" % "0.2"),
     scalacOptions += "-Xexperimental",
     //sourceDirectories in Compile += new File("common/src"),
     updateLibgdxTask,
@@ -75,7 +77,7 @@ object Settings {
     // Extract jars into their respective lib folders.
     val commonDest = file("common/lib")
     val desktopDest = file("desktop/lib")
-    val commonFilter = new ExactFilter("freenect-0.0.1.jar") | new ExactFilter("opencv-245.jar")
+    val commonFilter = new ExactFilter("freenect-0.0.1.jar") | new ExactFilter("opencv-245.jar") | new ExactFilter("monido-core_2.10-0.1.2.jar")
     val deskFilter = new ExactFilter("GlulogicMT.jar") | new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("flibopencv_java245.dylib")
     IO.unzip(zipFile, commonDest, commonFilter)
     IO.unzip(zipFile, desktopDest, deskFilter)

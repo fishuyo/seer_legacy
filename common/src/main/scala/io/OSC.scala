@@ -25,7 +25,7 @@ object OSC{
 	  rcv.action = {
 	  	//case (Message( "/colors", i1:Int, i2:Int, i3:Int), _) => callbacks.getOrElse("/color",f("/color")_)(Seq[Float](i1/255.f,i2/255.f,i3/255.f):_*)
 	    case (Message( name, vals @ _* ), _) =>
-	      callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Float]]:_*)
+	      callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Float]])
 
 	    //case (Message( name, v1:Float ), _) =>
 	    //  callbacks.getOrElse(name, (v:Float)=>{println(name)} )(v1)

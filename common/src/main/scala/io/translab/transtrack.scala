@@ -8,14 +8,22 @@ import java.net.InetAddress
 
 import java.io._
 
-import scala.actors.Actor
-import scala.actors.Actor._
+// import scala.actors.Actor
+// import scala.actors.Actor._
+import akka.actor.Actor
+import akka.actor.Props
+import akka.event.Logging
+import akka.actor.ActorSystem
 
 import collection.mutable.ListBuffer
 
 case class Receive
 
-object TransTrack extends TransTrack(7008)
+object TransTrack {
+  val system = ActorSystem("Network")
+  val actor = system.actorOf(Props( new TransTrack(7008)), name = "TransTrack")
+}
+
 class TransTrack(val port:Int=7008) extends Actor{
 
   type Vec3 = (Float,Float,Float)
@@ -33,32 +41,30 @@ class TransTrack(val port:Int=7008) extends Actor{
   val buf = new Array[Byte](2048)
   val packet = new DatagramPacket( buf, 2048 )
 
-  def act(){
-  	sock = new DatagramSocket(port)
-  	println( "Listening on port " + port + " ..." )
-
+  override def preStart(){
+    sock = new DatagramSocket(port)
+    println( "Listening on port " + port + " ..." )
     self ! Receive
-    loop{
-      react{
-        case Receive =>
-        	try{
-		    		sock.receive( packet )
-		  
-			      val data = new DataInputStream( new ByteArrayInputStream(packet.getData)).readLine
-			      if( debug ) println(data)
-			      
-			      data.split(" ") match {
-			        case Array("point",i,x,y,z,a,b,c,w) => pointEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat) )
-			        case Array("rigid_body",i,x,y,z,a,b,c,w) => rigidEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat, a.toFloat, b.toFloat, c.toFloat, w.toFloat) )
-			        case Array("bone",i,x,y,z,a,b,c,w) => boneEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat, a.toFloat, b.toFloat, c.toFloat, w.toFloat) )
-			        case _ => if(debug) println("non tracker data received from: " + packet.getAddress)
-			      }
-		      }catch {
-		      	case e:Exception => println(e)
-		      }
-	        self ! Receive
+  }
+  
+  def receive = {    
+    case Receive =>
+    	try{
+    		sock.receive( packet )
+  
+	      val data = new DataInputStream( new ByteArrayInputStream(packet.getData)).readLine
+	      if( debug ) println(data)
+	      
+	      data.split(" ") match {
+	        case Array("point",i,x,y,z,a,b,c,w) => pointEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat) )
+	        case Array("rigid_body",i,x,y,z,a,b,c,w) => rigidEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat, a.toFloat, b.toFloat, c.toFloat, w.toFloat) )
+	        case Array("bone",i,x,y,z,a,b,c,w) => boneEvent( i.toInt, Array(x.toFloat, y.toFloat, z.toFloat, a.toFloat, b.toFloat, c.toFloat, w.toFloat) )
+	        case _ => if(debug) println("non tracker data received from: " + packet.getAddress)
+	      }
+      }catch {
+      	case e:Exception => println(e)
       }
-    }
+      self ! Receive
   }
 
   def rigidEvent( body:Int, pose:Array[Float] ) = rcallbacks.foreach( _(body,pose) )

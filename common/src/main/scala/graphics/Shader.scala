@@ -83,13 +83,14 @@ object Shader {
   }
 
   def monitor(name:String) = {
+    val that = this;
     try{
   	  FileMonido(Gdx.files.internal(shaders(name)._1).path()){
-  	    case ModifiedOrCreated(f) => reload;
+  	    case ModifiedOrCreated(f) => that.reload;
   	    case _ => None
   	  }
   	  FileMonido(Gdx.files.internal(shaders(name)._2).path()){
-  	    case ModifiedOrCreated(f) => reload;
+  	    case ModifiedOrCreated(f) => that.reload;
   	    case _ => None
   	  }
     } catch { case e:Exception => println(e) }
