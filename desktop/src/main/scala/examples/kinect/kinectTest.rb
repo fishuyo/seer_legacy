@@ -2,6 +2,7 @@ require 'java'
 
 module M
   include_package "com.fishuyo.io"
+  include_package "com.fishuyo.io.kinect"
   include_package "com.fishuyo.maths"
   include_package "com.fishuyo.spatial"
   include_package "com.fishuyo.graphics"

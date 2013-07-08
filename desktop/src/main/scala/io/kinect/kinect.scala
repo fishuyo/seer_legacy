@@ -1,6 +1,7 @@
 
 package com.fishuyo
 package io
+package kinect
 
 import graphics._
 import maths.Vec3 
@@ -40,7 +41,7 @@ object Kinect extends GLAnimatable {
 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
 	val videoPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
 
-	var bg = new Mat(480,640,CvType.CV_32FC1)
+	var bg:Mat = null
 	var getBG = 20
 	def setBGImage() = { getBG = 20; bg.setTo( new Scalar(0.f)) }
 
@@ -54,6 +55,10 @@ object Kinect extends GLAnimatable {
 
 	def connect(){
 		if(connected) return
+
+    System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
+
+    bg = new Mat(480,640,CvType.CV_32FC1)
 
 		val c = Freenect.createContext()
     

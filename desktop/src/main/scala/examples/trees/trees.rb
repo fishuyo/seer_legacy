@@ -127,90 +127,90 @@ $Pad.bind( lambda{|i,f|
 
 # Kinect.connect()
 # Kinect.startDepth()
-Kinect.clear()
-Kinect.bind( lambda{|i,f|
-	#if f[2] < 10 || f[3] < 10 then return end
+# Kinect.clear()
+# Kinect.bind( lambda{|i,f|
+# 	#if f[2] < 10 || f[3] < 10 then return end
 
-	t = Main.tree
-	size = f[2]*f[3]/10000.0
-	x = (f[0] - 320)/320.0
-	y = (f[1] - 240)/-240.0
-	a = f[4]
-	if a < 90.0
-		a = -a
-	else
-		a = 180.0 - a
-	end
+# 	t = Main.tree
+# 	size = f[2]*f[3]/10000.0
+# 	x = (f[0] - 320)/320.0
+# 	y = (f[1] - 240)/-240.0
+# 	a = f[4]
+# 	if a < 90.0
+# 		a = -a
+# 	else
+# 		a = 180.0 - a
+# 	end
 
-	a = a / 180.0
-	# puts a
-	# print i
-	# print " "
-	# print x
-	# print " "
-	# print y
-	# print " "	
-	# # print f[2]
-	# # print " "
-	# # puts f[3]
-	# puts size
+# 	a = a / 180.0
+# 	# puts a
+# 	# print i
+# 	# print " "
+# 	# print x
+# 	# print " "
+# 	# print y
+# 	# print " "	
+# 	# # print f[2]
+# 	# # print " "
+# 	# # puts f[3]
+# 	# puts size
 		
 
 
-	if Main.day.x == 1.0
-		ur = Camera.nav.ur()
-		uf = Camera.nav.uf()
-		t.root.applyForce( ur*(-x*size*20))
-		t.root.applyForce( uf*(y*size*20))
-		Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
+# 	if Main.day.x == 1.0
+# 		ur = Camera.nav.ur()
+# 		uf = Camera.nav.uf()
+# 		t.root.applyForce( ur*(-x*size*20))
+# 		t.root.applyForce( uf*(y*size*20))
+# 		Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
 
-		return
-	end
+# 		return
+# 	end
 
-	# puts i
-	nm = Main.nmove
-	nr = Main.nrot
-	if i == 0
-		Main.nrot.set(0.0,0.0,0.0)
-		Main.nmove.set(a*2,nm.y,nm.z)
-		# Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
-		# Main.nrot.set(x*2.0, nr.y, nr.z)
-	elsif i == 1
-		# Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
-	elsif i == 2
-		# Main.nrot.set(nr.x,nr.y, x*4.0)
-	elsif i == 4
-		rz = f[3]*0.05
-		rx = f[2]*0.05
-	end
+# 	# puts i
+# 	nm = Main.nmove
+# 	nr = Main.nrot
+# 	if i == 0
+# 		Main.nrot.set(0.0,0.0,0.0)
+# 		Main.nmove.set(a*2,nm.y,nm.z)
+# 		# Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
+# 		# Main.nrot.set(x*2.0, nr.y, nr.z)
+# 	elsif i == 1
+# 		# Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
+# 	elsif i == 2
+# 		# Main.nrot.set(nr.x,nr.y, x*4.0)
+# 	elsif i == 4
+# 		rz = f[3]*0.05
+# 		rx = f[2]*0.05
+# 	end
 
-	# move.lerpTo(nmove, 0.05 )
+# 	# move.lerpTo(nmove, 0.05 )
 	
-	# t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
-	# #t.bAngle.y.set(mx)
- #    t.sRatio.setMinMax( 0.05, Main.move.z, false )
- #    #t.sRatio.set( mz )
- #    t.bRatio.setMinMax( 0.05, my, false )
- #    #t.bRatio.set( my )
- #    t.sAngle.x.setMinMax( 0.05, rx, false )
- #    t.bAngle.x.setMinMax( 0.05, rx, false )
- #    #t.sAngle.x.set( rx )
- #    t.sAngle.z.setMinMax( 0.05, rz, false )
- #    t.bAngle.z.setMinMax( 0.05, rz, false )
- #    #t.sAngle.z.set( rz )
- #    #t.branch(depth)
- #    t.refresh()
+# 	# t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
+# 	# #t.bAngle.y.set(mx)
+#  #    t.sRatio.setMinMax( 0.05, Main.move.z, false )
+#  #    #t.sRatio.set( mz )
+#  #    t.bRatio.setMinMax( 0.05, my, false )
+#  #    #t.bRatio.set( my )
+#  #    t.sAngle.x.setMinMax( 0.05, rx, false )
+#  #    t.bAngle.x.setMinMax( 0.05, rx, false )
+#  #    #t.sAngle.x.set( rx )
+#  #    t.sAngle.z.setMinMax( 0.05, rz, false )
+#  #    t.bAngle.z.setMinMax( 0.05, rz, false )
+#  #    #t.sAngle.z.set( rz )
+#  #    #t.branch(depth)
+#  #    t.refresh()
 
- #    t.root.accel.zero
- #    t.root.euler.zero
+#  #    t.root.accel.zero
+#  #    t.root.euler.zero
 	
-})
+# })
 
-Trees.setDamp(150.0)
+# Trees.setDamp(150.0)
 
-Kinect.threshold.set( 0.0, 0.4, 0.0 )
-# Kinect.device.get().setTiltAngle(0.0)
-Kinect.setSizeThreshold( 20 )
+# Kinect.threshold.set( 0.0, 0.4, 0.0 )
+# # Kinect.device.get().setTiltAngle(0.0)
+# Kinect.setSizeThreshold( 20 )
 
 def step(dt)
 	t = Main.tree
@@ -297,10 +297,10 @@ def step(dt)
 	pos = Camera.nav.pos + Camera.nav.uf()*1.5
 	pos += Camera.nav.ur()*(0.8)
 	pos += Camera.nav.uu()*-0.5
-	Kinect.cube.pose.pos.lerpTo( pos, 0.1)
-	Kinect.cube.pose.quat.slerpTo( Camera.nav.quat, 0.1)
+	# Kinect.cube.pose.pos.lerpTo( pos, 0.1)
+	# Kinect.cube.pose.quat.slerpTo( Camera.nav.quat, 0.1)
 	scl = 0.5
-	Kinect.cube.scale.set( scl*1.0, scl*480.0/640.0, 0.05 )
+	# Kinect.cube.scale.set( scl*1.0, scl*480.0/640.0, 0.05 )
 	#puts Kinect.cube.pose.pos
 	#puts Kinect.cube.pose.quat
 

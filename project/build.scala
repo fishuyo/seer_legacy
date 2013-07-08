@@ -57,6 +57,7 @@ object Settings {
     )
 
   val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
+  val updateUnmanagedLibs = TaskKey[Unit]("update-unmanaged-libs", "Downloads/Updates required unmanaged libs")
   val updateLibgdx = TaskKey[Unit]("update-gdx", "Updates libgdx")
 
   def doDownloadLibs(s:TaskStreams) = {
@@ -137,6 +138,9 @@ object Settings {
   val downloadLibsTask = downloadLibs <<= streams map { (s: TaskStreams) =>
     doDownloadLibs(s)
     doUpdateLibgdx(s)
+  }
+  val updateLibsTask = updateUnmanagedLibs <<= streams map { (s: TaskStreams) =>
+    doDownloadLibs(s)
   }
 
   val updateLibgdxTask = updateLibgdx <<= streams map { (s: TaskStreams) =>

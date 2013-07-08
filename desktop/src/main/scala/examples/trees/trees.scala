@@ -5,6 +5,7 @@ import spatial._
 import graphics._
 import trees._
 import io._
+import io.kinect._
 import dynamic._
 import audio._
 

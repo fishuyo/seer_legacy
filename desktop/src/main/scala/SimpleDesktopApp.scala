@@ -45,7 +45,7 @@ object SimpleAppRun {
     try {
       GdxNativesLoader.load()
       unsafeAddDir("lib")
-      System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
+      //System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
       //new SharedLibraryLoader("lib/GlulogicMT.jar").load("GlulogicMT")
     } catch { case e:Exception => println(e) } 
     nativesLoaded = true
