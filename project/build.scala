@@ -2,8 +2,8 @@ import sbt._
 
 import Keys._
 
-import org.scalasbt.androidplugin._
-import org.scalasbt.androidplugin.AndroidKeys._
+// import org.scalasbt.androidplugin._
+// import org.scalasbt.androidplugin.AndroidKeys._
 
 object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq (
@@ -45,16 +45,16 @@ object Settings {
     fork in Compile := true
   )
 
-  lazy val android = Settings.common ++
-    AndroidProject.androidSettings ++
-    AndroidMarketPublish.settings ++ Seq (
-      platformName in Android := "android-10",
-      keyalias in Android := "change-me",
-      mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
-      proguardOption in Android := "-keep class com.badlogic.gdx.backends.android.** { *; }"//proguard_options,
-      //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
-      //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
-    )
+  // lazy val android = Settings.common ++
+  //   AndroidProject.androidSettings ++
+  //   AndroidMarketPublish.settings ++ Seq (
+  //     platformName in Android := "android-10",
+  //     keyalias in Android := "change-me",
+  //     mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
+  //     proguardOption in Android := "-keep class com.badlogic.gdx.backends.android.** { *; }"//proguard_options,
+  //     //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
+  //     //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
+  //   )
 
   val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
   val updateUnmanagedLibs = TaskKey[Unit]("update-unmanaged-libs", "Downloads/Updates required unmanaged libs")
@@ -161,9 +161,9 @@ object LibgdxBuild extends Build {
     settings = Settings.desktop
   ) dependsOn common
 
-  lazy val android = Project (
-    "android",
-    file("android"),
-    settings = Settings.android
-  ) dependsOn common
+  // lazy val android = Project (
+  //   "android",
+  //   file("android"),
+  //   settings = Settings.android
+  // ) dependsOn common
 }
