@@ -29,7 +29,7 @@ object Shader {
   def setBgColor(c:Vec3, a:Float) = bg = (c.x,c.y,c.z,a)
   def setColor(c:Vec3, a:Float) = {
     color = (c.x,c.y,c.z,a)
-    this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+    //this().setUniformf("u_color", color._1, color._2, color._3, color._4)
   }
   def setAlpha(f:Float) = {
     alpha = f
