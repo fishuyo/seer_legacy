@@ -33,7 +33,7 @@ Keyboard.bind("l",lambda{ Seer.audio.Audio.toggleRecording() })
 Touch.clear()
 Touch.use()
 
-$newPos = Vec3.new(0,0,0.5)
+$newPos = Vec3.new(0.3,-0.3,2.0)
 Touch.bind("fling", lambda{|button,v|
 	thresh = 500
 	if v[0] > thresh
@@ -110,7 +110,7 @@ Trackpad.bind( lambda{ |i,f|
 def step dt
 
 
-	Camera.nav.pos.lerpTo($newPos, 0.1)
+	# Camera.nav.pos.lerpTo($newPos, 0.1)
 	t=0
 end
 
