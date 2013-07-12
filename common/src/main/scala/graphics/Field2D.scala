@@ -131,16 +131,19 @@ class Field2D(var w:Int, var h:Int) extends GLAnimatable {
   override def init(){
     //textureId = Texture(w,h,data)
   }
-  override def draw(){
+  
+  def bind(){
     synchronized{
-    if(resized){ textureId = Texture(w,h,data); resized = false }
+      if(resized){ textureId = Texture(w,h,data); resized = false }
 
-    Texture.bind(textureId)
-    Texture(textureId).getTextureData().consumeCompressedData()
-
-    quad.draw()
+      Texture.bind(textureId)
+      Texture(textureId).getTextureData().consumeCompressedData()
     }
+  }
 
+  override def draw(){
+    bind()
+    quad.draw()
   }
   override def step( dt: Float ) = {}
 

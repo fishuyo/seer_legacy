@@ -20,7 +20,7 @@ object Main extends App with GLAnimatable {
 
   var sines = ListBuffer[Osc]()
   for( i<-(0 until 10)) sines += new Sine(0.f)
-  sines.foreach( s => Audio.main ! Push( s ))
+  sines.foreach( s => Audio.push( s ))
 
   var display = Array(new AudioDisplay(512), new AudioDisplay(512))
   display(0).pose.pos.set(-1,0,0)

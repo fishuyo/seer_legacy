@@ -1,5 +1,5 @@
 
-$Main = com.fishuyo.examples.mandlebrot.Main
+$Main = com.fishuyo.examples.fieldViewer.fractal.Main
 $Main.field.zoom.set(1)
 $Main.field.pos.set(0)
 
@@ -17,6 +17,6 @@ Trackpad.bind( lambda{|i,f|
 
 
 def step( dt )
-    $Main.field.allocate(150,150)
-    $Main.field.sstep(dt)
+    $Main.field.resize(150,150)
+    $Main.field.step(dt)
 end

@@ -80,7 +80,7 @@ void main()
     color = normal;
   }
 
-color = vec3(depth);
+//color = vec3(depth);
 
   //if( u_edge == 1.0 ){
     color *= edge;

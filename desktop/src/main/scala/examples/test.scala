@@ -31,7 +31,7 @@ object Main extends App with GLAnimatable{
   pix.setColor(1.f,1.f,1.f,0)
   pix.fill()
 
-  SimpleAppRun()  
+  SimpleAppRun(true)  
 
   override def init(){
    //  Shader("res/shaders/sky.vert", "res/shaders/sky.frag")

@@ -77,7 +77,7 @@ class SimpleAppListener extends ApplicationListener {
 
   }
   def render(){
-    if(paused) return
+    //if(paused) return
     if(quad == null){
       //FrameBuffers(width,height)
 
@@ -114,7 +114,7 @@ class SimpleAppListener extends ApplicationListener {
     ///////////////
 
     // fill the g-buffer
-    fbo.begin() //FrameBuffer(0).begin();
+    //fbo.begin() //FrameBuffer(0).begin();
     Shader("firstPass").begin();
     {
       //Gdx.gl.glClearColor(1,1,1,0)
@@ -126,23 +126,23 @@ class SimpleAppListener extends ApplicationListener {
       scene.draw()
     }
     Shader().end();
-    fbo.end() //FrameBuffer(0).end();
+    //fbo.end() //FrameBuffer(0).end();
 
     // bind first pass to texture0
-    fbo.getColorBufferTexture().bind(0) //FrameBuffer(0).getColorBufferTexture().bind(0);
+    //fbo.getColorBufferTexture().bind(0) //FrameBuffer(0).getColorBufferTexture().bind(0);
 
 
     // color
-    Shader("secondPass").begin();
-    {
-      Shader().setUniformi("u_texture0", 0);
-      Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
-      //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
-      // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-      scene.draw2()
-      quad.render(Shader(), GL10.GL_TRIANGLES)
-    }
-    Shader().end();
+    // Shader("secondPass").begin();
+    // {
+    //   Shader().setUniformi("u_texture0", 0);
+    //   Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+    //   //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
+    //   // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+    //   scene.draw2()
+    //   quad.render(Shader(), GL10.GL_TRIANGLES)
+    // }
+    // Shader().end();
     ///////////////////////
 
     // //fb.begin

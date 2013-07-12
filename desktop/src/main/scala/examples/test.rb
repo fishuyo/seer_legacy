@@ -205,10 +205,10 @@ def step(dt)
 
 
 	frame = SimpleAppRun.app.frameCount % (600)
-
-	if frame == 600
+	#puts frame
+	if frame == 0
 		r = Randf.apply(-2.0,2.0,false)
-		m = Model.new(Pose.apply(Camer.nav), Vec3.apply(0.1,0.1,0.1))
+		m = Model.new(Pose.apply(Camera.nav), Vec3.apply(0.1,0.1,0.1))
 		m.add( Sphere.asLines() )
 		GLScene.push( m )
 		for i in 0..30
@@ -246,35 +246,35 @@ def step(dt)
 	end
 end
 
-TransTrack.clear()
-TransTrack.bind("point", lambda{|i,f|
-	o = i# - 655361
+# TransTrack.clear()
+# TransTrack.bind("point", lambda{|i,f|
+# 	o = i# - 655361
 	
-})
-TransTrack.bind("rigid_body", lambda{|i,f|
-	# puts i
-	if i == 3
-		Main.model.get().pose.pos.lerpTo(Vec3.new(f[0],f[1],f[2]),0.05)
-		q = Quat.new(f[6],f[3],f[4],f[5]) * Quat.apply(0,0,0,0).fromEuler(Vec3.apply(1.5,0,0))
-		Main.model.get().pose.quat.slerpTo(q,0.025)
-	end
+# })
+# TransTrack.bind("rigid_body", lambda{|i,f|
+# 	# puts i
+# 	if i == 3
+# 		Main.model.get().pose.pos.lerpTo(Vec3.new(f[0],f[1],f[2]),0.05)
+# 		q = Quat.new(f[6],f[3],f[4],f[5]) * Quat.apply(0,0,0,0).fromEuler(Vec3.apply(1.5,0,0))
+# 		Main.model.get().pose.quat.slerpTo(q,0.025)
+# 	end
 
 
-	if i==2
-		#$Sine.a(f[6]*10.0)
-		Main.model.get().scale.lerpTo(Vec3.new[f[1],f[1],f[1]]) 
-	end
-	if i==3 
-	end
+# 	if i==2
+# 		#$Sine.a(f[6]*10.0)
+# 		Main.model.get().scale.lerpTo(Vec3.new[f[1],f[1],f[1]]) 
+# 	end
+# 	if i==3 
+# 	end
 
-	if i == 5
-		Camera.nav.pos.lerpTo(Vec3.new(f[0],f[1],f[2]),0.05)
-		Camera.nav.quat.slerpTo(Quat.new(f[6],f[3],f[4],f[5]),0.05)
-	end
+# 	if i == 5
+# 		Camera.nav.pos.lerpTo(Vec3.new(f[0],f[1],f[2]),0.05)
+# 		Camera.nav.quat.slerpTo(Quat.new(f[6],f[3],f[4],f[5]),0.05)
+# 	end
 
-})
-TransTrack.setDebug(false)
-TransTrack.start()
+# })
+# TransTrack.setDebug(false)
+# TransTrack.start()
 
 Touch.clear()
 Touch.use()

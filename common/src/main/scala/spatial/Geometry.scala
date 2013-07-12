@@ -1,5 +1,6 @@
 package com.fishuyo
 package spatial
+package geometry
 
 import maths.Vec3
 
