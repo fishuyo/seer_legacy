@@ -57,6 +57,8 @@ object Audio {
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
 
   def push(o:AudioSource) = sources += o
+
+  def toggleRecording() = main ! Record
 }
 
 class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boolean=false) extends Actor {
@@ -128,6 +130,9 @@ class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boo
       outFile = AudioFile.openWrite(file, outSpec)
       recording = true; }
       catch { case e:Exception => println(e) }
+    } else {
+      outFile.close
+      recording = false
     }
     //case OutBuffer => sender ! out
     case "dispose" => dispose(); context.stop(self)

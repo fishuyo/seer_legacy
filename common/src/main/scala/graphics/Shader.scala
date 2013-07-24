@@ -22,14 +22,22 @@ object Shader {
   // var projModelViewMatrix = new Matrix4()
   // var modelViewMatrix = new Matrix4()
   // var modelMatrix = new Matrix4()
-  var bg = (0.f,0.f,0.f,1.f)
-  var color = (1.f,1.f,1.f,1.f)
+  var bg = RGBA(0,0,0,1)
+  var color = RGBA(1,1,1,1)
   var alpha = 1.f
 
-  def setBgColor(c:Vec3, a:Float) = bg = (c.x,c.y,c.z,a)
-  def setColor(c:Vec3, a:Float) = {
-    color = (c.x,c.y,c.z,a)
-    //this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+  var blend = true
+  def setBlend(b:Boolean) = blend = b
+  var multiPass = false
+
+  def setBgColor(c:RGBA) = bg = c
+  def setColor(c:RGBA) = {
+    color = c
+    this().setUniformf("u_color", color.r, color.g, color.b, color.a)
+  }
+  def setColor(v:Vec3, a:Float) = {
+    color = RGBA(v,a)
+    this().setUniformf("u_color", color.r, color.g, color.b, color.a)
   }
   def setAlpha(f:Float) = {
     alpha = f
@@ -48,7 +56,7 @@ object Shader {
     	this().setUniformMatrix("u_projectionViewMatrix", MatrixStack() )
     	// this().setUniformMatrix("u_modelViewMatrix", modelViewMatrix)
     	//this().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-      // this().setUniformf("u_color", color._1, color._2, color._3, color._4)
+      this().setUniformf("u_color", color.r, color.g, color.b, color.a)
     } catch { case e:Exception => e}
 
   }

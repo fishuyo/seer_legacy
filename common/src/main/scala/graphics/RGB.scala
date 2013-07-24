@@ -2,6 +2,8 @@
 package com.fishuyo
 package graphics
 
+import maths.Vec3
+
 
 object RGB {
   def apply( i: Float) = new RGB(i,i,i)
@@ -15,25 +17,31 @@ object RGB {
   val blue = RGB(0,0,1)
 }
 
-class RGB(val r:Float, val g:Float, val b:Float){
+class RGB(var r:Float, var g:Float, var b:Float){
 	def rgb() : Int = new java.awt.Color(Math.min(1,r),Math.min(1,g),Math.min(1,b)).getRGB()
+
+  def set(c:RGB) = { r=c.r; g=c.g; b=c.b }
 	def +(c: RGB) = new RGB(r+c.r, g+c.g, b+c.b)
 	def *(s:Float) = new RGB(r*s, g*s, b*s)
 	def *(c:RGB) = new RGB(r*c.r, g*c.g, b*c.b)
 	def /(s: Float) = this * (1/s)
 
-  def toGray() = (r+g+b)/3.f // not correct way :p
+
+
+  def toGray() = (.3f*r+.59f*g+.11f*b)
 
   override def toString() = "( " + r + " " + g + " " + b + " )"
 }
 
 object RGBA{
   def apply( r:Float, g:Float, b:Float, a:Float=1.f) = new RGBA(r,g,b,a)
+  def apply( v:Vec3, a:Float) = new RGBA(v.x,v.y,v.z,a)
 
 }
-class RGBA( r:Float, g:Float, b:Float, val a:Float ) extends RGB(r,g,b){
-  def value = r
+class RGBA( rr:Float, gg:Float, bb:Float, var a:Float ) extends RGB(rr,gg,bb){
+  def value = toGray()
 
+  def set(c:RGBA) = { r=c.r; g=c.g; b=c.b; a=c.a }
 	def +(c: RGBA) = new RGBA(r+c.r, g+c.g, b+c.b, a+c.a)
 	override def *(s:Float) = new RGBA(r*s, g*s, b*s, a)
 	def *(c:RGBA) = new RGBA(r*c.r, g*c.g, b*c.b, a*c.a)

@@ -46,13 +46,13 @@ class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles
       var x = cosPhi * sinTheta
       var y = cosTheta
       var z = sinPhi * sinTheta
-      var u = 1.0 - (long / bands)
-      var v = lat / bands
+      var u = 1.f - (long.toFloat / bands)
+      var v = lat.toFloat / bands
       vert += x.toFloat
       vert += y.toFloat
       vert += z.toFloat
-      vert += u.toFloat
-      vert += v.toFloat
+      vert += u
+      vert += v
       vert += radius * x.toFloat
       vert += radius * y.toFloat
       vert += radius * z.toFloat
@@ -382,7 +382,7 @@ class Trace3D( var size:Int ) extends GLDrawable {
       mesh.setVertices( vertices )
       dirty = false
     }
-    Shader.setColor(color1,1.f)
+    Shader.setColor(RGBA(color1,1.f))
     MatrixStack.push()
     MatrixStack.transform(pose,scale)
     Shader.setMatrices()

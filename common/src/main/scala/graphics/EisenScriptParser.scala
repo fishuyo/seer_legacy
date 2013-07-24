@@ -42,7 +42,9 @@ object EisenScriptParser extends StandardTokenParsers {
 	override val lexical:MyLexer = new MyLexer()
  
   lexical.delimiters ++= List("{","}","(", ")",",","*","=")
- 	lexical.reserved += ("var","set","rule","x","y","z","rx","ry","rz","s","box","sphere","grid")
+ 	lexical.reserved += ("var","set","rule","x","y","z","rx","ry","rz","s",
+ 											"hue","h","sat","brightness","b","alpha","a","color",
+ 											"box","sphere","grid")
  
 
 //  program = { set | rule } ;
@@ -76,6 +78,7 @@ object EisenScriptParser extends StandardTokenParsers {
   def tloop = (numericLit ~ "*" ~ tlist ^^ { case t~_~list => TransLoop(t.toInt, list)}
  						| ident ~ "*" ~ tlist ^^ { case t~_~list => TransLoopV(t, list)})
   def tlist = "{" ~ (transformation*) ~ "}" ^^ { case _~list~_ => list }
+
   def transformation = ("x"~numericLit ^^ { case _~v => Transform(Pose(Vec3(v.toFloat,0,0)),Vec3(1)) }
   										| "y"~numericLit ^^ { case _~v => Transform(Pose(Vec3(0,v.toFloat,0)),Vec3(1)) }
   										| "z"~numericLit ^^ { case _~v => Transform(Pose(Vec3(0,0,v.toFloat)),Vec3(1)) }
@@ -174,6 +177,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 		rule._2.foreach( applyAction(_).foreach(n.addNode(_)) )
 		ruleDepth(name) = depth
 	}
+
 	def applyAction(a:Action) = {
 		a match {
 			case Action(loop,list,call) => {

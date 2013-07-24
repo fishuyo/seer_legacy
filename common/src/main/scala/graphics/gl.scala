@@ -56,14 +56,14 @@ object Model {
   def apply(prim:GLDrawable) = { val m=new Model(); m.add(prim) }
   def apply(m:Model):Model = {
     val model = new Model(Pose(m.pose),Vec3(m.scale))
-    model.color.set(m.color)
+    model.color = m.color
     m.nodes.foreach( (n) => model.nodes = model.nodes :+ Model(n) )
     m.primitives.foreach( (p) => model.primitives = model.primitives :+ p )
     model
   }
 }
 class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
-  var color = Vec3(1.f)
+  var color = RGBA(1,1,1,.6f)
   var nodes = Vector[Model]()
   var primitives = Vector[GLDrawable]()
 
@@ -89,7 +89,7 @@ class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
     MatrixStack.transform(pose,scale)
 
     Shader.setMatrices()
-    Shader.setColor(color,1.f)
+    Shader.setColor(color)
 
     primitives.foreach( _.draw() )
     nodes.foreach( _.draw() )
@@ -115,9 +115,9 @@ class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
 // }
 
 class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
-  var color = Vec3(1.f)
+  var color = RGBA(1,1,1,.6f)
   override def draw(){
-    Shader.setColor(color,1.f)
+    Shader.setColor(color)
     val s = scale / 2.f
 
     MatrixStack.push()

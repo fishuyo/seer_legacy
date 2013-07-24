@@ -184,7 +184,7 @@ end
 
 def step(dt)
 	Main.cube.scale.set(0.1)
-
+	Main.cube.color.set(RGBA.new(1,0,0,0.2))
 	
 	r = Randf.apply(-0.001,0.001,false)
 	$Sine.a( $Sine.amp+r[] )

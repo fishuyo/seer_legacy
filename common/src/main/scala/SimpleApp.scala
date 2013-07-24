@@ -60,8 +60,10 @@ class SimpleAppListener extends ApplicationListener {
     val path = "res/shaders/"
 
     //Shader(path+"simple.vert", path+"simple.frag")
+    Shader("default",path+"default.vert", path+"default.frag")
     Shader("firstPass",path+"firstPass.vert", path+"firstPass.frag")
     Shader("secondPass",path+"secondPass.vert", path+"secondPass.frag")
+    Shader.monitor("default")
     Shader.monitor("firstPass")
     Shader.monitor("secondPass")
 
@@ -95,17 +97,22 @@ class SimpleAppListener extends ApplicationListener {
       frameCount +=1 
     }
     
-    Gdx.gl.glClearColor(Shader.bg._1,Shader.bg._2,Shader.bg._3,Shader.bg._4)
+    Gdx.gl.glClearColor(Shader.bg.r,Shader.bg.g,Shader.bg.b,Shader.bg.a)
     Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
     //Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
-    //Gdx.gl.glEnable(GL20.GL_BLEND);
+
+    if( Shader.blend ){ 
+      Gdx.gl.glEnable(GL20.GL_BLEND);
+      Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+    }else {
+      Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
+    }
     //Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH);
 
     // Gdx.gl.glEnable(GL10.GL_CULL_FACE);
     // Gdx.gl.glCullFace(GL10.GL_BACK);
     
-    Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
     // Gdx.gl.glDepthFunc(GL10.GL_LESS);
     // Gdx.gl.glDepthMask(true);
 
@@ -113,36 +120,42 @@ class SimpleAppListener extends ApplicationListener {
 
     ///////////////
 
-    // fill the g-buffer
-    //fbo.begin() //FrameBuffer(0).begin();
-    Shader("firstPass").begin();
-    {
-      //Gdx.gl.glClearColor(1,1,1,0)
-      Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-      // Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+    if(Shader.multiPass){
+      // fill the g-buffer
+      fbo.begin() //FrameBuffer(0).begin();
+      Shader("firstPass").begin();
+    }else { Shader("default").begin() }
 
-      MatrixStack.clear()
-      Shader.setMatrices()
-      scene.draw()
-    }
+    
+    //Gdx.gl.glClearColor(1,1,1,0)
+    Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+    // Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_SRC_ALPHA)
+
+    MatrixStack.clear()
+    Shader.setMatrices()
+    scene.draw()
+    
     Shader().end();
-    //fbo.end() //FrameBuffer(0).end();
 
-    // bind first pass to texture0
-    //fbo.getColorBufferTexture().bind(0) //FrameBuffer(0).getColorBufferTexture().bind(0);
+    if(Shader.multiPass){
+      fbo.end() //FrameBuffer(0).end();
+
+      //bind first pass to texture0
+      fbo.getColorBufferTexture().bind(0) //FrameBuffer(0).getColorBufferTexture().bind(0);
 
 
-    // color
-    // Shader("secondPass").begin();
-    // {
-    //   Shader().setUniformi("u_texture0", 0);
-    //   Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
-    //   //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
-    //   // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-    //   scene.draw2()
-    //   quad.render(Shader(), GL10.GL_TRIANGLES)
-    // }
-    // Shader().end();
+      //color
+      Shader("secondPass").begin();
+      {
+        Shader().setUniformi("u_texture0", 0);
+        Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+        //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
+        // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+        scene.draw2()
+        quad.render(Shader(), GL10.GL_TRIANGLES)
+      }
+      Shader().end();
+    }
     ///////////////////////
 
     // //fb.begin

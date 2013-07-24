@@ -22,7 +22,7 @@ class Camera extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f) {
   var theta = 0.f
   var dw = 0.f
 
-  near = .05f
+  near = .01f
 
   def step( dt:Float ) = {
 

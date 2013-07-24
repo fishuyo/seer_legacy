@@ -12,8 +12,8 @@ object Main extends App with GLAnimatable {
   SimpleAppRun.loadLibs()
   GLScene.push(this)
 
-  val live = new Ruby("src/main/scala/examples/fieldViewer/conway/live.rb")
-  // val live = new JS("src/main/scala/live/live.js")
+  //val live = new Ruby("src/main/scala/examples/fieldViewer/live/live.rb")
+  val live = new JS("src/main/scala/examples/fieldViewer/live/live.js")
 
   var fieldViewer = new FieldViewer(60,60)
   GLScene.push(fieldViewer)

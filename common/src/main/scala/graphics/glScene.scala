@@ -11,7 +11,17 @@ import scala.collection.mutable.ListBuffer
 */
 object GLScene extends GLScene
 
+object SceneManager {
+  val scenes = new ListBuffer[GLScene]
+  val active = GLScene :: List()
+
+
+
+}
+
 class GLScene {
+  
+  var alpha = 1.f
 
   val drawable = new ListBuffer[GLDrawable]
   val animatable = new ListBuffer[GLAnimatable]

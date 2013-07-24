@@ -39,7 +39,7 @@ class Plot2D( var size:Int, var range:Float=1.f) extends GLDrawable {
       mesh.setVertices( vertices )
       dirty = false
     }
-    Shader.setColor(color,1.f)
+    Shader.setColor(RGBA(color,1.f))
     val s = scale / 2.f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
@@ -100,13 +100,13 @@ class AudioDisplay(val size:Int) extends GLDrawable {
       cursorMesh.setVertices( cursorVert)
       dirty = false
     }
-    Shader.setColor(color,1.f)
+    Shader.setColor(RGBA(color,1.f))
     val s = scale / 2.f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
     Shader.setMatrices()
     mesh.render(Shader(), GL10.GL_LINE_STRIP)
-    Shader.setColor(Vec3(1.f,1.f,0),1.f)
+    Shader.setColor(RGBA(1.f,1.f,0,1.f))
     cursorMesh.render(Shader(), GL10.GL_LINES)
     MatrixStack.pop()
   }
