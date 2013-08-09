@@ -62,6 +62,7 @@ object Model {
     model
   }
 }
+
 class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
   var color = RGBA(1,1,1,.6f)
   var nodes = Vector[Model]()

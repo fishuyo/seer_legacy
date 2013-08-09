@@ -23,12 +23,20 @@ Keyboard.bind("6",lambda{ l=5 })
 Keyboard.bind("7",lambda{ l=6 })
 Keyboard.bind("8",lambda{ l=7 })
 Keyboard.bind("r",lambda{ looper.toggleRecord(l) })
-Keyboard.bind("c",lambda{ looper.clear(l) })
+Keyboard.bind("c",lambda{ looper.stop(l); looper.clear(l) })
 Keyboard.bind("x",lambda{ looper.stack(l) })
 Keyboard.bind("t",lambda{ looper.togglePlay(l) })
 Keyboard.bind("	",lambda{ looper.reverse(l) })
 Keyboard.bind("q",lambda{ looper.switchTo(l) })
 Keyboard.bind("l",lambda{ Seer.audio.Audio.toggleRecording() })
+
+Keyboard.bind("f", lambda{
+	looper.toggleRecord(l)
+})
+Keyboard.bind("g", lambda{
+	looper.setDecay(l,0.99)
+	looper.stack(l)
+})
 
 Touch.clear()
 Touch.use()
@@ -56,6 +64,7 @@ Trackpad.connect()
 down = false
 s = []
 t = []
+width = 0.001
 Trackpad.bind( lambda{ |i,f|
 		# 	a = []
 		# for ff in f do
@@ -100,6 +109,14 @@ Trackpad.bind( lambda{ |i,f|
 		down =false
 	elsif i == 1
 		looper.setPan(l,f[0])
+
+		width += 0.01*f[3]
+		width = 0.0 if width < 0.0
+		width = 1.0 - f[0] if width > 1.0 - f[0]
+		e = f[0] + width
+		e = 1.0 if e > 1.0
+		#looper.setBounds(l,f[0],e)
+
 		# puts f[0]
 		down = false
 	end
