@@ -18,7 +18,7 @@ object Main extends App with GLAnimatable{
   Audio.push( looper )
   GLScene.push( looper )
 
-  val live = new Ruby("src/main/scala/examples/loop/loop.rb")
+  val live = new Ruby("loop.rb")
 
   SimpleAppRun()  
 

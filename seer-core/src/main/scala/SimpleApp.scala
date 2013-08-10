@@ -57,15 +57,12 @@ class SimpleAppListener extends ApplicationListener {
     camera.nav.pos.z = 2.f 
     Gdx.gl.glClearColor(0,0,0,0)
 
-    val path = "res/shaders/"
+    // val path = "res/shaders/"
 
     //Shader(path+"simple.vert", path+"simple.frag")
-    Shader("default",path+"default.vert", path+"default.frag")
-    Shader("firstPass",path+"firstPass.vert", path+"firstPass.frag")
-    Shader("secondPass",path+"secondPass.vert", path+"secondPass.frag")
-    Shader.monitor("default")
-    Shader.monitor("firstPass")
-    Shader.monitor("secondPass")
+    Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
+    Shader.load("firstPass", DefaultShaders.firstPass._1, DefaultShaders.firstPass._2)
+    Shader.load("secondPass", DefaultShaders.secondPass._1, DefaultShaders.secondPass._2)
 
     // t1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     // t1.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
@@ -124,7 +121,9 @@ class SimpleAppListener extends ApplicationListener {
       // fill the g-buffer
       fbo.begin() //FrameBuffer(0).begin();
       Shader("firstPass").begin();
-    }else { Shader("default").begin() }
+    }else { 
+      Shader("basic").begin()
+    }
 
     
     //Gdx.gl.glClearColor(1,1,1,0)

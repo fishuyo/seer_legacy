@@ -47,7 +47,7 @@ object Main extends App with GLAnimatable with AudioSource {
   var nmove = Vec3(0.f)
   var nrot = Vec3(0.f)
 
-  val live = new Ruby("src/main/scala/examples/trees/trees.rb", "com.fishuyo.examples.trees"::"com.fishuyo.trees"::List())
+  val live = new Ruby("trees.rb", "com.fishuyo.examples.trees"::"com.fishuyo.trees"::List())
 
   SimpleAppRun() 
 
