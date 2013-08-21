@@ -49,10 +49,12 @@ object Main extends App with GLAnimatable with AudioSource {
 
   val live = new Ruby("trees.rb", "com.fishuyo.examples.trees"::"com.fishuyo.trees"::List())
 
+
+
   SimpleAppRun() 
 
   override def init(){
-    ground = OBJ("src/main/scala/examples/trees/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
+    ground = OBJ("res/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
     ground.pose.quat.set(0.42112392f,-0.09659095f, 0.18010217f, -0.8836787f)
     ground.pose.pos.set(0.f,-1.3f,-.0f)
     ground.scale.set(5.f,5.f,5.f)
@@ -62,6 +64,10 @@ object Main extends App with GLAnimatable with AudioSource {
     wind.setVolume(0.f)
     wind.setLooping(true)
     wind.play
+
+    Shader.load("firstPass", Gdx.files.internal("res/shaders/firstPass.vert"), Gdx.files.internal("res/shaders/firstPass.frag"))
+    Shader.load("secondPass", Gdx.files.internal("res/shaders/secondPass.vert"), Gdx.files.internal("res/shaders/secondPass.frag"))
+    Shader.multiPass = true;
 
     Kinect.init()
     tree.init()

@@ -1,30 +1,33 @@
 package com.fishuyo
 package graphics
 
+import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.glutils._
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.BufferUtils
+
 
 import scala.collection.mutable.ListBuffer
 
 import java.nio.FloatBuffer
 
 
-object Texture{
+object Texture {
 
-	var textures = new ListBuffer[Texture]
+	var textures = new ListBuffer[GdxTexture]
 	def apply(path:String) = {
-		val t = new Texture(Gdx.files.internal(path));
+		val t = new GdxTexture(Gdx.files.internal(path));
 		textures += t
 		textures.length - 1
 	}
 	def apply(w:Int,h:Int, b:FloatBuffer) = {
-		val t = new Texture(new DynamicFloatTexture(w,h,b))
+		val t = new GdxTexture(new DynamicFloatTexture(w,h,b))
 		textures += t
 		textures.length - 1
 	}
 	def apply(p:Pixmap) = {
-		val t = new Texture(p)
+		val t = new GdxTexture(p)
 		textures += t
 		textures.length - 1
 	}
@@ -47,6 +50,13 @@ object Texture{
   }
 
   // def getFloatBuffer(i:Int) = textures(i).getTextureData match { case td:FloatTextureDataExposed => td.getBuffer; case _ => null }
+}
+
+class Texture(w:Int,h:Int) {
+	val data:FloatBuffer = BufferUtils.newFloatBuffer( 4*w*h )
+	val td = new DynamicFloatTexture(w,h,data)
+	val t = new GdxTexture( td )
+
 }
 
 

@@ -1,25 +1,26 @@
 # require 'java'
 
-# module M
-#   include_package "scala"
-#   include_package "com.fishuyo"
-#   include_package "com.fishuyo.io"
-#   include_package "com.fishuyo.maths"
-#   include_package "com.fishuyo.spatial"
-#   include_package "com.fishuyo.graphics"
-#   include_package "com.fishuyo.util"
-#   include_package "com.fishuyo.examples.trees"
-#   include_package "com.fishuyo.trees"
-# end
+module M
+  include_package "scala"
+  include_package "com.fishuyo"
+  include_package "com.fishuyo.io"
+  include_package "com.fishuyo.io.kinect"
+  include_package "com.fishuyo.maths"
+  include_package "com.fishuyo.spatial"
+  include_package "com.fishuyo.graphics"
+  include_package "com.fishuyo.util"
+  include_package "com.fishuyo.examples.trees"
+  include_package "com.fishuyo.trees"
+end
 
-# class Object
-#   class << self
-#     alias :const_missing_old :const_missing
-#     def const_missing c
-#       M.const_get c
-#     end
-#   end
-# end
+class Object
+  class << self
+    alias :const_missing_old :const_missing
+    def const_missing c
+      M.const_get c
+    end
+  end
+end
 
 $Seer = Java::com.fishuyo
 Seer = $Seer
@@ -63,7 +64,7 @@ $tree.branch(depth)
 
 $Camera.rotateWorld(0.0)
 
-$Seer.trees.Fabric.gv.set(0.0,-5.0,0.0)
+#$Seer.trees.Fabric.gv.set(0.0,-5.0,0.0)
 $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
 
 
@@ -262,7 +263,7 @@ def step(dt)
 
 	#Main.day.set(1,0,1)
 
-	Shader.setBgColor(Main.color,1.0)
+	Shader.setBgColor(RGBA.apply(Main.color,1.0))
 
 	if Main.day.x == 0.0
 		Main.move.lerpTo(Main.nmove, 0.05 )
@@ -297,8 +298,8 @@ def step(dt)
 	pos = Camera.nav.pos + Camera.nav.uf()*1.5
 	pos += Camera.nav.ur()*(0.8)
 	pos += Camera.nav.uu()*-0.5
-	# Kinect.cube.pose.pos.lerpTo( pos, 0.1)
-	# Kinect.cube.pose.quat.slerpTo( Camera.nav.quat, 0.1)
+	Kinect.cube.pose.pos.lerpTo( pos, 0.1)
+	Kinect.cube.pose.quat.slerpTo( Camera.nav.quat, 0.1)
 	scl = 0.5
 	# Kinect.cube.scale.set( scl*1.0, scl*480.0/640.0, 0.05 )
 	#puts Kinect.cube.pose.pos

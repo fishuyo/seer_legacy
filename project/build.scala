@@ -74,6 +74,11 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn seer_core
 
+  lazy val z_allo_seer = Project (
+    "allo-seer",
+    file("allo-seer"),
+    settings = Settings.desktop
+  ) dependsOn seer_core
 
 
 
@@ -90,11 +95,16 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn seer_desktop
 
+  lazy val particleSystems = Project (
+    "examples-particleSystems",
+    file("examples/particleSystems"),
+    settings = Settings.desktop
+  ) dependsOn seer_desktop
+
 
 
 
   // apps
-
   lazy val loop = Project (
     "loop",
     file("apps/desktop/loop"),

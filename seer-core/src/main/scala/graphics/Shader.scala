@@ -25,7 +25,7 @@ object Shader {
   var color = RGBA(1,1,1,1)
   var alpha = 1.f
 
-  var blend = true
+  var blend = false
   def setBlend(b:Boolean) = blend = b
   var multiPass = false
 

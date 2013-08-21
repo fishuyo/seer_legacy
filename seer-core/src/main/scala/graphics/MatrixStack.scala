@@ -19,6 +19,19 @@ object MatrixStack {
 	def push(){ stack = stack.push(new Matrix4(model)) }
 	def pop(){ model = stack.top; stack = stack.pop }
 
+	def translate(p:Vec3){
+		val m = new Matrix4().translate(p.x,p.y,p.z)
+		Matrix4.mul(model.`val`, m.`val`)	
+	}
+	def rotate(q:Quat){
+		val m = new Matrix4().rotate(q.toQuaternion)
+		Matrix4.mul(model.`val`, m.`val`)	
+	}
+	def scale( s:Vec3 ){
+		val m = new Matrix4().scale(s.x,s.y,s.z)
+		Matrix4.mul(model.`val`, m.`val`)	
+	}
+
 	def transform(pose:Pose, scale:Vec3=Vec3(1)){
 		val m = new Matrix4().translate(pose.pos.x,pose.pos.y,pose.pos.z).rotate(pose.quat.toQuaternion()).scale(scale.x,scale.y,scale.z)
 		Matrix4.mul(model.`val`, m.`val`)

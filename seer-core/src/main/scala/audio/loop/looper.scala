@@ -75,10 +75,25 @@ class Looper extends AudioSource with GLDrawable {
 		plots(i).setCursor(1,b2.toInt)
 	}
 
+	def duplicate(i:Int,times:Int) = loops(i).duplicate(times)
+
 	def switchTo(i:Int) = {
 		play(master,1);
 		loops(master).onDone = ()=>{loops(i).play; loops(master).onDone=non; master=i}
 	}
+
+	def setMaster(i:Int) = {
+		mode match {
+			case "sync" => 
+				loops(master).onSync = non
+				master = i
+				loops(master).onSync = this.rewindAll
+			case _ => ()
+		}
+
+	}
+
+	def rewindAll(){ loops.foreach( _.rewind ) }
 
 	override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
 

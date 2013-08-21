@@ -29,8 +29,8 @@ class LoopBuffer( var maxSize:Int = 0) {
   //read one sample
   def apply() = {
     if(rPos >= rMax){ 
-        rPos = rMin;
-        times+=1;
+       rPos = rMin;
+       times+=1;
     }
     val s = readSampleAt(rPos)
     rPos += 1
@@ -38,9 +38,9 @@ class LoopBuffer( var maxSize:Int = 0) {
   }
   //read one sample reverse
   def r() = {
-        if(rPos < rMin){ 
-        rPos = rMax-1;
-        times+=1;
+    if(rPos < rMin){ 
+       rPos = rMax-1;
+       times+=1;
     }
     val s = readSampleAt(rPos)
     rPos -= 1
@@ -83,6 +83,7 @@ class LoopBuffer( var maxSize:Int = 0) {
         read += 1
         if( read == numSamples ) return
       }
+      times += 1
       rPos = rPos - rMax + rMin
     }
 
@@ -118,6 +119,7 @@ class LoopBuffer( var maxSize:Int = 0) {
           read += 1
           if( read == numSamples ) return
         }
+        times += 1
         rPos = rPos + rMax - rMin
       }
     //   val underlap = rPos + 1 - numSamples - rMin
@@ -272,6 +274,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   var b = new LoopBuffer()
   var numSamples = (seconds * sampleRate).toInt
   var times = 0
+  var sync = 0
 
   var (gain, pan, decay, rms) = (1.f,0.5f,0.5f,0.f)
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
@@ -297,7 +300,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   }
   
   def play(){ playing = true; recording = false}
-  def play(t:Int){ times = t; play() }
+  def play(t:Int){ b.times=0; times = t; play() }
   def stop(){ playing = false; recording = false}
   def rewind(){ b.rPos = b.rMin }
   def record(){ recording = true; playing = false }
@@ -311,6 +314,12 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     b.rPos = 0
     b.curSize = 0
   }
+
+  def duplicate(times:Int){
+    val size = b.curSize
+    for( i <- (0 until times)) b.append( b.samples, size)
+  }
+
   var onDone = ()=>{}
   var onSync = ()=>{}
 
@@ -319,7 +328,6 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     var lPos = 0.f
     val l = (1.f - pan )
     val r = pan
-    var sync = b.times
     
     if(recording){ //fresh loop
 
@@ -342,11 +350,11 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
         
         b.read( iobuffer, count, gain )
         
-      if(stacking){
-          b.applyGain( decay, count, lPos)
-          b.addFrom( in, count, lPos )
-      }     
-    }
+        if(stacking){
+            b.applyGain( decay, count, lPos)
+            b.addFrom( in, count, lPos )
+        }     
+      }
       
       //up mix to 2 channels
       for( i <- (0 until count)){
@@ -354,11 +362,14 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
         out(1)(i) += iobuffer(i)*r
       }
       
-      if( sync < b.times) onSync()
+      if( sync != b.times){
+        sync = b.times
+        onSync()
+      }
       if( times > 0 && b.times >= times ){
-          b.times = 0; times = 0;
-          stop()
-          onDone()
+        b.times = 0; times = 0;
+        stop()
+        onDone()
       }
       
     }//end else if(playing)

@@ -10,6 +10,7 @@ Seer = Java::com.fishuyo
 
 
 looper = Seer.examples.loop.Main.looper
+$looper = looper
 l = 0
 
 Keyboard.clear()
@@ -27,13 +28,21 @@ Keyboard.bind("c",lambda{ looper.stop(l); looper.clear(l) })
 Keyboard.bind("x",lambda{ looper.stack(l) })
 Keyboard.bind("t",lambda{ looper.togglePlay(l) })
 Keyboard.bind("	",lambda{ looper.reverse(l) })
-Keyboard.bind("q",lambda{ looper.switchTo(l) })
+Keyboard.bind("p",lambda{ looper.switchTo(l) })
+Keyboard.bind("m",lambda{ looper.setMaster(l) })
+Keyboard.bind("b",lambda{ looper.duplicate(l,1) })
 Keyboard.bind("l",lambda{ Seer.audio.Audio.toggleRecording() })
 
 Keyboard.bind("f", lambda{
+	looper.setGain(l,1)
+	looper.setSpeed(l,1)
+	looper.setBounds(l,0,1)
 	looper.toggleRecord(l)
 })
 Keyboard.bind("g", lambda{
+	looper.setGain(l,1)
+	looper.setSpeed(l,1)
+	looper.setBounds(l,0,1)
 	looper.setDecay(l,0.99)
 	looper.stack(l)
 })
@@ -90,7 +99,7 @@ Trackpad.bind( lambda{ |i,f|
 		quat2 = Quat.new(0,0,0,1).getRotationTo(quat1.rotate(s[0]-s[1]),(t[1]-t[0]))
 		q = quat2 * quat1
 
-		looper.plots[l].pose.quat.set(q)
+		# looper.plots[l].pose.quat.set(q)
 
 		#looper.setGain(l,2*f[1])
 		#looper.setPan(l,f[0])
@@ -126,6 +135,7 @@ Trackpad.bind( lambda{ |i,f|
 
 def step dt
 
+	$looper.setMode("sync")
 
 	# Camera.nav.pos.lerpTo($newPos, 0.1)
 	t=0
