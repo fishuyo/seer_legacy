@@ -72,13 +72,37 @@ object SeerBuild extends Build {
     "seer-desktop",
     file("seer-desktop"),
     settings = Settings.desktop
-  ) dependsOn seer_core
+  ) dependsOn ( seer_core, seer_multitouch )
 
-  lazy val z_allo_seer = Project (
-    "allo-seer",
-    file("allo-seer"),
+  lazy val seer_allosphere = Project (
+    "seer-allosphere",
+    file("seer-allosphere"),
     settings = Settings.desktop
   ) dependsOn seer_core
+
+  lazy val seer_sensors = Project (
+    "seer-sensors",
+    file("seer-sensors"),
+    settings = Settings.desktop
+  ) aggregate( seer_kinect, seer_leap, seer_multitouch )
+
+    lazy val seer_kinect = Project (
+      "seer-kinect",
+      file("seer-sensors/seer-kinect"),
+      settings = Settings.desktop
+    ) dependsOn seer_core
+
+    lazy val seer_leap = Project (
+      "seer-leap",
+      file("seer-sensors/seer-leap"),
+      settings = Settings.desktop
+    ) dependsOn seer_core
+
+    lazy val seer_multitouch = Project (
+      "seer-multitouch",
+      file("seer-sensors/seer-multitouch"),
+      settings = Settings.desktop
+    ) dependsOn seer_core
 
 
 
@@ -89,13 +113,13 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn seer_desktop
 
-  lazy val fieldviewer = Project (
+  lazy val examples_fieldViewer = Project (
     "examples-fieldViewer",
     file("examples/fieldViewer"),
     settings = Settings.desktop
   ) dependsOn seer_desktop
 
-  lazy val particleSystems = Project (
+  lazy val examples_particleSystems = Project (
     "examples-particleSystems",
     file("examples/particleSystems"),
     settings = Settings.desktop
@@ -109,7 +133,7 @@ object SeerBuild extends Build {
     "loop",
     file("apps/desktop/loop"),
     settings = Settings.desktop
-  ) dependsOn seer_desktop
+  ) dependsOn( seer_desktop )
 
   lazy val trees = Project (
     "trees",

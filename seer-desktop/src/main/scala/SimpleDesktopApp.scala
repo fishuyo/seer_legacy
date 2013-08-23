@@ -59,9 +59,9 @@ object SimpleAppRun {
     try {
       GdxNativesLoader.load()
       unsafeAddDir("lib")
-      unsafeAddDir("../seer-desktop/lib")
-      unsafeAddDir("../../seer-desktop/lib")
-      unsafeAddDir("../../../seer-desktop/lib")
+      unsafeAddDir("../lib")
+      unsafeAddDir("../../lib")
+      unsafeAddDir("../../../lib")
       //System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
       //new SharedLibraryLoader("lib/GlulogicMT.jar").load("GlulogicMT")
     } catch { case e:Exception => println(e) } 
