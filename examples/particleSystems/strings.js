@@ -1,6 +1,7 @@
 
 importPackage(com.fishuyo)
 importPackage(com.fishuyo.io)
+importPackage(com.fishuyo.io.leap)
 importPackage(com.fishuyo.maths)
 importPackage(com.fishuyo.graphics)
 importPackage(com.fishuyo.examples.particleSystems.strings)
@@ -54,12 +55,32 @@ Trackpad.bind(function(i,f){
 	}
 })
 
+Leap.connect()
+Leap.clear()
+Leap.bind(function(frame){
+
+	if( frame.hands().isEmpty() ) return
+	var hand = frame.hands().get(0)
+	if( hand.fingers().isEmpty() ) return
+	var count = hand.fingers().count()
+
+	var s = 0.01
+
+	for( i=0; i < count; i++){
+		var finger = hand.fingers().get(i)
+		var pos = finger.tipPosition()
+		Main.strings().apply(i).pins().apply(0).position().lerpTo(Vec3(s*pos.getX(),s*pos.getY(),s*pos.getZ()), 0.1)
+	}
+
+})
+
 function step( dt ){
 	// println("hi")
+	Shader.lightAmbient().set( RGBA.apply(0,1,1,1))
 
 	var p = Main.strings().apply(0).pins().apply(0).position()
-	p = Vec3(p.x(),p.y(),10)
-	SimpleAppRun.app().camera().nav().pos().lerpTo(p, 0.01)
+	p = Vec3(p.x(),p.y(),p.z()+50)
+	// SimpleAppRun.app().camera().nav().pos().lerpTo(p, 0.05)
 
 }
 

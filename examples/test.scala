@@ -18,9 +18,9 @@ object Main extends App with GLAnimatable{
 
   GLScene.push(this)
 
-  val live = new Ruby("src/main/scala/examples/test.rb", "com.fishuyo.examples" :: List())
+  val live = new Ruby("test.rb", "com.fishuyo.examples" :: List())
 
-  val cube = Model(Quad())
+  val cube = Model(Cube())
   var modelBuilder = Some(parsers.EisenScriptParser(""))
   var model = Some(Model())
 
@@ -31,7 +31,7 @@ object Main extends App with GLAnimatable{
   pix.setColor(1.f,1.f,1.f,0)
   pix.fill()
 
-  SimpleAppRun(true)  
+  SimpleAppRun()  
 
   override def init(){
    //  Shader("res/shaders/sky.vert", "res/shaders/sky.frag")

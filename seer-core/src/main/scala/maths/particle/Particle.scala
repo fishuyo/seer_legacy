@@ -3,7 +3,7 @@ package com.fishuyo
 package maths
 package particle
 
-
+import spatial._
 
 
 trait KinematicState {
@@ -15,8 +15,16 @@ trait KinematicState {
 
 trait RotationalState {
 
-	var orientation = Quat()
-	var lOrientation = Quat()
+	var pose = Pose()
+	var lPose = Pose()
+  var restPose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
+  var relQuat = Quat()
+
+  //var pos = Vec3(0)
+  // var lPos = Vec3(0)
+  var accel = Vec3(0)
+  var euler = Vec3(0.f,0.f,0.f)
+  var lEuler = Vec3(0.f,0.f,0.f)
 
 }
 
@@ -30,7 +38,7 @@ object KinematicState {
     k.lPosition = k.position
     k.position = k.position + k.velocity + k.acceleration * ( .5f * dt * dt )
 
-    k.acceleration = Vec3()
+    k.acceleration = Vec3(0)
 	}
 
 	def euler(k:KinematicState)(dt:Float){

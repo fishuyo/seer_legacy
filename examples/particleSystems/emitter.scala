@@ -7,6 +7,8 @@ import dynamic._
 import maths._
 import particle._
 
+import com.badlogic.gdx.Gdx
+
 object Main extends App with GLAnimatable{
 
   SimpleAppRun.loadLibs()
@@ -19,6 +21,11 @@ object Main extends App with GLAnimatable{
   val generateRandVel = util.RandVec3(Vec3(-.1),Vec3(.1))
 
   SimpleAppRun()  
+
+  override def init(){
+    // Shader.load("basic", Gdx.files.internal("res/t.vert"), Gdx.files.internal("res/t.frag"))
+    // Shader.monitor("basic")
+  }
 
   override def draw(){
   	emitter.draw()
@@ -46,7 +53,7 @@ class MyEmitter(n:Int) extends ParticleEmitter(n) {
 			Shader.setColor(RGBA(c,c,c,1.f))
 			Shader.setMatrices()
 			Cube().draw()
-
+      // Sphere().draw()
 			MatrixStack.pop()
 		})
 	}

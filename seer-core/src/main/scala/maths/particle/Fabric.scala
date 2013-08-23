@@ -70,7 +70,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
 
     //for( t <- (0 until steps)){
 
-    for( s <- (0 until 3) ){ 
+    for( s <- (0 until 5) ){ 
       links.foreach( _.solve() )
       pins.foreach( _.solve() )
     }

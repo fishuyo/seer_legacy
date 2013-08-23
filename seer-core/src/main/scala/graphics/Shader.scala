@@ -26,31 +26,48 @@ object Shader {
   var alpha = 1.f
 
   var blend = false
-  def setBlend(b:Boolean) = blend = b
   var multiPass = false
 
+  var lighting = 1.f
+  var lightPosition = Vec3(5,5,5)
+  var lightAmbient = RGBA(.2f,.2f,.2f,1)
+  var lightDiffuse = RGBA(.6f,.6f,.6f,1)
+  var lightSpecular = RGBA(.4f,.4f,.4f,1)
+
+  var texture = 0.f
+
+  def setBlend(b:Boolean) = blend = b
+
   def setBgColor(c:RGBA) = bg = c
-  def setColor(c:RGBA) = {
+  def setColor(c:RGBA){
     color = c
     this().setUniformf("u_color", color.r, color.g, color.b, color.a)
   }
-  def setColor(v:Vec3, a:Float) = {
-    color = RGBA(v,a)
-    this().setUniformf("u_color", color.r, color.g, color.b, color.a)
-  }
+  def setColor(v:Vec3, a:Float){ setColor( RGBA(v,a) ) }
+
   def setAlpha(f:Float) = {
     alpha = f
     this().setUniformf("u_alpha", alpha)
   }
 
+  def setLightUniforms() = {
+    this().setUniformf("u_lighting", lighting)
+    this().setUniformf("u_lightPosition", lightPosition.x, lightPosition.y, lightPosition.z)
+    this().setUniformf("u_lightAmbient", lightAmbient.r, lightAmbient.g, lightAmbient.b, lightAmbient.a)
+    this().setUniformf("u_lightDiffuse", lightDiffuse.r, lightDiffuse.g, lightDiffuse.b, lightDiffuse.a)
+    this().setUniformf("u_lightSpecular", lightSpecular.r, lightSpecular.g, lightSpecular.b, lightSpecular.a)
+  }
 
   def setMatrices() = {
     try{
-    	this().setUniformMatrix("u_projectionViewMatrix", MatrixStack() )
-    	// this().setUniformMatrix("u_modelViewMatrix", modelViewMatrix)
-    	//this().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+      MatrixStack()
+    	this().setUniformMatrix("u_projectionViewMatrix", MatrixStack.projectionModelViewMatrix() )
+      this().setUniformMatrix("u_modelViewMatrix", MatrixStack.modelViewMatrix() )
+    	this().setUniformMatrix("u_viewMatrix", MatrixStack.viewMatrix() )
+    	this().setUniformMatrix("u_normalMatrix", MatrixStack.normalMatrix() )
       this().setUniformf("u_color", color.r, color.g, color.b, color.a)
-    } catch { case e:Exception => e}
+      setLightUniforms();
+    } catch { case e:Exception => println(e)}
 
   }
 
@@ -124,37 +141,26 @@ object DefaultShaders {
       uniform vec4 u_color;
       uniform mat4 u_projectionViewMatrix;
       uniform mat4 u_modelViewMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_normalMatrix;
+      uniform vec3 u_lightPosition;
 
-      varying vec3 v_normal;
-      varying vec3 v_eye;
-      varying vec3 v_lightPosition;
       varying vec4 v_color;
-
-      varying vec2 v_texCoords;
-
-
+      varying vec3 v_normal, v_lightDir, v_eyeVec;
+      varying vec2 v_texCoord;
 
       void main(){
-
-        v_texCoords = a_texCoord0;
-
-        v_eye = -(u_modelViewMatrix * a_position).xyz; //-transformedVertex.xyz;
-
-        // transform normals to the current view
-        v_normal = a_normal.xyz; //normalize(u_normalMatrix * a_normal).xyz;
-
-        // pass the light position through
-        v_lightPosition = vec3(10.0,10.0,10.0);
-
-        //if( a_color != vec4(0.0,0.0,0.0,1.0)){
-        //  v_color = a_color;
-        //}else{
-          v_color = u_color;  
-        //}
-
-        gl_Position = u_projectionViewMatrix * a_position;
+        v_color = u_color;
+        vec4 vertex = u_modelViewMatrix * a_position;
+        v_normal = vec3(u_normalMatrix * a_normal);
+        vec3 V = vertex.xyz;
+        v_eyeVec = normalize(-V);
+        vec3 light_pos = vec3(u_viewMatrix * vec4(u_lightPosition,1));
+        v_lightDir = normalize(vec3(light_pos - V));
+        v_texCoord = a_texCoord0;
+        gl_Position = u_projectionViewMatrix * a_position; 
       }
+
     """,
     // Fragment Shader
     """
@@ -163,39 +169,39 @@ object DefaultShaders {
       #endif
 
       uniform sampler2D u_texture0;
-      uniform sampler2D u_texture1;
 
-      uniform float u_near;
-      uniform float u_far;
-      uniform float u_useTexture;
+      uniform float u_texture;
+      uniform float u_lighting;
+      uniform vec4 u_lightAmbient;
+      uniform vec4 u_lightDiffuse;
+      uniform vec4 u_lightSpecular;
 
-      varying vec2 v_texCoords;
-      varying float v_depth;
+      varying vec2 v_texCoord;
       varying vec3 v_normal;
-      varying vec3 v_eye;
-      varying vec3 v_lightPosition;
+      varying vec3 v_eyeVec;
+      varying vec3 v_lightDir;
       varying vec4 v_color;
 
-      void main()
-      {
+      void main() {
         
-        vec4 textureColor = texture2D(u_texture0, v_texCoords);
-        vec4 textureColor1 = texture2D(u_texture1, vec2(1.0*v_texCoords.y,2.0*v_texCoords.x));
-
-        //gl_FragData[0] = v_color;
-
-        //gl_FragData[0] = vec4( textureColor, depthShift);
-
-        if( u_useTexture == 1.0){
-          gl_FragData[0] = textureColor;
+        vec4 colorMixed;
+        if( u_texture > 0.0){
+          vec4 textureColor = texture2D(u_texture0, v_texCoord);
+          colorMixed = mix(v_color, textureColor, u_texture);
         }else{
-          gl_FragData[0] = v_color;
+          colorMixed = v_color;
         }
 
-        gl_FragData[0] = v_color;
-        //gl_FragData[0] = vec4(textureColor.xyz, 1.0);
-        //gl_FragData[0] = textureColor;
-
+        vec4 final_color = colorMixed * u_lightAmbient;
+        vec3 N = normalize(v_normal);
+        vec3 L = v_lightDir;
+        float lambertTerm = max(dot(N, L), 0.0);
+        final_color += u_lightDiffuse * colorMixed * lambertTerm;
+        vec3 E = v_eyeVec;
+        vec3 R = reflect(-L, N);
+        float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
+        final_color += u_lightSpecular * spec;
+        gl_FragColor = mix(colorMixed, final_color, u_lighting);
       }
 
     """

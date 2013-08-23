@@ -23,8 +23,6 @@ object Main extends App with GLAnimatable{
 
   val live = new JS("strings.js")
 
-
-
   SimpleAppRun()  
 
   override def draw(){
@@ -64,7 +62,7 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
 
   override def step( dt: Float ) = {
 
-    for( s <- (0 until 3) ){ 
+    for( s <- (0 until 5) ){ 
       links.foreach( _.solve() )
       links = links.filter( (l) => !l.isTorn )
       pins.foreach( _.solve() )

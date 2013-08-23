@@ -45,7 +45,12 @@ object MatrixStack {
   	modelView.set(Camera.view)
   	Matrix4.mul( projModelView.`val`, model.`val`)
   	Matrix4.mul( modelView.`val`, model.`val`)
-  	projModelView
 	}
+
+	def projectionModelViewMatrix() = projModelView
+	def modelViewMatrix() = modelView
+	def viewMatrix() = Camera.view
+	def normalMatrix() = modelView.toNormalMatrix()
+
 
 }

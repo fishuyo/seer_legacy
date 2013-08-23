@@ -3,6 +3,7 @@ require 'java'
 module M
   include_package "scala.math"
   include_package "com.fishuyo.io"
+  include_package "com.fishuyo.io.leap"
   include_package "com.fishuyo.maths"
   include_package "com.fishuyo.spatial"
   include_package "com.fishuyo.graphics"
@@ -36,6 +37,18 @@ Keyboard.bind("n", lambda{
 		m = m.transform(p,s)
 		m.add( Sphere.asLines() )
 	end
+})
+
+Leap.clear()
+Leap.connect()
+Leap.bind( lambda{ |frame|
+	return if frame.hands().isEmpty()
+	hand = frame.hands().get(0)
+	normal = hand.palmNormal()
+	dir = hand.direction()
+
+	quat = Quat.apply(1,0,0,0).fromEuler(Vec3.apply( dir.pitch(), -dir.yaw(), normal.roll() ))
+	Main.cube.pose.quat.set(quat)
 })
 
 Keyboard.bind("m", lambda{
