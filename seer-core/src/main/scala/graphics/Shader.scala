@@ -36,6 +36,9 @@ object Shader {
 
   var texture = 0.f
 
+  // def texture_=(v:Float){ texture = v }
+  // def lighting_=(v:Float){ lighting = v }
+
   def setBlend(b:Boolean) = blend = b
 
   def setBgColor(c:RGBA) = bg = c
@@ -52,6 +55,7 @@ object Shader {
 
   def setLightUniforms() = {
     this().setUniformf("u_lighting", lighting)
+    this().setUniformf("u_texture", texture)
     this().setUniformf("u_lightPosition", lightPosition.x, lightPosition.y, lightPosition.z)
     this().setUniformf("u_lightAmbient", lightAmbient.r, lightAmbient.g, lightAmbient.b, lightAmbient.a)
     this().setUniformf("u_lightDiffuse", lightDiffuse.r, lightDiffuse.g, lightDiffuse.b, lightDiffuse.a)

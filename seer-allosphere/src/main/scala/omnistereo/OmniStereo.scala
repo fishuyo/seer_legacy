@@ -1,8 +1,9 @@
 
 
 
-package com.fishuyo.seer
-package allo
+package com.fishuyo
+package seer
+package allosphere
 
 import graphics._
 
@@ -15,74 +16,75 @@ object OmniStereo {
 	val fovy = math.Pi
 	val aspect = 2.0
 
-	def fillFishEye(float * value, double normx, double normy) {
-		Vec3f& out = *(Vec3f *)value;
-		
-		// move (0,0) to center of texture:
-		float sx = normx - 0.5;
-		float sy = normy - 0.5;
-		// azimuth covers full 360':
-		float az = fovy * aspect * sx;
-		// elevation covers 180':
-		float el = fovy * sy;
-		
-		float sel = sin(el);
-		float cel = cos(el);
-		float saz = sin(az);
-		float caz = cos(az);
-		
-		// assumes standard OpenGL coordinate frame
-		// -Z forward, Y up, X right
-		out.x =  cel*saz;
-		out.y =  sel;
-		out.z = -cel*caz;
-		out.normalize();
-		
-		value[3] = 1.;	
+	def fillFishEye(data:FloatBuffer, w:Int, h:Int) {
+		data.rewind
+
+		for( y<-(0 until h); x<-(0 until w)){
+			val normx = x.toDouble / w.toDouble
+			val normy = y.toDouble / h.toDouble
+
+			val sx = normx - 0.5
+			val sy = normy - 0.5
+
+			val az = fovy * aspect * sx
+			val el = fovy * sy;
+			val sel = math.sin(el)
+			val cel = math.cos(el)
+			val saz = math.sin(az)
+			val caz = math.cos(az)
+
+			val v = Vec3f(cel*saz,sel,-cel*caz)
+			v.normalize
+
+			data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+
+		}
+		data.rewind
 	}
 
-	def fillCylinder(float * value, double normx, double normy) {
-		Vec3f& out = *(Vec3f *)value;
-		
-		// move (0,0) to center of texture:
-		float sx = normx - 0.5;
-		float sy = normy - 0.5;
-		
-		float y1 = sy * fovy * 2.;
-		float y0 = 1. - fabs(y1);
-		
-		// azimuth covers full 360':
-		float az = fovy * M_PI * aspect * sx;
-		float saz = sin(az);
-		float caz = cos(az);
-		
-		// assumes standard OpenGL coordinate frame
-		// -Z forward, Y up, X right
-		out.x =  y0*saz;
-		out.y =  y1;
-		out.z = -y0*caz;
-		out.normalize();
-		
-		value[3] = 1.;	
+	def fillCylinder(data:FloatBuffer, w:Int, h:Int) {
+		data.rewind
+
+		for( y<-(0 until h); x<-(0 until w)){
+			val normx = x.toDouble / w.toDouble
+			val normy = y.toDouble / h.toDouble
+
+			val sx = normx - 0.5
+			val sy = normy - 0.5
+			val y1 = sy*fovy*2.0
+			val y0 = 1.0 - math.abs(y1)
+
+			val az = fovy * math.Pi * aspect * sx
+			val saz = math.sin(az)
+			val caz = math.cos(az)
+
+			val v = Vec3f(y0*saz,y1,-y0*caz)
+			v.normalize
+
+			data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+
+		}
+		data.rewind
 	}
 
-	def fillRect(float * value, double normx, double normy) {
-		Vec3f& out = *(Vec3f *)value;
-		
-		// move (0,0) to center of texture:
-		float sx = normx - 0.5;
-		float sy = normy - 0.5;
-		
-		float f = 1./tan(fovy * 0.5);
-		
-		// assumes standard OpenGL coordinate frame
-		// -Z forward, Y up, X right
-		out.x =  f * sx * aspect;
-		out.y =  f * sy;
-		out.z = -1.;
-		out.normalize();
-		
-		value[3] = 1.;	
+	def fillRect(data:FloatBuffer, w:Int, h:Int) {
+		data.rewind
+
+		for( y<-(0 until h); x<-(0 until w)){
+			val normx = x.toDouble / w.toDouble
+			val normy = y.toDouble / h.toDouble
+
+			val sx = normx - 0.5
+			val sy = normy - 0.5
+			val f = 1.0/ math.tan(fovy * 0.5)
+
+			val v = Vec3f(f*sx*aspect,f*sy,-1)
+			v.normalize
+
+			data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+
+		}
+		data.rewind	
 	}
 
 	def softEdge(uint8_t * value, double normx, double normy) {
@@ -409,10 +411,55 @@ object OmniStereo {
 		}
 	"""
 
-}
+}	
 
 // Object to encapsulate rendering omni-stereo worlds via cube-maps:
-class OmniStereo {
+class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
+	
+	type DrawMethod = (Pose,Double) => ()
+	
+	// ShaderProgram mCubeProgram, mSphereProgram, mWarpProgram, mDemoProgram;
+	
+	// supports up to 4 warps/viewports
+	val mProjections = new Array[Projection](4)
+
+	val mModelView = 0 //TODO;
+	var mClearColor = RGBA(0,0,0,0);
+	
+	var mFace = 5
+	var mEyeParallax = 0.f
+	var mNear = 0.1f
+	var mFar = 100.f
+	var mResolution = resolution
+	var mNumProjections = 1
+	var mFrame = 0
+	var mMode:StereoMode = MONO
+	var mStereo = 0
+	var mAnaglyphMode:AnaglyphMode = RED_CYAN
+	var mMipmap = useMipMaps
+	var mFullScreen = false
+
+	var mFbo = 0
+	var mRbo = 0
+
+	mTex = Array(0,0)
+
+	configure(FISHEYE)
+	configure(SOFTEDGE)
+	
+	val mQuad = Quad()
+	// mQuad.reset();
+	// mQuad.primitive(gl.TRIANGLE_STRIP);
+	// mQuad.texCoord	( 0, 0);
+	// mQuad.vertex	( 0, 0, 0);
+	// mQuad.texCoord	( 1, 0);
+	// mQuad.vertex	( 1, 0, 0);
+	// mQuad.texCoord	( 0, 1);
+	// mQuad.vertex	( 0, 1, 0);
+	// mQuad.texCoord	( 1, 1);
+	// mQuad.vertex	( 1, 1, 0);
+	
+	
 
 	///	Abstract base class for any object that can be rendered via OmniStereo:
 	class Drawable  {
@@ -448,7 +495,7 @@ class OmniStereo {
 		// allocate blend map:
 
 		val mBlend:GdxTexture = null
-		val mWarp = new Texture(256,256)
+		val mWarp:Texture = null 
 
 		// allocate warp map:
 		// mWarp.resize(256, 256)
@@ -458,7 +505,9 @@ class OmniStereo {
 		// 	.filterMin(Texture::LINEAR)
 		// 	.allocate();
 			
-		// t = u = v = 0;
+		var t:Array[Float] = _
+		var u:Array[Float] = _
+		var v:Array[Float] = _
 
 		val params = new Parameters()
 		
@@ -489,19 +538,51 @@ class OmniStereo {
 
 		}
 		def readWarp(path:String){
+
+			try{
+				val ds = new DataInputStream( new FileInputStream(path))
+
+				val h = readInt(ds)/3
+				val w = readInt(ds)
+
+				println(s"warp dim $w x $h\n")
+
+				t = new Array[Float](w*h)
+				u = new Array[Float](w*h)
+				v = new Array[Float](w*h)
+
+				for( i <- (0 until w*h)) t[i] = readFloat(ds)
+				for( i <- (0 until w*h)) u[i] = readFloat(ds)
+				for( i <- (0 until w*h)) v[i] = readFloat(ds)
+
+				mWarp = new Texture(w,h)
 			
+				updatedWarp()
+
+				ds.close()
+				
+				println(s"read $path\n")
+				
+			catch {
+				case e: Exception => println("failed to open Projector configuration file " + path + "\n")
+			}
+						
 		}
+
+		def readInt(ds:DataInputStream) = {
+			var b = Array[Byte](0,0,0,0)
+			for( i <- (0 until 4)) b(i) = ds.readByte
+			val i = ((b(3)&0xff)<< 24)+((b(2)&0xff)<< 16)+((b(1)&0xff)<< 8)+(b(0)&0xff)
+			i
+		}
+		def readFloat(ds:DataInputStream) = {
+			intBitsToFloat(readInt(ds))
+		}
+
 		def readParameters(path:String, verbose:Boolean=true){
 
 			import java.io._
 			import java.lang.Float.intBitsToFloat
-
-			def readFloat(ds:DataInputStream) = {
-				var b = Array[Byte](0,0,0,0)
-				for( i <- (0 until 4)) b(i) = ds.readByte
-				val i = ((b(3)&0xff)<< 24)+((b(2)&0xff)<< 16)+((b(1)&0xff)<< 8)+(b(0)&0xff)
-				intBitsToFloat(i)
-			}
 
 			try{
 				val ds = new DataInputStream( new FileInputStream(path))
@@ -544,9 +625,28 @@ class OmniStereo {
 		// Viewport& viewport() { return mViewport; }
 		
 		
-		def updatedWarp();
-		
-	};
+		def updatedWarp(){
+			val w = mWarp.w
+			val h = mWarp.h
+			for( y <- (0 until h); x <- (0 until w)){
+				val y1 = h-y-1
+				val idx = y1*w+x
+
+		    mWarp.data.position(4*idx)
+		    mWarp.data.put( Array(t(idx),u(idx),v(idx),1.f),0, 4)
+
+			 //  if (y == 32 && x == 32) {
+				// 	println("example: %f %f %f -> %f %f %f\n", 
+				// 		t[idx], u[idx], v[idx],
+				// 		cell[0], cell[1], cell[2]);
+				// }
+			}
+		  
+		  mWarp.data.rewind
+			mWarp.td.consumeCompressedData();
+		}
+
+	}
 	
 	/// Stereographic mode
 	object StereoMode extends Enumeration {
@@ -582,18 +682,51 @@ class OmniStereo {
 		SOFTEDGE
 	};
 
-	// @resolution sets the resolution of the cube textures / render buffers:
-	OmniStereo(unsigned resolution = 1024, bool useMipMaps=true);
+
 
 	// @resolution should be a power of 2
-	OmniStereo& resolution(unsigned resolution);
-	unsigned resolution() { return mResolution; }
+	def resolution(resolution:Int) = {
+		mResolution = r;
+		// force GPU reallocation:	
+		mFbo = 0;
+		mRbo = 0;
+		mTex(0) = 0
+		mTex(1) = 0;
+		this
+	}
+	def resolution() = mResolution
 	
 	// configure the projections according to files
-	OmniStereo& configure(std::string configpath, std::string configname="default");
+	OmniStereo& configure(std::string configpath, std::string configname="default"){
+
+	}
 	
 	// configure generatively:
-	OmniStereo& configure(WarpMode wm, float aspect=2., float fovy=M_PI);
+	OmniStereo& configure(wm:WarpMode, a:Float=2.f, f:Float=math.Pi){
+		mNumProjections = 1
+		val p = mProjections(0)
+		wm match {
+			case FISHEYE =>
+				OmniStereo.fovy = f;
+				OmniStereo.aspect = a;
+				p.warp().array().fill(fillFishEye);
+				p.warp().dirty();
+				break;
+			case CYLINDER =>
+				OmniStereo.fovy = f / M_PI;
+				OmniStereo.aspect = a;
+				p.warp().array().fill(fillCylinder);
+				p.warp().dirty();
+				break;
+			case _ =>
+				OmniStereo.fovy = f / 2.;
+				OmniStereo.aspect = a;
+				p.warp().array().fill(fillRect);
+				p.warp().dirty();
+				break;
+		}
+		return *this;
+	}
 	OmniStereo& configure(BlendMode bm);
 	
 	// capture a scene to the cubemap textures 
@@ -806,234 +939,6 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 
 
 
-
-//////////
-
-OmniStereo::Projection::Projection()
-:	mViewport(0, 0, 1, 1) {
-	
-	// allocate blend map:
-	mBlend.resize(128, 128)
-		.target(Texture::TEXTURE_2D)
-		.format(Graphics::LUMINANCE)
-		.type(Graphics::UBYTE)
-		.filterMin(Texture::LINEAR)
-		.allocate();
-		
-
-	// allocate warp map:
-	mWarp.resize(256, 256)
-		.target(Texture::TEXTURE_2D)
-		.format(Graphics::RGBA)
-		.type(Graphics::FLOAT)
-		.filterMin(Texture::LINEAR)
-		.allocate();
-		
-	t = u = v = 0;
-}
-
-void OmniStereo::Projection::onCreate() {
-	mWarp.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
-	mWarp.filterMag(Texture::LINEAR);
-	mWarp.texelFormat(GL_RGB32F_ARB);
-	mWarp.dirty();
-	
-	mBlend.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
-	mBlend.filterMag(Texture::LINEAR);
-	mBlend.dirty();
-}
-
-void OmniStereo::Projection::registrationPosition(const Vec3d& pos) {
-	
-}
-
-void OmniStereo::Projection::readParameters(std::string path, bool verbose) {
-	File f(path, "rb");
-	if (!f.open()) {
-		printf("failed to open Projector configuration file %s\n", path.c_str());
-		return;
-	}
-	
-	f.read((void *)(&params), sizeof(OmniStereo::Projection::Parameters), 1);
-	f.close();
-	
-	initParameters(verbose);
-	
-	printf("read %s\n", path.c_str());
-}
-
-void OmniStereo::Projection::initParameters(bool verbose) {
-	// initialize:
-	Vec3f v = params.screen_center - params.projector_position;
-	float screen_perpendicular_dist = params.normal_unit.dot(v);
-	Vec3f compensated_center = (v) / screen_perpendicular_dist + params.projector_position;
-	
-	// calculate uv parameters
-	float x_dist = params.x_vec.mag();
-	x_unit = params.x_vec / x_dist;
-	x_pixel = x_dist / params.width;
-	x_offset = x_unit.dot(compensated_center - params.projector_position);
-	
-	float y_dist = params.y_vec.mag();
-	y_unit = params.y_vec / y_dist;
-	y_pixel = y_dist / params.height;
-	y_offset = y_unit.dot(compensated_center - params.projector_position);
-	
-//	if (verbose) {
-//		printf("Projector %d width %d height %d\n", (int)params.projnum, (int)params.width, (int)params.height);
-//		params.projector_position.print(); printf(" = projector_position\n");
-//		params.screen_center.print(); printf(" = screen_center\n");
-//		params.normal_unit.print(); printf(" = normal_unit\n");
-//		params.x_vec.print(); printf(" = x_vec\n");
-//		params.y_vec.print(); printf(" = y_vec\n");
-//		x_unit.print(); printf(" = x_unit\n");
-//		y_unit.print(); printf(" = y_unit\n");
-//		printf("%f = screen_radius\n", params.screen_radius);
-//		printf("%f = x_pixel\n", x_pixel);
-//		printf("%f = y_pixel\n", y_pixel);
-//
-//	}
-}
-
-void OmniStereo::Projection::readBlend(std::string path) {
-	Image img(path);
-	mBlend.allocate(img.array(), true);
-	printf("read & allocated %s\n", path.c_str());
-}
-
-void OmniStereo::Projection::readWarp(std::string path) {
-	File f(path, "rb");
-	if (!f.open()) {
-		printf("failed to open file %s\n", path.c_str());
-		exit(-1);
-	}
-	
-	if (t) free(t);
-	if (u) free(u);
-	if (v) free(v);
-	
-	int32_t dim[2];
-	f.read((void *)dim, sizeof(int32_t), 2);
-	
-	int32_t w = dim[1];
-	int32_t h = dim[0]/3;
-	
-	printf("warp dim %dx%d\n", w, h);
-	
-	int32_t elems = w*h;
-	t = (float *)malloc(sizeof(float) * elems);
-	u = (float *)malloc(sizeof(float) * elems);
-	v = (float *)malloc(sizeof(float) * elems);
-	
-	int r = 0;	
-	r = f.read((void *)t, sizeof(float), elems);
-	r = f.read((void *)u, sizeof(float), elems);
-	r = f.read((void *)v, sizeof(float), elems);
-	f.close();
-	
-	mWarp.resize(w, h)
-		.target(Texture::TEXTURE_2D)
-		.format(Graphics::RGBA)
-		.type(Graphics::FLOAT)
-		.filterMin(Texture::LINEAR)
-		.allocate();
-		
-	updatedWarp();
-	
-	printf("read %s\n", path.c_str());
-}
-
-void OmniStereo::Projection::updatedWarp() {	
-	Array& arr = mWarp.array();
-	int w = arr.width();
-	int h = arr.height();
-	for (int y=0; y<h; y++) {
-		for (int x=0; x<w; x++) {
-			// Y axis appears to be inverted
-			int32_t y1 = (h-y-1);
-			// input data is row-major format
-			int32_t idx = y1*w+x;	
-		
-			float * cell = arr.cell<float>(x, y);
-			Vec3f& out = *(Vec3f *)cell;
-			
-//			// coordinate system change?
-//			out.x = v[idx];
-//			out.y = u[idx];
-//			out.z = -t[idx];
-
-            // Matt negates x as an expedient: pablo undoes
-			out.x = t[idx];
-			out.y = u[idx];
-			out.z = v[idx];
-			
-			// TODO:
-			// out -= mRegistration.pos();
-			// // & unrotate by mRegistration.quat()
-			// do not normalize; instead capsule fit
-			
-			// normalize here so the shaders don't have to
-			//out.normalize();
-			
-			// fourth element is currently unused:
-			cell[3] = 1.;
-			
-			if (y == 32 && x == 32) {
-				printf("example: %f %f %f -> %f %f %f\n", 
-					t[idx], u[idx], v[idx],
-					cell[0], cell[1], cell[2]);
-			}
-		}
-	}
-	
-	mWarp.dirty();
-	
-	printf("updated Warp\n");
-}	
-
-#pragma mark OmniStereo
-
-OmniStereo::OmniStereo(unsigned resolution, bool useMipMaps)
-:	mFace(5),
-	mEyeParallax(0),
-	mNear(0.1),
-	mFar(100),
-	mResolution(resolution),
-	mNumProjections(1),
-	mFrame(0),
-	mMode(MONO),
-	mStereo(0),
-	mAnaglyphMode(RED_CYAN),
-	mMipmap(useMipMaps),
-	mFullScreen(false)
-{
-	mFbo = mRbo = 0;
-	mTex[0] = mTex[1] = 0;
-	
-	mQuad.reset();
-	mQuad.primitive(gl.TRIANGLE_STRIP);
-	mQuad.texCoord	( 0, 0);
-	mQuad.vertex	( 0, 0, 0);
-	mQuad.texCoord	( 1, 0);
-	mQuad.vertex	( 1, 0, 0);
-	mQuad.texCoord	( 0, 1);
-	mQuad.vertex	( 0, 1, 0);
-	mQuad.texCoord	( 1, 1);
-	mQuad.vertex	( 1, 1, 0);
-	
-	mClearColor.set(0.);
-	
-	configure(FISHEYE).configure(SOFTEDGE);
-}
-
-OmniStereo& OmniStereo::resolution(unsigned r) {
-	mResolution = r;
-	// force GPU reallocation:	
-	mFbo = mRbo = 0;
-	mTex[0] = mTex[1] = 0;
-	return *this;
-	
-}
 
 OmniStereo& OmniStereo::configure(WarpMode wm, float a, float f) {
 	mNumProjections = 1;

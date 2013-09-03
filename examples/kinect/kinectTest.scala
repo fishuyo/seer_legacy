@@ -18,7 +18,7 @@ object Main extends App with GLAnimatable{
 
   GLScene.push(this)
 
-  val live = new Ruby("src/main/scala/examples/kinect/kinectTest.rb")
+  val live = new Ruby("kinectTest.rb")
 
   val cube = Model(Cube())
   cube.scale.set(1.f, (2*480.f)/640.f, 1.f)

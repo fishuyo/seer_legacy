@@ -3,6 +3,7 @@ package com.fishuyo
 package io
 package kinect
 
+import cv._
 import graphics._
 import maths.Vec3 
 import java.nio.ByteBuffer
@@ -20,6 +21,8 @@ import scala.collection.JavaConversions._
 import collection.mutable.ListBuffer
 
 object Kinect extends GLAnimatable {
+  
+  var bgsub:BackgroundSubtract = _
 
   type Callback = (Int, Array[Float]) => Any
   val callbacks = new ListBuffer[Callback]()
@@ -58,6 +61,8 @@ object Kinect extends GLAnimatable {
 
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
 
+    bgsub =  new BackgroundSubtract
+
     bg = new Mat(480,640,CvType.CV_32FC1)
 
 		val c = Freenect.createContext()
@@ -91,7 +96,7 @@ object Kinect extends GLAnimatable {
 			// println( "depth wy: " + mode.getWidth + " " + mode.getHeight + " " + mode.format )
 
 			val mat = new Mat(480,640,CvType.CV_8UC1)
-			val diff = new Mat(480,640,CvType.CV_8UC1)
+			// val diff = new Mat(480,640,CvType.CV_8UC1)
 			val depthData = new Array[Byte](640*480)
 			val flo = new Array[Float](640*480)
 
@@ -120,31 +125,34 @@ object Kinect extends GLAnimatable {
 
 				// depthPix.drawPixel(x,y)
 
-				depthData(640*y+x) = (if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
-				// depthData(640*y+x) = (depth*255.f).toByte //(if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
+				//depthData(640*y+x) = (if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
+				depthData(640*y+x) = (depth*255.f).toByte //(if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
 				flo(640*y+x) = depth
 			}
 			//println ( flo.max )
 
 			mat.put(0,0, depthData)
-			if( getBG > 0 ){
-				Imgproc.accumulateWeighted( mat, bg, .1f) //mat.clone
-				getBG -= 1
-				for( y<-(0 until 480); x<-(0 until 640)){
-					val d = bg.get(y,x)(0).toFloat / 255.f
-					videoPix.setColor(d,d,d,1.f)
-					videoPix.drawPixel(x,y)
-				}
-			}
 
-			val tmp = new Mat()
-			val bg8u = new Mat()
-			bg.convertTo(bg8u, CvType.CV_8UC1)
-			Core.absdiff(bg8u,mat,tmp)
-			Imgproc.threshold(tmp,diff,threshold.y,255.f, Imgproc.THRESH_BINARY)
+			// if( getBG > 0 ){
+			// 	Imgproc.accumulateWeighted( mat, bg, .1f) //mat.clone
+			// 	getBG -= 1
+			// 	for( y<-(0 until 480); x<-(0 until 640)){
+			// 		val d = bg.get(y,x)(0).toFloat / 255.f
+			// 		videoPix.setColor(d,d,d,1.f)
+			// 		videoPix.drawPixel(x,y)
+			// 	}
+			// }
+
+			// val tmp = new Mat()
+			// val bg8u = new Mat()
+			// bg.convertTo(bg8u, CvType.CV_8UC1)
+			// Core.absdiff(bg8u,mat,tmp)
+			// Imgproc.threshold(tmp,diff,threshold.y,255.f, Imgproc.THRESH_BINARY)
+
+			val diff = bgsub(mat)
 
 			for( y<-(0 until 480); x<-(0 until 640)){
-				val d = ( if (mat.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
+				val d = ( if (diff.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
 				depthPix.setColor(d,d,d,1.f)
 				depthPix.drawPixel(x,y)
 
@@ -153,7 +161,7 @@ object Kinect extends GLAnimatable {
 			//Highgui.imwrite("depthimage.png",mat)
 
 			val contours = new java.util.ArrayList[MatOfPoint]()
-			Imgproc.findContours(mat, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+			Imgproc.findContours(diff, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
 
 			var offset = 0
 			for( i<-(0 until contours.length)){
