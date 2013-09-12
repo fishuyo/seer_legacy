@@ -5,12 +5,18 @@ package geometry
 import maths.Vec3
 
 
+trait Pickable {
+  def intersect(r:Ray):Option[Hit] = None
+  var onPick = (hit:Hit)=>{}
+}
+
 /**
 * Ray/Geometry intersection
 */
-class Hit(val obj: Geometry, val ray:Ray, val t: Float, val inside: Boolean = false) extends Ordered[Hit] {
-  def point() = ray.o + ray.d * t
-  def norm() = if (!inside) obj.normalAt( point ); else -obj.normalAt( point )
+class Hit(val obj: Pickable, val ray:Ray, val t: Float, val inside: Boolean = false) extends Ordered[Hit] {
+  obj.onPick(this)
+  def point() = ray(t)
+  // def norm() = if (!inside) obj.normalAt( point ); else -obj.normalAt( point )
   def compare(h:Hit) = t compare h.t
 }
 
@@ -28,8 +34,8 @@ class Hit(val obj: Geometry, val ray:Ray, val t: Float, val inside: Boolean = fa
 /**
 * Geometries
 */
-trait Geometry {
-  def intersect( ray: Ray ) : Option[Hit] = None
+trait Geometry extends Pickable {
+  // def intersect( ray: Ray ) : Option[Hit] = None
   def normalAt( p: Vec3 ) : Vec3 = Vec3(0) 
 }
 
@@ -84,7 +90,9 @@ class Triangle( val vertices:(Vec3,Vec3,Vec3)) extends Geometry {
   override def normalAt( p: Vec3):Vec3 = normal
 }
 
-class Quadrilateral ( val vertices:(Vec3,Vec3,Vec3,Vec3)) extends Geometry {
+class Quad( val vertices:(Vec3,Vec3,Vec3,Vec3)) extends Geometry {
+
+  def this(cen:Vec3, w:Float, h:Float) = this((cen + Vec3(-w,-h,0), cen + Vec3(w,-h,0), cen + Vec3(w,h,0), cen + Vec3(-w,h,0)))
  
   val normal: Vec3 = (( vertices._2 - vertices._1 ) cross ( vertices._3 - vertices._1 )).normalize
   
@@ -103,7 +111,9 @@ class Quadrilateral ( val vertices:(Vec3,Vec3,Vec3,Vec3)) extends Geometry {
         (((vertices._4 - vertices._3) cross ( x - vertices._3 )) dot n) < 0 ||
         (((vertices._1 - vertices._4) cross ( x - vertices._4 )) dot n) < 0 ) return None
 
-    return Some( new Hit(this, ray, t))
+    val hit = new Hit(this, ray, t)
+    onPick(hit)
+    return Some(hit)
   }
 
   override def normalAt( p: Vec3):Vec3 = normal

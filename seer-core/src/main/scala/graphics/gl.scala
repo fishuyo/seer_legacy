@@ -14,6 +14,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Vector3
 
 object GLImmediate {
   val renderer = new ImmediateModeRenderer20(true,true,2)
@@ -36,9 +37,6 @@ trait GLAnimatable extends GLDrawable {
   def step( dt: Float){}
 }
 
-trait Pickable {
-  def intersect(r:Ray):Vec3
-}
 
 // class Poseable(val p:GlDrawable) extends GLDrawable {
 //   var pose = Pose()
@@ -52,6 +50,7 @@ trait Pickable {
 * Model as a collection of primitives with relative transforms, and animation
 */
 object Model {
+  def apply(pos:Vec3) = new Model(Pose(pos,Quat()),Vec3(1))
   def apply(pose:Pose=Pose(),scale:Vec3=Vec3(1)) = new Model(pose,scale)
   def apply(prim:GLDrawable) = { val m=new Model(); m.add(prim) }
   def apply(m:Model):Model = {
@@ -63,20 +62,32 @@ object Model {
   }
 }
 
-class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
+class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable with geometry.Pickable {
   var color = RGBA(1,1,1,.6f)
   var nodes = Vector[Model]()
   var primitives = Vector[GLDrawable]()
+  // var pickable = Vector[geometry.Pickable]()
+
+  var worldTransform = new Matrix4
+
+  def translate(p:Vec3) = transform(Pose(p,Quat()),Vec3(1))
+  def rotate(q:Quat) = transform(Pose(Vec3(),q),Vec3(1))
+  def scale(s:Vec3) = transform(Pose(),s)
 
   def transform(p:Pose,s:Vec3=Vec3(1.f)) = {
     val m = new Model(p,s)
     nodes = nodes :+ m
     m
   }
+
   def add(p:GLDrawable) = {
     primitives = primitives :+ p
     this
   }
+  // def add(p:geometry.Pickable) = {
+  //   pickable = pickable :+ p
+  //   this
+  // }
   def addNode(m:Model) = {
     nodes = nodes :+ Model(m)
   }
@@ -87,7 +98,9 @@ class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
 
   override def draw(){
     MatrixStack.push()
+
     MatrixStack.transform(pose,scale)
+    worldTransform.set(MatrixStack.model)
 
     Shader.setMatrices()
     Shader.setColor(color)
@@ -101,6 +114,24 @@ class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
 
   }
 
+  override def intersect(ray:Ray):Option[geometry.Hit] = {
+    
+    val (pos,scale) = (new Vector3(),new Vector3())
+    worldTransform.getTranslation(pos)
+    worldTransform.getScale(scale)
+
+    var hits:Vector[geometry.Hit] = primitives.collect {
+      case q:Quad => ray.intersectQuad(Vec3(pos.x,pos.y,pos.z), scale.x, scale.y ) match {
+          case Some(t) => new geometry.Hit(this, ray, t)
+          case None => null
+      }
+    }
+
+    hits = (hits ++ nodes.map( _.intersect(ray).getOrElse(null) )).filterNot( _ == null).sorted
+    if( hits.isEmpty ) None
+    else Some(hits(0))
+  }
+
   override def toString() = {
     var out = pose.pos.toString + " " + scale.toString + " " + nodes.length + " " + primitives.length + "\n"
     nodes.foreach( out += _.toString )
@@ -109,27 +140,8 @@ class Model(var pose:Pose=Pose(), var scale:Vec3=Vec3(1)) extends GLAnimatable {
 
 }
 
-// class GLPrimitive(var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
-//   override def draw(){
-//     drawFunc()
-//   }
-// }
 
-class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
-  var color = RGBA(1,1,1,.6f)
-  override def draw(){
-    Shader.setColor(color)
-    val s = scale / 2.f
 
-    MatrixStack.push()
-    MatrixStack.transform(pose,s)
-
-    Shader.setMatrices()
-    drawFunc()
-    
-    MatrixStack.pop()
-  }
-}
 
 
 

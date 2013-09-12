@@ -79,6 +79,7 @@ object Mouse extends InputAdapter {
     false
   }
  	override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
+ 		// println( com.badlogic.gdx.Gdx.input.getCurrentEventTime )
     try{ callbacks("down").foreach( _(Array(screenX,screenY,pointer,button)) ) }
     catch { case e:Exception => println(e) }
     false

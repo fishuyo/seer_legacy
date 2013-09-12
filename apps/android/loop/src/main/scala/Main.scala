@@ -45,21 +45,58 @@ class LoopScene extends InputAdapter with GLAnimatable {
   Audio.push( looper )
   GLScene.push( looper )
 
-  var t=0.f
-
+  var t = 0.f
   var l = 0
   var newPos = Vec3(0)
+
+  val buttons = Model()
+  buttons.scale.set(.05f)
+
+  for( i<-(-2 to 2)){
+    val offset = Vec3(0,2.5f,0)
+    var m = buttons.translate( offset * i)
+    m.color = RGBA(0,0,0,1)
+    m.add( Quad.asLines() )
+    i match {
+      case 2 => m.onPick = (h) => { val r = looper.toggleRecord(l); if(r) m.color = (RGBA(1,0,0,1)) else m.color = (RGBA(0,0,0,1)) } 
+      case 1 => m.onPick = (h) => { val p = looper.togglePlay(l); if(p) m.color = (RGBA(1,0,0,1)) else m.color = (RGBA(0,1,0,1)) } 
+      case 0 => m.onPick = (h) => { val s = looper.stack(l); if(s) m.color = (RGBA(1,0,0,1)) else m.color = (RGBA(0,0,0,1)) }
+      case -1 => m.onPick = (h) => { looper.setMaster(l) }
+      case -2 => m.onPick = (h) => { looper.duplicate(l,1) }
+    }
+  }
+
+
+  Mouse.use()
+  Mouse.bind("down", (i:Array[Int]) => {
+    val (x,y) = (i(0),i(1))
+    val ray = Camera.ray(x,y)
+    val hit = buttons.intersect(ray) //.intersect(buttons)
+    // if (hit.isDefined) hit.get.obj.onPick(hit.get)
+    
+
+  })
 
   Touch.use();
   Touch.bind("multi", (num:Int, coords:Array[Float]) => {
     num match {
       case 2 => {
-        looper.setGain(0,coords(1) / 100.f)
-        looper.setSpeed(0, coords(3) / 100.f )
+        val r1 = Camera.ray(coords(0),coords(1))
+        val r2 = Camera.ray(coords(2),coords(3))
 
-        val b1 = coords(0) / 800.f 
-        val b2 = coords(2) / 800.f
-        looper.setBounds(0, b1, b2)
+        val c = looper.plots(l).pose.pos
+        val t1 = r1.intersectQuad(c,.5,.5)
+        val t2 = r2.intersectQuad(c,.5,.5)
+
+        if( t1.isDefined && t2.isDefined){
+          val p1 = r1(t1.get) - c + Vec3(.5,.5,0)
+          val p2 = r2(t2.get) - c + Vec3(.5,.5,0)
+
+          looper.setGain(0,p1.y)
+          looper.setSpeed(0, p2.y * 2.f )
+          looper.setBounds(l, p1.x, p2.x)
+        }
+        
       }
     } 
   })
@@ -77,25 +114,29 @@ class LoopScene extends InputAdapter with GLAnimatable {
     
   })
 
+  Shader.lighting=0.f
+  Shader.setBgColor(RGBA(1,1,1,1))
+  looper.setMode("sync")
+
+
   //val live = new Ruby("res/live.rb", "com.fishuyo.loop" :: List())
 
   override def step(dt:Float){
+    Camera.nav.pos.lerpTo(newPos, 0.15f)
 
-    Camera.nav.pos.lerpTo(newPos, 0.1f)
+    pos = Camera.nav.pos + Vec3.apply(-0.45,0,-0.55)
+    buttons.pose.pos.lerpTo(pos, 0.2)
     //live.step(dt)
-  	if( t > 10.f){
-  		looper.stop(0); looper.play(0)
-  	}else if( t > 1.f && t < 1.5f){
-  		looper.clear(0); looper.stop(0); looper.record(0)
-		}
-		t += dt;
+    //if( t > 10.f){
+    //  looper.stop(0); looper.play(0)
+    //}else if( t > 1.f && t < 1.5f){
+    //  looper.clear(0); looper.stop(0); looper.record(0)
+  	//}
+  	//t += dt;
   }
 
   override def draw(){
-    //live.draw()
-  // 	plot.setSamples(loop.b.samples, 0, loop.b.curSize)
-		// plot.setCursor(2,loop.b.rPos.toInt)
-  // 	plot.draw()
+
   }
 
 }

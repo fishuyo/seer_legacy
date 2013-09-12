@@ -28,11 +28,13 @@ object Sphere{
 	def asLines() = wireSphere.getOrElse({ wireSphere = Some(new Sphere(1.f,30,"lines")); wireSphere.get })
 	def asPoints() = pointSphere.getOrElse({ pointSphere = Some(new Sphere(1.f,30,"points")); pointSphere.get })
 }
+
 class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles") extends GLDrawable {
   val vert = new ListBuffer[Float]
   val indx = new ListBuffer[Short]
   var mesh:Mesh = _
-  var drawFunc = () => {}
+  var primitive = GL10.GL_TRIANGLES
+  // var drawFunc = () => {}
 
   for ( lat <- (0 to bands)){
     var theta = lat * math.Pi / bands
@@ -62,7 +64,8 @@ class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles
   style match {
   	case "points" =>
 		  mesh = new Mesh(true, vert.size/8, 0, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
-		  drawFunc = () => { mesh.render(Shader(), GL10.GL_POINTS)}
+		  primitive = GL10.GL_POINTS
+      // drawFunc = () => { mesh.render(Shader(), GL10.GL_POINTS)}
 
   	case "lines" =>
 		  for ( lat <- (0 until bands)){
@@ -85,7 +88,8 @@ class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles
 		  }
 		  mesh = new Mesh(true, vert.size/8, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
   		mesh.setIndices(indx.toArray)
-		  drawFunc = () => { mesh.render(Shader(), GL10.GL_LINES)}
+		  primitive = GL10.GL_LINES
+      // drawFunc = () => { mesh.render(Shader(), GL10.GL_LINES)}
 
   	case _ => //"triangles"
 		  for ( lat <- (0 until bands)){
@@ -102,13 +106,13 @@ class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles
 		  }
 		  mesh = new Mesh(true, vert.size/8, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
   		mesh.setIndices(indx.toArray)
-		  drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+		  // drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
   }
 
   mesh.setVertices(vert.toArray)
 
   override def draw(){
-    drawFunc()
+    mesh.render(Shader(), primitive)
   }
 }
 
@@ -120,7 +124,8 @@ object Cube{
 }
 class Cube(style:String="triangles") extends GLDrawable {
 	var mesh:Mesh = _
-  var drawFunc = () => {}
+  var primitive = GL10.GL_TRIANGLES
+  // var drawFunc = () => {}
 
 	style match {
 		case "lines" =>
@@ -141,7 +146,8 @@ class Cube(style:String="triangles") extends GLDrawable {
 		    -1,-1,-1,
 		    1,-1,-1
 		  ))
-			drawFunc = () => { mesh.render(Shader(), GL10.GL_LINES)}
+      primitive = GL10.GL_LINES
+			// drawFunc = () => { mesh.render(Shader(), GL10.GL_LINES)}
 		case _ => 
   		mesh = new Mesh(true,24,36, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0) )
   		mesh.setIndices( Array[Short](
@@ -183,10 +189,11 @@ class Cube(style:String="triangles") extends GLDrawable {
 		    -1,-1,1,  0,-1,0, 1,0,
 		    1,-1,1,   0,-1,0, 0,0
 		  ))
-			drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+			// drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
 	}
   override def draw(){
-    drawFunc()
+    mesh.render(Shader(), primitive)
+    // drawFunc()
   }
 }
 
@@ -200,7 +207,7 @@ class Cylinder(r1:Float=1.f, r2:Float=1.f, vertCount:Int=30) extends GLDrawable 
 
   val indxCount = vertCount+2
   var theta = 0.0
-  var drawMode = GL10.GL_TRIANGLE_STRIP
+  var primitive = GL10.GL_TRIANGLE_STRIP
 
   for (j <- (0 until vertCount)){
     val r = (if( 3*j % 2 == 0) r1 else r2)
@@ -231,7 +238,7 @@ class Cylinder(r1:Float=1.f, r2:Float=1.f, vertCount:Int=30) extends GLDrawable 
   mesh.setIndices(indx.toArray)
 
 	override def draw(){
-		mesh.render(Shader(), drawMode)
+		mesh.render(Shader(), primitive)
 	}  
 }
 
@@ -241,6 +248,27 @@ object OBJ {
 class OBJ( file:String ) extends GLDrawable {
   val model = new ObjLoader().loadObj(Gdx.files.internal(file))
   override def draw() = model.meshes.get(0).render(Shader(), GL10.GL_TRIANGLES)
+}
+
+
+
+
+
+
+class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
+  var color = RGBA(1,1,1,.6f)
+  override def draw(){
+    Shader.setColor(color)
+    val s = scale / 2.f
+
+    MatrixStack.push()
+    MatrixStack.transform(pose,s)
+
+    Shader.setMatrices()
+    drawFunc()
+    
+    MatrixStack.pop()
+  }
 }
 
 

@@ -17,7 +17,8 @@ object Quad {
 }
 class Quad(style:String="triangles") extends GLDrawable {
   var mesh:Mesh = _
-  var drawFunc = () => {}
+  var primitive = GL10.GL_TRIANGLES
+  // var drawFunc = () => {}
 
   style match {
     case "lines" =>
@@ -32,7 +33,8 @@ class Quad(style:String="triangles") extends GLDrawable {
       mesh.setIndices( Array[Short](
         0,1,2,3,0
       ))
-      drawFunc = () => { mesh.render(Shader(), GL10.GL_LINE_STRIP)}
+      primitive = GL10.GL_LINE_STRIP
+      // drawFunc = () => { mesh.render(Shader(), GL10.GL_LINE_STRIP)}
 
     case _ => 
       mesh = new Mesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
@@ -46,10 +48,10 @@ class Quad(style:String="triangles") extends GLDrawable {
       mesh.setIndices( Array[Short](
         0,1,2, 0,2,3
       ))
-      drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+      // drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
   }
   override def draw(){
-    drawFunc()
+    mesh.render(Shader(), primitive)
   }
 
   def intersect(ray:Ray):Option[Vec3] = {

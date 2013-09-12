@@ -31,7 +31,8 @@ class Looper extends AudioSource with GLDrawable {
 		loops = l :: loops
 		val p = new AudioDisplay(500)
 		p.pose.pos = Vec3( -0.75f*(plots.size%4)+1.5f,  -0.75f+0.75f*(plots.size/4), 0.f)
-		p.color = Vec3(0,1.f,0)
+		p.color = RGBA(0,0,0,1)
+		p.cursorColor = RGBA(0,0,0,1)
 		plots = p :: plots
 	}
 
@@ -39,29 +40,41 @@ class Looper extends AudioSource with GLDrawable {
 		if( times == 0) loops(i).play
 		else loops(i).play(times)
 	}
+	
 	def stop(i:Int) = loops(i).stop
-	def togglePlay(i:Int){
+
+	def togglePlay(i:Int) = {
 		if(!loops(i).playing){
     	loops(i).play
 		}else{
       loops(i).stop()
 		}
+		loops(i).playing
 	}
-	def stack(i:Int) = loops(i).stack
+
+	def stack(i:Int) = {
+		loops(i).stack
+		loops(i).stacking
+	}
+
 	def reverse(i:Int) = loops(i).reverse
 	def rewind(i:Int) = loops(i).rewind
 	def clear(i:Int) = loops(i).clear
+
 	def record(i:Int){
 		loops(i).clear; loops(i).stop; loops(i).record
 	}
-	def toggleRecord(i:Int) {
+
+	def toggleRecord(i:Int) = {
     if(!loops(i).recording){
     	record(i)
 		}else{
       loops(i).stop()
       loops(i).play()
 		}
+		loops(i).recording
 	}
+
 	def setGain(i:Int,f:Float) = loops(i).gain = f
 	def setDecay(i:Int,f:Float) = loops(i).decay = f
 	def setPan(i:Int,f:Float) = loops(i).pan = f

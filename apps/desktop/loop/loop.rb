@@ -1,22 +1,15 @@
-# require 'java'
 Seer = Java::com.fishuyo
-# Key = Seer.io.Keyboard
-# Trackpad = Seer.io.Trackpad
-
-# $Seer = Java::com.fishuyo
-# $Vec3 = $Seer.maths.Vec3
-# $Quat = $Seer.maths.Quat
-# $Camera = $Seer.graphics.Camera
 
 
 looper = Seer.examples.loop.Main.looper
+$Main = Seer.examples.loop.Main
 $looper = looper
 l = 0
 
 Keyboard.clear()
 Keyboard.use()
-Keyboard.bind("1",lambda{ l=0 })
-Keyboard.bind("2",lambda{ l=1 })
+Keyboard.bind("1",lambda{ l=0; $Main.l_=(0) })
+Keyboard.bind("2",lambda{ l=1; $Main.l_=(1) })
 Keyboard.bind("3",lambda{ l=2 })
 Keyboard.bind("4",lambda{ l=3 })
 Keyboard.bind("5",lambda{ l=4 })
@@ -67,9 +60,25 @@ Touch.bind("fling", lambda{|button,v|
 	$newPos.set(pos)
 })
 
+# Mouse.clear()
+# Mouse.use()
+# Mouse.bind( "down", lambda{ |i|
+# 	x = i[0]
+# 	y = i[1]
+# 	ray = Camera.ray(x,y)
+# 	t = ray.intersectQuad($model.pose.pos, 0.05, 0.05 )
+# 	if t.isDefined()
+# 		$model.nodes[0].color.set(RGBA.apply(1,0,0,0))
+# 		looper.toggleRecord(l)
+# 	else
+# 		$model.nodes[0].color.set(RGBA.apply(0,0,1,0))
+# 	end
+# })
+
 
 Trackpad.clear()
 Trackpad.connect()
+
 down = false
 s = []
 t = []
@@ -133,11 +142,34 @@ Trackpad.bind( lambda{ |i,f|
 
 
 
+# $model = Model.apply(Pose.apply(Vec3.apply(0,0,0), Quat.apply()), Vec3.apply(0.05) )
+# $model.add( Quad.asLines() )
+# m = $model.transform(Pose.apply(Vec3.apply(0,-2.5,0),Quat.apply()), Vec3.apply(1))
+# m.add( Quad.asLines() )
+# m = $model.transform(Pose.apply(Vec3.apply(0,-2.5,0)*2,Quat.apply()), Vec3.apply(1))
+# m.add( Quad.asLines() )
+# m = $model.transform(Pose.apply(Vec3.apply(0,-2.5,0)*3,Quat.apply()), Vec3.apply(1))
+# m.add( Quad.asLines() )
+# m = $model.transform(Pose.apply(Vec3.apply(0,-2.5,0)*4,Quat.apply()), Vec3.apply(1))
+# m.add( Quad.asLines() )
+
+
+
+
 def step dt
 
 	$looper.setMode("sync")
+	Camera.nav.pos.lerpTo($newPos, 0.15)
 
-	# Camera.nav.pos.lerpTo($newPos, 0.1)
+	pos = Camera.nav.pos + Vec3.apply(-0.45,0,-0.55) #$model.pose.pos
+	# pos.set(pos.x, pos.y, 0)
+	$Main.buttons.pose.pos.lerpTo(pos, 0.2)
+	# puts $Main.buttons.pose.pos
 	t=0
 end
 
+
+
+def draw
+	# $model.draw()
+end

@@ -11,16 +11,9 @@ import scala.collection.mutable.ListBuffer
 */
 object GLScene extends GLScene
 
-object SceneManager {
-  val scenes = new ListBuffer[GLScene]
-  val active = GLScene :: List()
-
-
-
-}
-
 class GLScene {
   
+  var active = true
   var alpha = 1.f
 
   val drawable = new ListBuffer[GLDrawable]
@@ -42,3 +35,26 @@ class GLScene {
   
 }
 
+object SceneManager {
+  val scenes = new ListBuffer[GLScene]
+  val active = GLScene :: List()
+
+  def apply(i:Int) = scenes(i)
+
+
+
+  // def init() = scenes.foreach( _.init() )
+  def step( dt: Float ) = scenes.filter( _.active == true).foreach( _.step(dt) )
+  def draw() = scenes.filter( _.active == true).foreach( _.draw() )
+
+}
+
+
+class RenderNode {
+  val scene = new GLScene
+  val camera = new Camera
+
+  // val inputs = new ListBuffer[]
+
+
+}

@@ -20,9 +20,8 @@ trait RotationalState {
   var restPose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
   var relQuat = Quat()
 
-  //var pos = Vec3(0)
-  // var lPos = Vec3(0)
-  var accel = Vec3(0)
+  var angularAcceleration = Vec3(0)
+  var angularVelocity = Vec3(0)
   var euler = Vec3(0.f,0.f,0.f)
   var lEuler = Vec3(0.f,0.f,0.f)
 
@@ -37,13 +36,14 @@ object KinematicState {
     k.velocity = k.position - k.lPosition
     k.lPosition = k.position
     k.position = k.position + k.velocity + k.acceleration * ( .5f * dt * dt )
-
     k.acceleration = Vec3(0)
 	}
 
 	def euler(k:KinematicState)(dt:Float){
 		k.velocity = k.velocity + k.acceleration*dt
+		k.lPosition = k.position
 		k.position = k.position + k.velocity*dt
+		k.acceleration = Vec3(0)
 	}
 
 }
@@ -51,17 +51,24 @@ object KinematicState {
 // Rotational State integrators
 object RotationalState {
 
-	def verlet(k:KinematicState)(dt:Float){
-    val v = k.position - k.lPosition
-    k.lPosition = k.position
-    k.position = k.position + v + k.acceleration * ( .5f * dt * dt )
+	def verlet(k:RotationalState)(dt:Float){
+    k.angularVelocity =  k.euler - k.lEuler  	
+  	k.lEuler = k.euler
+  	k.euler = k.euler + k.angularVelocity + k.angularAcceleration * (.5f*dt*dt)
 
-    k.acceleration = Vec3()
+  	// move to particle / constraint
+  	// dw -= w * (Trees.damp / mass) //damping
+  	// dw -= euler * k //restoring spring force
+  	// pose.quat = restPose.quat * Quat().fromEuler(euler.x,euler.y,euler.z)
+
+  	k.angularAcceleration = Vec3(0)
 	}
 
-	def euler(k:KinematicState)(dt:Float){
-		k.velocity = k.velocity + k.acceleration*dt
-		k.position = k.position + k.velocity*dt
+	def euler(k:RotationalState)(dt:Float){
+		k.angularVelocity = k.angularVelocity + k.angularAcceleration*dt
+		k.lEuler = k.euler
+		k.euler = k.euler + k.angularVelocity*dt
+  	k.angularAcceleration = Vec3(0)
 	}
 
 }
@@ -87,6 +94,12 @@ class Particle() extends KinematicState {
   def applyGravity() = acceleration = acceleration + Gravity
   def applyDamping( damp: Float ) = acceleration = acceleration - velocity * (damp / mass)
 
+}
+
+class Stick extends KinematicState with RotationalState {
+	var mass = 1.f
+	var length = 1.f
+	
 }
 
 

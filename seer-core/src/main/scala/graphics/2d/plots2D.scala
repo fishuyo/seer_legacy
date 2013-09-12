@@ -55,7 +55,8 @@ class Plot2D( var size:Int, var range:Float=1.f) extends GLDrawable {
 * Display Audio Samples and boundary/playback cursors
 */
 class AudioDisplay(val size:Int) extends GLDrawable {
-  var color = Vec3(1)
+  var color = RGBA(0,1,0,1)
+  var cursorColor = RGBA(1,1,0,1)
   var pose = Pose()
   var scale = Vec3(1)
   val mesh = new Mesh(false,size*2,0, VertexAttribute.Position)
@@ -138,13 +139,13 @@ class AudioDisplay(val size:Int) extends GLDrawable {
       cursorMesh.setVertices( cursorVert)
       dirty = false
     }
-    Shader.setColor(RGBA(color,1.f))
+    Shader.setColor(color)
     val s = scale / 2.f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
     Shader.setMatrices()
     mesh.render(Shader(), GL10.GL_LINES)
-    Shader.setColor(RGBA(1.f,1.f,0,1.f))
+    Shader.setColor(cursorColor)
     cursorMesh.render(Shader(), GL10.GL_LINES)
     MatrixStack.pop()
   }

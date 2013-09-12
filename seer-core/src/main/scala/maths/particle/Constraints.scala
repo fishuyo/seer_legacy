@@ -68,5 +68,12 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, length:Float, stiff
 // 	}
 // }
 
+class RotationalSpringConstraint(val p:Particle, k:Float) extends Constraint {
+
+	override def solve(){
+
+	}
+}
+
 
 

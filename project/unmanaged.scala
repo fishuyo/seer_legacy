@@ -66,18 +66,18 @@ object SeerLibs {
     s.log.info("Extracting..")
 
     // Extract jars into their respective lib folders.
-    val commonDest = file("common/lib")
+    val commonDest = file("seer-core/lib")
     val commonFilter = new ExactFilter("gdx.jar")
     IO.unzip(zipFile, commonDest, commonFilter)
 
-    val desktopDest = file("desktop/lib")
+    val desktopDest = file("seer-desktop/lib")
     val desktopFilter = new ExactFilter("gdx-natives.jar") |
     new ExactFilter("gdx-backend-lwjgl.jar") |
     new ExactFilter("gdx-backend-lwjgl-natives.jar") |
     new ExactFilter("gdx-tools.jar")
     IO.unzip(zipFile, desktopDest, desktopFilter)
 
-    val androidDest = file("android/src/main/libs")
+    val androidDest = file("apps/android/loop/src/main/libs")
     val androidFilter = new ExactFilter("gdx-backend-android.jar") |
     new ExactFilter("armeabi/libgdx.so") |
     new ExactFilter("armeabi/libandroidgl20.so") |
