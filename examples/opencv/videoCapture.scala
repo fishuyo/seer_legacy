@@ -1,5 +1,5 @@
 package com.fishuyo
-package examples.opencv
+package examples.opencv.cap
 
 import graphics._
 import io._
@@ -15,14 +15,17 @@ import com.badlogic.gdx.graphics.glutils._
 
 import org.opencv.core._
 import org.opencv.highgui._
+import org.opencv.imgproc._
 
 object Main extends App with GLAnimatable{
 
 	var capture: VideoCapture = _
   var bgsub:BackgroundSubtract = _
+  var blobTracker:BlobTracker = _
 
+  val images = new ListBuffer[Mat]()
 
-	val bytes = new Array[Byte](1280*720*3)
+  var bytes:Array[Byte] = null
 
   SimpleAppRun.loadLibs()
 
@@ -31,12 +34,9 @@ object Main extends App with GLAnimatable{
   val live = new Ruby("videoCapture.rb")
 
   val cube = Model(Cube())
-  cube.scale.set(1.f, (720.f)/1280.f, 1.f)
   GLScene.push(cube)
 
-  val pix = new Pixmap(1280,720, Pixmap.Format.RGB888)
-  pix.setColor(1.f,1.f,1.f,0)
-  pix.fill()
+  var pix:Pixmap = null //new Pixmap(1280,720, Pixmap.Format.RGB888)
 
   SimpleAppRun()  
 
@@ -44,11 +44,17 @@ object Main extends App with GLAnimatable{
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
     capture = new VideoCapture(0)
     bgsub = new BackgroundSubtract
+    blobTracker = new BlobTracker
 
-   //  val sizes = capture.getSupportedPreviewSizes()
-   //  for( s <- sizes ){
-   //  	println( s"$s.width x $s.height")
-  	// }
+    val w = capture.get(Highgui.CV_CAP_PROP_FRAME_WIDTH)
+    val h = capture.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT)
+
+    println( s"starting capture w: $w $h")
+
+    pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
+    bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
+    cube.scale.set(1.f, (h/w).toFloat, 1.f)
+
   	Texture(pix) 
   }
   override def draw(){
@@ -67,14 +73,19 @@ object Main extends App with GLAnimatable{
 
   	if( !read ) return
 
-    val diff = bgsub(img)
+    val rsmall = new Mat()
+    val small = new Mat()
+    Imgproc.resize(img,rsmall, new Size(), 0.5,0.5,0)
+    Core.flip(rsmall,small,1)
 
+    val diff = bgsub(small)
 
   	diff.get(0,0,bytes)
-
   	val bb = pix.getPixels()
   	bb.put(bytes)
   	bb.rewind()
+
+    blobTracker(bgsub.mask, pix)
 
 		Texture(0).draw(pix,0,0)
 

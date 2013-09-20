@@ -116,7 +116,11 @@ class Looper extends AudioSource with GLDrawable {
 	override def draw(){
 		for( i<-(0 until plots.size)){
 			val p = plots(i)
-			p.setSamples(loops(i).b.samples, 0, loops(i).b.curSize) //loops(i).b.rMin,loops(i).b.rMax)
+			if( loops(i).recording || loops(i).stacking ) p.setSamplesSimple(loops(i).b.samples, 0, loops(i).b.curSize)
+			else if( loops(i).dirty ){
+				p.setSamples(loops(i).b.samples, 0, loops(i).b.curSize) //loops(i).b.rMin,loops(i).b.rMax)
+				loops(i).dirty = false
+			}
 			p.setCursor(2,loops(i).b.rPos.toInt)
 			p.draw()
 		}

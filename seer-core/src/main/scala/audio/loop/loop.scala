@@ -281,6 +281,8 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   var recOut = false
   var iobuffer = new Array[Float](2048)
 
+  var dirty = true
+
   allocate(numSamples)
 
   gen = ()=>{
@@ -303,8 +305,8 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   def play(t:Int){ b.times=0; times = t; play() }
   def stop(){ playing = false; recording = false}
   def rewind(){ b.rPos = b.rMin }
-  def record(){ recording = true; playing = false }
-  def stack() =stacking = !stacking 
+  def record(){ recording = true; playing = false; dirty = true }
+  def stack() = { stacking = !stacking; dirty = true }
   def reverse() = reversing = !reversing
   def reverse(b:Boolean) = reversing = b
   def undo() = {}
@@ -318,6 +320,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   def duplicate(times:Int){
     val size = b.curSize
     for( i <- (0 until times)) b.append( b.samples, size)
+    dirty = true
   }
 
   var onDone = ()=>{}

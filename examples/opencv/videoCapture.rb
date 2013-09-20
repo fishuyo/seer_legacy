@@ -4,7 +4,7 @@ module M
   include_package "com.fishuyo.io"
   include_package "com.fishuyo.maths"
   include_package "com.fishuyo.graphics"
-  include_package "com.fishuyo.examples.opencv"
+  include_package "com.fishuyo.examples.opencv.cap"
 end
 
 class Object
@@ -16,8 +16,8 @@ class Object
   end
 end
 
-Main.bgsub.updateBackgroundNextFrame()
 
 def step dt
-  Main.bgsub.setThreshold(20.0)
+  # Main.bgsub.updateBackgroundNextFrame()
+  Main.bgsub.setThreshold(50.0)
 end

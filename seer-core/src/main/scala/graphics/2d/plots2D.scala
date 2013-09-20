@@ -63,10 +63,31 @@ class AudioDisplay(val size:Int) extends GLDrawable {
   val vertices = new Array[Float](size*2*3)
   val cursorMesh = new Mesh(false,6,0,VertexAttribute.Position)
   val cursorVert = new Array[Float](6*(3))
+  var primitive = GL10.GL_LINE_STRIP
+  var renderSize = size
   var dirty = true
+  var cursorDirty = true
   var samples:Array[Float] = _
   var left = 0
   var right = 0
+
+  def setSamplesSimple(s:Array[Float], l:Int=0, r:Int=0){
+    samples = s
+    left = l
+    right = if(r == 0) s.size-1 else r-1
+    for( i<-(0 until size)){
+      val s = i / (size-1).toFloat * (right-left) + left
+      val si = s.toInt
+      val si2 = if( si >= right) left else si + 1
+      val f = s-si
+      vertices(3*i) = (i - size/2) / size.toFloat
+      vertices(3*i+1) = samples(si)*(1.f-f) + samples(si2)*f
+      vertices(3*i+2) = 0.f
+    }
+    primitive = GL10.GL_LINE_STRIP
+    renderSize = size
+    dirty = true
+  }
 
   def setSamples(s:Array[Float], l:Int=0, r:Int=0){
     samples = s
@@ -119,6 +140,8 @@ class AudioDisplay(val size:Int) extends GLDrawable {
       vertices(6*i+4) = min
       vertices(6*i+5) = 0.f
     }
+    primitive = GL10.GL_LINES
+    renderSize = size*2
     dirty = true
   }
 
@@ -130,21 +153,24 @@ class AudioDisplay(val size:Int) extends GLDrawable {
     cursorVert(6*i+3) = x
     cursorVert(6*i+4) = -0.5f
     cursorVert(6*i+5) = 0.f
-    dirty = true
+    cursorDirty = true
   }
 
   override def draw(){ 
     if( dirty ){
       mesh.setVertices( vertices )
-      cursorMesh.setVertices( cursorVert)
       dirty = false
+    }
+    if( cursorDirty ){
+      cursorMesh.setVertices( cursorVert)
+      cursorDirty = false
     }
     Shader.setColor(color)
     val s = scale / 2.f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
     Shader.setMatrices()
-    mesh.render(Shader(), GL10.GL_LINES)
+    mesh.render(Shader(), primitive, 0, renderSize)
     Shader.setColor(cursorColor)
     cursorMesh.render(Shader(), GL10.GL_LINES)
     MatrixStack.pop()

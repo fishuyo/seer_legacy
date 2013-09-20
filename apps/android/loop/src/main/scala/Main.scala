@@ -69,35 +69,38 @@ class LoopScene extends InputAdapter with GLAnimatable {
 
   Mouse.use()
   Mouse.bind("down", (i:Array[Int]) => {
-    val (x,y) = (i(0),i(1))
+     val (x,y) = (i(0),i(1))
     val ray = Camera.ray(x,y)
-    val hit = buttons.intersect(ray) //.intersect(buttons)
+    val hit = buttons.intersect(ray)
     // if (hit.isDefined) hit.get.obj.onPick(hit.get)
-    
-
   })
 
   Touch.use();
   Touch.bind("multi", (num:Int, coords:Array[Float]) => {
     num match {
+      // case 1 => {
+      //   val (x,y) = (coords(0).toInt,coords(1).toInt)
+      //   val ray = Camera.ray(x,y)
+      //   val hit = buttons.intersect(ray)
+      // }
       case 2 => {
-        val r1 = Camera.ray(coords(0),coords(1))
-        val r2 = Camera.ray(coords(2),coords(3))
+        val r1 = Camera.ray(coords(0).toInt,coords(1).toInt)
+        val r2 = Camera.ray(coords(2).toInt,coords(3).toInt)
 
         val c = looper.plots(l).pose.pos
-        val t1 = r1.intersectQuad(c,.5,.5)
-        val t2 = r2.intersectQuad(c,.5,.5)
+        val t1 = r1.intersectQuad(c,.5f,.5f)
+        val t2 = r2.intersectQuad(c,.5f,.5f)
 
         if( t1.isDefined && t2.isDefined){
           val p1 = r1(t1.get) - c + Vec3(.5,.5,0)
           val p2 = r2(t2.get) - c + Vec3(.5,.5,0)
 
-          looper.setGain(0,p1.y)
-          looper.setSpeed(0, p2.y * 2.f )
+          looper.setGain(l,p1.y)
+          looper.setSpeed(l, p2.y * 2.f )
           looper.setBounds(l, p1.x, p2.x)
-        }
-        
+        } 
       }
+      case _ => ()
     } 
   })
   Touch.bind("fling", (button:Int,v:Array[Float]) => {
@@ -119,13 +122,13 @@ class LoopScene extends InputAdapter with GLAnimatable {
   looper.setMode("sync")
 
 
-  //val live = new Ruby("res/live.rb", "com.fishuyo.loop" :: List())
+  // val live = new Ruby("res/live.rb", "com.fishuyo.loop" :: List())
 
   override def step(dt:Float){
     Camera.nav.pos.lerpTo(newPos, 0.15f)
 
-    pos = Camera.nav.pos + Vec3.apply(-0.45,0,-0.55)
-    buttons.pose.pos.lerpTo(pos, 0.2)
+    val pos = Camera.nav.pos + Vec3.apply(-0.38,0,-0.55) //Vec3.apply(-0.45,0,-0.55)
+    buttons.pose.pos.lerpTo(pos, 0.2f)
     //live.step(dt)
     //if( t > 10.f){
     //  looper.stop(0); looper.play(0)
@@ -136,7 +139,7 @@ class LoopScene extends InputAdapter with GLAnimatable {
   }
 
   override def draw(){
-
+    buttons.draw()
   }
 
 }

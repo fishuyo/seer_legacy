@@ -42,8 +42,13 @@ object Kinect extends GLAnimatable {
 	def setSizeThreshold(v:Int) = sizeThreshold = v
 
 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
+	val depthData = new Array[Byte](640*480)
+	val flo = new Array[Float](640*480)	
+	val col = new Array[Int](640*480)	
+
 	val videoPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
 
+	var mat:Mat = null
 	var bg:Mat = null
 	var getBG = 20
 	def setBGImage() = { getBG = 20; bg.setTo( new Scalar(0.f)) }
@@ -64,6 +69,7 @@ object Kinect extends GLAnimatable {
     bgsub =  new BackgroundSubtract
 
     bg = new Mat(480,640,CvType.CV_32FC1)
+    mat = new Mat(480,640,CvType.CV_8UC1)
 
 		val c = Freenect.createContext()
     
@@ -95,10 +101,10 @@ object Kinect extends GLAnimatable {
 		override def onFrameReceived(mode:FrameMode, frame:ByteBuffer, timestamp:Int) {
 			// println( "depth wy: " + mode.getWidth + " " + mode.getHeight + " " + mode.format )
 
-			val mat = new Mat(480,640,CvType.CV_8UC1)
+			// val mat = new Mat(480,640,CvType.CV_8UC1)
 			// val diff = new Mat(480,640,CvType.CV_8UC1)
-			val depthData = new Array[Byte](640*480)
-			val flo = new Array[Float](640*480)
+			// val depthData = new Array[Byte](640*480)
+			// val flo = new Array[Float](640*480)
 
 			for( y<-(0 until 480); x<-(0 until 640)){
 				val i = 2*(640*y + x)
@@ -106,23 +112,24 @@ object Kinect extends GLAnimatable {
 				val lb = (frame.get(i) & 0xFF).toShort
 				val gb = (frame.get(i+1) & 0xFF).toShort
 				val raw:Int = (gb) << 8 | lb
-				var depth:Float = raw / 2048.f //gamma(raw) // / 2048.f
-				//if( depth > .5f) depth = 1.f
+				var depth:Float = gamma(raw) 
+				// var depth:Float = raw / 2048.f
 
-				// case class Color(r:Int,g:Int,b:Int)
-				// var color = gb match {
-				// 	case 0 => Color(255,255-lb,255-lb)
-				// 	case 1 => Color(255,lb,0)
-				// 	case 2 => Color(255-lb,255,0)
-				// 	case 3 => Color(0,255,lb)
-				// 	case 4 => Color(0,255-lb,255)
-				// 	case 5 => Color(0,0,255-lb)
-				// 	case _ => Color(0,0,0)
-				// }
-				// val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
+				case class Color(r:Int,g:Int,b:Int)
+				var color = gb match {
+					case 0 => Color(255,255-lb,255-lb)
+					case 1 => Color(255,lb,0)
+					case 2 => Color(255-lb,255,0)
+					case 3 => Color(0,255,lb)
+					case 4 => Color(0,255-lb,255)
+					case 5 => Color(0,0,255-lb)
+					case _ => Color(0,0,0)
+				}
+				val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
+				col(640*y+x) = c
+
 				// val d = (if(depth > threshold.x && depth < threshold.y) 1.f else 0.f)
 				// depthPix.setColor(d,d,d,1.f)
-
 				// depthPix.drawPixel(x,y)
 
 				//depthData(640*y+x) = (if(depth > threshold.x && depth < threshold.y) 255.toByte else 0.toByte )
@@ -149,12 +156,17 @@ object Kinect extends GLAnimatable {
 			// Core.absdiff(bg8u,mat,tmp)
 			// Imgproc.threshold(tmp,diff,threshold.y,255.f, Imgproc.THRESH_BINARY)
 
-			val diff = bgsub(mat)
+			val diff = bgsub(mat, true)
 
 			for( y<-(0 until 480); x<-(0 until 640)){
-				val d = ( if (diff.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
+				val d = diff.get(y,x)(0).toFloat / 255.f //( if (diff.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
+				val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255.f
 				depthPix.setColor(d,d,d,1.f)
 				depthPix.drawPixel(x,y)
+
+				videoPix.setColor(v,v,v,1.f)
+				// videoPix.setColor(col(640*y+x))
+				videoPix.drawPixel(x,y)
 
 			}
 

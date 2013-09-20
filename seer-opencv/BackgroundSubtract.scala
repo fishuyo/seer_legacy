@@ -13,13 +13,15 @@ class BackgroundSubtract {
 	// var mog = new BackgroundSubtractorMOG(3,4,0.8)
 
   // var bg = new Mat(720,1280,CvType.CV_32FC1)
-	var bg = new Mat()
+  var bg = new Mat()
+	var bgGray = new Mat()
 	val mask = new Mat()
 	val small = new Mat()
 
 	var updateBG = true
 	var adaptiveBG = false
-	var threshold = 12.f
+	var threshold = 20.f
+
 	def setThreshold(v:Float) = threshold = v
 
 	def apply( frame:Mat, return_mask:Boolean=false ) = {
@@ -30,12 +32,13 @@ class BackgroundSubtract {
 		else gray = frame
 
 		if(updateBG){
-			bg = gray.clone
+			bg = frame.clone
+			bgGray = gray.clone
 			updateBG = false
 			// return
 		}
 		if(adaptiveBG){
-			Imgproc.accumulateWeighted( gray, bg, .1f)
+			Imgproc.accumulateWeighted( gray, bgGray, .1f)
 		}
 
 		// Imgproc.resize(frame,small, new Size(), 0.5,0.5,0)
@@ -47,7 +50,7 @@ class BackgroundSubtract {
 
 		// compute the abs difference between background image and frame
 		val diff = new Mat()
-		Core.absdiff(bg,gray,diff) 
+		Core.absdiff(bgGray,gray,diff) 
 
 		// val mat = new Mat(480,640,CvType.CV_8UC1)
 		// val thresholdDiff = new Mat() //new Mat(480,640,CvType.CV_8UC1)

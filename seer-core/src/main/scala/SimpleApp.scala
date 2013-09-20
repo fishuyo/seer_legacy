@@ -71,8 +71,9 @@ class SimpleAppListener extends ApplicationListener {
 
     scene.init()
 
-    audio.main ! Connect
-    audio.main ! Process
+    audio.start
+    // audio.main ! Connect
+    // audio.main ! Process
 
   }
   def render(){
@@ -200,7 +201,8 @@ class SimpleAppListener extends ApplicationListener {
     //Trackpad.connect()
   }
   def dispose(){
-    audio.main ! "dispose"
+    audio.dispose
+    // audio.main ! "dispose"
     //Kinect.disconnect()
   }
 

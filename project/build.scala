@@ -4,8 +4,8 @@ import Keys._
 
 import seer.unmanaged._
 
-// import org.scalasbt.androidplugin._
-// import org.scalasbt.androidplugin.AndroidKeys._
+import org.scalasbt.androidplugin._
+import org.scalasbt.androidplugin.AndroidKeys._
 
 object Settings {
 
@@ -26,13 +26,13 @@ object Settings {
 
   lazy val core = Settings.common ++ Seq(
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.2.0-RC2",
+      "com.typesafe.akka" %% "akka-actor" % "2.2.1",
       "org.scala-lang" % "scala-actors" % "2.10.2",
       "de.sciss" %% "scalaosc" % "1.1.+",
       "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
       "org.jruby" % "jruby" % "1.7.3",
-      "net.java.dev.jna" % "jna" % "3.5.2",
-      "xuggle" % "xuggle-xuggler" % "5.4"
+      "net.java.dev.jna" % "jna" % "3.5.2"
+      //"xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
     ),
     SeerLibs.updateGdxTask,
@@ -43,16 +43,47 @@ object Settings {
     fork in Compile := true
   )
 
-  // lazy val android = Settings.common ++
-  //   AndroidProject.androidSettings ++
-  //   AndroidMarketPublish.settings ++ Seq (
-  //     platformName in Android := "android-10",
-  //     keyalias in Android := "change-me",
-  //     mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
-  //     proguardOption in Android := "-keep class com.badlogic.gdx.backends.android.** { *; }"//proguard_options,
-  //     //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
-  //     //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
-  //   )
+  lazy val android = Settings.common ++
+    AndroidProject.androidSettings ++
+    AndroidMarketPublish.settings ++ Seq (
+      platformName in Android := "android-10",
+      keyalias in Android := "change-me",
+      mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
+      proguardOption in Android := """-keep class com.badlogic.gdx.backends.android.** { *; }
+
+        ## Akka Stuff referenced at runtime
+        -keep class akka.actor.** {*;}
+        -keep public class akka.actor.LightArrayRevolverScheduler { *; }
+        -keep public class akka.actor.LocalActorRefProvider {
+          public <init>(...);
+        }
+        -keep public class akka.remote.RemoteActorRefProvider {
+          public <init>(...);
+        }
+        -keep class akka.actor.SerializedActorRef {
+          *;
+        }
+        -keep class akka.remote.netty.NettyRemoteTransport {
+          *;
+        }
+        -keep class akka.serialization.JavaSerializer {
+          *;
+        }
+        -keep class akka.serialization.ProtobufSerializer {
+          *;
+        }
+        -keep class com.google.protobuf.GeneratedMessage {
+          *;
+        }
+        -keep class akka.event.Logging*
+        -keep class akka.event.Logging$LogExt{
+          *;
+        }
+      """//proguard_options,
+      //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
+      //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
+    )
+
 
 
 }
@@ -158,9 +189,10 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn seer_desktop
 
-  // lazy val loop-android = Project (
-  //   "loop-android",
-  //   file("apps/android/loop"),
-  //   settings = Settings.android
-  // ) dependsOn common
+  // android apps
+  lazy val loop_android = Project (
+    "loop-android",
+    file("apps/android/loop"),
+    settings = Settings.android
+  ) dependsOn seer_core
 }

@@ -7,8 +7,7 @@ module M
   include_package "com.fishuyo.spatial"
   include_package "com.fishuyo.graphics"
   include_package "com.fishuyo.util"
-  include_package "com.fishuyo.test"
-  include_package "com.fishuyo.parsers.eisenscript"
+  include_package "com.fishuyo.examples.kinect"
 end
 
 class Object
@@ -20,6 +19,37 @@ class Object
   end
 end
 
+
+Mouse.clear()
+Mouse.use()
+Mouse.bind("drag", lambda{|i|
+  x = i[0]
+  y = i[1]
+  ray = Camera.ray(x,y)
+  t = ray.intersectQuad(Vec3.apply(0,0,1.0), 1.0, 2*480.0 / 640.0 )
+  if t.isDefined()
+    p = ray.apply(t.get) + Vec3.apply(1.0, 2*480.0/640.0, 0)
+    xx = (p.x * 0.5 * 640.0).to_i
+    yy = (p.y * (1.0/(2*480.0/640.0)) * 480.0).to_i
+
+    print xx
+    print " "
+    print yy
+    print " "
+    if yy >= 480
+      yy = yy - 480
+      puts Kinect.bgsub.mask.get(480 - yy,xx)[0]
+
+    else
+      # puts Kinect.depthData[(640*(480-yy)+xx).to_i]
+      puts Kinect.flo[(640*(480-yy)+xx).to_i]
+
+    end
+    # puts yy
+  else
+    
+  end
+})
 
 Keyboard.clear()
 Keyboard.use()
@@ -34,7 +64,7 @@ Keyboard.bind("b", lambda{
 
 
 Kinect.connect()
-Kinect.startVideo()
+# Kinect.startVideo()
 Kinect.startDepth()
 Kinect.bgsub.updateBackgroundNextFrame()
 
@@ -42,6 +72,8 @@ Kinect.setAngle(-10)
 
 def step(dt)
 
+
+  Shader.lighting_=(0.0)
 	Shader.texture_=(1.0)
 
 	# for i in 0..9000
