@@ -34,12 +34,31 @@ object SeerLibs {
     IO.download(url, zipFile)
 
     // Extract jars into their respective lib folders.
-    val commonDest = file("common/lib")
-    val desktopDest = file("desktop/lib")
-    val commonFilter = new ExactFilter("freenect-0.0.1.jar") | new ExactFilter("opencv-245.jar") | new ExactFilter("monido-core_2.10-0.1.2.jar")
-    val deskFilter = new ExactFilter("GlulogicMT.jar") | new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("libopencv_java245.dylib")
-    IO.unzip(zipFile, commonDest, commonFilter)
-    IO.unzip(zipFile, desktopDest, deskFilter)
+    val coreDest = file("seer-core/lib")
+    val deskDest = file("seer-desktop/lib")
+    val opencvDest = file("seer-opencv/lib")
+    val kinectDest = file("seer-sensors/seer-kinect/lib")
+    val leapDest = file("seer-sensors/seer-leap/lib")
+    val touchDest = file("seer-sensors/seer-multitouch/lib")
+    val nativeDest = file("lib")
+    val nativeFilter =  new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("libLeap.dylib") | 
+                        new ExactFilter("libLeapJava.dylib") | new ExactFilter("libopencv_java245.dylib")
+                      
+                
+    val coreFilter =  new ExactFilter("monido-core_2.10-0.1.2.jar") | new ExactFilter("gdx.jar")
+    val deskFilter =  new ExactFilter("gdx-natives.jar") | new ExactFilter("gdx-backend-lwjgl.jar") | new ExactFilter("gdx-backend-lwjgl-natives.jar")
+    val opencvFilter = new ExactFilter("opencv-245.jar")
+    val kinectFilter = new ExactFilter("freenect-0.0.1.jar")
+    val leapFilter = new ExactFilter("LeapJava.jar") |
+    val touchFilter = new ExactFilter("GlulogicMT.jar")
+    
+    IO.unzip(zipFile, coreDest, coreFilter)
+    IO.unzip(zipFile, deskDest, deskFilter)
+    IO.unzip(zipFile, opencvDest, opencvFilter)
+    IO.unzip(zipFile, kinectDest, kinectFilter)
+    IO.unzip(zipFile, leapDest, leapFilter)
+    IO.unzip(zipFile, touchDest, touchFilter)
+    IO.unzip(zipFile, nativeDest, nativeFilter)
 
     // Destroy the file.
     zipFile.delete
