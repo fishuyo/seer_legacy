@@ -57,7 +57,7 @@ class FaceDetector(var faceHeight:Double)(implicit camera:CalibratedCamera) {
 	    face.x *= 2;
 	    face.y *= 2;
 	    face.width *= 2;
-	    face.height *= 2; //scale by 1.5 in original image size
+	    face.height *= 2; 
 
 		  val intr = new Array[Double](9)
 		  camera.intrinsic.get(0,0,intr)

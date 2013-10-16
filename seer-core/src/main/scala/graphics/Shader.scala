@@ -71,7 +71,7 @@ object Shader {
     	this().setUniformMatrix("u_normalMatrix", MatrixStack.normalMatrix() )
       this().setUniformf("u_color", color.r, color.g, color.b, color.a)
       setLightUniforms();
-    } catch { case e:Exception => println(e)}
+    } catch { case e:Exception => ()}//println(e)}
 
   }
 

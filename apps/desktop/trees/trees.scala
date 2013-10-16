@@ -68,6 +68,8 @@ object Main extends App with GLAnimatable with AudioSource {
     Shader.load("firstPass", Gdx.files.internal("res/shaders/firstPass.vert"), Gdx.files.internal("res/shaders/firstPass.frag"))
     Shader.load("secondPass", Gdx.files.internal("res/shaders/secondPass.vert"), Gdx.files.internal("res/shaders/secondPass.frag"))
     Shader.multiPass = true;
+    Shader.monitor("firstPass")
+    Shader.monitor("secondPass")
 
     Kinect.init()
     tree.init()

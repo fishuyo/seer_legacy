@@ -142,6 +142,9 @@ Trackpad.bind( lambda{ |i,f|
 })
 
 
+OSC.clear()
+OSC.listen(8000)
+OSC.bind("/x", lambda{ |f| puts f[0]; looper.setSpeed(l,f[0]*2.0)    })
 
 # $model = Model.apply(Pose.apply(Vec3.apply(0,0,0), Quat.apply()), Vec3.apply(0.05) )
 # $model.add( Quad.asLines() )
@@ -160,7 +163,7 @@ Trackpad.bind( lambda{ |i,f|
 def step dt
 
 	$looper.setMode("sync")
-	Camera.nav.pos.lerpTo($newPos, 0.15)
+	# Camera.nav.pos.lerpTo($newPos, 0.15)
 
 	pos = Camera.nav.pos + Vec3.apply(-0.45,0,-0.55) #$model.pose.pos
 	# pos.set(pos.x, pos.y, 0)

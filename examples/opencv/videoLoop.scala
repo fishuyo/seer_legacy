@@ -6,6 +6,7 @@ import io._
 import maths._
 import dynamic._
 import cv._
+import video._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
@@ -26,6 +27,7 @@ object Main extends App with GLAnimatable{
 	var capture: VideoCapture = _
   var bgsub = new BackgroundSubtract
 	var loop = new VideoLoop
+
   var subtract = true
   def setSubtract(v:Boolean) = subtract = v
 
@@ -76,8 +78,9 @@ object Main extends App with GLAnimatable{
 
     val rsmall = new Mat()
   	val small = new Mat()
-  	Imgproc.resize(img,rsmall, new Size(), 0.5,0.5,0)
-    Core.flip(rsmall,small,1)
+  	Imgproc.resize(img,small, new Size(), 0.5,0.5,0)
+    Core.flip(small,rsmall,1)
+    Imgproc.cvtColor(rsmall,small, Imgproc.COLOR_BGR2RGB)
 
     var sub = small
     if( subtract ) sub = bgsub(small)

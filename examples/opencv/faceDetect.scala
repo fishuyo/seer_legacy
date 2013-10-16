@@ -32,12 +32,15 @@ object Main extends App with GLAnimatable{
 	var faceDetector = new FaceDetector(0.17/2.0)
 
 	// Camera Calibration
-	// var calcamera = new CalibratedCamera()
+	var calcamera = new CalibratedCamera()
+  val images = calcamera.loadImageDirectory("/Users/fishuyo/projects/Catch-Release/Floor/board_webcam")
 	// val images = calcamera.loadImageDirectory("/Users/fishuyo/projects/Catch-Release/Floor/thunder_webcam")
+  calcamera.calibrateFromBoardImages(images, new Size(6,9), 0.0235)
 	// calcamera.calibrateFromBoardImages(images, new Size(4,5), 0.013)
+  calcamera.writeParams("logitech_calib.json")
 	// calcamera.writeParams("thunder_calib.json")
-	// calcamera.printParams()
- //  System.exit(0)
+	calcamera.printParams()
+  System.exit(0)
 
 	var bytes:Array[Byte] = null
 	var w = 0.0

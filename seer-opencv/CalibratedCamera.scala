@@ -2,6 +2,7 @@
 package com.fishuyo
 package cv
 
+import maths.Vec3
 
 import org.opencv.core._
 import org.opencv.imgproc.Imgproc
@@ -187,6 +188,23 @@ class CalibratedCamera {
 	 //  v[14] = tvec.at<double>(2);
 	 //  v[15] = 1.0;
   // }
+
+  def unprojectRect( x:Int, y:Int, height:Int, worldHeight:Float ) = {
+
+		  val intr = new Array[Double](9)
+		  intrinsic.get(0,0,intr)
+
+		  val fy = intr(4) //(1,1);
+		  val fx = intr(0) //(0,0);
+		  val pp = new Point( intr(6) /*at(0,2)*/, intr(7) /*at(1,2)*/ )
+
+		  val z = fy * worldHeight / (1.0 * height);
+		  val yy = z * (pp.y - y ) / fy;
+		  val xx = z * (x - pp.x) / fx;
+		  Vec3(xx,yy,z)
+  }
+
+
 
   //util functions
   def loadImageDirectory( path:String ) = {

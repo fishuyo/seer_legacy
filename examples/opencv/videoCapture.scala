@@ -21,6 +21,7 @@ object Main extends App with GLAnimatable{
 
 	var capture: VideoCapture = _
   var bgsub:BackgroundSubtract = _
+  var colorThresh:ColorThreshold = _
   var blobTracker:BlobTracker = _
 
   val images = new ListBuffer[Mat]()
@@ -44,7 +45,11 @@ object Main extends App with GLAnimatable{
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
     capture = new VideoCapture(0)
     bgsub = new BackgroundSubtract
+    colorThresh = new ColorThreshold((140,10),(20,255),(20,255))
     blobTracker = new BlobTracker
+    blobTracker.setThreshold(30,30)
+
+    Thread.sleep(2000)
 
     val w = capture.get(Highgui.CV_CAP_PROP_FRAME_WIDTH)
     val h = capture.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT)
@@ -78,14 +83,16 @@ object Main extends App with GLAnimatable{
     Imgproc.resize(img,rsmall, new Size(), 0.5,0.5,0)
     Core.flip(rsmall,small,1)
 
-    val diff = bgsub(small)
+    // val diff = bgsub(small)
+    val thresh = colorThresh(small, false)
 
-  	diff.get(0,0,bytes)
+  	thresh.get(0,0,bytes)
   	val bb = pix.getPixels()
   	bb.put(bytes)
   	bb.rewind()
 
-    blobTracker(bgsub.mask, pix)
+    // blobTracker(bgsub.mask, pix)
+    blobTracker(colorThresh.mask, pix)
 
 		Texture(0).draw(pix,0,0)
 

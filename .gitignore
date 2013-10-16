@@ -1,5 +1,7 @@
 sbt-launch.jar
 *.hide
+*.mov
+
 
 lib/
 libs/

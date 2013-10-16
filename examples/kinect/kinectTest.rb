@@ -64,11 +64,11 @@ Keyboard.bind("b", lambda{
 
 
 Kinect.connect()
-# Kinect.startVideo()
+Kinect.startVideo()
 Kinect.startDepth()
 Kinect.bgsub.updateBackgroundNextFrame()
 
-Kinect.setAngle(-10)
+Kinect.setAngle(0)
 
 def step(dt)
 
@@ -80,7 +80,8 @@ def step(dt)
 	# 	# Texture.apply(0).getTextureData().buffer.put(i,1.0)
 	# end
 
-	Kinect.threshold.set(0.0,100.4,0.0)
+  Kinect.bgsub.setThreshold(10.0)
+	# Kinect.threshold.set(0.0,100.4,0.0)
 	Texture.apply(0).draw(Kinect.depthPix,0,0)
 	Texture.apply(0).draw(Kinect.videoPix,0,480)
 

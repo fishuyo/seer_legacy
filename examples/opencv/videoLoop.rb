@@ -5,7 +5,7 @@ module M
   include_package "com.fishuyo.maths"
   include_package "com.fishuyo.graphics"
   include_package "com.fishuyo.examples.opencv.loop"
-  include_package "org.opencv.highgui"
+  include_package "com.fishuyo.video"
 
 end
 
@@ -24,18 +24,36 @@ Keyboard.bind("r",lambda{ Main.loop.toggleRecord() })
 Keyboard.bind("c",lambda{ Main.loop.stop(); Main.loop.clear() })
 Keyboard.bind("x",lambda{ Main.loop.stack() })
 Keyboard.bind("t",lambda{ Main.loop.togglePlay() })
-Keyboard.bind("	",lambda{ Main.loop.reverse() })
+Keyboard.bind(" ",lambda{ Main.loop.reverse() })
+
+Keyboard.bind("o",lambda{ Main.loop.writeToFile("out2.mov",1.0,"mpeg4") })
+
+capture = false
+Keyboard.bind("p",lambda{
+  if capture
+    puts "stop capture."
+    ScreenCapture.stop()
+  else
+    puts "start capture."
+    ScreenCapture.start()
+  end
+  capture = !capture
+})
+
+
 
 Mouse.clear()
 Mouse.use()
 Mouse.bind("drag", lambda{|i|
 	speed = (400 - i[1]) / 100.0
   decay = (i[0] - 400) / 100.0
-  Main.loop.setSpeed(speed)
+  # decay = (decay + 4)/8
+  # Main.loop.setSpeed(speed)
 	Main.loop.setAlphaBeta(decay, speed)
-  Main.loop.setAlpha(0.5)
+  # Main.loop.setAlpha(decay)
 })
 
+Main.setSubtract(false)
 Main.bgsub.updateBackgroundNextFrame()
 Main.bgsub.setThreshold(50.0)
 Main.loop.setAlphaBeta(1,1)
@@ -45,6 +63,8 @@ Main.loop.setAlphaBeta(1,1)
 # end
 
 def step dt
+  # puts Main.loop.alpha
+  # puts Main.loop.beta
 	# puts Main.w
 	# puts Main.loop.images[0].type()
 end

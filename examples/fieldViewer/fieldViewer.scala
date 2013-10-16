@@ -14,7 +14,7 @@ object Main extends App with GLAnimatable {
   val fieldViewer = new ConwayFV(100,100)
   GLScene.push(fieldViewer)
 
-  val live = new Ruby("src/main/scala/examples/fieldViewer/fieldViewer.rb")
+  val live = new Ruby("fieldViewer.rb")
 
   SimpleAppRun()
 
@@ -40,7 +40,10 @@ class FieldViewer(var w:Int, var h:Int) extends GLAnimatable {
   def toggleRunning() = running = !running
 
   override def init() = runOnce()
-  override def draw() = field.draw
+  override def draw() = {
+    Shader.texture = 1.f
+    field.draw
+  }
   override def step(dt:Float) = if(running) runEverytime(dt)
 
 

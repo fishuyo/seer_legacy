@@ -7,6 +7,7 @@ import io._
 import maths._
 import dynamic._
 import cv._
+import video._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
@@ -17,6 +18,8 @@ import com.badlogic.gdx.graphics.glutils._
 import org.opencv.core._
 import org.opencv.highgui._
 import org.opencv.imgproc._
+
+import java.awt.image.BufferedImage
 
 trait VideoSource {
 	def videoIO(in:Mat, out:Mat)
@@ -99,6 +102,40 @@ class VideoLoop extends VideoSource {
   	if( images.length > 0) images(frame.toInt).copyTo(out)
   }
 
+
+
+  def writeToFile(path:String="default", scale:Float=1.f, codec:String="mpeg4"){
+
+    if( images.length == 0) return
+
+    var file = path
+    if( file == "default") file = "out-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".mov" 
+
+    val w = images(0).width
+    val ww = (images(0).width * scale).toInt
+    val h = images(0).height
+    val hh = (images(0).height * scale).toInt
+
+    val bi = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR)
+    val buf = new Array[Byte](w*h*4)
+
+    val writer = new VideoWriter(path, ww, hh, 30, codec)
+    for( i<-(0 until images.length)){
+
+      val mat = images(i)
+      mat.get(0,0,buf)
+      for( x<-(0 until w); y<-(0 until h)){
+        val rgb = (buf(3*(x+y*w)) << 16) + (buf(3*(x+y*w)+1) << 8) + buf(3*(x+y*w)+2)
+        bi.setRGB(x,y,rgb)
+        // bi.setRGB(0,0,w,h,buf,0,w)
+      }
+
+      writer.addFrame(bi)
+      // println("add frame")
+    }
+
+    writer.close
+  }
 }
 
   

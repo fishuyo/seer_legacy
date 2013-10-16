@@ -39,6 +39,10 @@ object Settings {
     SeerLibs.downloadTask
   )
 
+  lazy val xuggle = Settings.common ++ Seq(
+    libraryDependencies += "xuggle" % "xuggle-xuggler" % "5.4"
+  )
+
   lazy val desktop = Settings.common ++ Seq (
     fork in Compile := true
   )
@@ -139,6 +143,12 @@ object SeerBuild extends Build {
     "seer-opencv",
     file("seer-opencv"),
     settings = Settings.desktop
+  ) dependsOn( seer_core, seer_video )
+
+  lazy val seer_video = Project (
+    "seer-video",
+    file("seer-video"),
+    settings = Settings.desktop ++ Settings.xuggle
   ) dependsOn seer_core 
 
 
@@ -173,6 +183,12 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_opencv )
 
+  lazy val examples_video = Project (
+    "examples-video",
+    file("examples/video"),
+    settings = Settings.desktop
+  ) dependsOn( seer_desktop, seer_video )
+
 
 
 
@@ -187,7 +203,7 @@ object SeerBuild extends Build {
     "trees",
     file("apps/desktop/trees"),
     settings = Settings.desktop
-  ) dependsOn seer_desktop
+  ) dependsOn( seer_desktop, seer_kinect )
 
   // android apps
   lazy val loop_android = Project (

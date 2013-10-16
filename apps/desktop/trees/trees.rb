@@ -62,7 +62,7 @@ $tree.setReseed(true)
 $tree.setDepth(depth)
 $tree.branch(depth)
 
-$Camera.rotateWorld(0.0)
+$Camera.rotateWorld(0.1)
 
 #$Seer.trees.Fabric.gv.set(0.0,-5.0,0.0)
 $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
@@ -231,7 +231,7 @@ def step(dt)
 
 	gpose = Pose.apply(Vec3.apply(0,-1.3,0),Quat.apply(0.42112392,-0.09659095, 0.18010217, -0.8836787))
 
-	frame = 300 #SimpleAppRun.app.frameCount % (6500)
+	frame = SimpleAppRun.app.frameCount % (6500)
 	#puts frame
 	if frame <= dawnf
 		Main.nmove.set(1.3, 1.22, 1.2)
@@ -305,8 +305,8 @@ def step(dt)
 	#puts Kinect.cube.pose.pos
 	#puts Kinect.cube.pose.quat
 
-	# Kinect.cube.pose.pos.set(0.49894238, -0.6203693, 1.2422245)
-	# Kinect.cube.pose.quat.set(-0.7918381, 0.60365784, -0.08232442, -0.042571533)
+	Kinect.cube.pose.pos.set(0.49894238, -0.6203693, 1.2422245)
+	Kinect.cube.pose.quat.set(-0.7918381, 0.60365784, -0.08232442, -0.042571533)
 
 
 

@@ -25,6 +25,7 @@ class BlobTracker {
   val callbacks = new ListBuffer[Callback]()
 
 	val blobs = new ListBuffer[TRect]()
+	var mask:Mat = _
 
 	var areaThreshold = 100
 	var dimThreshold = 100
@@ -37,6 +38,7 @@ class BlobTracker {
 		Imgproc.findContours(binary, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
 
 		blobs.clear
+		mask = Mat.zeros(binary.size(),CvType.CV_8UC1)
 
 		var offset = 0
 		for( i<-(0 until contours.length)){
@@ -49,10 +51,10 @@ class BlobTracker {
 
 				if( rotRect.size.width > dimThreshold && rotRect.size.height > dimThreshold){
 					val (x,y) = (rotRect.center.x, rotRect.center.y)
-
 					val blob = new TRect(x.toFloat,y.toFloat,rotRect.size.width.toFloat,rotRect.size.height.toFloat,rotRect.angle.toFloat)
-
 					blobs += blob
+
+					Imgproc.drawContours(mask, contours, i, new Scalar(255), -1);
 					// val i = blobs.indexWhere( (_.pos - blob.pos).magSq < 5.f )
 					// if( i > -1){
 
@@ -85,8 +87,9 @@ class BlobTracker {
 			}
 		}
 
-		callbacks.foreach(_(blobs.toArray))
-
+		try{ callbacks.foreach(_(blobs.toArray)) }
+		catch{ case e:Exception => println(e) }
+		mask
 	}
 
 	def clear() = { callbacks.clear()}

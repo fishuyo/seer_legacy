@@ -23,6 +23,7 @@ class GLScene {
 
   def push( o: GLDrawable) = drawable += o
   def push( o: GLAnimatable) = { animatable += o;  drawable += o }
+  def remove( o: GLAnimatable) = { animatable -= o;  drawable -= o }
   //def pushPickable( o: GLPickable) = pickable += o
   //def push( s: SoundSource) = { sounds += s; objects += s }
 
