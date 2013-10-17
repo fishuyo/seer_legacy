@@ -49,7 +49,7 @@ object SeerLibs {
     val deskFilter =  new ExactFilter("gdx-natives.jar") | new ExactFilter("gdx-backend-lwjgl.jar") | new ExactFilter("gdx-backend-lwjgl-natives.jar")
     val opencvFilter = new ExactFilter("opencv-245.jar")
     val kinectFilter = new ExactFilter("freenect-0.0.1.jar")
-    val leapFilter = new ExactFilter("LeapJava.jar") |
+    val leapFilter = new ExactFilter("LeapJava.jar")
     val touchFilter = new ExactFilter("GlulogicMT.jar")
     
     IO.unzip(zipFile, coreDest, coreFilter)
