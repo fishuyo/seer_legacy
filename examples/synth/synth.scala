@@ -30,7 +30,7 @@ object Main extends App with GLAnimatable {
 
   Audio.push( (lfo + osc.f ) -> osc  ) //* ((1.f-lfo)*.5f) )
 
-  val live = new Ruby("src/main/scala/examples/synth/synth.rb")
+  val live = new Ruby("synth.rb")
 
   SimpleAppRun()
 
@@ -47,6 +47,7 @@ object Main extends App with GLAnimatable {
     display(1).setSamples(Audio.out(1))
   } 
   override def draw(){
+    Shader.lighting = 0
   	display.foreach( _.draw())
   }
 }

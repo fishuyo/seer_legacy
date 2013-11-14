@@ -137,7 +137,7 @@ class Field2D(var w:Int, var h:Int) extends GLAnimatable {
       if(resized){ textureId = Texture(w,h,data); resized = false }
 
       Texture.bind(textureId)
-      Texture(textureId).getTextureData().consumeCompressedData()
+      Texture(textureId).getTextureData().consumeCompressedData(0) // ? check this
     }
   }
 

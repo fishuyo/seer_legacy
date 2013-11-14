@@ -10,7 +10,9 @@ import java.nio.ByteBuffer
 
 import org.openkinect.freenect._
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.graphics.glutils._
 
 import org.opencv.core._
@@ -40,12 +42,15 @@ object Kinect extends GLAnimatable {
 	cube.scale.set(1.f, 480.f/640.f, .1f)
 
 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
+	val videoPix = new Pixmap(640,480, Pixmap.Format.RGB888)
+	
+	val detectPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
+
 	val depthData = new Array[Byte](640*480)
 	val flo = new Array[Float](640*480)	
 	val col = new Array[Int](640*480)
 	var bytes = new Array[Byte](640*480*3)
 
-	val videoPix = new Pixmap(640,480, Pixmap.Format.RGB888)
 
 	var mat:Mat = _
 	var videoMat:Mat = _
@@ -95,6 +100,7 @@ object Kinect extends GLAnimatable {
 	def setAngle(v:Double) = device.foreach( _.setTiltAngle(v) )
 
 	def startDepth = device.foreach( _.startDepth(depthHandler) )
+	
 	val depthHandler = new DepthHandler{ 
 		override def onFrameReceived(mode:FrameMode, frame:ByteBuffer, timestamp:Int) {
 			// println( "depth wy: " + mode.getWidth + " " + mode.getHeight + " " + mode.format )
@@ -107,18 +113,18 @@ object Kinect extends GLAnimatable {
 				var depth:Float = gamma(raw) 
 				//var depth:Float = raw / 2048.f
 
-				// case class Color(r:Int,g:Int,b:Int)
-				// var color = gb match {
-				// 	case 0 => Color(255,255-lb,255-lb)
-				// 	case 1 => Color(255,lb,0)
-				// 	case 2 => Color(255-lb,255,0)
-				// 	case 3 => Color(0,255,lb)
-				// 	case 4 => Color(0,255-lb,255)
-				// 	case 5 => Color(0,0,255-lb)
-				// 	case _ => Color(0,0,0)
-				// }
-				// val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
-				// col(i) = c
+				case class Color(r:Int,g:Int,b:Int)
+				var color = gb match {
+					case 0 => Color(255,255-lb,255-lb)
+					case 1 => Color(255,lb,0)
+					case 2 => Color(255-lb,255,0)
+					case 3 => Color(0,255,lb)
+					case 4 => Color(0,255-lb,255)
+					case 5 => Color(0,0,255-lb)
+					case _ => Color(0,0,0)
+				}
+				val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
+				col(i) = c
 
 				depthData(i) = (depth*255.f).toByte
 				flo(i) = depth
@@ -139,17 +145,17 @@ object Kinect extends GLAnimatable {
 			val diff = bgsub(mat, true)
 
 			// blob tracking
-			blob(diff, depthPix)
+			blob(diff, detectPix)
 
 			for( y<-(0 until 480); x<-(0 until 640)){
 				val d = blob.mask.get(y,x)(0).toFloat / 255.f //( if (diff.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
-				depthPix.setColor(d,d,d,1.f)
-				depthPix.drawPixel(x,y)
+				detectPix.setColor(d,d,d,1.f)
+				detectPix.drawPixel(x,y)
 
 				// val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255.f
 				// videoPix.setColor(v,v,v,1.f)
-				// // videoPix.setColor(col(640*y+x))
-				// videoPix.drawPixel(x,y)
+				depthPix.setColor(col(640*y+x))
+				depthPix.drawPixel(x,y)
 
 			}
 
@@ -198,4 +204,41 @@ object Kinect extends GLAnimatable {
 
 	def clear() = { callbacks.clear()}
   def bind(f:Callback) = callbacks += f
+
+
+  def captureDepthImage(){
+  	Gdx.files.external("SeerData/image").file().mkdirs()
+  	var file = Gdx.files.external("SeerData/image/depth-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".png" )
+    PixmapIO.writePNG(file, depthPix)
+  }
+
+  def captureDepthPoints(scale:Float = 1000.f){
+  	Gdx.files.external("SeerData/points").file().mkdirs()
+  	var file = Gdx.files.external("SeerData/points/kinect-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".xyz" ).file()
+
+    val w = 640
+    val h = 480
+    
+    val buf = new Array[Byte](w*h*4)
+    
+    val out = new java.io.FileWriter( file )
+
+    for( x<-(0 until w); y<-(0 until h)){
+    	val d = flo(640*y+x)
+      val off = .25f
+
+      val z = d * -scale
+
+      if( d > 0.f){
+	      out.write( x + " " + y + " " + (z+off) + " 0 0 1\n" )
+	      out.write( x + " " + y + " " + (z-off) + " 0 0 -1\n" )
+	      out.write( x + " " + (y+off) + " " + z + " 0 1 0\n" )
+	      out.write( x + " " + (y-off) + " " + z + " 0 -1 0\n" )
+	      out.write( (x+off) + " " + y + " " + z + " 1 0 0\n" )
+	      out.write( (x-off) + " " + y + " " + z + " -1 0 0\n" )
+    	}
+    }
+
+    out.close
+  }
 }

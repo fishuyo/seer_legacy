@@ -53,8 +53,9 @@ Mouse.bind("drag", lambda{|i|
 
 Keyboard.clear()
 Keyboard.use()
-Keyboard.bind("n", lambda{
-
+Keyboard.bind("p", lambda{
+  Kinect.captureDepthImage()
+  Kinect.captureDepthPoints(2000.0)
 })
 
 Keyboard.bind("b", lambda{

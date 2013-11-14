@@ -28,7 +28,7 @@ Keyboard.bind("x",lambda{ $Loop.loop.stack() })
 Keyboard.bind("t",lambda{ $Loop.loop.togglePlay() })
 Keyboard.bind("	",lambda{ $Loop.loop.reverse() })
 
-Keyboard.bind("o",lambda{ $Loop.loop.writeToFile("out3.mov",1.0,"mpeg4") })
+Keyboard.bind("o",lambda{ $Loop.loop.writeToFile("out5.mov",1.0,"mpeg4") })
 
 capture = false
 Keyboard.bind("p",lambda{
@@ -51,7 +51,7 @@ Mouse.bind("drag", lambda{|i|
   decay = (i[0] - 400) / 100.0
   # decay = (decay + 4)/8
   # Loop.loop.setSpeed(speed)
-	# Loop.loop.setAlphaBeta(decay, speed)
+	$Loop.loop.setAlphaBeta(decay, speed)
   # Loop.loop.setAlpha(decay)
 })
 
@@ -70,7 +70,8 @@ Kinect.bgsub.updateBackgroundNextFrame()
 Kinect.setAngle(0)
 
 def step(dt)
-
+# puts $Loop.loop.alpha
+# puts $Loop.loop.beta
   	Kinect.bgsub.setThreshold(10.0)
 	# Texture.apply(0).draw(Kinect.depthPix,0,0)
 	# Texture.apply(0).draw(Kinect.videoPix,0,480)

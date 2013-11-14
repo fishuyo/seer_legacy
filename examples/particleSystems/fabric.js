@@ -3,14 +3,15 @@ importPackage(com.fishuyo.io)
 importPackage(com.fishuyo.maths)
 importPackage(com.fishuyo.maths.particle)
 importPackage(com.fishuyo.graphics)
+
 importPackage(com.fishuyo.examples.particleSystems.verletFabric)
 
 
-// var fabric = Main.fabric()
+var fabric = Main.fabric()
 
-Keyboard.use()
 Keyboard.clear()
-Keyboard.bind("g",function(){ println("hi"); Gravity().set(0,-Gravity().y(),0)})
+Keyboard.use()
+Keyboard.bind("g",function(){ println("hi"); Gravity.set(0,-Gravity.y(),0)})
 
 
 Trackpad.connect()
@@ -25,6 +26,7 @@ Trackpad.bind(function(i,f){
 })
 
 function step( dt ){
+	// println("hi");
 	// var pins = Main.fabric().pins()
 	// for( i=1; i < pins.length()-1; i++ ){
 		// pins.apply(i).setActive(false)

@@ -201,7 +201,9 @@ class SimpleAppListener extends ApplicationListener {
     //Trackpad.connect()
   }
   def dispose(){
+    println("Dispose called.")
     audio.dispose
+    Thread.sleep(100)
     // audio.main ! "dispose"
     //Kinect.disconnect()
   }

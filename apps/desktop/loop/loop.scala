@@ -47,9 +47,28 @@ object Main extends App with GLAnimatable{
     val ray = Camera.ray(x,y)
     val hit = buttons.intersect(ray) //.intersect(buttons)
     // if (hit.isDefined) hit.get.obj.onPick(hit.get)
+
+     val r1 = Camera.ray(i(0),i(1))
+    // val r2 = Camera.ray(coords(2).toInt,coords(3).toInt)
+
+    val c = looper.plots(l).pose.pos
+    val t1 = r1.intersectQuad(c,.5f,.5f)
+    // val t2 = r2.intersectQuad(c,.5f,.5f)
+
+    if( t1.isDefined ){
+      val p1 = (r1(t1.get) - c)*2.f + Vec3(.5,.5,0)
+      println( p1 )
+      // val p2 = r2(t2.get) - c + Vec3(.5,.5,0)
+
+      // looper.setGain(l,p1.y)
+      // looper.setSpeed(l, p2.y * 2.f )
+      // looper.setBounds(l, p1.x, p2.x)
+    } 
     
 
   })
+
+ 
 
   Shader.lighting=0.f
   Shader.setBgColor(RGBA(1,1,1,1))

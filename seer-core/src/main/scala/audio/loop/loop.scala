@@ -1,6 +1,10 @@
 package com.fishuyo
 package audio
 
+import com.badlogic.gdx.Gdx
+import de.sciss.synth.io._
+
+
 class LoopBuffer( var maxSize:Int = 0) {
   
   var samples = new Array[Float](maxSize)
@@ -377,8 +381,35 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
       
     }//end else if(playing)
   }
-  //int load( const char* filename );
-  //int save( const char* filename );
+
+  def save( path:String ){
+    val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, 1, sampleRate.toDouble, None, 0)
+    var file = Gdx.files.external(path).file()
+    file.mkdirs()
+    val outFile = AudioFile.openWrite(file, outSpec)
+    outFile.write( Array(b.samples), 0, b.curSize )
+    outFile.close
+  }
+
+  def load(path:String){
+    var file = Gdx.files.external(path).file()
+    val in = AudioFile.openRead(file)
+
+    // create a buffer
+    val bufSz   = 8192  // perform operations in blocks of this size
+    val buf     = in.buffer(bufSz)
+
+    clear
+    var remain  = in.numFrames
+    while (remain > 0) {
+      val chunk = math.min(bufSz, remain).toInt
+      in.read(buf, 0, chunk)
+      b.append( buf(0), chunk )
+      remain -= chunk
+    }
+    in.close
+    dirty = true
+  }
 
 }
 

@@ -75,3 +75,13 @@ class KarplusStrong(f:Float=440.f, var blend:Float=.99f, var damping:Float=.5f) 
     buffer.push(value);
   }*/
 }
+
+object Scale {
+  var root = 440.f
+  var ratios = Array(1.f, 1.1f, 1.3f, 1.67f, 1.8f)
+  def note( idx: Int) : Float = {
+    var i = idx % ratios.length
+    var s = idx.toFloat / ratios.length + 1.f
+    root * ratios(i)*s
+  }
+}

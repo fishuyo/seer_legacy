@@ -32,6 +32,11 @@ object Texture {
 		textures.length - 1
 	}
 
+	def update(i:Int, p:Pixmap){
+		textures(i).dispose
+		textures(i) = new GdxTexture(p)
+	}
+
   def apply(i:Int) = {
   	textures(i)
   }

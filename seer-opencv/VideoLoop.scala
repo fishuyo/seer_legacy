@@ -136,6 +136,47 @@ class VideoLoop extends VideoSource {
 
     writer.close
   }
+
+  def writeToPointCloud(path:String=""){
+    if( images.length == 0) return
+
+    var file = path
+    if( file == "") file = "out-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".xyz" 
+
+    val w = (images(0).width*0.5).toInt
+    val h = (images(0).height*0.5).toInt
+    
+    val buf = new Array[Byte](w*h*4)
+    
+    val out = new java.io.FileWriter( file )
+
+    for( i<-(0 until images.length)){
+
+      val mat = images(i)
+      val small = new Mat()
+      Imgproc.resize(mat,small, new Size(), 0.5,0.5,0)
+      small.get(0,0,buf)
+      for( x<-(0 until w); y<-(0 until h)){
+        val rgb = (buf(3*(x+y*w)) << 16) + (buf(3*(x+y*w)+1) << 8) + buf(3*(x+y*w)+2)
+        if( rgb > 0){
+          val s = .25f
+
+          // out.write( x + " " + y + " " + (i) + "\n" )
+
+          out.write( x + " " + y + " " + (i+s) + " 0 0 1\n" )
+          out.write( x + " " + y + " " + (i-s) + " 0 0 -1\n" )
+          out.write( x + " " + (y+s) + " " + i + " 0 1 0\n" )
+          out.write( x + " " + (y-s) + " " + i + " 0 -1 0\n" )
+          out.write( (x+s) + " " + y + " " + i + " 1 0 0\n" )
+          out.write( (x-s) + " " + y + " " + i + " -1 0 0\n" )
+        }
+      }
+
+    }
+
+
+    out.close
+  }
 }
 
   

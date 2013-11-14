@@ -26,10 +26,15 @@ object Main extends App with GLAnimatable{
 
 	var capture: VideoCapture = _
   var bgsub = new BackgroundSubtract
+  var blob = new BlobTracker
 	var loop = new VideoLoop
+  var subRect:Rect = _
+  var dirty = false
 
-  var subtract = true
+  var subtract = false
   def setSubtract(v:Boolean) = subtract = v
+  var output = "loop"
+  def setOutput(s:String) = output = s
 
 	var bytes:Array[Byte] = null
 	var w = 0.0
@@ -54,12 +59,23 @@ object Main extends App with GLAnimatable{
 
     println( s"starting capture w: $w $h")
 
+    subRect = new Rect(0,0,w.toInt,h.toInt)
+
     pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
     bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
   	cube.scale.set(1.f, (h/w).toFloat, 1.f)
 
   	Texture(pix) 
   }
+
+  def resize(x:Int, y:Int, width:Int, height:Int){
+    w = width.toDouble
+    h = height.toDouble
+    subRect = new Rect(x,y,width,height)
+    loop.clear()
+    dirty = true
+  }
+
   override def draw(){
 
     Shader.lighting = 0.f
@@ -71,35 +87,63 @@ object Main extends App with GLAnimatable{
 
   override def step(dt:Float){
 
-  	val img = new Mat()
-  	val read = capture.read(img)
+    if( dirty ){  // resize everything if using sub image
+      pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
+      bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
+      cube.scale.set(1.f, (h/w).toFloat, 1.f)
+      Texture.update(0, pix) 
+    }
 
-  	if( !read ) return
+  	val img = new Mat()
+  	val read = capture.read(img)  // read from camera
+
+    if( !read ) return
+
+    val subImg = new Mat(img, subRect )   // take sub image
 
     val rsmall = new Mat()
   	val small = new Mat()
-  	Imgproc.resize(img,small, new Size(), 0.5,0.5,0)
-    Core.flip(small,rsmall,1)
-    Imgproc.cvtColor(rsmall,small, Imgproc.COLOR_BGR2RGB)
+
+  	Imgproc.resize(subImg,small, new Size(), 0.5,0.5,0)   // scale down
+    Core.flip(small,rsmall,1)   // flip so mirrored
+    Imgproc.cvtColor(rsmall,small, Imgproc.COLOR_BGR2RGB)   // convert to rgb
 
     var sub = small
-    if( subtract ) sub = bgsub(small)
+    if( subtract ){  // do bgsubtraction and blob masking
+      sub = bgsub(small)
 
-  	val out = new Mat()
-  	loop.videoIO( sub, out)
+      // val diff = bgsub(small, true)
+      // blob(diff)
+      // sub = new Mat()
+      // small.copyTo(sub, blob.mask)
+    }
+
+  	var out = new Mat()
+  	loop.videoIO( sub, out)  // pass frame to loop get next output
     if( out.empty()) return
 
-    if( subtract ){
+    if( subtract ){  // if subtracting copy background to blank pixels
       val bgmask = new Mat()
       Core.compare(out, new Scalar(0.0), bgmask, Core.CMP_EQ)
       bgsub.bg.copyTo(out,bgmask)
     }
 
+    output match {
+      case "live" => out = small
+      case "loop" => ()
+      case "bg" => out = bgsub.bg
+      case "sub" => Imgproc.cvtColor(bgsub.mask, out, Imgproc.COLOR_GRAY2RGB)
+      case "blob" => Imgproc.cvtColor(blob.mask, out, Imgproc.COLOR_GRAY2RGB)
+      case _ => ()
+    }
+
+    // copy MAT to pixmap
   	out.get(0,0,bytes)
 		val bb = pix.getPixels()
 		bb.put(bytes)
 		bb.rewind()
 
+    // update texture from pixmap
 		Texture(0).draw(pix,0,0)
 
     live.step(dt)

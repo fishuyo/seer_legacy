@@ -26,7 +26,7 @@ object Settings {
 
   lazy val core = Settings.common ++ Seq(
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.2.1",
+      "com.typesafe.akka" %% "akka-actor" % "2.1.4", //"2.2.1",
       "org.scala-lang" % "scala-actors" % "2.10.2",
       "de.sciss" %% "scalaosc" % "1.1.+",
       "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
@@ -53,6 +53,7 @@ object Settings {
       platformName in Android := "android-10",
       keyalias in Android := "change-me",
       mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
+      // useProguard in Android := false,
       proguardOption in Android := """-keep class com.badlogic.gdx.backends.android.** { *; }
 
         ## Akka Stuff referenced at runtime

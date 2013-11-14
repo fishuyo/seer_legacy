@@ -28,7 +28,7 @@ class BlobTracker {
 	var mask:Mat = _
 
 	var areaThreshold = 100
-	var dimThreshold = 100
+	var dimThreshold = 10
 
 	def setThreshold(area:Int,dim:Int){ areaThreshold = area; dimThreshold = dim }
 

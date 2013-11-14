@@ -52,7 +52,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
     particles += p
   }
   
-  var xt=0.f
+  var xt=0.0
 
   var vertices = new Array[Float](3*2*numLinks)
   var mesh:Mesh = null
@@ -64,25 +64,25 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
     //   Fabric.gv.y = -Gdx.input.getAccelerometerY
     //   //Fabric.gv.z = -Gdx.input.getAccelerometerZ
     // }
-    //val ts = .015f
-    //val steps = ( (dt+xt) / ts ).toInt
-    //xt = dt - steps * ts
 
-    //for( t <- (0 until steps)){
+    val ts = .015
+    val steps = ( (dt+xt) / ts ).toInt
+    xt += dt - steps * ts
 
-    for( s <- (0 until 5) ){ 
-      links.foreach( _.solve() )
-      pins.foreach( _.solve() )
+    for( t <- (0 until steps)){
+      for( s <- (0 until 3) ){ 
+        links.foreach( _.solve() )
+        pins.foreach( _.solve() )
+      }
+
+      particles.foreach( (p) => {
+      	if( field != null ) p.applyForce( field(p.position) ) 
+        p.applyGravity()
+        p.applyDamping(20.f)
+        p.step(.015f) 
+      })
+
     }
-
-    particles.foreach( (p) => {
-    	if( field != null ) p.applyForce( field(p.position) ) 
-      p.applyGravity()
-      p.applyDamping(20.f)
-      p.step(dt) 
-    })
-
-    //}
 
   }
 

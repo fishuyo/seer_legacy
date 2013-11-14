@@ -27,7 +27,11 @@ Keyboard.bind("m",lambda{ looper.setMaster(l) })
 Keyboard.bind("b",lambda{ looper.duplicate(l,1) })
 Keyboard.bind("l",lambda{ Seer.audio.Audio.toggleRecording() })
 
+Keyboard.bind("j",lambda{ looper.save("") })
+Keyboard.bind("k",lambda{ looper.load("project-Nov-3,-2013-1-21-06-AM") })
+
 Keyboard.bind("f", lambda{
+	OSC.send("127.0.0.1", 8001, "/test", "f")
 	looper.setGain(l,1)
 	looper.setSpeed(l,1)
 	looper.setBounds(l,0,1)
@@ -143,8 +147,25 @@ Trackpad.bind( lambda{ |i,f|
 
 
 OSC.clear()
-OSC.listen(8000)
-OSC.bind("/x", lambda{ |f| puts f[0]; looper.setSpeed(l,f[0]*2.0)    })
+OSC.disconnect()
+OSC.listen(8082)
+OSC.bind("/button", lambda{|f| looper.toggleRecord(l) if f[0] == 1 })
+OSC.bind("/x", lambda{|f| looper.setSpeed(l,f[0]*2.0); OSC.send("localhost", 8001, "/test", f[0])    })
+OSC.bind("/1/toggle1", lambda{|f| looper.toggleRecord(l) })
+OSC.bind("/1/toggle2", lambda{|f| looper.stack(l) })
+OSC.bind("/1/toggle3", lambda{|f| Seer.audio.Audio.toggleRecording() })
+OSC.bind("/1/push1", lambda{|f| looper.setMaster(l) })
+OSC.bind("/1/rotary1", lambda{|f| l=0; looper.setPan(l,f[0]) })
+OSC.bind("/1/rotary2", lambda{|f| l=1; looper.setPan(l,f[0]) })
+OSC.bind("/1/rotary3", lambda{|f| l=2; looper.setPan(l,f[0]) })
+OSC.bind("/1/rotary4", lambda{|f| l=3; looper.setPan(l,f[0]) })
+OSC.bind("/1/rotary5", lambda{|f| l=4; looper.setPan(l,f[0]) })
+OSC.bind("/1/rotary6", lambda{|f| l=5; looper.setPan(l,f[0]) })
+
+b1 = 0.0
+b2 = 1.0
+OSC.bind("/3/xy1", lambda{|f| b1=f[0]; looper.setBounds(l,b1,b2); looper.setGain(l,1-f[1]) })
+OSC.bind("/3/xy2", lambda{|f| b2=f[0]; looper.setBounds(l,b1,b2); looper.setSpeed(l,(1-f[1])*2.0) })
 
 # $model = Model.apply(Pose.apply(Vec3.apply(0,0,0), Quat.apply()), Vec3.apply(0.05) )
 # $model.add( Quad.asLines() )

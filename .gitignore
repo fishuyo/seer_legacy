@@ -1,6 +1,8 @@
 sbt-launch.jar
 *.hide
+*.mp4
 *.mov
+*.xyz
 
 
 lib/

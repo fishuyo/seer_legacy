@@ -26,6 +26,7 @@ object Main extends App with GLAnimatable{
   SimpleAppRun()  
 
   override def draw(){
+    Shader.lighting = 0.f
   	strings.foreach( _.draw() )
   }
 

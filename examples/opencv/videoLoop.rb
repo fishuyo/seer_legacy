@@ -26,20 +26,19 @@ Keyboard.bind("x",lambda{ Main.loop.stack() })
 Keyboard.bind("t",lambda{ Main.loop.togglePlay() })
 Keyboard.bind(" ",lambda{ Main.loop.reverse() })
 
-Keyboard.bind("o",lambda{ Main.loop.writeToFile("out2.mov",1.0,"mpeg4") })
+Keyboard.bind("o",lambda{ Main.loop.writeToFile("default",1.0,"mpeg4") })
+Keyboard.bind("i",lambda{ Main.loop.writeToPointCloud("") })
+Keyboard.bind("p",lambda{ ScreenCapture.toggleRecord() })
 
-capture = false
-Keyboard.bind("p",lambda{
-  if capture
-    puts "stop capture."
-    ScreenCapture.stop()
-  else
-    puts "start capture."
-    ScreenCapture.start()
-  end
-  capture = !capture
+sub = false
+Keyboard.bind("y",lambda{
+  Main.setSubtract(sub)
+  Main.bgsub.updateBackgroundNextFrame()
+  Main.loop.setAlphaBeta(1,1)
+  sub = !sub
 })
 
+Main.bgsub.setThreshold(10.0)
 
 
 Mouse.clear()
@@ -47,22 +46,67 @@ Mouse.use()
 Mouse.bind("drag", lambda{|i|
 	speed = (400 - i[1]) / 100.0
   decay = (i[0] - 400) / 100.0
+
+  if decay > 0.0 and decay < 1.0
+    OSC.send("192.168.3.105",9000,"1/fader1", decay)
+  elsif decay < 0.0 and decay > -1.0
+    OSC.send("192.168.3.105",9000,"1/rotary3", -decay)
+  elsif decay < -1.0
+    OSC.send("192.168.3.105",9000,"1/rotary2", -decay)
+  elsif decay > 1.0
+    OSC.send("192.168.3.105",9000,"1/rotary1", decay)
+  end
+
+  if speed > 0.0 and speed < 1.0
+    OSC.send("192.168.3.105",9000,"1/fader2", speed)
+  elsif speed < 0.0 and speed > -1.0
+    OSC.send("192.168.3.105",9000,"1/rotary6", -speed)
+  elsif speed < -1.0
+    OSC.send("192.168.3.105",9000,"1/rotary5", -speed)
+  elsif speed > 1.0
+    OSC.send("192.168.3.105",9000,"1/rotary4", speed)
+  end
+
   # decay = (decay + 4)/8
   # Main.loop.setSpeed(speed)
 	Main.loop.setAlphaBeta(decay, speed)
   # Main.loop.setAlpha(decay)
 })
 
-Main.setSubtract(false)
-Main.bgsub.updateBackgroundNextFrame()
-Main.bgsub.setThreshold(50.0)
-Main.loop.setAlphaBeta(1,1)
+OSC.clear()
+OSC.disconnect()
+OSC.listen(8082)
+OSC.bind("/1/toggle1", lambda{|f| Main.loop.toggleRecord() })
+OSC.bind("/1/toggle2", lambda{|f| Main.loop.stack() })
+OSC.bind("/1/toggle3", lambda{|f| Main.loop.togglePlay() })
+OSC.bind("/1/toggle4", lambda{|f| ScreenCapture.toggleRecord() })
+OSC.bind("/1/push1", lambda{|f| Main.loop.reverse() })
+OSC.bind("/1/push2", lambda{|f| Main.loop.stop(); Main.loop.clear() })
+OSC.bind("/1/push3", lambda{|f| Main.setSubtract(false) })
+OSC.bind("/1/push4", lambda{|f| Main.setSubtract(true); Main.bgsub.updateBackgroundNextFrame(); Main.loop.setAlphaBeta(1,1) })
+OSC.bind("/1/fader1", lambda{|f| Main.loop.setAlphaBeta(f[0], Main.loop.beta) })
+OSC.bind("/1/rotary3", lambda{|f| Main.loop.setAlphaBeta(-f[0], Main.loop.beta) })
+OSC.bind("/1/fader2", lambda{|f| Main.loop.setAlphaBeta(Main.loop.alpha, f[0]) })
+OSC.bind("/1/rotary6", lambda{|f| Main.loop.setAlphaBeta(Main.loop.alpha, -f[0]) })
+OSC.bind("/1/fader3", lambda{|f| Main.loop.setAlpha(f[0]); OSC.send("192.168.3.105",9000,"1/fader1", f[0]); OSC.send("192.168.3.105",9000,"1/fader2", 1.0-f[0]) })
+
+
+b1 = 0.0
+b2 = 1.0
+OSC.bind("/3/xy1", lambda{|f| b1=f[0]; looper.setBounds(l,b1,b2); looper.setGain(l,1-f[1]) })
+OSC.bind("/3/xy2", lambda{|f| b2=f[0]; looper.setBounds(l,b1,b2); looper.setSpeed(l,(1-f[1])*2.0) })
+
+
+
 
 # for i in 0...Main.loop.images.length
 #  Highgui.imwrite("/Users/fishuyo/img/"+i.to_s+".png",Main.loop.images[i])
 # end
 
+# Main.resize(0,0,80,80)
+
 def step dt
+
   # puts Main.loop.alpha
   # puts Main.loop.beta
 	# puts Main.w

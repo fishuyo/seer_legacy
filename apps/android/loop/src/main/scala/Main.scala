@@ -27,6 +27,8 @@ class Main extends AndroidApplication {
     val loopscene = new LoopScene
     initialize(new SimpleAppListener, config)
   }
+
+  override def getLogLevel(): Int = 0
 }
 
 
@@ -92,8 +94,8 @@ class LoopScene extends InputAdapter with GLAnimatable {
         val t2 = r2.intersectQuad(c,.5f,.5f)
 
         if( t1.isDefined && t2.isDefined){
-          val p1 = r1(t1.get) - c + Vec3(.5,.5,0)
-          val p2 = r2(t2.get) - c + Vec3(.5,.5,0)
+          val p1 = (r1(t1.get) - c)*2.f + Vec3(.5,.5,0)
+          val p2 = (r2(t2.get) - c)*2.f + Vec3(.5,.5,0)
 
           looper.setGain(l,p1.y)
           looper.setSpeed(l, p2.y * 2.f )
