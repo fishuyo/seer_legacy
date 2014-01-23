@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import maths._
@@ -15,18 +15,28 @@ object MatrixStack {
 	var model = new Matrix4()
 	var projModelView = new Matrix4()
   var modelView = new Matrix4()
+  var view = new Matrix4()
+
+  var worldPose = Pose()
+  var worldScale = Vec3(1)
 
 	def push(){ stack = stack.push(new Matrix4(model)) }
 	def pop(){ model = stack.top; stack = stack.pop }
 
+  def translate(x:Float,y:Float,z:Float){ translate(Vec3(x,y,z)) }
 	def translate(p:Vec3){
 		val m = new Matrix4().translate(p.x,p.y,p.z)
-		Matrix4.mul(model.`val`, m.`val`)	
+		Matrix4.mul(model.`val`, m.`val`)
 	}
+
+  def rotate(x:Float, y:Float, z:Float){ rotate(Quat(x,y,z)) }
 	def rotate(q:Quat){
 		val m = new Matrix4().rotate(q.toQuaternion)
 		Matrix4.mul(model.`val`, m.`val`)	
 	}
+
+  def scale(s:Float){ scale(Vec3(s)) }
+  def scale(x:Float,y:Float,z:Float){ scale(Vec3(x,y,z)) }
 	def scale( s:Vec3 ){
 		val m = new Matrix4().scale(s.x,s.y,s.z)
 		Matrix4.mul(model.`val`, m.`val`)	
@@ -37,20 +47,20 @@ object MatrixStack {
 		Matrix4.mul(model.`val`, m.`val`)
 	}
 
-	def clear() = { stack = new Stack[Matrix4](); model.idt }
+	def clear() = { stack = new Stack[Matrix4](); model.idt; transform(worldPose,worldScale) }
 	def setIdentity() = model.idt
 
-	def apply() = {
-		projModelView.set(Camera.combined)
-  	modelView.set(Camera.view)
+	def apply(camera:Camera=Camera) = {
+		projModelView.set(camera.combined)
+  	modelView.set(camera.view)
+  	view.set(camera.view)
   	Matrix4.mul( projModelView.`val`, model.`val`)
   	Matrix4.mul( modelView.`val`, model.`val`)
 	}
 
 	def projectionModelViewMatrix() = projModelView
 	def modelViewMatrix() = modelView
-	def viewMatrix() = Camera.view
+	def viewMatrix() = view
 	def normalMatrix() = modelView.toNormalMatrix()
-
 
 }

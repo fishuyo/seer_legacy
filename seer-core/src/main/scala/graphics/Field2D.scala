@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import maths._
@@ -19,7 +19,7 @@ object Field2D {
   def apply(width:Int=256, height:Int=256 ) = new Field2D(width,height)
 }
 
-class Field2D(var w:Int, var h:Int) extends GLAnimatable {
+class Field2D(var w:Int, var h:Int) extends Animatable {
 
   var resized = true
 
@@ -145,6 +145,6 @@ class Field2D(var w:Int, var h:Int) extends GLAnimatable {
     bind()
     quad.draw()
   }
-  override def step( dt: Float ) = {}
+  override def animate( dt: Float ) = {}
 
 }

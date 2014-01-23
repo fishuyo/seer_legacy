@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package spatial
 package geometry
 
@@ -20,16 +20,7 @@ class Hit(val obj: Pickable, val ray:Ray, val t: Float, val inside: Boolean = fa
   def compare(h:Hit) = t compare h.t
 }
 
-// /**
-// * Materials
-// */
-// abstract class Material
 
-// case class Plastic( c: RGB ) extends Material
-// case class Mirror() extends Material
-// case class Glass( ior: Float ) extends Material
-// case class Diffuse( f: Float ) extends Material
-// case class Emmiter( c: RGB ) extends Material 
 
 /**
 * Geometries
@@ -40,14 +31,14 @@ trait Geometry extends Pickable {
 }
 
 
-class Sphere( val cen: Vec3, val r: Double ) extends Geometry {
+class Sphere( val center: Vec3, val radius: Double ) extends Geometry {
 
   
   override def intersect( ray: Ray ) : Option[Hit] = {
-    val o_c = ray.o - cen
+    val o_c = ray.o - center
     val A = ray.d dot ray.d
     val B = 2 * ( ray.d dot o_c )
-    val C = (o_c dot o_c) - r*r
+    val C = (o_c dot o_c) - radius*radius
     val det = B*B - 4*A*C
 
     if( det > 0 ){
@@ -63,7 +54,7 @@ class Sphere( val cen: Vec3, val r: Double ) extends Geometry {
     None
   }
 
-  override def normalAt( p: Vec3) : Vec3 = (p - cen).normalize
+  override def normalAt( p: Vec3) : Vec3 = (p - center).normalize
 }
 
 class Triangle( val vertices:(Vec3,Vec3,Vec3)) extends Geometry {
@@ -92,7 +83,7 @@ class Triangle( val vertices:(Vec3,Vec3,Vec3)) extends Geometry {
 
 class Quad( val vertices:(Vec3,Vec3,Vec3,Vec3)) extends Geometry {
 
-  def this(cen:Vec3, w:Float, h:Float) = this((cen + Vec3(-w,-h,0), cen + Vec3(w,-h,0), cen + Vec3(w,h,0), cen + Vec3(-w,h,0)))
+  def this(center:Vec3, w:Float, h:Float) = this((center + Vec3(-w,-h,0), center + Vec3(w,-h,0), center + Vec3(w,h,0), center + Vec3(-w,h,0)))
  
   val normal: Vec3 = (( vertices._2 - vertices._1 ) cross ( vertices._3 - vertices._1 )).normalize
   

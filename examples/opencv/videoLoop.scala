@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.opencv.loop
 
 import graphics._
@@ -18,11 +18,11 @@ import org.opencv.core._
 import org.opencv.highgui._
 import org.opencv.imgproc._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
   System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
-  GLScene.push(this)
+  Scene.push(this)
 
 	var capture: VideoCapture = _
   var bgsub = new BackgroundSubtract
@@ -41,7 +41,7 @@ object Main extends App with GLAnimatable{
 	var h = 0.0
 
   val cube = Model(Cube())
-  GLScene.push(cube)
+  Scene.push(cube)
 
   var pix:Pixmap = null
   
@@ -85,7 +85,7 @@ object Main extends App with GLAnimatable{
 
   }
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
     if( dirty ){  // resize everything if using sub image
       pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
@@ -146,7 +146,7 @@ object Main extends App with GLAnimatable{
     // update texture from pixmap
 		Texture(0).draw(pix,0,0)
 
-    live.step(dt)
+    live.animate(dt)
   }
 
 }

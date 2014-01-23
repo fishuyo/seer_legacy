@@ -1,6 +1,7 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
+
 import maths._
 import spatial._
 
@@ -11,251 +12,177 @@ import scala.collection.mutable.Queue
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 import com.badlogic.gdx.graphics.g3d.loader._
-//import com.badlogic.gdx.graphics.g3d.loaders.wavefront._
-//import com.badlogic.gdx.graphics.g3d.model.still._
 
-
-
-
-
-object Sphere{
-	var sphere = None:Option[Sphere]
-	var wireSphere = None:Option[Sphere]
-	var pointSphere = None:Option[Sphere]
-	def apply() = sphere.getOrElse({ sphere = Some(new Sphere()); sphere.get })
-	def asLines() = wireSphere.getOrElse({ wireSphere = Some(new Sphere(1.f,30,"lines")); wireSphere.get })
-	def asPoints() = pointSphere.getOrElse({ pointSphere = Some(new Sphere(1.f,30,"points")); pointSphere.get })
+trait Primitive {
+  var mesh:Option[Mesh] = None
+  def apply():Model = Model(mesh.getOrElse({mesh = Some(generateMesh()); mesh.get}))
+  def generateMesh() = Mesh()
 }
 
-class Sphere(val radius:Float=1.f, val bands:Int=30, val style:String="triangles") extends GLDrawable {
-  val vert = new ListBuffer[Float]
-  val indx = new ListBuffer[Short]
-  var mesh:Mesh = _
-  var primitive = GL10.GL_TRIANGLES
-  // var drawFunc = () => {}
 
-  for ( lat <- (0 to bands)){
-    var theta = lat * math.Pi / bands
-    var sinTheta = math.sin(theta)
-    var cosTheta = math.cos(theta)
+object Sphere extends Primitive {
+  var radius = 1.f
+  var bands = 30
+  var primitive = Triangles
 
-    for (long <- (0 to bands)){
-      var phi = long * 2 * math.Pi / bands
-      var sinPhi = math.sin(phi)
-      var cosPhi = math.cos(phi)
-      var x = cosPhi * sinTheta
-      var y = cosTheta
-      var z = sinPhi * sinTheta
-      var u = 1.f - (long.toFloat / bands)
-      var v = lat.toFloat / bands
-      vert += x.toFloat
-      vert += y.toFloat
-      vert += z.toFloat
-      vert += u
-      vert += v
-      vert += radius * x.toFloat
-      vert += radius * y.toFloat
-      vert += radius * z.toFloat
+  override def generateMesh():Mesh = generateMesh(radius, bands, primitive)
+  def generateMesh(radius:Float=1.f, bands:Int=30, prim:Int=Triangles):Mesh = generateMesh(new Mesh(), radius, bands, prim)
+  def generateMesh( mesh:Mesh, radius:Float, bands:Int, prim:Int):Mesh = {
+    mesh.primitive = prim
+    for ( lat <- (0 to bands)){
+      var theta = lat * math.Pi / bands
+      var sinTheta = math.sin(theta)
+      var cosTheta = math.cos(theta)
+
+      for (long <- (0 to bands)){
+        var phi = long * 2 * math.Pi / bands
+        var sinPhi = math.sin(phi)
+        var cosPhi = math.cos(phi)
+        var x = cosPhi * sinTheta
+        var y = cosTheta
+        var z = sinPhi * sinTheta
+        var u = 1.f - (long.toFloat / bands)
+        var v = lat.toFloat / bands
+        mesh.vertices += Vec3(x,y,z)*radius
+        mesh.texCoords += Vec2(u,v)
+        mesh.normals += Vec3(x,y,z)
+      }
+    }
+    for ( lat <- (0 until bands)){
+      for ( long <- (0 until bands)){
+        var first = (lat * (bands + 1)) + long
+        var second = first + bands + 1
+        mesh.indices += first.toShort
+        mesh.indices += second.toShort
+        mesh.indices += (first + 1).toShort
+        mesh.indices += second.toShort
+        mesh.indices += (second + 1).toShort
+        mesh.indices += (first + 1).toShort
+      }
+    }
+    mesh.init
+    mesh
+  }
+
+}
+class Sphere extends Model {
+  var mesh = Sphere.generateMesh()
+  addPrimitive(mesh)
+}
+
+object Cube {
+  var mesh = None:Option[Mesh]
+  var meshLines = None:Option[Mesh]
+
+  def apply():Model = apply(Triangles)
+  def apply(prim:Int):Model = {
+    var m:Mesh = null
+    prim match {
+      case Lines => m = meshLines.getOrElse({ meshLines = Some(generateMesh(prim)); meshLines.get })
+      case _ => m = mesh.getOrElse({ mesh = Some(generateMesh(prim)); mesh.get })
+    }
+    Model(m)
+  }
+
+  def generateMesh(prim:Int=Triangles):Mesh = generateMesh(new Mesh(), prim)
+  def generateMesh( mesh:Mesh, prim:Int):Mesh = {
+    mesh.primitive = prim
+    for( n<-(0 to 2); i<-List(-1,1); j<-List(-1,1); k<-List(-1,1)){
+      val u = (j+1)/2
+      val v = (1-k)/2
+      mesh.texCoords += Vec2(u,v)      
+      n match {
+        case 0 => mesh.vertices += Vec3(i,j,k)  // left/right
+                  mesh.normals += Vec3(i,0,0)
+        case 1 => mesh.vertices += Vec3(k,i,j)  // top/bottom
+                  mesh.normals += Vec3(0,i,0)
+        case 2 => mesh.vertices += Vec3(j,k,i)  // front/back
+                  mesh.normals += Vec3(i,0,0)
+      }
+    }
+
+    prim match {
+      case Triangles => for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i).toShort
+      case Lines => for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.indices += (4*f+i).toShort
+      case _ => ()
+    }
+    mesh.init
+    mesh
+  }
+}
+class Cube extends Model {
+  var mesh = Cube.generateMesh()
+  addPrimitive(mesh)
+}
+
+
+object Cylinder {
+  var mesh = None:Option[Mesh]
+	var meshLines = None:Option[Mesh]
+  def apply(prim:Int = TriangleStrip) = {
+    prim match {
+      case Lines => Model(meshLines.getOrElse({ meshLines = Some(generateMesh(prim=prim)); meshLines.get }))
+      case _ => Model(mesh.getOrElse({ mesh = Some(generateMesh(prim=prim)); mesh.get }))
     }
   }
 
-  style match {
-  	case "points" =>
-		  mesh = new Mesh(true, vert.size/8, 0, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
-		  primitive = GL10.GL_POINTS
-      // drawFunc = () => { mesh.render(Shader(), GL10.GL_POINTS)}
+  def generateMesh(r1:Float=1.f, r2:Float=1.f, vertCount:Int=30, prim:Int=TriangleStrip):Mesh = generateMesh(new Mesh(),r1,r2,vertCount,prim)
+  def generateMesh(mesh:Mesh, r1:Float, r2:Float, vertCount:Int, prim:Int):Mesh = {
+    mesh.primitive = prim
+    
+    val indxCount = vertCount+2
+    var theta = 0.0
 
-  	case "lines" =>
-		  for ( lat <- (0 until bands)){
-		    for ( long <- (0 until bands)){
-		     var first = (lat * (bands + 1)) + long
-		     var second = first + bands + 1
-		     indx += first.toShort
-		     indx += second.toShort
-		     indx += second.toShort
-		     indx += (first + 1).toShort
-		     indx += (first + 1).toShort
-		     indx += first.toShort
-		     indx += second.toShort
-		     indx += (second + 1).toShort
-		     indx += (second + 1).toShort
-		     indx += (first + 1).toShort
-		     indx += (first + 1).toShort
-		     indx += second.toShort
-		   }
-		  }
-		  mesh = new Mesh(true, vert.size/8, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
-  		mesh.setIndices(indx.toArray)
-		  primitive = GL10.GL_LINES
-      // drawFunc = () => { mesh.render(Shader(), GL10.GL_LINES)}
+    for (j <- (0 until vertCount)){
+      val r = (if(j % 2 == 0) r1 else r2)
+      val x = math.cos(theta).toFloat
+      val y = math.sin(theta).toFloat
+      val u = (if(j % 2 == 0) 1.f else 0.f)
+      val v = j*1.f / vertCount
 
-  	case _ => //"triangles"
-		  for ( lat <- (0 until bands)){
-		    for ( long <- (0 until bands)){
-		     var first = (lat * (bands + 1)) + long
-		     var second = first + bands + 1
-		     indx += first.toShort
-		     indx += second.toShort
-		     indx += (first + 1).toShort
-		     indx += second.toShort
-		     indx += (second + 1).toShort
-		     indx += (first + 1).toShort
-		   }
-		  }
-		  mesh = new Mesh(true, vert.size/8, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
-  		mesh.setIndices(indx.toArray)
-		  // drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
-  }
+      mesh.normals += Vec3(x,y,(r1-r2)/2.f)
+      mesh.texCoords += Vec2(u,v)
+      mesh.vertices += Vec3(r*x,r*y,(if(j % 2 == 0) 0.f else 1.f))
 
-  mesh.setVertices(vert.toArray)
+      theta += 2 * math.Pi / (vertCount)
+    }
 
-  override def draw(){
-    mesh.render(Shader(), primitive)
+    prim match {
+      case Lines => for( i<-(0 until vertCount)){
+        if( i % 2 == 0){
+          mesh.indices += i.toShort
+          mesh.indices += ((i+1) % vertCount).toShort
+        }
+        mesh.indices += ((i) % vertCount).toShort
+        mesh.indices += ((i+2) % vertCount).toShort
+      }
+      case _ => for( i<-(0 until indxCount)) mesh.indices += (i % vertCount).toShort
+    }
+    mesh.init
+    mesh
   }
 }
-
-object Cube{
-	var cube = None:Option[Cube]
-	var wireCube = None:Option[Cube]
-	def apply() = cube.getOrElse({ cube = Some(new Cube()); cube.get })
-	def asLines() = wireCube.getOrElse({ wireCube = Some(new Cube("lines")); wireCube.get })
-}
-class Cube(style:String="triangles") extends GLDrawable {
-	var mesh:Mesh = _
-  var primitive = GL10.GL_TRIANGLES
-  // var drawFunc = () => {}
-
-	style match {
-		case "lines" =>
-  		mesh = new Mesh(true,8,24, VertexAttribute.Position )
-		  mesh.setIndices( Array[Short](
-		    0,1,1,3,3,2,2,0,
-		    4,5,5,7,7,6,6,4,
-		    0,4,1,5,2,6,3,7
-		  ))
-		  mesh.setVertices( Array[Float](
-		    -1,1,1,   
-		    1,1,1,    
-		    -1,-1,1,  
-		    1,-1,1,   
-
-		    -1,1,-1,  
-		    1,1,-1,    
-		    -1,-1,-1,
-		    1,-1,-1
-		  ))
-      primitive = GL10.GL_LINES
-			// drawFunc = () => { mesh.render(Shader(), GL10.GL_LINES)}
-		case _ => 
-  		mesh = new Mesh(true,24,36, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0) )
-  		mesh.setIndices( Array[Short](
-		    0,1,2, 1,2,3, //f
-		    4,5,6, 5,6,7, //b
-		    8,9,10, 9,10,11, //l
-		    12,13,14, 13,14,15, //r
-		    16,17,18, 17,18,19, //t
-		    20,21,22, 21,22,23 //b
-		  ))
-		  mesh.setVertices( Array[Float](
-		    -1,1,1,   0,0,1, 0,0,
-		    1,1,1,    0,0,1, 1,0,
-		    -1,-1,1,  0,0,1, 0,1,
-		    1,-1,1,   0,0,1, 1,1,
-
-		    -1,1,-1,  0,0,-1, 1,0,
-		    1,1,-1,   0,0,-1, 0,0,
-		    -1,-1,-1, 0,0,-1, 1,1,
-		    1,-1,-1,  0,0,-1, 0,1,
-
-		    -1,1,-1,  -1,0,0, 1,0,
-		    -1,1,1,   -1,0,0, 0,0,
-		    -1,-1,-1, -1,0,0, 1,1,
-		    -1,-1,1,  -1,0,0, 0,1,
-
-		    1,1,1,    1,0,0, 1,0,
-		    1,1,-1,   1,0,0, 0,0,
-		    1,-1,1,   1,0,0, 1,1,
-		    1,-1,-1,  1,0,0, 0,1,
-
-		    -1,1,-1,  0,1,0, 0,1,
-		    1,1,-1,   0,1,0, 1,1,
-		    -1,1,1,   0,1,0, 0,0,
-		    1,1,1,    0,1,0, 1,0,
-
-		    -1,-1,-1, 0,-1,0, 1,1,
-		    1,-1,-1,  0,-1,0, 0,1,
-		    -1,-1,1,  0,-1,0, 1,0,
-		    1,-1,1,   0,-1,0, 0,0
-		  ))
-			// drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
-	}
-  override def draw(){
-    mesh.render(Shader(), primitive)
-    // drawFunc()
-  }
+class Cylinder extends Model {
+  var mesh = Cylinder.generateMesh()
+  addPrimitive(mesh)
 }
 
-object Cylinder{
-	var cylinder = None:Option[Cylinder]
-	def apply() = cylinder.getOrElse({ cylinder = Some(new Cylinder()); cylinder.get })
-}
-class Cylinder(r1:Float=1.f, r2:Float=1.f, vertCount:Int=30) extends GLDrawable {
-  val vert = new ListBuffer[Float]
-  val indx = new ListBuffer[Short]
-
-  val indxCount = vertCount+2
-  var theta = 0.0
-  var primitive = GL10.GL_TRIANGLE_STRIP
-
-  for (j <- (0 until vertCount)){
-    val r = (if( 3*j % 2 == 0) r1 else r2)
-    val x = math.cos(theta).toFloat
-    val y = math.sin(theta).toFloat
-    val u = (if(3 *j % 2 == 0) 1.f else 0.f)
-    val v = j*1.f / vertCount
-
-    vert += x
-    vert += y
-    vert += (r1-r2) / (2.f) //0.f
-
-    vert += u
-    vert += v
-
-    vert += r*x
-    vert += r*y
-    vert += (if( 3*j % 2 == 0) 0.f else 2.f) //-1.f)
-    theta += 2 * math.Pi / (vertCount)
-  }
-
-  for ( j <- (0 until indxCount)) {
-    indx += (j % vertCount).toShort
-  }
-
-  val mesh = new Mesh(true, vert.size/6, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
-  mesh.setVertices(vert.toArray)
-  mesh.setIndices(indx.toArray)
-
-	override def draw(){
-		mesh.render(Shader(), primitive)
-	}  
-}
 
 object OBJ {
-  def apply(s:String) = Model(new OBJ(s))
+  def apply(file:String) = Model(load(file))
+
+  def load(file:String) = {
+    val model = new ObjLoader().loadObj(Gdx.files.internal(file))
+    Mesh(model.meshes.get(0))
+  }
 }
-class OBJ( file:String ) extends GLDrawable {
-  val model = new ObjLoader().loadObj(Gdx.files.internal(file))
-  override def draw() = model.meshes.get(0).render(Shader(), GL10.GL_TRIANGLES)
-}
 
 
 
-
-
-
-class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:Mesh, val drawFunc:()=>Unit) extends GLDrawable {
+class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh, val drawFunc:()=>Unit) extends Drawable {
   var color = RGBA(1,1,1,.6f)
   override def draw(){
     Shader.setColor(color)
@@ -272,116 +199,12 @@ class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:Mesh, v
 }
 
 
-object Primitive3D extends GLThis { 
-def cube( p:Pose = new Pose(), s:Vec3=Vec3(1)) = {
-  val mesh = new Mesh(true,24,36, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0) )
-  mesh.setVertices( Array[Float](
-    -1,1,1,   0,0,1, 0,0,
-    1,1,1,    0,0,1, 1,0,
-    -1,-1,1,  0,0,1, 0,1,
-    1,-1,1,   0,0,1, 1,1,
-
-    -1,1,-1,  0,0,-1, 1,0,
-    1,1,-1,   0,0,-1, 0,0,
-    -1,-1,-1, 0,0,-1, 1,1,
-    1,-1,-1,  0,0,-1, 0,1,
-
-    -1,1,-1,  -1,0,0, 1,0,
-    -1,1,1,   -1,0,0, 0,0,
-    -1,-1,-1, -1,0,0, 1,1,
-    -1,-1,1,  -1,0,0, 0,1,
-
-    1,1,1,    1,0,0, 1,0,
-    1,1,-1,   1,0,0, 0,0,
-    1,-1,1,   1,0,0, 1,1,
-    1,-1,-1,  1,0,0, 0,1,
-
-    -1,1,-1,  0,1,0, 0,1,
-    1,1,-1,   0,1,0, 1,1,
-    -1,1,1,   0,1,0, 0,0,
-    1,1,1,    0,1,0, 1,0,
-
-    -1,-1,-1, 0,-1,0, 1,1,
-    1,-1,-1,  0,-1,0, 0,1,
-    -1,-1,1,  0,-1,0, 1,0,
-    1,-1,1,   0,-1,0, 0,0
-  ))
-
-  mesh.setIndices( Array[Short](
-    0,1,2, 1,2,3, //f
-    4,5,6, 5,6,7, //b
-    8,9,10, 9,10,11, //l
-    12,13,14, 13,14,15, //r
-    16,17,18, 17,18,19, //t
-    20,21,22, 21,22,23 //b
-  ))
-
-  val draw = () => {
-
-    // draw the cube
-    mesh.render(Shader(), GL10.GL_TRIANGLES)
-    //gl10.glPopMatrix()
-  }
-  new GLPrimitive(p,s,mesh,draw)
-}
-
-def cylinder(p:Pose=Pose(), s:Vec3=Vec3(1), r1:Float=1.f, r2:Float=1.f, vertCount:Int=60) = {
-  val vert = new ListBuffer[Float]
-  val indx = new ListBuffer[Short]
-
-  val indxCount = vertCount+2
-  var theta = 0.0
-
-  for (j <- (0 until vertCount)){
-    val r = (if( 3*j % 2 == 0) r1 else r2)
-    val x = math.cos(theta).toFloat
-    val y = math.sin(theta).toFloat
-    val u = (if(3 *j % 2 == 0) 1.f else 0.f)
-    val v = j*1.f / vertCount
-
-    vert += x
-    vert += y
-    vert += (r1-r2) / (s.z) //0.f
-
-    vert += u
-    vert += v
-
-    vert += r*x
-    vert += r*y
-    vert += (if( 3*j % 2 == 0) 0.f else 2.f) //-1.f)
-    theta += 2 * math.Pi / (vertCount)
-  }
-
-  for ( j <- (0 until indxCount)) {
-    indx += (j % vertCount).toShort
-  }
-
-  val mesh = new Mesh(true, vert.size/6, indx.size, VertexAttribute.Normal, VertexAttribute.TexCoords(0), VertexAttribute.Position)
-  mesh.setVertices(vert.toArray)
-  mesh.setIndices(indx.toArray)
-
-  val draw = () => {
-    mesh.render(Shader(), GL10.GL_TRIANGLE_STRIP)
-  }
-  new GLPrimitive(p,s,mesh,draw)
-}
-
-def fromObj( file:String ) = {
-
-  val model = new ObjLoader().loadObj(Gdx.files.internal(file))
-  val draw = () => { model.meshes.get(0).render(Shader(), GL10.GL_TRIANGLES)}
-  new GLPrimitive(Pose(),Vec3(1.f),null,draw)
-}
-}
-
-
-
-class Trace3D( var size:Int ) extends GLDrawable {
+class Trace3D( var size:Int ) extends Drawable {
   var color1 = Vec3(1.f,0.f,0.f)
   var color2 = Vec3(0.f,0.f,1.f)
   var pose = Pose()
   var scale = Vec3(1.f)
-  val mesh = new Mesh(false,size,0, VertexAttribute.Position, VertexAttribute.ColorUnpacked)
+  val mesh = new GdxMesh(false,size,0, VertexAttribute.Position, VertexAttribute.ColorUnpacked)
   var data = Queue[Vec3]()
   for( i<-(0 until size)) data.enqueue(Vec3())
   val vertices = new Array[Float](size*(3+4))
@@ -420,6 +243,27 @@ class Trace3D( var size:Int ) extends GLDrawable {
 
 }
 
+ // def vertexGenerator(radius:Float=1.f, bands:Int=30 ) = new Generator[Vec3]{
+  //   var (lat,long) = (0,0)
 
+  //   def apply() = {
+  //     if(lat < 0) value = Vec3(0)
+  //     return value
 
+  //     val theta = lat * math.Pi / bands
+  //     val phi = long * 2 * math.Pi / bands
+  //     value = Vec3(math.cos(phi)*math.sin(theta), math.cos(theta), math.sin(phi)*math.cos(theta))
+  //     if(long == bands){
+  //       long = 0
+  //       if(lat == bands){
+  //         lat = -1
+  //       } else lat += 1
+  //     } else long += 1
+  //     value * radius
+  //   }
+
+  //   def vertex() = value * radius
+  //   def normal() = value
+  //   def uv() = Vec2(1.f - (long.toFloat / bands), lat.toFloat / bands)
+  // }
 

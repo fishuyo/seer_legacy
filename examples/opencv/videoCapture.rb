@@ -1,10 +1,10 @@
 require 'java'
 
 module M
-  include_package "com.fishuyo.io"
-  include_package "com.fishuyo.maths"
-  include_package "com.fishuyo.graphics"
-  include_package "com.fishuyo.examples.opencv.cap"
+  include_package "com.fishuyo.seer.io"
+  include_package "com.fishuyo.seer.maths"
+  include_package "com.fishuyo.seer.graphics"
+  include_package "com.fishuyo.seer.examples.opencv.cap"
 end
 
 class Object
@@ -17,7 +17,7 @@ class Object
 end
 
 
-def step dt
+def animate dt
   # Main.bgsub.updateBackgroundNextFrame()
   Main.bgsub.setThreshold(50.0)
 end

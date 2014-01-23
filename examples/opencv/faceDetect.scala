@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.opencv.faceDetect
 
 import graphics._
@@ -17,12 +17,12 @@ import org.opencv.core._
 import org.opencv.highgui._
 import org.opencv.imgproc._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
   System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
 
-  GLScene.push(this)
+  Scene.push(this)
 
 	var capture: VideoCapture = _
 	implicit var camera = new CalibratedCamera()
@@ -33,21 +33,21 @@ object Main extends App with GLAnimatable{
 
 	// Camera Calibration
 	var calcamera = new CalibratedCamera()
-  val images = calcamera.loadImageDirectory("/Users/fishuyo/projects/Catch-Release/Floor/board_webcam")
+  // val images = calcamera.loadImageDirectory("/Users/fishuyo/projects/Catch-Release/Floor/board_webcam")
 	// val images = calcamera.loadImageDirectory("/Users/fishuyo/projects/Catch-Release/Floor/thunder_webcam")
-  calcamera.calibrateFromBoardImages(images, new Size(6,9), 0.0235)
+  // calcamera.calibrateFromBoardImages(images, new Size(6,9), 0.0235)
 	// calcamera.calibrateFromBoardImages(images, new Size(4,5), 0.013)
-  calcamera.writeParams("logitech_calib.json")
+  // calcamera.writeParams("logitech_calib.json")
 	// calcamera.writeParams("thunder_calib.json")
 	calcamera.printParams()
-  System.exit(0)
+  // System.exit(0)
 
 	var bytes:Array[Byte] = null
 	var w = 0.0
 	var h = 0.0
 
   val cube = Model(Cube())
-  GLScene.push(cube)
+  Scene.push(cube)
 
   var pix:Pixmap = null
   
@@ -80,7 +80,7 @@ object Main extends App with GLAnimatable{
 
   }
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
   	val img = new Mat()
   	val read = capture.read(img)
@@ -108,7 +108,7 @@ object Main extends App with GLAnimatable{
 
 		Texture(0).draw(pix,0,0)
 
-    live.step(dt)
+    live.animate(dt)
   }
 
 }

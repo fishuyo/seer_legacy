@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.opencv.cap
 
 import graphics._
@@ -17,7 +17,7 @@ import org.opencv.core._
 import org.opencv.highgui._
 import org.opencv.imgproc._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
 	var capture: VideoCapture = _
   var bgsub:BackgroundSubtract = _
@@ -30,12 +30,12 @@ object Main extends App with GLAnimatable{
 
   SimpleAppRun.loadLibs()
 
-  GLScene.push(this)
+  Scene.push(this)
 
   val live = new Ruby("videoCapture.rb")
 
   val cube = Model(Cube())
-  GLScene.push(cube)
+  Scene.push(cube)
 
   var pix:Pixmap = null //new Pixmap(1280,720, Pixmap.Format.RGB888)
 
@@ -45,7 +45,7 @@ object Main extends App with GLAnimatable{
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
     capture = new VideoCapture(0)
     bgsub = new BackgroundSubtract
-    colorThresh = new ColorThreshold((140,10),(20,255),(20,255))
+    colorThresh = new ColorThreshold((20,40)) //(140,10),(20,255),(20,255))
     blobTracker = new BlobTracker
     blobTracker.setThreshold(30,30)
 
@@ -71,7 +71,7 @@ object Main extends App with GLAnimatable{
 
   }
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
   	val img = new Mat()
   	val read = capture.read(img)
@@ -96,7 +96,7 @@ object Main extends App with GLAnimatable{
 
 		Texture(0).draw(pix,0,0)
 
-    live.step(dt)
+    live.animate(dt)
   }
 
 }

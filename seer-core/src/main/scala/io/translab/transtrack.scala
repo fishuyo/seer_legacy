@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package io
 
 import java.net.DatagramPacket

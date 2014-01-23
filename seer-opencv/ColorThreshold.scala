@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package cv
 
 
@@ -19,10 +19,11 @@ class ColorThreshold( val hue:(Int,Int), val sat:(Int,Int)=(100,255), val value:
 	}
 
 	val mask = new Mat()
+	val hsv = new Mat()
+	val out = new Mat()
 
 	def apply( frame:Mat, return_mask:Boolean=true ) = {
 
-		var hsv = new Mat()
 		Imgproc.cvtColor(frame,hsv, Imgproc.COLOR_BGR2HSV)
 
 		if( twoChecks ){
@@ -42,9 +43,8 @@ class ColorThreshold( val hue:(Int,Int), val sat:(Int,Int)=(100,255), val value:
 
 		if( return_mask ) mask
 		else{
-			val ret = new Mat()
-			frame.copyTo( ret, mask)
-			ret
+			frame.copyTo( out, mask)
+			out
 		}
 
 	}

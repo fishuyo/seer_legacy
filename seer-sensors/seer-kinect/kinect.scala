@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package io
 package kinect
 
@@ -24,7 +24,7 @@ import collection.mutable.ListBuffer
 
 
 
-object Kinect extends GLAnimatable {
+object Kinect extends Animatable {
   
   var bgsub:BackgroundSubtract = _
   var blob:BlobTracker = _
@@ -38,7 +38,7 @@ object Kinect extends GLAnimatable {
 	var connected = false
 
 	var depthTextureID = 0
-	val cube = Primitive3D.cube()
+	val cube = Cube() //Primitive3D.cube()
 	cube.scale.set(1.f, 480.f/640.f, .1f)
 
 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
@@ -198,7 +198,7 @@ object Kinect extends GLAnimatable {
 		Shader().setUniformi("u_texture0", t );
 		cube.draw()
 	}
-	override def step(dt:Float){
+	override def animate(dt:Float){
 		Texture(depthTextureID).draw(depthPix,0,0)
 	}
 
@@ -225,7 +225,7 @@ object Kinect extends GLAnimatable {
 
     for( x<-(0 until w); y<-(0 until h)){
     	val d = flo(640*y+x)
-      val off = .25f
+      val off = .33f
 
       val z = d * -scale
 

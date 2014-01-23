@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package cv
 
 import graphics._
@@ -79,6 +79,7 @@ class VideoLoop extends VideoSource {
   	else if(frame > images.length-1) frame = 0.f
 
     if(stacking){
+      if( images.length == 0) return
       var from = frame
       var to = (if(reversing) frame-speed else frame+speed)
       if( from > to){
@@ -119,7 +120,7 @@ class VideoLoop extends VideoSource {
     val bi = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR)
     val buf = new Array[Byte](w*h*4)
 
-    val writer = new VideoWriter(path, ww, hh, 30, codec)
+    val writer = new VideoWriter(path, ww, hh, 1.f, 30, codec)
     for( i<-(0 until images.length)){
 
       val mat = images(i)

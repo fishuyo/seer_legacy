@@ -1,6 +1,6 @@
 
 
-package com.fishuyo
+package com.fishuyo.seer
 package maths
 package particle
 
@@ -12,15 +12,16 @@ package particle
 }
 
 object AbsoluteConstraint{
-	def apply(p:Particle, pos:Vec3) = new AbsoluteConstraint(p,pos)
+	def apply(p:KinematicState, pos:Vec3) = new AbsoluteConstraint(p, Particle(pos))
+	def apply(p:KinematicState, q:KinematicState) = new AbsoluteConstraint(p,q)
 }
-class AbsoluteConstraint(val p:Particle, var position:Vec3) extends Constraint {
+class AbsoluteConstraint(val p:KinematicState, var q:KinematicState) extends Constraint {
 	override def solve(){
 		if( !active ) return
-		p.position = position
-		p.lPosition = position
-		p.velocity = Vec3(0)
-		p.acceleration = Vec3(0)
+		p.position = q.position
+		p.lPosition = q.lPosition
+		p.velocity = q.velocity
+		p.acceleration = q.acceleration
 	}
 }
 
@@ -28,7 +29,7 @@ object LinearSpringConstraint {
 	def apply(p:Particle,q:Particle,l:Float=1.f,s:Float=1.f,tear:Float=0.f) = new LinearSpringConstraint(p,q,l,s,tear)
 }
 
-class LinearSpringConstraint(val p:Particle, val q:Particle, length:Float, stiffness:Float, tearThreshold:Float) extends Constraint {
+class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, stiffness:Float, tearThreshold:Float) extends Constraint {
 	val imP = 1.f/p.mass
   val imQ = 1.f/q.mass
   val wP = ( imP / (imP+imQ) ) * stiffness;
@@ -68,9 +69,29 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, length:Float, stiff
 // 	}
 // }
 
-class RotationalSpringConstraint(val p:Particle, k:Float) extends Constraint {
+class RotationalSpringConstraint(val p:Stick, var zeroQuat:Quat=Quat(), k:Float=0.1f) extends Constraint {
+
+  var torn = false
+  def isTorn() = torn
 
 	override def solve(){
+		if( torn ) return
+
+		// val d = p.euler - zeroQuat.toEulerVec
+  //   val dist = d.mag
+  //   if( dist == 0.f ) return
+
+  //   p.euler = p.euler + d * k
+
+    p.quat = p.quat.slerp(zeroQuat, k)
+		
+		// val quat = Quat().fromEuler(p.euler)
+		// val pos = p.position + quat.toZ()*p.length
+
+  	// q.position = pos
+  	// zeroQuat = quat * relativeQuat
+		// q.lEuler.set(q.euler)
+  	// q.euler = (zeroQuat * Quat().fromEuler(q.euler)).toEulerVec
 
 	}
 }

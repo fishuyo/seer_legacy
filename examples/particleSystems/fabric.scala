@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.particleSystems.verletFabric
 
 import graphics._
@@ -8,10 +8,10 @@ import maths._
 import particle._
 import objects._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
   val live = new JS("fabric.js")
 
@@ -25,9 +25,9 @@ object Main extends App with GLAnimatable{
   	fabric.draw()
   }
 
-  override def step(dt:Float){
-  	fabric.step(dt)
-    live.step(dt)
+  override def animate(dt:Float){
+  	fabric.animate(dt)
+    live.animate(dt)
   }
 
 }

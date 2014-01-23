@@ -1,16 +1,15 @@
 # require 'java'
 
 module M
-  include_package "scala"
-  include_package "com.fishuyo"
-  include_package "com.fishuyo.io"
-  include_package "com.fishuyo.io.kinect"
-  include_package "com.fishuyo.maths"
-  include_package "com.fishuyo.spatial"
-  include_package "com.fishuyo.graphics"
-  include_package "com.fishuyo.util"
-  include_package "com.fishuyo.examples.trees"
-  include_package "com.fishuyo.trees"
+  include_package "com.fishuyo.seer"
+  include_package "com.fishuyo.seer.io"
+  include_package "com.fishuyo.seer.io.kinect"
+  include_package "com.fishuyo.seer.maths"
+  include_package "com.fishuyo.seer.spatial"
+  include_package "com.fishuyo.seer.graphics"
+  include_package "com.fishuyo.seer.util"
+  include_package "com.fishuyo.seer.examples.trees"
+  include_package "com.fishuyo.seer.trees"
 end
 
 class Object
@@ -22,8 +21,8 @@ class Object
   end
 end
 
-$Seer = Java::com.fishuyo
-Seer = $Seer
+$Seer = Java::com.fishuyo.seer
+# Seer = $Seer
 $Vec3 = $Seer.maths.Vec3
 $Camera = $Seer.graphics.Camera
 $Audio = $Seer.audio.Audio
@@ -33,8 +32,8 @@ $Pad = $Seer.io.Trackpad
 $tree = $Seer.examples.trees.Main.tree
 tree = $tree
 
-$tree.root.pose.pos.set(0,-0.5,0)
-$tree.root.pin($tree.root.pose.pos)
+# $tree.root.position.set(0,-0.5,0)
+# $tree.root.pin($tree.root.pose.pos)
 
 
 
@@ -62,7 +61,7 @@ $tree.setReseed(true)
 $tree.setDepth(depth)
 $tree.branch(depth)
 
-$Camera.rotateWorld(0.1)
+Main.rotateWorld(0.004)
 
 #$Seer.trees.Fabric.gv.set(0.0,-5.0,0.0)
 $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
@@ -80,8 +79,8 @@ $Pad.connect()
 $Pad.bind( lambda{|i,f|
 	t = Main.tree #Seer.examples.trees.Main.tree
 	if i == 1
-		ur = Camera.nav.ur()
-		uf = Camera.nav.uf()
+		ur = SceneGraph.root.camera.nav.ur()
+		uf = SceneGraph.root.camera.nav.uf()
 
 		# Main.tree.root.applyForce( (v * 10.0 * Main.rms) )
 		# t.root.applyForce( Vec3.apply((f[0]-0.5)*1.0*f[4],0,(f[1]-0.5)*f[4]))
@@ -115,105 +114,109 @@ $Pad.bind( lambda{|i,f|
 	    #t.branch(depth)
 	    t.refresh()
 
-	    t.root.accel.zero
-	    t.root.euler.zero
+	    # t.root.accel.zero
+	    # t.root.euler.zero
 	end
 })
 
 
-# move = Vec3.apply(0,0,0)
-# rot = Vec3.apply(0,0,0)
-# nmove = Vec3.apply(0,0,0)
-# nrot = Vec3.apply(0,0,0)
+move = Vec3.apply(0,0,0)
+rot = Vec3.apply(0,0,0)
+nmove = Vec3.apply(0,0,0)
+nrot = Vec3.apply(0,0,0)
 
 # Kinect.connect()
 # Kinect.startDepth()
-# Kinect.clear()
-# Kinect.bind( lambda{|i,f|
-# 	#if f[2] < 10 || f[3] < 10 then return end
+Kinect.clear()
+Kinect.bind( lambda{|i,f|
+	#if f[2] < 10 || f[3] < 10 then return end
 
-# 	t = Main.tree
-# 	size = f[2]*f[3]/10000.0
-# 	x = (f[0] - 320)/320.0
-# 	y = (f[1] - 240)/-240.0
-# 	a = f[4]
-# 	if a < 90.0
-# 		a = -a
-# 	else
-# 		a = 180.0 - a
-# 	end
+	t = Main.tree
+	size = f[2]*f[3]/10000.0
+	x = (f[0] - 320)/320.0
+	y = (f[1] - 240)/-240.0
+	a = f[4]
+	if a < 90.0
+		a = -a
+	else
+		a = 180.0 - a
+	end
 
-# 	a = a / 180.0
-# 	# puts a
-# 	# print i
-# 	# print " "
-# 	# print x
-# 	# print " "
-# 	# print y
-# 	# print " "	
-# 	# # print f[2]
-# 	# # print " "
-# 	# # puts f[3]
-# 	# puts size
+	a = a / 180.0
+	# puts a
+	# print i
+	# print " "
+	# print x
+	# print " "
+	# print y
+	# print " "	
+	# # print f[2]
+	# # print " "
+	# # puts f[3]
+	# puts size
 		
 
 
-# 	if Main.day.x == 1.0
-# 		ur = Camera.nav.ur()
-# 		uf = Camera.nav.uf()
-# 		t.root.applyForce( ur*(-x*size*20))
-# 		t.root.applyForce( uf*(y*size*20))
-# 		Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
+	if Main.day.x == 1.0
+		ur = SceneGraph.root.camera.nav.ur()
+		uf = SceneGraph.root.camera.nav.uf()
+		t.root.applyForce( ur*(-x*size*20))
+		t.root.applyForce( uf*(y*size*20))
+		Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
 
-# 		return
-# 	end
+		return
+	end
 
-# 	# puts i
-# 	nm = Main.nmove
-# 	nr = Main.nrot
-# 	if i == 0
-# 		Main.nrot.set(0.0,0.0,0.0)
-# 		Main.nmove.set(a*2,nm.y,nm.z)
-# 		# Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
-# 		# Main.nrot.set(x*2.0, nr.y, nr.z)
-# 	elsif i == 1
-# 		# Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
-# 	elsif i == 2
-# 		# Main.nrot.set(nr.x,nr.y, x*4.0)
-# 	elsif i == 4
-# 		rz = f[3]*0.05
-# 		rx = f[2]*0.05
-# 	end
+	# puts i
+	nm = Main.nmove
+	nr = Main.nrot
+	if i == 0
+		Main.nrot.set(0.0,0.0,0.0)
+		Main.nmove.set(a*2,nm.y,nm.z)
+		# Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
+		# Main.nrot.set(x*2.0, nr.y, nr.z)
+	elsif i == 1
+		# Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
+	elsif i == 2
+		# Main.nrot.set(nr.x,nr.y, x*4.0)
+	elsif i == 4
+		rz = f[3]*0.05
+		rx = f[2]*0.05
+	end
 
-# 	# move.lerpTo(nmove, 0.05 )
+	# move.lerpTo(nmove, 0.05 )
 	
-# 	# t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
-# 	# #t.bAngle.y.set(mx)
-#  #    t.sRatio.setMinMax( 0.05, Main.move.z, false )
-#  #    #t.sRatio.set( mz )
-#  #    t.bRatio.setMinMax( 0.05, my, false )
-#  #    #t.bRatio.set( my )
-#  #    t.sAngle.x.setMinMax( 0.05, rx, false )
-#  #    t.bAngle.x.setMinMax( 0.05, rx, false )
-#  #    #t.sAngle.x.set( rx )
-#  #    t.sAngle.z.setMinMax( 0.05, rz, false )
-#  #    t.bAngle.z.setMinMax( 0.05, rz, false )
-#  #    #t.sAngle.z.set( rz )
-#  #    #t.branch(depth)
-#  #    t.refresh()
+	# t.bAngle.y.setMinMax( 0.05, Main.move.x,false )
+	# #t.bAngle.y.set(mx)
+ #    t.sRatio.setMinMax( 0.05, Main.move.z, false )
+ #    #t.sRatio.set( mz )
+ #    t.bRatio.setMinMax( 0.05, my, false )
+ #    #t.bRatio.set( my )
+ #    t.sAngle.x.setMinMax( 0.05, rx, false )
+ #    t.bAngle.x.setMinMax( 0.05, rx, false )
+ #    #t.sAngle.x.set( rx )
+ #    t.sAngle.z.setMinMax( 0.05, rz, false )
+ #    t.bAngle.z.setMinMax( 0.05, rz, false )
+ #    #t.sAngle.z.set( rz )
+ #    #t.branch(depth)
+ #    t.refresh()
 
-#  #    t.root.accel.zero
-#  #    t.root.euler.zero
+ #    t.root.accel.zero
+ #    t.root.euler.zero
 	
-# })
+})
 
-# Trees.setDamp(150.0)
+Trees.setDamp(150.0)
 
 # Kinect.threshold.set( 0.0, 0.4, 0.0 )
-# # Kinect.device.get().setTiltAngle(0.0)
+# Kinect.device.get().setTiltAngle(0.0)
 # Kinect.setSizeThreshold( 20 )
 
-def step(dt)
+def animate(dt)
+
+	f = com.fishuyo.seer.util.Random.float
+	Shader.apply("test").setUniformf("u_dist", f[])
+
 	t = Main.tree
 
 	if SimpleAppRun.app.frameCount % 10
@@ -284,24 +287,24 @@ def step(dt)
 	    #t.branch(depth)
 	    t.refresh()
 
-	    t.root.accel.zero
-	    t.root.euler.zero
+	    # t.root.accel.zero
+	    # t.root.euler.zero
 	end
 
 	height = t.root.getMaxHeight() + 1
 	height = 10 if height > 10
 	height = 1 if height < 1
-	ncamPos = Camera.nav.uf*-height
+	ncamPos = SceneGraph.root.camera.nav.uf()*-height
 	#Camera.nav.pos.lerpTo( ncamPos, 0.005 )
 	Main.dayUniforms.set(0.0,10.0,0.0)
 
-	pos = Camera.nav.pos + Camera.nav.uf()*1.5
-	pos += Camera.nav.ur()*(0.8)
-	pos += Camera.nav.uu()*-0.5
+	pos = SceneGraph.root.camera.nav.pos + SceneGraph.root.camera.nav.uf()*1.5
+	pos += SceneGraph.root.camera.nav.ur()*(0.8)
+	pos += SceneGraph.root.camera.nav.uu()*-0.5
 	Kinect.cube.pose.pos.lerpTo( pos, 0.1)
-	Kinect.cube.pose.quat.slerpTo( Camera.nav.quat, 0.1)
+	Kinect.cube.pose.quat.slerpTo( SceneGraph.root.camera.nav.quat, 0.1)
 	scl = 0.5
-	# Kinect.cube.scale.set( scl*1.0, scl*480.0/640.0, 0.05 )
+	Kinect.cube.scale.set( scl*1.0, scl*480.0/640.0, 0.05 )
 	#puts Kinect.cube.pose.pos
 	#puts Kinect.cube.pose.quat
 

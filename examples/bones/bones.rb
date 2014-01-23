@@ -1,6 +1,6 @@
 require 'java'
 
-Seer = Java::com.fishuyo
+Seer = Java::com.fishuyo.seer
 Vec3 = Seer.maths.Vec3
 Quat = Seer.maths.Quat
 Key = Seer.io.Keyboard

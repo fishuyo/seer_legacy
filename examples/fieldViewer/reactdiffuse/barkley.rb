@@ -1,6 +1,6 @@
 
 
-$fv = com.fishuyo.examples.fieldViewer.reactdiffuse.barkley.Main.fv
+$fv = com.fishuyo.seer.examples.fieldViewer.reactdiffuse.barkley.Main.fv
 
 
 ############################

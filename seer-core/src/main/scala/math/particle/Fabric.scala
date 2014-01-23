@@ -1,6 +1,6 @@
 
 
-package com.fishuyo
+package com.fishuyo.seer
 package objects
 
 import maths._
@@ -12,13 +12,14 @@ import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx._
 import com.badlogic.gdx.graphics.GL10
 import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject
 
 object Fabric {
   def apply( p: Vec3, w: Float, h: Float, d: Float, m:String="xy") = new Fabric(p,w,h,d,m)
 }
 
-class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f, mode:String="xy") extends GLAnimatable {
+class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f, mode:String="xy") extends Animatable {
 
   var stiff = 1.1f
   var particles = ListBuffer[Particle]()
@@ -55,9 +56,9 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
   var xt=0.0
 
   var vertices = new Array[Float](3*2*numLinks)
-  var mesh:Mesh = null
+  var mesh:GdxMesh = null
 
-  override def step( dt: Float ) = {
+  override def animate( dt: Float ) = {
 
     // if( Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)){
     //   Fabric.gv.x = -Gdx.input.getAccelerometerX
@@ -88,7 +89,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
 
   override def draw() {
     //if( vbo == null ) vbo = new VertexBufferObject( false, 2*links, VertexAttribute.Position )
-    if( mesh == null) mesh = new Mesh(false,2*numLinks,0,VertexAttribute.Position)
+    if( mesh == null) mesh = new GdxMesh(false,2*numLinks,0,VertexAttribute.Position)
     var i = 0;
     for( i<-(0 until links.size)){
       val p = links(i).p.position

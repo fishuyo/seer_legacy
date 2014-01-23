@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.fieldViewer
 package dla
 
@@ -11,7 +11,7 @@ object Main extends App {
   SimpleAppRun.loadLibs()
 
   val fv = new DlaFV(300,300)
-  GLScene.push( fv );
+  Scene.push( fv );
 
   SimpleAppRun();
 

@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import maths.Vec3
@@ -20,6 +20,7 @@ object RGB {
 class RGB(var r:Float, var g:Float, var b:Float){
 	def rgb() : Int = new java.awt.Color(Math.min(1,r),Math.min(1,g),Math.min(1,b)).getRGB()
 
+  def set(r1:Float,g1:Float,b1:Float) = { r=r1; g=g1; b=b1 }
   def set(c:RGB) = { r=c.r; g=c.g; b=c.b }
 	def +(c: RGB) = new RGB(r+c.r, g+c.g, b+c.b)
 	def *(s:Float) = new RGB(r*s, g*s, b*s)
@@ -41,6 +42,7 @@ object RGBA{
 class RGBA( rr:Float, gg:Float, bb:Float, var a:Float ) extends RGB(rr,gg,bb){
   def value = toGray()
 
+  def set(r1:Float,g1:Float,b1:Float,a1:Float=1.f) = { r=r1; g=g1; b=b1; a=a1 }
   def set(c:RGBA) = { r=c.r; g=c.g; b=c.b; a=c.a }
 	def +(c: RGBA) = new RGBA(r+c.r, g+c.g, b+c.b, a+c.a)
 	override def *(s:Float) = new RGBA(r*s, g*s, b*s, a)

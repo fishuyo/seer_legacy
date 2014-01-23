@@ -1,5 +1,5 @@
 
-// package com.fishuyo
+// package com.fishuyo.seer
 
 // import maths._
 // import particle._
@@ -14,7 +14,7 @@
 // import com.badlogic.gdx.graphics._
 // import com.badlogic.gdx.graphics.glutils.VertexBufferObject
 
-// object Fabric extends GLAnimatable {
+// object Fabric extends Animatable {
 
 //   var g = -10.f
 //   var gv = Vec3(0.f,-10.f,0.f)
@@ -29,7 +29,7 @@
 
 // }
 
-// class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f, mode:String="xy") extends GLAnimatable {
+// class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f, mode:String="xy") extends Animatable {
 
 //   var stiff = 1.f
 //   var particles = ListBuffer[Particle]()
@@ -109,7 +109,7 @@
 //   def apply( p:Vec3, d: Float, s: Float = 1.f ) = new VParticle { pos = p; lPos = p; dist = d; stiff = s; } 
 // }
 
-// class VParticle extends GLAnimatable{
+// class VParticle extends Animatable{
 //   var pos = Vec3(0)
 //   var lPos = Vec3(0)
 //   var accel = Vec3(0)

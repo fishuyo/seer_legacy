@@ -1,17 +1,10 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package io
 
 import graphics._
 import maths._
 import spatial._
-//import ray._
-
-// import java.awt.event.KeyEvent
-// import java.awt.event.KeyListener
-// import java.awt.event.MouseEvent
-// import java.awt.event.MouseListener
-// import java.awt.event.MouseMotionListener
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
@@ -22,37 +15,66 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.input._
 import com.badlogic.gdx.math.Vector2
 
+import rx._
+
 class Input extends InputAdapter
 
 object Inputs extends InputMultiplexer
 
 object Keyboard extends InputAdapter {
-	var charCallbacks = Map[Char,()=>Unit]()
-	var charUpCallbacks = Map[Char,()=>Unit]()
-	var callbacks = Map[String,()=>Unit]()
-	def non()() = {}
+	// var charCallbacks = Map[Char,()=>Unit]()
+	// var charUpCallbacks = Map[Char,()=>Unit]()
+	// var callbacks = Map[String,()=>Unit]()
 
-	def clear() = { charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear(); Inputs.removeProcessor(this) }
+	val key = Var('\0')
+	val up = Var('\0')
+	val down = Var('\0')
+	var observing = List[Obs]()
+
+	// def non()() = {}
+
+	def clear() = { observing.foreach( _.active = false ); observing = List(); /*charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear();*/ Inputs.removeProcessor(this) }
 	def use() = Inputs.addProcessor(this)
-	def bind( s:String, f:()=>Unit) = {
-		if( s.length == 1) charCallbacks += s.charAt(0) -> f
-		else callbacks += s -> f
+
+	def bind( s:String, f:()=>Unit){
+		val k = s.charAt(0)
+		observing = Obs(key,skipInitial=true){ 
+			if( key() == k ) try{ 
+				f()
+			}catch{ case e:Exception => println(e) }
+		} :: observing
+		// if( s.length == 1) charCallbacks += s.charAt(0) -> f
+		// else callbacks += s -> f
+	}
+	def bindDown( s:String, f:()=>Unit) = {
+		val k = s.charAt(0)
+		observing = Obs(down,skipInitial=true){ if( down() == k ) f() } :: observing
 	}
 	def bindUp( s:String, f:()=>Unit) = {
-		if( s.length == 1) charUpCallbacks += s.charAt(0) -> f
-		//else callbacks += s -> f
+		val k = s.charAt(0)
+		observing = Obs(up,skipInitial=true){ if( up() == k ) f() } :: observing
 	}
 	override def keyTyped(k:Char) = {
-		try{
-			charCallbacks.getOrElse(k, non()_)()
-		} catch { case e:Exception => println(e) }
+		key() = k
+		// try{
+			// charCallbacks.getOrElse(k, non()_)()
+		// } catch { case e:Exception => println(e) }
+		false
+	}
+	override def keyDown(k:Int) = {
+		val c = (k+68).toChar
+		down() = c
+		// try{
+			// charUpCallbacks.getOrElse(c, non()_)()
+		// } catch { case e:Exception => println(e) }
 		false
 	}
 	override def keyUp(k:Int) = {
 		val c = (k+68).toChar
-		try{
-			charUpCallbacks.getOrElse(c, non()_)()
-		} catch { case e:Exception => println(e) }
+		up() = c
+		// try{
+			// charUpCallbacks.getOrElse(c, non()_)()
+		// } catch { case e:Exception => println(e) }
 		false
 	}
 }
@@ -66,6 +88,13 @@ object Mouse extends InputAdapter {
 	callbacks += ("move" -> List())
 	callbacks += ("scroll" -> List())
 
+	val x = Var(0)
+	val y = Var(0)
+	val id = Var(0)
+	val button = Var(0)
+	val scroll = Var(0)
+	val status = Var("up")
+
 	def non()() = {}
 
 	def clear() = { callbacks.keys.foreach(callbacks(_) = List()); Inputs.removeProcessor(this) }
@@ -73,18 +102,32 @@ object Mouse extends InputAdapter {
 
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
-  override def touchUp( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
-    try { callbacks("up").foreach( _(Array(screenX,screenY,pointer,button)) ) }
+  override def touchUp( screenX:Int, screenY:Int, pointer:Int, but:Int) = {
+  	x() = screenX
+  	y() = screenY
+  	id() = pointer
+  	button() = but
+  	status() = "up"
+    try { callbacks("up").foreach( _(Array(screenX,screenY,pointer,but)) ) }
     catch { case e:Exception => println(e) }
     false
   }
- 	override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
+ 	override def touchDown( screenX:Int, screenY:Int, pointer:Int, but:Int) = {
  		// println( com.badlogic.gdx.Gdx.input.getCurrentEventTime )
-    try{ callbacks("down").foreach( _(Array(screenX,screenY,pointer,button)) ) }
+ 		x() = screenX
+  	y() = screenY
+  	id() = pointer
+  	button() = but
+  	status() = "down"
+    try{ callbacks("down").foreach( _(Array(screenX,screenY,pointer,but)) ) }
     catch { case e:Exception => println(e) }
     false
 	}
   override def touchDragged( screenX:Int, screenY:Int, pointer:Int) = {
+  	x() = screenX
+  	y() = screenY
+  	id() = pointer
+  	status() = "drag"
     try{ callbacks("drag").foreach( _(Array(screenX,screenY,pointer)) ) }
     catch { case e:Exception => println(e) }
     false
@@ -92,11 +135,15 @@ object Mouse extends InputAdapter {
 
   // mouse only
   override def mouseMoved( screenX:Int, screenY:Int ) = {
+  	x() = screenX
+  	y() = screenY
+  	status() = "move"
     try { callbacks("move").foreach( _(Array(screenX,screenY)) ) }
     catch { case e:Exception => println(e) }
     false
   }
   override def scrolled( amount:Int) = {
+  	scroll() = amount
     try{ callbacks("scroll").foreach( _(Array(amount)) ) }
     catch { case e:Exception => println(e) }
     false
@@ -187,6 +234,8 @@ object Touch extends InputAdapter {
     false
   }
 }
+
+
 
 class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
 

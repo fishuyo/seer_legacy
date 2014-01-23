@@ -1,4 +1,4 @@
-package com.fishuyo.dynamic
+package com.fishuyo.seer.dynamic
 
 import scala.language.dynamics
 import javax.script._

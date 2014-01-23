@@ -1,17 +1,20 @@
 
-importPackage(com.fishuyo.io)
-importPackage(com.fishuyo.maths)
-importPackage(com.fishuyo.maths.particle)
-importPackage(com.fishuyo.graphics)
+importPackage(com.fishuyo.seer.io)
+importPackage(com.fishuyo.seer.maths)
+importPackage(com.fishuyo.seer.maths.particle)
+importPackage(com.fishuyo.seer.graphics)
 
-importPackage(com.fishuyo.examples.particleSystems.verletFabric)
+importPackage(com.fishuyo.seer.examples.particleSystems.verletFabric)
 
 
 var fabric = Main.fabric()
 
 Keyboard.clear()
 Keyboard.use()
-Keyboard.bind("g",function(){ println("hi"); Gravity.set(0,-Gravity.y(),0)})
+Keyboard.bind("g",function(){ 
+	if( Gravity.y() == 0.0) Gravity.set(0,-10,0)
+	else Gravity.set(0,0,0)
+})
 
 
 Trackpad.connect()
@@ -25,7 +28,7 @@ Trackpad.bind(function(i,f){
 	}
 })
 
-function step( dt ){
+function animate( dt ){
 	// println("hi");
 	// var pins = Main.fabric().pins()
 	// for( i=1; i < pins.length()-1; i++ ){

@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package video
 
 import graphics._
@@ -21,13 +21,22 @@ import com.xuggle.xuggler.IPacket
 
 import com.badlogic.gdx.Gdx
 
-class VideoWriter(val path:String, val w:Int, val h:Int, val framerate:Int=30, val codec:String = "mpeg4" ) {
+class VideoWriter(val path:String, val w:Int, val h:Int, val scale:Float=1.f, val framerate:Int=30, val codec:String = "mpeg4" ) {
+
+  var closing = false
 
   val dt = DEFAULT_TIME_UNIT.convert( (1000.0/framerate).toInt, MILLISECONDS )
   var t = 0L;
 
-  var file = path
-  if( file == "default") file = "out-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-').replace(',','-') + ".mp4" 
+  val sw = if((w*scale).toInt%2 == 1) (w*scale).toInt-1 else (w * scale).toInt
+  val sh = if((h*scale).toInt%2 == 1) (h*scale).toInt-1 else (h * scale).toInt
+
+  var name = path
+  if( name == ""){
+    Gdx.files.external("SeerData/video").file().mkdirs()
+    name = "SeerData/video/out-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".mp4" 
+  }
+  var file = Gdx.files.external(name).file().getPath()
   
   // val container = IContainer.make();
   // val iContainerFormatWriter = IContainerFormat.make();
@@ -46,8 +55,8 @@ class VideoWriter(val path:String, val w:Int, val h:Int, val framerate:Int=30, v
   val writer = ToolFactory.makeWriter( file )
   // println( writer.getDefaultPixelType)
   // writer.addVideoStream( 0, 0, ICodec.findEncodingCodecByName(codec), w, h )
-  writer.addVideoStream(0, 0, w, h)
-  val resample = IVideoResampler.make(w,h,IPixelFormat.Type.YUV420P,w,h,IPixelFormat.Type.RGBA)
+  writer.addVideoStream(0, 0, sw, sh)
+  val resample = IVideoResampler.make(sw,sh,IPixelFormat.Type.YUV420P,w,h,IPixelFormat.Type.RGBA)
 
 
   def addFrame( i: BufferedImage ) = {
@@ -57,7 +66,7 @@ class VideoWriter(val path:String, val w:Int, val h:Int, val framerate:Int=30, v
 
   def addFrame( v: IVideoPicture ) = {
     v.setComplete(true,IPixelFormat.Type.RGBA,w,h,t)
-    val out = IVideoPicture.make(IPixelFormat.Type.YUV420P,w,h)
+    val out = IVideoPicture.make(IPixelFormat.Type.YUV420P,sw,sh)
     resample.resample(out,v)
     writer.encodeVideo(0, out)
     // val packet = IPacket.make(); 
@@ -75,12 +84,14 @@ class VideoWriter(val path:String, val w:Int, val h:Int, val framerate:Int=30, v
     // streamCoder.close()
     // container.close()
     writer.close()
+    closing = false
+    println("video writer finished.")
   }
 }
 
 
 
-object ScreenCapture extends GLAnimatable {
+object ScreenCapture extends Animatable {
 
   var writer:VideoWriter = null
   var bi:BufferedImage = null
@@ -88,35 +99,46 @@ object ScreenCapture extends GLAnimatable {
   var h = 0
   var skip = false
   var recording = false
+  // var closing = false
+  var scale = 1.f
 
   def toggleRecord(){
     if( recording ) stop
     else start
   }
   def start(){
+    if( writer != null && writer.closing ){
+      println("still closing..")
+      return
+    }
     w = Gdx.graphics.getWidth()
     h = Gdx.graphics.getHeight()
     if( w % 2 == 1 ){
-      println(s"height and width must be even: $w $h")
+      println(s"width must be even: $w $h")
       return
     }
-    writer = new VideoWriter("default", w, h, 30, "mpeg4" )
+    writer = new VideoWriter("", w, h, scale )
     // bi = new BufferedImage(w,h, BufferedImage.TYPE_3BYTE_BGR)
     Video.writer ! Open(writer)
     recording = true
     println("Screen capture started.")
-    GLScene.push(this)
+    Scene.push(this)
   }
 
   def stop(){
-    GLScene.remove(this)
+    if( writer != null && writer.closing ){
+      println("still closing..")
+      return
+    }
+    Scene.remove(this)
     // writer.close()
+    writer.closing = true
+    recording = false
     Video.writer ! Close
     println("Screen capture stopped.")
-    recording = false
   }
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
     val bytes = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixels(true)
     val buffer = IBuffer.make(null, bytes, 0, bytes.length)
@@ -158,9 +180,9 @@ class VideoWriterActor extends Actor {
   // }
 
   def receive = {
-    case Open(w:VideoWriter) => writer = Some(w)
+    case Open(w:VideoWriter) => if( writer == None) writer = Some(w) else println("still writing")
     case Frame(frame:IVideoPicture) => writer.foreach( _.addFrame(frame) )
-    case Close => writer.foreach( _.close )
+    case Close => writer.foreach( _.close ); writer = None
   }
 
 }

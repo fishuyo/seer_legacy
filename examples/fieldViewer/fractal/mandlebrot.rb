@@ -1,5 +1,5 @@
 
-$Main = com.fishuyo.examples.fieldViewer.fractal.Main
+$Main = com.fishuyo.seer.examples.fieldViewer.fractal.Main
 $Main.field.zoom.set(1)
 $Main.field.pos.set(0)
 

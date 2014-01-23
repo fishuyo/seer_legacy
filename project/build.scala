@@ -18,7 +18,9 @@ object Settings {
       "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
       "Sonatypes OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
       "ScalaNLP Maven2" at "http://repo.scalanlp.org/repo",
-      "maven.org" at "http://repo1.maven.org/maven2"
+      "maven.org" at "http://repo1.maven.org/maven2",
+      "java portaudio" at "http://maven.renejeschke.de/snapshots",
+      "java portaudio natives" at "http://maven.renejeschke.de/native-snapshots"
     ),
     autoCompilerPlugins := true,
     scalacOptions += "-Xexperimental"
@@ -31,7 +33,8 @@ object Settings {
       "de.sciss" %% "scalaosc" % "1.1.+",
       "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
       "org.jruby" % "jruby" % "1.7.3",
-      "net.java.dev.jna" % "jna" % "3.5.2"
+      "net.java.dev.jna" % "jna" % "3.5.2",
+      "com.scalarx" % "scalarx_2.10" % "0.1"
       //"xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
     ),
@@ -44,7 +47,9 @@ object Settings {
   )
 
   lazy val desktop = Settings.common ++ Seq (
-    fork in Compile := true
+    fork in Compile := true,
+    libraryDependencies ++= Seq("com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
+      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT")
   )
 
   lazy val android = Settings.common ++
@@ -54,37 +59,51 @@ object Settings {
       keyalias in Android := "change-me",
       mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
       // useProguard in Android := false,
-      proguardOption in Android := """-keep class com.badlogic.gdx.backends.android.** { *; }
+      proguardOption in Android := """
+        -keep class com.badlogic.gdx.backends.android.** { *; }
 
-        ## Akka Stuff referenced at runtime
-        -keep class akka.actor.** {*;}
-        -keep public class akka.actor.LightArrayRevolverScheduler { *; }
-        -keep public class akka.actor.LocalActorRefProvider {
-          public <init>(...);
+        -keep class com.typesafe.**
+        -keep class akka.**
+        -keep class scala.collection.immutable.StringLike {
+            *;
         }
-        -keep public class akka.remote.RemoteActorRefProvider {
-          public <init>(...);
+        -keepclasseswithmembers class * {
+            public <init>(java.lang.String, akka.actor.ActorSystem$Settings, akka.event.EventStream, akka.actor.Scheduler, akka.actor.DynamicAccess);
         }
-        -keep class akka.actor.SerializedActorRef {
-          *;
+        -keepclasseswithmembers class * {
+            public <init>(akka.actor.ExtendedActorSystem);
         }
-        -keep class akka.remote.netty.NettyRemoteTransport {
-          *;
+        -keep class scala.collection.SeqLike {
+            public protected *;
         }
-        -keep class akka.serialization.JavaSerializer {
-          *;
-        }
-        -keep class akka.serialization.ProtobufSerializer {
-          *;
-        }
-        -keep class com.google.protobuf.GeneratedMessage {
-          *;
-        }
-        -keep class akka.event.Logging*
-        -keep class akka.event.Logging$LogExt{
-          *;
-        }
-      """//proguard_options,
+      """
+        // ## Akka Stuff referenced at runtime
+        // -keep class akka.actor.** {*;}
+        // -keep public class akka.actor.LightArrayRevolverScheduler { *; }
+        // -keep public class akka.actor.LocalActorRefProvider { *;}
+        // -keep public class akka.remote.RemoteActorRefProvider {
+        //   public <init>(...);
+        // }
+        // -keep class akka.actor.SerializedActorRef {
+        //   *;
+        // }
+        // -keep class akka.remote.netty.NettyRemoteTransport {
+        //   *;
+        // }
+        // -keep class akka.serialization.JavaSerializer {
+        //   *;
+        // }
+        // -keep class akka.serialization.ProtobufSerializer {
+        //   *;
+        // }
+        // -keep class com.google.protobuf.GeneratedMessage {
+        //   *;
+        // }
+        // -keep class akka.event.Logging*
+        // -keep class akka.event.Logging$LogExt{
+        //   *;
+        // }
+      //"""//proguard_options,
       //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
       //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
     )
@@ -158,7 +177,7 @@ object SeerBuild extends Build {
     "examples",
     file("examples"),
     settings = Settings.desktop
-  ) dependsOn seer_desktop
+  ) dependsOn( seer_desktop )
 
   lazy val examples_fieldViewer = Project (
     "examples-fieldViewer",

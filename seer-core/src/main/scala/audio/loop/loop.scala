@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package audio
 
 import com.badlogic.gdx.Gdx

@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package spatial
 
 import maths.Vec3

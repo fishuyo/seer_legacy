@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.synth
 import maths._
 import graphics._
@@ -13,10 +13,10 @@ import akka.pattern.ask
 
 import scala.collection.mutable.ListBuffer
 
-object Main extends App with GLAnimatable {
+object Main extends App with Animatable {
 
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
   var sines = ListBuffer[Osc]()
   for( i<-(0 until 10)) sines += new Sine(0.f)

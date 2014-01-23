@@ -1,24 +1,30 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.trees
 import maths._
 import spatial._
 import graphics._
 import trees._
+// import particle.structures._
 import io._
 import io.kinect._
 import dynamic._
 import audio._
 
+import util._
+
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.GL10
 
 import collection.mutable.ListBuffer
 
 
-object Main extends App with GLAnimatable with AudioSource {
+object Main extends App with Animatable with AudioSource {
 
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
-  //GLScene.push(Kinect)
+  Scene.push(this)
+  //Scene.push(Kinect)
   
   var ground:Model = _
   var tree = new Tree() 
@@ -47,9 +53,10 @@ object Main extends App with GLAnimatable with AudioSource {
   var nmove = Vec3(0.f)
   var nrot = Vec3(0.f)
 
-  val live = new Ruby("trees.rb", "com.fishuyo.examples.trees"::"com.fishuyo.trees"::List())
+  val live = new Ruby("trees.rb")
 
-
+  var theta = 0.f
+  var dw = 0.f
 
   SimpleAppRun() 
 
@@ -65,17 +72,59 @@ object Main extends App with GLAnimatable with AudioSource {
     wind.setLooping(true)
     wind.play
 
-    Shader.load("firstPass", Gdx.files.internal("res/shaders/firstPass.vert"), Gdx.files.internal("res/shaders/firstPass.frag"))
-    Shader.load("secondPass", Gdx.files.internal("res/shaders/secondPass.vert"), Gdx.files.internal("res/shaders/secondPass.frag"))
+    var s = Shader.load("firstPass", Gdx.files.internal("res/shaders/firstPass.vert"), Gdx.files.internal("res/shaders/firstPass.frag"))
+    s.monitor()
+    s = Shader.load("secondPass", Gdx.files.internal("res/shaders/secondPass.vert"), Gdx.files.internal("res/shaders/secondPass.frag"))
+    s.monitor()
+    s = Shader.load("test", Gdx.files.internal("res/shaders/test.vert"), Gdx.files.internal("res/shaders/test.frag"))
+    s.monitor()
     Shader.multiPass = true;
-    Shader.monitor("firstPass")
-    Shader.monitor("secondPass")
 
-    Kinect.init()
+    SceneGraph.root.shader = "firstPass"
+
+    println("trees init.")
+    val node = new RenderNode //{
+    //   override def render(){
+    //     inputs.foreach( _.buffer.get.getColorBufferTexture().bind(0) )
+
+    //     Shader("secondPass").begin()
+    //     Shader().setUniformi("u_texture0", 0);
+    //     Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+    //     //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
+    //     // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+    //     // scene.draw2()
+    //     if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
+    //     else Shader("secondPass").setUniformf("u_depth", 1.f)
+
+    //     quad.render(Shader(), GL10.GL_TRIANGLES)
+        
+    //     Shader().end();
+    //   }
+    // }
+    node.shader = "secondPass"
+    node.scene.push( Mesh(Primitive2D.quad) )
+    SceneGraph.root.outputTo(node)
+
+    val node2 = new RenderNode
+    node2.shader = "test"
+    val quad = new Drawable {
+      val m = Mesh(Primitive2D.quad)
+      override def draw(){
+        Shader("test").setUniformf("u_dist", Random.float()*0.01f)
+        m.draw()
+      }
+    }
+    node2.scene.push( quad )
+    node.outputTo(node2)
+
+    // Kinect.init()
     tree.init()
   }
   override def draw(){
-    
+
+    theta += dw
+    MatrixStack.rotate(0.f,theta,0.f)
+
     if(day.x == 1.f){
       Shader().setUniformf("u_useLocalZ", dayUniforms.z)
       Shader().setUniformf("u_near", dayUniforms.x)
@@ -101,17 +150,22 @@ object Main extends App with GLAnimatable with AudioSource {
       //Kinect.draw()
       tree.draw()
     }
+
   }
-  override def draw2(){
+
+  def rotateWorld(v:Float) = dw = v
+  
+  def draw2(){
       // Shader("secondPass").setUniformf("u_edge", 1.)
     if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
     else Shader("secondPass").setUniformf("u_depth", 1.f)
   }
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
-    live.step(dt)
-    Kinect.step(dt)
-    tree.step(dt)
+    live.animate(dt)
+    // Kinect.animate(dt)
+    // MatrixStack.worldPose.rotate(0,dw,0)
+    tree.animate(dt)
   }
 
   override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){

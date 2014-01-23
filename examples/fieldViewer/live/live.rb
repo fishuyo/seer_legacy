@@ -1,7 +1,7 @@
 ############################
 # global state 
 ############################
-$Main = com.fishuyo.examples.fieldViewer.live.Main  # Main class
+$Main = com.fishuyo.seer.examples.fieldViewer.live.Main  # Main class
 $go = Vec3.new(1,0,0)
 
 $pos = Vec3.new(0,0,0)

@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.kinect
 
 import graphics._
@@ -18,11 +18,11 @@ import org.opencv.core._
 import org.opencv.highgui._
 import org.opencv.imgproc._
 
-object Loop extends App with GLAnimatable{
+object Loop extends App with Animatable{
 
   SimpleAppRun.loadLibs()
   System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
-  GLScene.push(this)
+  Scene.push(this)
 
   var bgsub = new BackgroundSubtract
   var blob = new BlobTracker
@@ -33,7 +33,7 @@ object Loop extends App with GLAnimatable{
 
   val cube = Model(Cube())
   cube.scale.set(1.f, (2*480.f)/640.f, 1.f)
-  GLScene.push(cube)
+  Scene.push(cube)
 
   val bigpix = new Pixmap(640,2*480, Pixmap.Format.RGBA8888)
   val pix = new Pixmap(640,480, Pixmap.Format.RGB888)
@@ -58,7 +58,7 @@ object Loop extends App with GLAnimatable{
   	cube.draw()
   }
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 		
   	val img = Kinect.videoMat //new Mat()
   	// try{
@@ -99,7 +99,7 @@ object Loop extends App with GLAnimatable{
 		Texture(0).draw(pix,0,0)
 
 
-    live.step(dt)
+    live.animate(dt)
   }
 
 }

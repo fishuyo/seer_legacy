@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.dla3d
 
 import maths._
@@ -13,6 +13,7 @@ import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 import com.badlogic.gdx.graphics.GL10
 
 
@@ -20,7 +21,7 @@ object Main extends App {
 
   SimpleAppRun.loadLibs()
 
-  GLScene.push( ParticleCollector )
+  Scene.push( ParticleCollector )
   
   //ParticleCollector.seedLine( Vec3(0,-1,0), Vec3(0,1,0) )
   //ParticleCollector.seedLine( Vec3(0,.2,0), Vec3(-.2,.8,0) )
@@ -133,7 +134,7 @@ object Particle {
   def randomVec(s: Float) : Vec3 = (new Vec3( rand.nextFloat * 2 - 1, rand.nextFloat * 2 - 1, rand.nextFloat * 2 - 1)).normalize * s
 }
 
-object ParticleCollector extends GLAnimatable {
+object ParticleCollector extends Animatable {
 
   var pointSize = 5.f
   var showField = false
@@ -163,17 +164,17 @@ object ParticleCollector extends GLAnimatable {
     //field.set(x,y,z, (Vec3(0,1,0)-cen).normalize * .1f )
   }
 
-  var mesh:Mesh = _
+  var mesh:GdxMesh = _
   var vertices:Array[Float] = _
-  var meshCol:Mesh = _
+  var meshCol:GdxMesh = _
   var verticesCol:Array[Float] = _
   var color = Vec3(2.f)
 
     if( mesh == null){
       vertices = new Array[Float](3*numParticles)
-      mesh = new Mesh(false,numParticles,0,VertexAttribute.Position)
+      mesh = new GdxMesh(false,numParticles,0,VertexAttribute.Position)
       verticesCol = new Array[Float](3*maxParticles)
-      meshCol = new Mesh(false,maxParticles,0,VertexAttribute.Position)
+      meshCol = new GdxMesh(false,maxParticles,0,VertexAttribute.Position)
     }
 
   def setThresh(f:Float) = thresh = f
@@ -235,7 +236,7 @@ object ParticleCollector extends GLAnimatable {
 
 
 
-  override def step( dt: Float )= {
+  override def animate( dt: Float )= {
 
     if( rotate ) rot += 2.f
     if( rot > 180.f) rot = -180.f
@@ -277,9 +278,9 @@ object ParticleCollector extends GLAnimatable {
   override def draw() = {
     if( mesh == null){
       vertices = new Array[Float](3*numParticles)
-      mesh = new Mesh(false,numParticles,0,VertexAttribute.Position)
+      mesh = new GdxMesh(false,numParticles,0,VertexAttribute.Position)
       verticesCol = new Array[Float](3*maxParticles)
-      meshCol = new Mesh(false,maxParticles,0,VertexAttribute.Position)
+      meshCol = new GdxMesh(false,maxParticles,0,VertexAttribute.Position)
     }
  
     Shader.setColor( color, 1.f)

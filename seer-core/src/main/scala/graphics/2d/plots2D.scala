@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import maths._
@@ -9,15 +9,16 @@ import scala.collection.mutable.Queue
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 /* 
 * Plot stream of size data points scaled by range
 */
-class Plot2D( var size:Int, var range:Float=1.f) extends GLDrawable {
+class Plot2D( var size:Int, var range:Float=1.f) extends Drawable {
   var color = Vec3(1.f)
   var pose = Pose()
   var scale = Vec3(1.f)
-  val mesh = new Mesh(false,size,0, VertexAttribute.Position)
+  val mesh = new GdxMesh(false,size,0, VertexAttribute.Position)
   var data = Queue[Float]()
   data.enqueue(new Array[Float](size):_*)
   val vertices = new Array[Float](size*3)
@@ -54,14 +55,14 @@ class Plot2D( var size:Int, var range:Float=1.f) extends GLDrawable {
 /* 
 * Display Audio Samples and boundary/playback cursors
 */
-class AudioDisplay(val size:Int) extends GLDrawable {
+class AudioDisplay(val size:Int) extends Drawable {
   var color = RGBA(0,1,0,1)
   var cursorColor = RGBA(1,1,0,1)
   var pose = Pose()
   var scale = Vec3(1)
-  val mesh = new Mesh(false,size*2,0, VertexAttribute.Position)
+  val mesh = new GdxMesh(false,size*2,0, VertexAttribute.Position)
   val vertices = new Array[Float](size*2*3)
-  val cursorMesh = new Mesh(false,6,0,VertexAttribute.Position)
+  val cursorMesh = new GdxMesh(false,6,0,VertexAttribute.Position)
   val cursorVert = new Array[Float](6*(3))
   var primitive = GL10.GL_LINE_STRIP
   var renderSize = size

@@ -1,4 +1,4 @@
-// package com.fishuyo
+// package com.fishuyo.seer
 // package bones
 
 // import maths._
@@ -20,7 +20,7 @@
 
 //   SimpleAppRun.loadLibs()
 
-//   GLScene.push( ParticleCollector )
+//   Scene.push( ParticleCollector )
 //   var p = new Particle(Vec3(.01,0,.01),Vec3(1,0,1).normalize)
 //   p.setAlignment("line")
 //   ParticleCollector.insertPoint(p)
@@ -38,25 +38,25 @@
 // 		bones(i) = GLPrimitive.cube(Pose(), Vec3(.01f))
 // 		sines(i) = new Sine(80.f,0.f)
 // 	}
-//   bones.foreach( GLScene.push( _ ))
+//   bones.foreach( Scene.push( _ ))
 //   sines.foreach( Audio.push( _ ))
 
 
 
 
 //   var drone = new ParticleDrone
-//   GLScene.push( drone )
+//   Scene.push( drone )
 
 //   val ground = ObjParser("src/main/scala/drone/ground.obj")
 //   ground.scale.set(100.f,1.f,100.f)
-//   GLScene.push(ground)
+//   Scene.push(ground)
 //   // val ground2 = ObjParser("src/main/scala/drone/groundrough.obj")
 //   // ground2.p.pos.set(0.f,0.f,-200.f)
 //   // ground2.s.set(100.f,1.f,100.f)
-//   // GLScene.push(ground2)
+//   // Scene.push(ground2)
 //   // val ground3 = ObjParser("src/main/scala/drone/landscapealiendecimated.obj","triangles",false)
 //   // //ground.s.set(100.f,1.f,100.f)
-//   // GLScene.push(ground3)
+//   // Scene.push(ground3)
 
 
 //   val live = new Ruby("src/main/scala/bones/bones.rb")

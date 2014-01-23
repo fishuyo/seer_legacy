@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import maths._
@@ -7,6 +7,7 @@ import spatial._
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 
 object Quad {
@@ -15,14 +16,14 @@ object Quad {
   def apply() = quad.getOrElse({ quad = Some(new Quad()); quad.get })
   def asLines() = wireQuad.getOrElse({ wireQuad = Some(new Quad("lines")); wireQuad.get })
 }
-class Quad(style:String="triangles") extends GLDrawable {
-  var mesh:Mesh = _
+class Quad(style:String="triangles") extends Drawable {
+  var mesh:GdxMesh = _
   var primitive = GL10.GL_TRIANGLES
   // var drawFunc = () => {}
 
   style match {
     case "lines" =>
-      mesh = new Mesh(true,4,5, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
+      mesh = new GdxMesh(true,4,5, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
       mesh.setVertices( Array[Float](
         -1,-1,0, 0,0,1,   0,0,
         1,-1,0,  0,0,1,   1,0,
@@ -37,7 +38,7 @@ class Quad(style:String="triangles") extends GLDrawable {
       // drawFunc = () => { mesh.render(Shader(), GL10.GL_LINE_STRIP)}
 
     case _ => 
-      mesh = new Mesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
+      mesh = new GdxMesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
       mesh.setVertices( Array[Float](
         -1,-1,0, 0,0,1,   0,0,
         1,-1,0,  0,0,1,   1,0,
@@ -78,7 +79,7 @@ object Primitive2D extends GLThis {
 
 
   def quad = {
-    val mesh = new Mesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
+    val mesh = new GdxMesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
     mesh.setVertices( Array[Float](
       -1,-1,0, 0,0,1,   0,0,
       1,-1,0,  0,0,1,   1,0,

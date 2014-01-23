@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package loop
 
 import maths._
@@ -29,10 +29,11 @@ class Main extends AndroidApplication {
   }
 
   override def getLogLevel(): Int = 0
+  override def log(s:String,ss:String,t:Throwable){} //
 }
 
 
-class LoopScene extends InputAdapter with GLAnimatable {
+class LoopScene extends InputAdapter with Animatable {
 
   // var loop = new Loop(10.f)
   // var plot = new AudioDisplay(500)
@@ -40,12 +41,14 @@ class LoopScene extends InputAdapter with GLAnimatable {
   // plot.scale = Vec3(3)
   // Audio.push(loop);
 
-  GLScene.push(this);
+  Scene.push(this);
 
   var looper = new Looper
 
   Audio.push( looper )
-  GLScene.push( looper )
+  Audio.actor ! Execute(()=>{android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO)})
+  
+  Scene.push( looper )
 
   var t = 0.f
   var l = 0
@@ -124,7 +127,7 @@ class LoopScene extends InputAdapter with GLAnimatable {
   looper.setMode("sync")
 
 
-  // val live = new Ruby("res/live.rb", "com.fishuyo.loop" :: List())
+  // val live = new Ruby("res/live.rb", "com.fishuyo.seer.loop" :: List())
 
   override def step(dt:Float){
     Camera.nav.pos.lerpTo(newPos, 0.15f)

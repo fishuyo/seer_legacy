@@ -4,7 +4,7 @@
 *
 */
 
-package com.fishuyo
+package com.fishuyo.seer
 package maths
 
 import com.badlogic.gdx.math.Quaternion
@@ -16,6 +16,8 @@ object Quat {
   val acc_min = 0.999999
   def apply( w:Float, x:Float, y:Float, z:Float ) = new Quat(w,x,y,z)
   def apply(q:Quat) = new Quat(q.w,q.x,q.y,q.z)
+  def apply(x:Float, y:Float, z:Float) = new Quat(1,0,0,0).fromEuler(x,y,z)
+  def apply(euler:Vec3) = new Quat(1,0,0,0).fromEuler(euler)
   def apply() = new Quat(1,0,0,0)
 }
 
@@ -67,6 +69,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     z = axis.z * sin2a
   }
   // from euler angles ( elevation, azimuth, bank )
+  def fromEuler( x:Float, y:Float, z:Float ): Quat = fromEuler((x,y,z))
   def fromEuler( eu:Vec3 ) : Quat = fromEuler((eu.x,eu.y,eu.z))
   def fromEuler( eu:(Float,Float,Float) ) : Quat= { //eu = Vec3( el, az, ba )
     val c1 = math.cos(eu._1*.5f); val c2 = math.cos(eu._2*.5f); val c3 = math.cos(eu._3*.5f)   

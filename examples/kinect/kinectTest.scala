@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.kinect
 
 import graphics._
@@ -12,17 +12,17 @@ import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
 
-  GLScene.push(this)
+  Scene.push(this)
 
   val live = new Ruby("kinectTest.rb")
 
   val cube = Model(Cube())
   cube.scale.set(1.f, (2*480.f)/640.f, 1.f)
-  GLScene.push(cube)
+  Scene.push(cube)
 
   val pix = new Pixmap(640,2*480, Pixmap.Format.RGBA8888)
   pix.setColor(1.f,1.f,1.f,0)
@@ -44,8 +44,8 @@ object Main extends App with GLAnimatable{
 
   }
 
-  override def step(dt:Float){
-    live.step(dt)
+  override def animate(dt:Float){
+    live.animate(dt)
   }
 
 }

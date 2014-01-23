@@ -1,9 +1,9 @@
 
 
-importPackage(com.fishuyo.io)
-importPackage(com.fishuyo.maths)
-importPackage(com.fishuyo.graphics)
-importPackage(com.fishuyo.examples.fieldViewer.live)
+importPackage(com.fishuyo.seer.io)
+importPackage(com.fishuyo.seer.maths)
+importPackage(com.fishuyo.seer.graphics)
+importPackage(com.fishuyo.seer.examples.fieldViewer.live)
 
 // Main.n = 200
 // println(Main.n())

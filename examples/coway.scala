@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.conwayD
 
 import graphics._
@@ -10,7 +10,7 @@ import java.awt.event._
 import java.nio._
 //import com.jogamp.common.nio.Buffers
 
-import com.fishuyo.io._
+import com.fishuyo.seer.io._
 
 import com.badlogic.gdx._
 import com.badlogic.gdx.math._
@@ -72,7 +72,7 @@ object MyInput extends InputAdapter {
   }
 
   override def keyTyped( c: Char) = {
-    if( c == '\n' ) Main.field.step(0)
+    if( c == '\n' ) Main.field.animate(0)
     true
   }
 
@@ -89,7 +89,7 @@ object Main extends App {
   //field.set( 3, 2, 1.f );
   //field.set( 4, 2, 1.f );
 
-  GLScene.push( field )
+  Scene.push( field )
   Inputs.addProcessor(MyInput)
 
   // val win = new GLRenderWindow
@@ -106,7 +106,7 @@ class ConwayField(w:Int,h:Int) extends Field2D(w,h) {
   var next: FloatBuffer = _ //Array[Float] = _
 
   
-  override def step(dt: Float) = {
+  override def animate(dt: Float) = {
 
     if( next == null ){
       next = FloatBuffer.allocate( data.capacity ) //data.duplicate //new Array[Float](w*h);

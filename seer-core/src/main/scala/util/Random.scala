@@ -1,13 +1,13 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package util
 
 import maths._
 
-import scala.util.Random
+import scala.util.{Random => JRandom }
 
 object Randf{
-	val gen = new Random
+	val gen = new JRandom
 	def apply(min:Float=0.f, max:Float=1.f, gaus:Boolean=false) = new Randf(min,max,gaus)
 }
 
@@ -59,10 +59,10 @@ class Chooser[T]( var choices:Array[T], var prob:Array[Float]=Array[Float]()){
 	def apply():T = {
 		var i = 0
 		if( equal ){
-			i = Random.nextInt(choices.length)
+			i = JRandom.nextInt(choices.length)
 			return choices(i)
 		} else{
-			val r = Random.nextFloat
+			val r = JRandom.nextFloat
 			var sum = 0.f
 			for( i <- ( 0 until prob.length)){
 				sum += prob(i)

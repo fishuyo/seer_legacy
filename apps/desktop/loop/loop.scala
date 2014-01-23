@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.loop
 
 import graphics._
@@ -10,16 +10,16 @@ import audio._
 
 import scala.collection.mutable.ListBuffer
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
   
   var looper = new Looper
   var l = 0
 
-  Audio.push( looper )
-  GLScene.push( looper )
+  PortAudio.push( looper )
+  Scene.push( looper )
 
   val live = new Ruby("loop.rb")
 
@@ -28,9 +28,10 @@ object Main extends App with GLAnimatable{
 
   for( i<-(-2 to 2)){
     val offset = Vec3(0,2.5f,0)
-    var m = buttons.translate( offset * i)
+    var m = Model(Quad.asLines()).translate(offset*i)
     m.color = RGBA(0,0,0,1)
-    m.add( Quad.asLines() )
+    buttons.addChild(m) //translate( offset * i)
+    // m.addPrimitive( Quad.asLines() )
     i match {
       case 2 => m.onPick = (h) => { val r = looper.toggleRecord(l); if(r) m.color = (RGBA(1,0,0,1)) else m.color = (RGBA(0,0,0,1)) } 
       case 1 => m.onPick = (h) => { val p = looper.togglePlay(l); if(p) m.color = (RGBA(1,0,0,1)) else m.color = (RGBA(0,1,0,1)) } 
@@ -75,9 +76,9 @@ object Main extends App with GLAnimatable{
 
   SimpleAppRun()  
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
-    live.step(dt)
+    live.animate(dt)
   }
 
   override def draw(){

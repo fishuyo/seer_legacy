@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package maths
 
 import graphics._
@@ -7,7 +7,7 @@ import spatial._
 
 //import javax.media.opengl._
 
-class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c,halfsize) with GLAnimatable {
+class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c,halfsize) with Animatable {
 
   var data = new Array[Vec3](n*n*n) 
   val dn = (2*halfsize)/n

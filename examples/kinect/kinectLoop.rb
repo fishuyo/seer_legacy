@@ -1,11 +1,11 @@
 require 'java'
 
 module M
-  include_package "com.fishuyo.io"
-  include_package "com.fishuyo.io.kinect"
-  include_package "com.fishuyo.maths"
-  include_package "com.fishuyo.graphics"
-  include_package "com.fishuyo.examples.kinect"
+  include_package "com.fishuyo.seer.io"
+  include_package "com.fishuyo.seer.io.kinect"
+  include_package "com.fishuyo.seer.maths"
+  include_package "com.fishuyo.seer.graphics"
+  include_package "com.fishuyo.seer.examples.kinect"
 
 end
 
@@ -18,7 +18,7 @@ class Object
   end
 end
 
-$Loop = com.fishuyo.examples.kinect.Loop
+$Loop = com.fishuyo.seer.examples.kinect.Loop
 
 Keyboard.clear()
 Keyboard.use()
@@ -69,7 +69,7 @@ Kinect.bgsub.updateBackgroundNextFrame()
 
 Kinect.setAngle(0)
 
-def step(dt)
+def animate(dt)
 # puts $Loop.loop.alpha
 # puts $Loop.loop.beta
   	Kinect.bgsub.setThreshold(10.0)

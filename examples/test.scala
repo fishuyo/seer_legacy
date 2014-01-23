@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package test
 
 import graphics._
@@ -12,44 +12,53 @@ import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
 
-  GLScene.push(this)
+  Scene.push(this)
 
-  val live = new Ruby("test.rb", "com.fishuyo.examples" :: List())
+  val live = new Ruby("test.rb")
 
-  val cube = Model(Cube())
+  val cube = Cube()
+  val wire = Cube(Lines)
+
+  cube.addChild(wire)
+
+  val node = new RenderNode
+  val s = Sphere()
+  s.color.set(1,0,0,1)
+  node.scene.push(s)
+  SceneGraph.addNode(node)
+
+  val mesh = Cylinder.mesh.getOrElse(new Mesh()) //Sphere.generateMesh()
+
   var modelBuilder = Some(parsers.EisenScriptParser(""))
   var model = Some(Model())
 
   //cube.scale.set(1.f, (2*480.f)/640.f, 1.f)
-  GLScene.push(cube)
+  Scene.push(cube)
+  // Scene.push(wire)
 
-  val pix = new Pixmap(640,2*480, Pixmap.Format.RGBA8888)
-  pix.setColor(1.f,1.f,1.f,0)
-  pix.fill()
 
   SimpleAppRun()  
 
   override def init(){
-   //  Shader("res/shaders/sky.vert", "res/shaders/sky.frag")
-  	// Texture(pix) //"res/bunny.png");
-  	// Shader(3)
-  	// Shader.monitor(3)
+    cube.translate(-1,0,0)
+    wire.translate(2,0,0)
   }
   override def draw(){
 
-  	// Texture(0).bind()
-  	// Shader().setUniformi("u_texture0", 0);
-  	// cube.draw()
     live.draw()
 
   }
 
-  override def step(dt:Float){
-    live.step(dt)
+  override def animate(dt:Float){
+    cube.rotate(0,0.1f,0)
+    wire.rotate(0,-0.1f,0)
+
+    live.animate(dt)
+
   }
 
 }

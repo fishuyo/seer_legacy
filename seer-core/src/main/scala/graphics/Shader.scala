@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import maths.Vec3
@@ -17,13 +17,13 @@ object Shader {
 
   var load = true
   var indx = 0;
-  var shader:ShaderProgram = null
-  val loadedShaderFiles = new HashMap[String,(FileHandle,FileHandle)]()
-  val loadedShaders = new HashMap[String,ShaderProgram]()
+  var shader:Option[Shader] = None
+  val loadedShaders = new HashMap[String,Shader]()
 
   var bg = RGBA(0,0,0,1)
   var color = RGBA(1,1,1,1)
   var alpha = 1.f
+  var fade = 0.f
 
   var blend = false
   var multiPass = false
@@ -53,6 +53,10 @@ object Shader {
     this().setUniformf("u_alpha", alpha)
   }
 
+  def setMaterial(m:Material){
+    
+  }
+
   def setLightUniforms() = {
     this().setUniformf("u_lighting", lighting)
     this().setUniformf("u_texture", texture)
@@ -62,73 +66,129 @@ object Shader {
     this().setUniformf("u_lightSpecular", lightSpecular.r, lightSpecular.g, lightSpecular.b, lightSpecular.a)
   }
 
-  def setMatrices() = {
+  def setMatrices(camera:Camera = Camera) = {
     try{
-      MatrixStack()
+      MatrixStack(camera)
     	this().setUniformMatrix("u_projectionViewMatrix", MatrixStack.projectionModelViewMatrix() )
       this().setUniformMatrix("u_modelViewMatrix", MatrixStack.modelViewMatrix() )
     	this().setUniformMatrix("u_viewMatrix", MatrixStack.viewMatrix() )
     	this().setUniformMatrix("u_normalMatrix", MatrixStack.normalMatrix() )
       this().setUniformf("u_color", color.r, color.g, color.b, color.a)
+      // this().setUniformf("u_alpha", alpha)
+      // this().setUniformf("u_fade", fade)
       setLightUniforms();
-    } catch { case e:Exception => ()}//println(e)}
+    } catch { case e:Exception => ()} //println(e)}
 
   }
 
-  //load new shader program from file
+  def load(s:Shader) = {
+    if( s.loaded ){
+      loadedShaders(s.name) = s
+    }
+    s
+  }
+
+  //load new shader program from files
   def load(name:String, v:FileHandle, f:FileHandle) = {
+    val s = new Shader
+    s.load(name,v, f)
+
+    if( s.loaded ){
+      loadedShaders(name) = s
+    }
+    s
+  }
+
+  //load new shader program from strings
+  def load(name:String, v:String, f:String) = {
+    val s = new Shader
+    s.load(name,v, f)
+
+    if( s.loaded ){
+      loadedShaders(name) = s
+    }
+    s
+  }
+
+  // return selected shader
+  def apply() = { if(shader.isEmpty) shader = Some(loadedShaders.values.head); shader.get.program.get }
+
+  // select shader
+  def apply(n:String) = { shader = Some(loadedShaders(n)); shader.get.program.get }
+  
+  // called in between frames to reload shader programs
+  def update() = {
+    loadedShaders.foreach{ case(n,s) => s.update() } 
+  }
+
+}
+
+class Shader {
+
+  var name = ""
+  var index = 0
+  var loaded = false
+  var reloadFiles = false
+  var program:Option[ShaderProgram] = None
+  var vertFile:Option[FileHandle] = None
+  var fragFile:Option[FileHandle] = None
+
+  //load new shader program from file
+  def load(n:String, v:FileHandle, f:FileHandle) = {
 
     val s = new ShaderProgram(v, f)
     if( s.isCompiled() ){
-      loadedShaderFiles(name) = (v,f)
-      loadedShaders(name) = s
+      name = n
+      program = Some(s)
+      vertFile = Some(v)
+      fragFile = Some(f)
+      loaded = true
     }else{
       println( s.getLog() )
     }
   }
 
   //load new shader program directly
-  def load(name:String, v:String, f:String) = {
+  def load(n:String, v:String, f:String) = {
 
     val s = new ShaderProgram(v, f)
     if( s.isCompiled() ){
-      loadedShaders(name) = s
+      name = n
+      program = Some(s)
+      loaded = true
     }else{
       println( s.getLog() )
     }
   }
 
-  // return selected shader
-  def apply() = { if(shader == null) shader = loadedShaders.values.head; shader }
+  def reload() = reloadFiles = true
 
-  // select shader
-  def apply(n:String) = { shader = loadedShaders(n); shader}
-  
-  // reload shader programs
-  def reload() = load = true
+  def apply() = program.get
+  def begin() = program.get.begin()
+  def end() = program.get.end()
 
-  // called in between frames to reload shader programs
   def update() = {
-    if( load ){
-      loadedShaderFiles.foreach{ case(n,(v,f)) => load(n,v,f) } 
-      load = false
+    if( vertFile.isDefined && fragFile.isDefined && reloadFiles ){
+      load(name,vertFile.get,fragFile.get) 
+      reloadFiles = false
     }
   }
 
-  def monitor(name:String) = {
+  // reload shader when files modified
+  def monitor(){
+    if( vertFile.isEmpty || fragFile.isEmpty ) return
     val that = this;
     try{
-  	  FileMonido( loadedShaderFiles(name)._1.path() ){
-  	    case ModifiedOrCreated(f) => that.reload;
-  	    case _ => None
-  	  }
-  	  FileMonido( loadedShaderFiles(name)._2.path() ){
-  	    case ModifiedOrCreated(f) => that.reload;
-  	    case _ => None
-  	  }
+      FileMonido( vertFile.get.path() ){
+        case ModifiedOrCreated(f) => that.reload
+        case _ => None
+      }
+      FileMonido( fragFile.get.path() ){
+        case ModifiedOrCreated(f) => that.reload
+        case _ => None
+      }
     } catch { case e:Exception => println(e) }
-	}
-
+  } 
 }
 
 
@@ -174,6 +234,8 @@ object DefaultShaders {
 
       uniform sampler2D u_texture0;
 
+      uniform float u_alpha;
+      uniform float u_fade;
       uniform float u_texture;
       uniform float u_lighting;
       uniform vec4 u_lightAmbient;
@@ -206,6 +268,8 @@ object DefaultShaders {
         float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
         final_color += u_lightSpecular * spec;
         gl_FragColor = mix(colorMixed, final_color, u_lighting);
+        gl_FragColor *= (1.0 - u_fade);
+        gl_FragColor.a *= u_alpha;
       }
 
     """

@@ -1,12 +1,13 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 import maths._
 import spatial._
 
 //import javax.media.opengl._
 import com.badlogic.gdx.graphics.{Camera => GdxCamera}
-import com.badlogic.gdx.graphics.PerspectiveCamera
+import com.badlogic.gdx.graphics.{PerspectiveCamera => GdxPCam }
+import com.badlogic.gdx.graphics.{OrthographicCamera => GdxOCam }
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.Matrix4
 
@@ -14,7 +15,7 @@ import com.badlogic.gdx.math.Matrix4
 * Camera
 */
 
-trait CameraNav extends GdxCamera {
+trait Camera extends GdxCamera {
   var nav = new Nav()
   def step( dt:Float ){
     nav.step(dt)
@@ -31,40 +32,13 @@ trait CameraNav extends GdxCamera {
   }
 }
 
-object Camera extends Camera
-class Camera extends PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f) with CameraNav {
-
-  var rotWorld = new Matrix4()
-  var theta = 0.f
-  var dw = 0.f
-
+class PerspectiveCamera extends GdxPCam(67.f, SimpleAppSize.aspect, 1.f) with Camera {
   near = .01f
-
-  override def step( dt:Float ) = {
-
-    if(dw != 0.f){
-      theta += dw
-      if(theta > 180.f) theta = -180.f
-      val s = math.sin(theta.toRadians).toFloat
-      val c = math.cos(theta.toRadians).toFloat
-      rotWorld.set( Array(c,0,s,0, 0,1,0,0, -s,0,c,0, 0,0,0,1 ) )
-    }
-
-    nav.step(dt)
-    position.set(nav.pos.x, nav.pos.y, nav.pos.z)
-    direction.set(nav.mUF.x, nav.mUF.y, nav.mUF.z)
-    up.set(nav.mUU.x, nav.mUU.y, nav.mUU.z)
-
-    update()
-
-    Matrix4.mul(combined.`val`, rotWorld.`val`);
-    Matrix4.mul(view.`val`, rotWorld.`val`);
-
-  }
-  def rotateWorld(speed:Float) = dw = speed
-
   def setFOV(f:Float) = fieldOfView = f
-
 }
 
+class OrthographicCamera(w:Int,h:Int) extends GdxOCam(w,h) with Camera
  
+object Camera extends PerspectiveCamera
+// object Camera extends PerspectiveCamera with Camera
+

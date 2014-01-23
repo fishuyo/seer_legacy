@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.fieldViewer
 
 import dynamic._
@@ -7,12 +7,12 @@ import graphics._
 import maths._
 import io._
 
-object Main extends App with GLAnimatable {
+object Main extends App with Animatable {
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
   val fieldViewer = new ConwayFV(100,100)
-  GLScene.push(fieldViewer)
+  Scene.push(fieldViewer)
 
   val live = new Ruby("fieldViewer.rb")
 
@@ -24,7 +24,7 @@ object Main extends App with GLAnimatable {
 
 }
 
-class FieldViewer(var w:Int, var h:Int) extends GLAnimatable {
+class FieldViewer(var w:Int, var h:Int) extends Animatable {
 
   var running = true;
   var field = new Field2D(w,h)

@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.fieldViewer
 package reactdiffuse.barkley
 
@@ -8,13 +8,13 @@ import dynamic._
 import maths._
 
 
-object Main extends App with GLAnimatable {
+object Main extends App with Animatable {
 
 	SimpleAppRun.loadLibs()
-	GLScene.push( this )
+	Scene.push( this )
 
   val fv = new ReactDiffuseFV
-  GLScene.push( fv );
+  Scene.push( fv );
 
   val live = new Ruby("src/main/scala/examples/fieldViewer/reactdiffuse/barkley.rb")
 

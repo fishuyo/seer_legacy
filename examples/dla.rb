@@ -1,6 +1,6 @@
 require 'java'
 
-Seer = Java::com.fishuyo
+Seer = Java::com.fishuyo.seer
 Key = Seer.io.Keyboard
 
 P = Seer.examples.dla3d.ParticleCollector

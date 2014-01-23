@@ -3,7 +3,7 @@
 # 	save this file to reload it
 ############################
 
-$fieldViewer = com.fishuyo.examples.fieldViewer.Main.fieldViewer
+$fieldViewer = com.fishuyo.seer.examples.fieldViewer.Main.fieldViewer
 
 
 ############################

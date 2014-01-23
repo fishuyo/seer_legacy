@@ -1,13 +1,13 @@
 require 'java'
 
 module M
-  include_package "com.fishuyo.io"
-  include_package "com.fishuyo.io.kinect"
-  include_package "com.fishuyo.maths"
-  include_package "com.fishuyo.spatial"
-  include_package "com.fishuyo.graphics"
-  include_package "com.fishuyo.util"
-  include_package "com.fishuyo.examples.kinect"
+  include_package "com.fishuyo.seer.io"
+  include_package "com.fishuyo.seer.io.kinect"
+  include_package "com.fishuyo.seer.maths"
+  include_package "com.fishuyo.seer.spatial"
+  include_package "com.fishuyo.seer.graphics"
+  include_package "com.fishuyo.seer.util"
+  include_package "com.fishuyo.seer.examples.kinect"
 end
 
 class Object
@@ -53,7 +53,7 @@ Mouse.bind("drag", lambda{|i|
 
 Keyboard.clear()
 Keyboard.use()
-Keyboard.bind("p", lambda{
+Keyboard.bind("f", lambda{
   Kinect.captureDepthImage()
   Kinect.captureDepthPoints(2000.0)
 })
@@ -69,9 +69,9 @@ Kinect.startVideo()
 Kinect.startDepth()
 Kinect.bgsub.updateBackgroundNextFrame()
 
-Kinect.setAngle(0)
+Kinect.setAngle(10)
 
-def step(dt)
+def animate(dt)
 
 
   Shader.lighting_=(0.0)

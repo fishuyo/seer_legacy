@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.fieldViewer.fractal
 
 import dynamic._
@@ -7,9 +7,9 @@ import graphics._
 import maths._
 import io._
 
-object Main extends App with GLAnimatable {
+object Main extends App with Animatable {
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
   var field = new MField(100,100)
 

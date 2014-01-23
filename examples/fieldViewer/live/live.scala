@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.fieldViewer
 package live
 
@@ -8,15 +8,15 @@ import graphics._
 import maths._
 import io._
 
-object Main extends App with GLAnimatable {
+object Main extends App with Animatable {
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
   //val live = new Ruby("src/main/scala/examples/fieldViewer/live/live.rb")
   val live = new JS("src/main/scala/examples/fieldViewer/live/live.js")
 
   var fieldViewer = new FieldViewer(60,60)
-  GLScene.push(fieldViewer)
+  Scene.push(fieldViewer)
 
   SimpleAppRun()
 

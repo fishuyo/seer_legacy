@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package audio
 
 class Gen extends AudioSource {

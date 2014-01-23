@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package graphics
 
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}

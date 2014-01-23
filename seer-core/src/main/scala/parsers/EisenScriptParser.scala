@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package parsers
 
 import maths._
@@ -27,7 +27,7 @@ case class TransformV(param:String,value:String) extends Statement
 case class Comment extends Statement
 
 abstract trait Primitive extends Statement
-case class Draw(d:GLDrawable) extends Primitive
+case class Draw(d:Drawable) extends Primitive
 case class RuleCall(ident:String) extends Primitive
 case class Dont() extends Primitive
 
@@ -97,7 +97,7 @@ object EisenScriptParser extends StandardTokenParsers {
 
   def primitive = ( ident ^^ {case id => RuleCall(id)} | box | sphere | grid )
   def box = "box" ^^^ Draw(Cube())
-  def grid = "grid" ^^^ Draw(Cube.asLines())
+  def grid = "grid" ^^^ Draw(Cube(Lines))
   def sphere = "sphere" ^^^ Draw(Sphere())
 
 
@@ -174,7 +174,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 		val depth = ruleDepth(name)
 		ruleDepth(name) = depth+1
 		if( depth >= env("maxdepth").toInt ) return
-		rule._2.foreach( applyAction(_).foreach(n.addNode(_)) )
+		rule._2.foreach( applyAction(_).foreach(n.addChild(_)) )
 		ruleDepth(name) = depth
 	}
 
@@ -195,8 +195,8 @@ class ModelInterpreter(val tree: List[Statement]) {
 					var group = Vector[Model]()
 					for( i <- (0 until times)){
 
-						node = new Model(pp,ss)
-						m.foreach( node.addNode(_) )
+						node = new Model{ pose = pp; scale = ss}
+						m.foreach( node.addChild(_) )
 
 						group = group :+ node
 						pp = pp*p
@@ -220,7 +220,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 	def applyPrimitive(p:Primitive, n:Model){
 		p match {
 			case RuleCall(r) => applyRule(r,n)
-			case Draw(d) => n.add( d )
+			case Draw(d) => n.addPrimitive( d )
 			case Dont() => ()
 		}
 	}
@@ -251,7 +251,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 
 	def buildModel() = {
 		model = Model()
-		initialActions.foreach( (a) => applyAction(a).foreach(model.addNode(_)) )
+		initialActions.foreach( (a) => applyAction(a).foreach(model.addChild(_)) )
 		model
 	}
 

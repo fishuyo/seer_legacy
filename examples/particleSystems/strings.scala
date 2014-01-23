@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package examples.particleSystems.strings
 
 import scala.collection.mutable.ListBuffer
@@ -11,17 +11,18 @@ import particle._
 import io._
 
 import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
   val strings = ListBuffer[String]()
   for( i<-(0 until 5)) strings += new String(Vec3(), .5f, .01f, 1.0f)
 
-  val live = new JS("strings.js")
+  val live = new Ruby("strings.rb")
 
   SimpleAppRun()  
 
@@ -30,22 +31,24 @@ object Main extends App with GLAnimatable{
   	strings.foreach( _.draw() )
   }
 
-  override def step(dt:Float){
-  	strings.foreach( _.step(dt) )
-    live.step(dt)
+  override def animate(dt:Float){
+  	strings.foreach( _.animate(dt) )
+    live.animate(dt)
   }
 
 }
 
 
 
-class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, var stiff:Float=1.f) extends GLAnimatable {
+class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, var stiff:Float=1.f) extends Animatable {
 
   var particles = ListBuffer[Particle]()
   var links = ListBuffer[LinearSpringConstraint]()
   var pins = ListBuffer[AbsoluteConstraint]()
 
   val numLinks = (length / dist).toInt
+
+  var damping = 20.f
 
   for( i<-(0 to numLinks)){
   	val p = Particle(pos)
@@ -56,12 +59,12 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
   }
 
   pins += AbsoluteConstraint(particles(0), Vec3(pos))
-  // pins += AbsoluteConstraint(particles.last, Vec3(pos))
+  pins += AbsoluteConstraint(particles.last, Vec3(pos))
 
   var vertices = new Array[Float](3*2*numLinks)
-  var mesh:Mesh = null
+  var mesh:GdxMesh = null
 
-  override def step( dt: Float ) = {
+  override def animate( dt: Float ) = {
 
     for( s <- (0 until 5) ){ 
       links.foreach( _.solve() )
@@ -71,14 +74,33 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
 
     particles.foreach( (p) => {
       p.applyForce(Gravity)
-      p.applyDamping(20.f)
+      p.applyDamping(damping)
       p.step(dt) 
     })
 
+
+    // val ts = .015
+    // val animates = ( (dt+xt) / ts ).toInt
+    // xt += dt - animates * ts
+
+    // for( t <- (0 until animates)){
+    //   for( s <- (0 until 3) ){ 
+    //     links.foreach( _.solve() )
+    //     pins.foreach( _.solve() )
+    //   }
+
+    //   particles.foreach( (p) => {
+    //     if( field != null ) p.applyForce( field(p.position) ) 
+    //     p.applyGravity()
+    //     p.applyDamping(20.f)
+    //     p.animate(.015f) 
+    //   })
+
+    // }
   }
 
   override def draw() {
-    if( mesh == null) mesh = new Mesh(false,2*numLinks,0,VertexAttribute.Position)
+    if( mesh == null) mesh = new GdxMesh(false,2*numLinks,0,VertexAttribute.Position)
     var i = 0
     var off = 0
     for( i<-(0 until links.size)){

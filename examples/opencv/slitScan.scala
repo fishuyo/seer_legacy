@@ -1,4 +1,4 @@
-package com.fishuyo
+package com.fishuyo.seer
 package examples.opencv.slitscan
 
 import graphics._
@@ -16,10 +16,10 @@ import com.badlogic.gdx.graphics.glutils._
 import org.opencv.core._
 import org.opencv.highgui._
 
-object Main extends App with GLAnimatable{
+object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
-  GLScene.push(this)
+  Scene.push(this)
 
 	var capture: VideoCapture = _
 
@@ -30,7 +30,7 @@ object Main extends App with GLAnimatable{
 	var h = 0.0
 
   val cube = Model(Cube())
-  GLScene.push(cube)
+  Scene.push(cube)
 
   var pix:Pixmap = null
 
@@ -62,7 +62,7 @@ object Main extends App with GLAnimatable{
 
   }
 
-  override def step(dt:Float){
+  override def animate(dt:Float){
 
   	val img = new Mat()
   	val read = capture.read(img)
@@ -82,7 +82,7 @@ object Main extends App with GLAnimatable{
 
 		Texture(0).draw(pix,0,0)
 
-    // live.step(dt)
+    // live.animate(dt)
   }
 
 }

@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package trees
 
 import maths._
@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.Texture._
 
 import com.badlogic.gdx.graphics.GL10
 
-object Trees extends GLAnimatable {
+object Trees extends Animatable {
 
   def setDamp(v:Float) = damp = v
   var damp = 100.f
@@ -26,7 +26,7 @@ object Trees extends GLAnimatable {
 
   //var trees = TreeNode(Vec3(0), .1f) :: List()
   //trees(0).branch( 6, 45.f, .8f, 0 )
-  //override def step( dt: Float ) = trees.foreach( _.step(dt) )
+  //override def animate( dt: Float ) = trees.foreach( _.animate(dt) )
   //override def onDraw( gl: GL2 ) = trees.foreach( _.onDraw(gl) )
   //override def draw() = trees.foreach( _.draw() )
 
@@ -36,7 +36,7 @@ object Tree {
   def apply(pos:Vec3=Vec3(0)) = new Tree(){ root.pose.pos = pos; }
 }
 
-class Tree() extends GLAnimatable {
+class Tree() extends Animatable {
   
   var root = TreeNode()
 
@@ -149,7 +149,7 @@ class Tree() extends GLAnimatable {
     //mesh.render( Shader(), GL10.GL_LINES)
 
   }
-  override def step(dt:Float) = {
+  override def animate(dt:Float) = {
 
   	Trees.t += dt
 
@@ -162,7 +162,7 @@ class Tree() extends GLAnimatable {
     if( dirty ){ branch(); dirty = false }    
 
     if(animating){
-      root.step(dt)
+      root.animate(dt)
       root.solveConstraints()
     }
   }
@@ -172,7 +172,7 @@ class Tree() extends GLAnimatable {
 object TreeNode {
 
 	var taper=.8f
-	var glprimitive = Primitive3D.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
+	var glprimitive = Model(Cylinder.generateMesh(1.f,taper,10)) //Primitive3D.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
 
   def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(-math.Pi/2,0,0))), d:Float=1.f, t:Float=.2f, q:Quat=Quat() ) = new TreeNode {
   	restPose = Pose(p);
@@ -201,7 +201,7 @@ object TreeNode {
   }*/
 }
 
-class TreeNode extends GLAnimatable {
+class TreeNode extends Animatable {
 
   var pose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
   var lPose = Pose(Vec3(0), Quat().fromEuler(Vec3(math.Pi/2,0,0)))
@@ -248,9 +248,9 @@ class TreeNode extends GLAnimatable {
     
   }
 
-  override def step( dt: Float ) = {
+  override def animate( dt: Float ) = {
 
-    children.foreach( _.step(dt) )
+    children.foreach( _.animate(dt) )
 
 
   	//euler = (restPose.quat.inverse * pose.quat).toEulerVec()

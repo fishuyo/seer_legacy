@@ -1,7 +1,7 @@
-package com.fishuyo
-//package gdx.desktop
+package com.fishuyo.seer
 
 import io._
+import audio.PortAudio
 
 import com.badlogic.gdx.utils.GdxNativesLoader
 import com.badlogic.gdx.utils.SharedLibraryLoader
@@ -14,6 +14,12 @@ import com.badlogic.gdx.Input.Keys
 
 import org.lwjgl.opengl.Display
 import java.awt._
+import java.awt.event._
+
+object Window {
+  def width = Gdx.graphics.getWidth()
+  def height = Gdx.graphics.getHeight()
+}
 
 object SimpleAppRun {
 
@@ -25,6 +31,7 @@ object SimpleAppRun {
   loadLibs() // load gdx before simple app listener
 
   val app = new SimpleAppListener()
+
   Inputs.addProcessor(FullscreenKey)
 
   // for use to get fullscreen effect accross multiple monitors
@@ -83,11 +90,17 @@ object SimpleAppRun {
 
     if( usingCanvas ){
       frame = new Frame
+      frame.setLayout(new BorderLayout())
       canvas = new Canvas
 
-      frame.add(canvas)
+      frame.add(canvas, BorderLayout.CENTER)
       frame.setSize(cfg.width, cfg.height)
       frame.setTitle(cfg.title)
+      frame.addWindowListener(new WindowAdapter(){
+        override def windowClosing(we:WindowEvent){
+          Gdx.app.exit()
+        }
+      });
       canvas.setBackground(Color.black)
       frame.show()
       new LwjglApplication( app, cfg, canvas )
@@ -96,10 +109,12 @@ object SimpleAppRun {
 
       new LwjglApplication( app, cfg )
     }
+    // PortAudio.initialize()
+    // PortAudio.start()
+
   }
 
   def toggleFullscreen(){
-    
     app.pause()
     if( usingCanvas ){
 
@@ -107,16 +122,18 @@ object SimpleAppRun {
 
         val w = bounds.getWidth().toInt
         val h = bounds.getHeight().toInt
-        //Display.setParent(null)
+        // Display.setParent(null)
 
-        //frame.dispose
-        //frame.setUndecorated(false)
+        // frame.dispose
+        frame.removeNotify()
+        frame.setUndecorated(false)
+        frame.addNotify()
         // frame.add(canvas)
         frame.setBounds( bounds )
         canvas.setBounds( bounds )
-        //frame.pack; frame.setVisible(true)
+        // frame.pack; frame.setVisible(true)
 
-        //Display.setParent(canvas)
+        // Display.setParent(canvas)
 
         //app.resize( bounds.getWidth().toInt, bounds.getHeight().toInt )
 
@@ -136,12 +153,14 @@ object SimpleAppRun {
         // Display.setParent(null)
 
         // frame.dispose
-        // frame.setUndecorated(true)
+        frame.removeNotify()
+        frame.setUndecorated(true)
+        frame.addNotify()
         // frame.add(canvas)
         frame.setBounds( r.getBounds() )
         canvas.setBounds( r.getBounds() )
-        //frame.pack; frame.setVisible(true)
-        //Display.setParent(canvas)
+        // frame.pack; frame.setVisible(true)
+        // Display.setParent(canvas)
 
         //app.resize( r.getWidth().toInt, r.getHeight().toInt )
         // f.setSize(result.getWidth(), result.getHeight());
@@ -163,29 +182,22 @@ object SimpleAppRun {
     fullscreen = !fullscreen
     app.resume()
   }
+
+  def setDecorated(b:Boolean){
+    if( usingCanvas ){
+      frame.removeNotify()
+      frame.setUndecorated(!b)
+      frame.addNotify()
+    }
+  }
+  def setBounds(x:Int,y:Int,w:Int,h:Int){
+    frame.setBounds(x,y,w,h)
+    canvas.setBounds(x,y,w,h)
+    Gdx.gl.glViewport(0, 0, w, h)
+    app.resize(w,h)
+  }
 }
 
-// class SimpleDesktopApp( val app: ApplicationListener ){
-//   def run = {
-//     val cfg = new LwjglApplicationConfiguration()
-//     cfg.title = "seer"
-//     cfg.useGL20 = true
-//     cfg.width = SimpleAppSize.width
-//     cfg.height = SimpleAppSize.height
-
-//     val f = new Frame
-//     val c = new Canvas
-
-//     f.add(c)
-//     f.setUndecorated(true)
-//     f.show()
-//     f.setSize(800,800)
-//     c.setBackground(Color.red)
-
-//     new LwjglApplication( app, cfg )
-//     //new LwjglApplication( app, cfg, c )
-//   }
-// }
 
 object FullscreenKey extends InputAdapter {
 

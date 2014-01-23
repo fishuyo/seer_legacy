@@ -1,10 +1,10 @@
 require 'java'
 
 module M
-  include_package "com.fishuyo.io"
-  include_package "com.fishuyo.maths"
-  include_package "com.fishuyo.graphics"
-  include_package "com.fishuyo.examples.opencv.faceDetect"
+  include_package "com.fishuyo.seer.io"
+  include_package "com.fishuyo.seer.maths"
+  include_package "com.fishuyo.seer.graphics"
+  include_package "com.fishuyo.seer.examples.opencv.faceDetect"
 end
 
 class Object
@@ -17,6 +17,6 @@ class Object
 end
 
 
-def step dt
+def animate dt
 	puts Main.faceDetector.l
 end

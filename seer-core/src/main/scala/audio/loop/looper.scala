@@ -1,5 +1,5 @@
 
-package com.fishuyo
+package com.fishuyo.seer
 package audio
 
 import graphics._
@@ -8,7 +8,7 @@ import maths.Vec3
 import com.badlogic.gdx.Gdx
 
 
-class Looper extends AudioSource with GLDrawable {
+class Looper extends AudioSource with Drawable {
 	var loops = List[Loop]()
 	var plots = List[AudioDisplay]()
 	for( i<-(0 until 8)) newLoop
