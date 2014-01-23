@@ -3,7 +3,7 @@ sbt-launch.jar
 *.mp4
 *.mov
 *.xyz
-
+*.obj
 
 lib/
 libs/
