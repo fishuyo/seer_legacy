@@ -69,7 +69,7 @@ class MyEmitter(var maxParticles:Int) extends Animatable {
     if( particles.length > maxParticles ) particles = particles.takeRight(maxParticles)
     particles.foreach( (p) => {
       p.applyForce(Gravity)
-      p.step(dt)
+      p.step()
     })
 
   }
@@ -79,7 +79,7 @@ class MyEmitter(var maxParticles:Int) extends Animatable {
     particles.foreach( (p) => {
       MatrixStack.push()
       MatrixStack.translate(p.position)
-      MatrixStack.rotate(p.quat)
+      MatrixStack.rotate(p.orientation)
       // MatrixStack.rotate(Quat().fromEuler(p.euler))
       MatrixStack.scale(Vec3(.01f,.01f,.2f))
 

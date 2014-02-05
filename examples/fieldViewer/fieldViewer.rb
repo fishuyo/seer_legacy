@@ -76,18 +76,18 @@ Trackpad.connect()
 
 # called for each finger down
 # f is an array containting [x,y,dx,dy,size,angle]
-# Trackpad.bindEach( lambda{ |fingerID,f|
-# 	field = $fieldViewer.field
+Trackpad.bindEach( lambda{ |fingerID,f|
+	field = $fieldViewer.field
 
-#     x = f[0]*(field.w-1)
-#     y = f[1]*(field.h-1)
-#     r = (f[4]*1.5).to_i
-#     for j in -r..r
-#         for i in -r..r
-#             field.set(x+i,y+j,1.0)
-#         end
-#     end
-# })
+    x = f[0]*(field.w-1)
+    y = f[1]*(field.h-1)
+    r = (f[4]*1.5).to_i
+    for j in -r..r
+        for i in -r..r
+            field.set(x+i,y+j,1.0)
+        end
+    end
+})
 
 
 

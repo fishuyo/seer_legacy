@@ -16,6 +16,7 @@ object MatrixStack {
 	var projModelView = new Matrix4()
   var modelView = new Matrix4()
   var view = new Matrix4()
+  var normal = new Matrix4()
 
   var worldPose = Pose()
   var worldScale = Vec3(1)
@@ -50,17 +51,18 @@ object MatrixStack {
 	def clear() = { stack = new Stack[Matrix4](); model.idt; transform(worldPose,worldScale) }
 	def setIdentity() = model.idt
 
-	def apply(camera:Camera=Camera) = {
+	def apply(camera:NavCamera=Camera) = {
 		projModelView.set(camera.combined)
   	modelView.set(camera.view)
   	view.set(camera.view)
   	Matrix4.mul( projModelView.`val`, model.`val`)
   	Matrix4.mul( modelView.`val`, model.`val`)
+  	normal.set(modelView).toNormalMatrix()
 	}
 
 	def projectionModelViewMatrix() = projModelView
 	def modelViewMatrix() = modelView
 	def viewMatrix() = view
-	def normalMatrix() = modelView.toNormalMatrix()
+	def normalMatrix() = normal
 
 }

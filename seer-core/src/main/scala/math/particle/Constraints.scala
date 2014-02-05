@@ -83,7 +83,7 @@ class RotationalSpringConstraint(val p:Stick, var zeroQuat:Quat=Quat(), k:Float=
 
   //   p.euler = p.euler + d * k
 
-    p.quat = p.quat.slerp(zeroQuat, k)
+    p.orientation = p.orientation.slerp(zeroQuat, k)
 		
 		// val quat = Quat().fromEuler(p.euler)
 		// val pos = p.position + quat.toZ()*p.length

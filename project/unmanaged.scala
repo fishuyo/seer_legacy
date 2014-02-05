@@ -7,7 +7,7 @@ import Keys._
 
 object SeerLibs {
 
-	val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
+  val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
   val updateLibgdx = TaskKey[Unit]("update-gdx", "Updates libgdx")
 
   val downloadTask = downloadLibs <<= streams map { (s: TaskStreams) =>
@@ -71,8 +71,10 @@ object SeerLibs {
     import java.net.URL
     
     // Declare names
-    val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
-    val gdxName = "libgdx-nightly-latest"
+    val baseUrl = "http://libgdx.badlogicgames.com/releases"
+    val gdxName = "libgdx-0.9.9"
+    // val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
+    // val gdxName = "libgdx-nightly-latest"
 
     // Fetch the file.
     s.log.info("Pulling %s" format(gdxName))

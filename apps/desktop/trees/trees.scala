@@ -28,7 +28,7 @@ object Main extends App with Animatable with AudioSource {
   
   var ground:Model = _
   var tree = new Tree() 
- tree.branch()
+  tree.branch()
 
   var wind:com.badlogic.gdx.audio.Music = _
   Audio.push(this) 
@@ -57,6 +57,7 @@ object Main extends App with Animatable with AudioSource {
 
   var theta = 0.f
   var dw = 0.f
+  var blurDist = 0.0f
 
   SimpleAppRun() 
 
@@ -68,7 +69,7 @@ object Main extends App with Animatable with AudioSource {
 
     val f = Gdx.files.internal("res/wind.mp3")
     wind = Gdx.audio.newMusic(f)
-    wind.setVolume(0.f)
+    wind.setVolume(0.0f)
     wind.setLooping(true)
     wind.play
 
@@ -83,38 +84,30 @@ object Main extends App with Animatable with AudioSource {
     SceneGraph.root.shader = "firstPass"
 
     println("trees init.")
-    val node = new RenderNode //{
-    //   override def render(){
-    //     inputs.foreach( _.buffer.get.getColorBufferTexture().bind(0) )
-
-    //     Shader("secondPass").begin()
-    //     Shader().setUniformi("u_texture0", 0);
-    //     Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
-    //     //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
-    //     // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-    //     // scene.draw2()
-    //     if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
-    //     else Shader("secondPass").setUniformf("u_depth", 1.f)
-
-    //     quad.render(Shader(), GL10.GL_TRIANGLES)
-        
-    //     Shader().end();
-    //   }
-    // }
+    val node = new RenderNode
     node.shader = "secondPass"
-    node.scene.push( Mesh(Primitive2D.quad) )
+    val quad = new Drawable {
+      val m = Mesh(Primitive2D.quad)
+      override def draw(){
+        if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
+        else Shader("secondPass").setUniformf("u_depth", 1.f)
+
+        m.draw()
+      }
+    }
+    node.scene.push( quad )
     SceneGraph.root.outputTo(node)
 
     val node2 = new RenderNode
     node2.shader = "test"
-    val quad = new Drawable {
+    val quad2 = new Drawable {
       val m = Mesh(Primitive2D.quad)
       override def draw(){
-        Shader("test").setUniformf("u_dist", Random.float()*0.01f)
+        Shader("test").setUniformf("u_dist", getBlurDist)
         m.draw()
       }
     }
-    node2.scene.push( quad )
+    node2.scene.push( quad2 )
     node.outputTo(node2)
 
     // Kinect.init()
@@ -135,7 +128,7 @@ object Main extends App with Animatable with AudioSource {
       Shader().setUniformf("u_near", dayUniforms.x)
       Shader().setUniformf("u_far", dayUniforms.y)
       Shader().setUniformf("u_useTexture", 1.f)
-      if(day.z == 1.f) Kinect.draw()
+      // if(day.z == 1.f) Kinect.draw()
       tree.draw()
     }else{
       Shader().setUniformf("u_useLocalZ", 0.f)
@@ -154,6 +147,8 @@ object Main extends App with Animatable with AudioSource {
   }
 
   def rotateWorld(v:Float) = dw = v
+  def blurDist(v:Float){ blurDist = v }
+  def getBlurDist() = blurDist
   
   def draw2(){
       // Shader("secondPass").setUniformf("u_edge", 1.)

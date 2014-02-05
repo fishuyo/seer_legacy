@@ -18,7 +18,7 @@ object Main extends App with Animatable {
 
   SimpleAppRun()
 
-  override def step(dt:Float) = {
+  override def animate(dt:Float) = {
     live.runEverytime(dt)
   }
 
@@ -44,7 +44,7 @@ class FieldViewer(var w:Int, var h:Int) extends Animatable {
     Shader.texture = 1.f
     field.draw
   }
-  override def step(dt:Float) = if(running) runEverytime(dt)
+  override def animate(dt:Float) = if(running) runEverytime(dt)
 
 
   def runOnce(){

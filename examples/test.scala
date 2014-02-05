@@ -4,6 +4,7 @@ package test
 import graphics._
 import io._
 import maths._
+import particle._
 import dynamic._
 import audio._
 
@@ -18,47 +19,47 @@ object Main extends App with Animatable{
 
   Scene.push(this)
 
-  val live = new Ruby("test.rb")
 
-  val cube = Cube()
-  val wire = Cube(Lines)
-
-  cube.addChild(wire)
+  val cube = Cube() //new SpringMesh(Cube.generateMesh(), 1.f)
+  val cubes = ListBuffer[Model]()
+  val n = 15
+  for( i<-(-n until n); j<-(-n until n)){
+    val x = i * .2f
+    val z = j * .2f
+    val c = Cube().scale(.1f).translate(x,0,z)
+    cubes += c
+  }
 
   val node = new RenderNode
-  val s = Sphere()
-  s.color.set(1,0,0,1)
-  node.scene.push(s)
-  SceneGraph.addNode(node)
+  val s = new SpringMesh( Sphere.generateMesh(prim=Triangles), 1.f) //Sphere()
+  // s.color.set(1,0,0,1)
+  // node.scene.push(s)
+  // SceneGraph.addNode(node)
+  Scene.push(s)
 
   val mesh = Cylinder.mesh.getOrElse(new Mesh()) //Sphere.generateMesh()
 
-  var modelBuilder = Some(parsers.EisenScriptParser(""))
-  var model = Some(Model())
+  // var modelBuilder = Some(parsers.EisenScriptParser(""))
+  // var model = Some(Model())
 
-  //cube.scale.set(1.f, (2*480.f)/640.f, 1.f)
-  Scene.push(cube)
-  // Scene.push(wire)
+  // Scene.push(cube)
 
+  val live = new Ruby("test.rb")
 
   SimpleAppRun()  
 
   override def init(){
-    cube.translate(-1,0,0)
-    wire.translate(2,0,0)
   }
   override def draw(){
 
     live.draw()
+    // cubes.foreach( _.draw() )
 
   }
 
   override def animate(dt:Float){
-    cube.rotate(0,0.1f,0)
-    wire.rotate(0,-0.1f,0)
 
     live.animate(dt)
-
   }
 
 }

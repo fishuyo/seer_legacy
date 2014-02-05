@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Matrix4
 * Camera
 */
 
-trait Camera extends GdxCamera {
+trait NavCamera extends GdxCamera {
   var nav = new Nav()
   def step( dt:Float ){
     nav.step(dt)
@@ -32,13 +32,13 @@ trait Camera extends GdxCamera {
   }
 }
 
-class PerspectiveCamera extends GdxPCam(67.f, SimpleAppSize.aspect, 1.f) with Camera {
+class PerspectiveCamera extends GdxPCam(67.f, SimpleAppSize.aspect, 1.f) with NavCamera {
   near = .01f
   def setFOV(f:Float) = fieldOfView = f
 }
 
-class OrthographicCamera(w:Int,h:Int) extends GdxOCam(w,h) with Camera
+class OrthographicCamera(w:Int,h:Int) extends GdxOCam(w,h) with NavCamera
  
-object Camera extends PerspectiveCamera
+object Camera extends PerspectiveCamera with NavCamera
 // object Camera extends PerspectiveCamera with Camera
 

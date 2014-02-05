@@ -4,8 +4,8 @@ import Keys._
 
 import seer.unmanaged._
 
-import org.scalasbt.androidplugin._
-import org.scalasbt.androidplugin.AndroidKeys._
+// import org.scalasbt.androidplugin._
+// import org.scalasbt.androidplugin.AndroidKeys._
 
 object Settings {
 
@@ -48,65 +48,67 @@ object Settings {
 
   lazy val desktop = Settings.common ++ Seq (
     fork in Compile := true,
-    libraryDependencies ++= Seq("com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
-      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT")
+    libraryDependencies ++= Seq(
+      "com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
+      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT"
+    )
   )
 
-  lazy val android = Settings.common ++
-    AndroidProject.androidSettings ++
-    AndroidMarketPublish.settings ++ Seq (
-      platformName in Android := "android-10",
-      keyalias in Android := "change-me",
-      mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
-      // useProguard in Android := false,
-      proguardOption in Android := """
-        -keep class com.badlogic.gdx.backends.android.** { *; }
+  // lazy val android = Settings.common ++
+  //   AndroidProject.androidSettings ++
+  //   AndroidMarketPublish.settings ++ Seq (
+  //     platformName in Android := "android-10",
+  //     keyalias in Android := "change-me",
+  //     mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
+  //     // useProguard in Android := false,
+  //     proguardOption in Android := """
+  //       -keep class com.badlogic.gdx.backends.android.** { *; }
 
-        -keep class com.typesafe.**
-        -keep class akka.**
-        -keep class scala.collection.immutable.StringLike {
-            *;
-        }
-        -keepclasseswithmembers class * {
-            public <init>(java.lang.String, akka.actor.ActorSystem$Settings, akka.event.EventStream, akka.actor.Scheduler, akka.actor.DynamicAccess);
-        }
-        -keepclasseswithmembers class * {
-            public <init>(akka.actor.ExtendedActorSystem);
-        }
-        -keep class scala.collection.SeqLike {
-            public protected *;
-        }
-      """
-        // ## Akka Stuff referenced at runtime
-        // -keep class akka.actor.** {*;}
-        // -keep public class akka.actor.LightArrayRevolverScheduler { *; }
-        // -keep public class akka.actor.LocalActorRefProvider { *;}
-        // -keep public class akka.remote.RemoteActorRefProvider {
-        //   public <init>(...);
-        // }
-        // -keep class akka.actor.SerializedActorRef {
-        //   *;
-        // }
-        // -keep class akka.remote.netty.NettyRemoteTransport {
-        //   *;
-        // }
-        // -keep class akka.serialization.JavaSerializer {
-        //   *;
-        // }
-        // -keep class akka.serialization.ProtobufSerializer {
-        //   *;
-        // }
-        // -keep class com.google.protobuf.GeneratedMessage {
-        //   *;
-        // }
-        // -keep class akka.event.Logging*
-        // -keep class akka.event.Logging$LogExt{
-        //   *;
-        // }
-      //"""//proguard_options,
-      //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
-      //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
-    )
+  //       -keep class com.typesafe.**
+  //       -keep class akka.**
+  //       -keep class scala.collection.immutable.StringLike {
+  //           *;
+  //       }
+  //       -keepclasseswithmembers class * {
+  //           public <init>(java.lang.String, akka.actor.ActorSystem$Settings, akka.event.EventStream, akka.actor.Scheduler, akka.actor.DynamicAccess);
+  //       }
+  //       -keepclasseswithmembers class * {
+  //           public <init>(akka.actor.ExtendedActorSystem);
+  //       }
+  //       -keep class scala.collection.SeqLike {
+  //           public protected *;
+  //       }
+  //     """
+  //       // ## Akka Stuff referenced at runtime
+  //       // -keep class akka.actor.** {*;}
+  //       // -keep public class akka.actor.LightArrayRevolverScheduler { *; }
+  //       // -keep public class akka.actor.LocalActorRefProvider { *;}
+  //       // -keep public class akka.remote.RemoteActorRefProvider {
+  //       //   public <init>(...);
+  //       // }
+  //       // -keep class akka.actor.SerializedActorRef {
+  //       //   *;
+  //       // }
+  //       // -keep class akka.remote.netty.NettyRemoteTransport {
+  //       //   *;
+  //       // }
+  //       // -keep class akka.serialization.JavaSerializer {
+  //       //   *;
+  //       // }
+  //       // -keep class akka.serialization.ProtobufSerializer {
+  //       //   *;
+  //       // }
+  //       // -keep class com.google.protobuf.GeneratedMessage {
+  //       //   *;
+  //       // }
+  //       // -keep class akka.event.Logging*
+  //       // -keep class akka.event.Logging$LogExt{
+  //       //   *;
+  //       // }
+  //     //"""//proguard_options,
+  //     //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
+  //     //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
+  //   )
 
 
 
@@ -225,10 +227,10 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_kinect )
 
-  // android apps
-  lazy val loop_android = Project (
-    "loop-android",
-    file("apps/android/loop"),
-    settings = Settings.android
-  ) dependsOn seer_core
+  // // android apps
+  // lazy val loop_android = Project (
+  //   "loop-android",
+  //   file("apps/android/loop"),
+  //   settings = Settings.android
+  // ) dependsOn seer_core
 }

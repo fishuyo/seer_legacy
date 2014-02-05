@@ -17,8 +17,9 @@ class Test
 		Trackpad.bind( lambda{ |i,f| 
 
 			if i == 1
-				Main.node.scene.fade(f[1])
-				Scene.fade(f[0])
+				# Main.node.scene.fade(f[1])
+				# Scene.fade(f[0])
+				Main.s.applyForce(Vec3.new(f[0]*100,0,0))
 
 			elsif i == 3
 				@dx += f[2]*0.01
@@ -44,12 +45,15 @@ class Test
 		Keyboard.bind("n", lambda{
 			cube = Cube.apply(4)
 			Scene.push(cube)
-			cube.pose.pos.set( Main.cube.pose.pos + com.fishuyo.seer.t.util.Random.vec3.apply()*0.1)
-			f = com.fishuyo.seer.t.util.Random.float
+			cube.pose.pos.set( Main.cube.pose.pos + com.fishuyo.seer.util.Random.vec3.apply()*0.1)
+			f = com.fishuyo.seer.util.Random.float
 			cube.color.set(RGBA.new(f[],f[],f[],0.1))
 		})
 		Keyboard.bind("c", lambda{
 			Scene.drawable.clear()
+		})
+		Keyboard.bind("r", lambda{
+			Main.s.particles.foreach( lambda{|p| p.reset() })
 		})
 	end
 
@@ -57,6 +61,12 @@ class Test
 		# puts "hi"
 		@frame += 1
 		Main.node.scene.alpha(1.0)
+		f = com.fishuyo.seer.util.Random.float(-1,1)
+
+		Main.cubes.foreach( lambda{|c|
+			# c.scale.set(0.1)
+			c.scale(1,1+f[]*0.005,1)
+		})
 		# Scene.alpha(1.0)
 		# puts Main.node.scene.alpha
     # node.scene.alpha = math.abs(math.sin(SimpleAppRun.app.frameCount/100.f).toFloat)

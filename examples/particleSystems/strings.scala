@@ -32,7 +32,7 @@ object Main extends App with Animatable{
   }
 
   override def animate(dt:Float){
-  	strings.foreach( _.animate(dt) )
+  	// strings.foreach( _.animate(dt) )
     live.animate(dt)
   }
 
@@ -75,7 +75,7 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
     particles.foreach( (p) => {
       p.applyForce(Gravity)
       p.applyDamping(damping)
-      p.step(dt) 
+      p.step() 
     })
 
 

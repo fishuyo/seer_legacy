@@ -113,7 +113,7 @@ class RenderNode {
 
   var viewport = new Viewport(0,0,800,800)
   var scene = new Scene
-  var camera:Camera = new OrthographicCamera(2,2)
+  var camera:NavCamera = new OrthographicCamera(2,2)
 
   var buffer:Option[FrameBuffer] = None
   var shader = "basic"
@@ -145,9 +145,10 @@ class RenderNode {
   }
 
   def render(){
-    if( buffer.isDefined ) buffer.get.begin()
-    
-    Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+    if( buffer.isDefined ){
+      buffer.get.begin()
+      Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+    }
 
     inputs.foreach( _.buffer.get.getColorBufferTexture().bind(0) )
 

@@ -16,7 +16,7 @@ import com.github.rjeschke.jpa._
 
 object PortAudio {
 	val sampleRate = 44100
-  val bufferSize = 256
+  val bufferSize = 512
   val channelsIn = 1
   val channelsOut = 2
 

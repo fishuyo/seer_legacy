@@ -66,7 +66,9 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
     //   //Fabric.gv.z = -Gdx.input.getAccelerometerZ
     // }
 
-    val ts = .015
+    val ts = .015f
+    Integrators.setTimeStep(ts)
+
     val steps = ( (dt+xt) / ts ).toInt
     xt += dt - steps * ts
 
@@ -80,7 +82,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
       	if( field != null ) p.applyForce( field(p.position) ) 
         p.applyGravity()
         p.applyDamping(20.f)
-        p.step(.015f) 
+        p.step() // ts 
       })
 
     }

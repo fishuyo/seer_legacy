@@ -84,6 +84,7 @@ def animate(dt)
   Kinect.bgsub.setThreshold(10.0)
 	# Kinect.threshold.set(0.0,100.4,0.0)
 	Texture.apply(0).draw(Kinect.depthPix,0,0)
-	Texture.apply(0).draw(Kinect.videoPix,0,480)
+  # Texture.apply(0).draw(Kinect.videoPix,0,480)
+	Texture.apply(0).draw(Kinect.detectPix,0,480)
 
 end

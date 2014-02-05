@@ -19,6 +19,8 @@ object Main extends App with Animatable{
   var l = 0
 
   PortAudio.push( looper )
+  // Audio.push( looper )
+
   Scene.push( looper )
 
   val live = new Ruby("loop.rb")
@@ -57,7 +59,7 @@ object Main extends App with Animatable{
     // val t2 = r2.intersectQuad(c,.5f,.5f)
 
     if( t1.isDefined ){
-      val p1 = (r1(t1.get) - c)*2.f + Vec3(.5,.5,0)
+      val p1 = (r1(t1.get) - c)*2.0f + Vec3(.5,.5,0)
       println( p1 )
       // val p2 = r2(t2.get) - c + Vec3(.5,.5,0)
 
@@ -71,7 +73,7 @@ object Main extends App with Animatable{
 
  
 
-  Shader.lighting=0.f
+  Shader.lighting=0.0f
   Shader.setBgColor(RGBA(1,1,1,1))
 
   SimpleAppRun()  

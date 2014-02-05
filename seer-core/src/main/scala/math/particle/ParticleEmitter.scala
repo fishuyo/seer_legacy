@@ -21,7 +21,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 		if( particles.length > maxParticles ) particles = particles.takeRight(maxParticles)
 		particles.foreach( (p) => {
 			// p.applyForce(Gravity)
-			p.step(dt)
+			p.step()
 		})
 
 	}

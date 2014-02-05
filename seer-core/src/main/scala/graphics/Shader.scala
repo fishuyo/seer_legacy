@@ -1,7 +1,7 @@
 package com.fishuyo.seer
 package graphics
 
-import maths.Vec3
+import maths._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
@@ -12,6 +12,9 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.files.FileHandle;
 
 import monido._
+
+abstract class Uniform 
+case class Matrix(m:Matrix4) extends Uniform
 
 object Shader {
 
@@ -43,8 +46,10 @@ object Shader {
 
   def setBgColor(c:RGBA) = bg = c
   def setColor(c:RGBA){
+    if( shader.isEmpty ) return
     color = c
-    this().setUniformf("u_color", color.r, color.g, color.b, color.a)
+    shader.get.uniforms("u_color") = color
+    // this().setUniformf("u_color", color.r, color.g, color.b, color.a)
   }
   def setColor(v:Vec3, a:Float){ setColor( RGBA(v,a) ) }
 
@@ -57,28 +62,33 @@ object Shader {
     
   }
 
-  def setLightUniforms() = {
-    this().setUniformf("u_lighting", lighting)
-    this().setUniformf("u_texture", texture)
-    this().setUniformf("u_lightPosition", lightPosition.x, lightPosition.y, lightPosition.z)
-    this().setUniformf("u_lightAmbient", lightAmbient.r, lightAmbient.g, lightAmbient.b, lightAmbient.a)
-    this().setUniformf("u_lightDiffuse", lightDiffuse.r, lightDiffuse.g, lightDiffuse.b, lightDiffuse.a)
-    this().setUniformf("u_lightSpecular", lightSpecular.r, lightSpecular.g, lightSpecular.b, lightSpecular.a)
+  def setLightUniforms(){
+    if( shader.isEmpty ) return
+    val s = shader.get
+    s.uniforms("u_lighting") = lighting
+    s.uniforms("u_texture") = texture
+    s.uniforms("u_lightPosition") = lightPosition
+    s.uniforms("u_lightAmbient") = lightAmbient
+    s.uniforms("u_lightDiffuse") = lightDiffuse
+    s.uniforms("u_lightSpecular") = lightSpecular
   }
 
-  def setMatrices(camera:Camera = Camera) = {
+  def setMatrices(camera:NavCamera = Camera){
+    if( shader.isEmpty ) return
+    val s = shader.get
     try{
       MatrixStack(camera)
-    	this().setUniformMatrix("u_projectionViewMatrix", MatrixStack.projectionModelViewMatrix() )
-      this().setUniformMatrix("u_modelViewMatrix", MatrixStack.modelViewMatrix() )
-    	this().setUniformMatrix("u_viewMatrix", MatrixStack.viewMatrix() )
-    	this().setUniformMatrix("u_normalMatrix", MatrixStack.normalMatrix() )
-      this().setUniformf("u_color", color.r, color.g, color.b, color.a)
-      // this().setUniformf("u_alpha", alpha)
-      // this().setUniformf("u_fade", fade)
-      setLightUniforms();
-    } catch { case e:Exception => ()} //println(e)}
 
+      s.uniforms("u_projectionViewMatrix") = MatrixStack.projectionModelViewMatrix() 
+      s.uniforms("u_modelViewMatrix") = MatrixStack.modelViewMatrix() 
+      s.uniforms("u_viewMatrix") = MatrixStack.viewMatrix() 
+      s.uniforms("u_normalMatrix") = MatrixStack.normalMatrix() 
+      // s.uniforms("u_color") = color
+      // s.uniforms("u_alpha") = alpha
+      // s.uniforms("u_fade") = fade
+      setLightUniforms()
+    } catch { case e:Exception => println(e)}
+    s.setUniforms() 
   }
 
   def load(s:Shader) = {
@@ -133,6 +143,8 @@ class Shader {
   var vertFile:Option[FileHandle] = None
   var fragFile:Option[FileHandle] = None
 
+  val uniforms = new HashMap[String,Any]()
+
   //load new shader program from file
   def load(n:String, v:FileHandle, f:FileHandle) = {
 
@@ -166,6 +178,29 @@ class Shader {
   def apply() = program.get
   def begin() = program.get.begin()
   def end() = program.get.end()
+
+  def setUniforms(){
+    if( program.isEmpty) return
+    val s = program.get
+
+    uniforms.foreach( (u) => {
+      // try{
+        // s.setUniformMatrix(u._1, u._2)
+        if( s.hasUniform(u._1)){
+          u._2 match {
+            // case Matrix(m) => s.setUniformMatrix(u._1,m)
+            case m:Matrix4 => s.setUniformMatrix(u._1, m)
+            case f:Float => s.setUniformf(u._1, f)
+            case v:Vec2 => s.setUniformf(u._1, v.x, v.y)
+            case v:Vec3 => s.setUniformf(u._1, v.x, v.y, v.z)
+            case v:RGBA => s.setUniformf(u._1, v.r, v.g, v.b, v.a)
+            case _ => println("TODO: implement uniform type: " + u._1 + " " + u._2)
+          }
+        }
+      // } catch { case e:Exception => ()}
+    })
+    uniforms.clear()
+  }
 
   def update() = {
     if( vertFile.isDefined && fragFile.isDefined && reloadFiles ){

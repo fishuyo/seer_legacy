@@ -61,7 +61,6 @@ $tree.setReseed(true)
 $tree.setDepth(depth)
 $tree.branch(depth)
 
-Main.rotateWorld(0.004)
 
 #$Seer.trees.Fabric.gv.set(0.0,-5.0,0.0)
 $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
@@ -69,9 +68,9 @@ $Seer.trees.Trees.gv.set(0.0,1.0,0.0)
 
 ### Trackpad state ###
 mx=0.0
-my=0.0
-mz=0.0 
-rz=0.0
+my=1.0
+mz=1.0 
+rz=0.1
 rx=0.0
 ry=0.0
 $Pad.clear()
@@ -127,15 +126,19 @@ nrot = Vec3.apply(0,0,0)
 
 # Kinect.connect()
 # Kinect.startDepth()
-Kinect.clear()
-Kinect.bind( lambda{|i,f|
+# Kinect.blob.clear()
+Kinect.bind( lambda{|r|
 	#if f[2] < 10 || f[3] < 10 then return end
 
+	if r.size == 0
+		return
+	end
+
 	t = Main.tree
-	size = f[2]*f[3]/10000.0
-	x = (f[0] - 320)/320.0
-	y = (f[1] - 240)/-240.0
-	a = f[4]
+	size = r[0].w*r[0].h/10000.0
+	x = (r[0].x - 320)/320.0
+	y = (r[0].y - 240)/-240.0
+	a = r[0].angle
 	if a < 90.0
 		a = -a
 	else
@@ -143,6 +146,7 @@ Kinect.bind( lambda{|i,f|
 	end
 
 	a = a / 180.0
+	i = 0
 	# puts a
 	# print i
 	# print " "
@@ -160,8 +164,8 @@ Kinect.bind( lambda{|i,f|
 	if Main.day.x == 1.0
 		ur = SceneGraph.root.camera.nav.ur()
 		uf = SceneGraph.root.camera.nav.uf()
-		t.root.applyForce( ur*(-x*size*20))
-		t.root.applyForce( uf*(y*size*20))
+		t.root.applyForce( ur*(-x*20))
+		t.root.applyForce( uf*(y*20))
 		Main.volume.lerpTo(Vec3.apply(1,1,1),0.01)
 
 		return
@@ -176,9 +180,9 @@ Kinect.bind( lambda{|i,f|
 		# Main.nmove.set(nm.x, nm.y, (y+0.5)*size+1.0 )
 		# Main.nrot.set(x*2.0, nr.y, nr.z)
 	elsif i == 1
-		# Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
+		Main.nmove.set(x*4.0, (y+0.5)*size+0.8, nm.z )
 	elsif i == 2
-		# Main.nrot.set(nr.x,nr.y, x*4.0)
+		Main.nrot.set(nr.x,nr.y, x*4.0)
 	elsif i == 4
 		rz = f[3]*0.05
 		rx = f[2]*0.05
@@ -210,19 +214,24 @@ Trees.setDamp(150.0)
 
 # Kinect.threshold.set( 0.0, 0.4, 0.0 )
 # Kinect.device.get().setTiltAngle(0.0)
+# Kinect.bgsub.updateBackgroundNextFrame()
+# Kinect.bgsub.setThreshold(10.0)
+
 # Kinect.setSizeThreshold( 20 )
 
 def animate(dt)
 
-	f = com.fishuyo.seer.util.Random.float
-	Shader.apply("test").setUniformf("u_dist", f[])
+	# f = com.fishuyo.seer.util.Random.float.apply()
+	# # Main.blurDist(f*0.001 + 0.001)
+	# Main.blurDist(0)
 
 	t = Main.tree
+	t.root.pose.pos.set(0,-0.5,0)
 
 	if SimpleAppRun.app.frameCount % 10
 		Main.wind.setVolume(Main.volume.x)
 	end
-	Main.volume.lerpTo(Vec3.apply(0,0,0),0.01)
+	Main.volume.lerpTo(Vec3.apply(0.0,0,0),0.01)
 
 	dawnf = 200
 	dayf = 3250
@@ -230,7 +239,7 @@ def animate(dt)
 	nightf = 6500
 
 	blue = Vec3.apply(68.0/255.0,122.0/256.0,222.0/256.0)
-	white = Vec3.apply(1)
+	white = Vec3.apply(0.1)
 
 	gpose = Pose.apply(Vec3.apply(0,-1.3,0),Quat.apply(0.42112392,-0.09659095, 0.18010217, -0.8836787))
 
@@ -264,11 +273,11 @@ def animate(dt)
 
 	end
 
-	#Main.day.set(1,0,1)
+	# Main.day.set(0,0,0)
 
 	Shader.setBgColor(RGBA.apply(Main.color,1.0))
 
-	if Main.day.x == 0.0
+	if Main.day.x == false #0.0
 		Main.move.lerpTo(Main.nmove, 0.05 )
 		Main.rot.lerpTo(Main.nrot, 0.05 )
 
@@ -295,7 +304,7 @@ def animate(dt)
 	height = 10 if height > 10
 	height = 1 if height < 1
 	ncamPos = SceneGraph.root.camera.nav.uf()*-height
-	#Camera.nav.pos.lerpTo( ncamPos, 0.005 )
+	SceneGraph.root.camera.nav.pos.lerpTo( ncamPos, 0.005 )
 	Main.dayUniforms.set(0.0,10.0,0.0)
 
 	pos = SceneGraph.root.camera.nav.pos + SceneGraph.root.camera.nav.uf()*1.5
@@ -316,16 +325,22 @@ def animate(dt)
 
 end
 
-# Keyboard.clear()
-# Keyboard.use()
-# Keyboard.bind("n", lambda{
-# 	p = Pose.apply(Camera.nav)
-# 	Main.niceViews += p
-# 	Main.niceTrees += [mx,my,mz,rx,ry,rz].to_java 
+Keyboard.clear()
+Keyboard.use()
+Keyboard.bind("r", lambda{
+	Main.rotateWorld(0.004)	
+})
+Keyboard.bind("t", lambda{
+	Main.rotateWorld(0.000)	
+})
+Keyboard.bind("n", lambda{
+	p = Pose.apply(Camera.nav)
+	Main.niceViews += p
+	Main.niceTrees += [mx,my,mz,rx,ry,rz].to_java 
 
-# })
-# Keyboard.bind("m", lambda{
-# 	for i in 0..Main.niceTrees.length
-# 		puts Main.niceTrees(i)
-# 	end
-# })
+})
+Keyboard.bind("m", lambda{
+	for i in 0..Main.niceTrees.length
+		puts Main.niceTrees(i)
+	end
+})
