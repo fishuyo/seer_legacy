@@ -20,6 +20,7 @@ object Text {
 	var texture:GdxTexture = null
 	var font:BitmapFont = null
 	var smoothing = 1.f/16.f
+	var sb:SpriteBatch = null
 
 	def setSmoothing(v:Float){ smoothing = v }
 
@@ -27,23 +28,24 @@ object Text {
 		texture = new GdxTexture(Gdx.files.internal(path + ".png"), true); // true enables mipmaps
 		texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear); // linear filtering in nearest mipmap image
 		font = new BitmapFont(Gdx.files.internal(path + ".fnt"), new TextureRegion(texture), false);
+		sb = new SpriteBatch
 	}
 
 	def render(text:String, x:Float, y:Float){
 		if(font == null) return
 		Shader("text")
 		val s = Shader.shader.get.program.get
-		SpriteBatch.begin()
-		SpriteBatch.setShader(s);
-		font.drawMultiLine(SpriteBatch, text, x, y);
+		sb.begin()
+		sb.setShader(s);
+		font.drawMultiLine(sb, text, x, y);
 			MatrixStack.push()
 			MatrixStack.scale(0.01f)
 			MatrixStack(Camera)
 			s.setUniformMatrix("u_projTrans", MatrixStack.projectionModelViewMatrix())
 			s.setUniformf("smoothing", smoothing)
 			MatrixStack.pop()
-		SpriteBatch.setShader(null);
-		SpriteBatch.end()
+		sb.setShader(null);
+		sb.end()
 
 	}
 }
