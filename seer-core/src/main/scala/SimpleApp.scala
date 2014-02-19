@@ -82,7 +82,7 @@ class SimpleAppListener extends ApplicationListener {
     // renderNodes += node
     scene.init()
 
-    audio.start
+    if(audio.sources.length > 0) audio.start
   }
 
   def render(){
