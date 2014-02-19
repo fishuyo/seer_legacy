@@ -101,6 +101,8 @@ object ScreenCapture extends Animatable {
   var recording = false
   // var closing = false
   var scale = 1.f
+  var framerate = 15.f
+  var dtAccum = 0.f
 
   def toggleRecord(){
     if( recording ) stop
@@ -117,7 +119,7 @@ object ScreenCapture extends Animatable {
       println(s"width must be even: $w $h")
       return
     }
-    writer = new VideoWriter("", w, h, scale )
+    writer = new VideoWriter("", w, h, scale, 15 )
     // bi = new BufferedImage(w,h, BufferedImage.TYPE_3BYTE_BGR)
     Video.writer ! Open(writer)
     recording = true
@@ -140,14 +142,22 @@ object ScreenCapture extends Animatable {
 
   override def animate(dt:Float){
 
-    val bytes = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixels(true)
-    val buffer = IBuffer.make(null, bytes, 0, bytes.length)
-    // val pix = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixmap(0,0,w,h)
-    // val buffer = IBuffer.make(null, pix.getPixels, 0, w*h*4)
-    val picture = IVideoPicture.make(buffer,IPixelFormat.Type.RGBA,w,h)
+    val timeStep = 1.f/framerate
+    dtAccum += dt
+    if( dtAccum > timeStep ){
+      val bytes = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixels(true)
+      val buffer = IBuffer.make(null, bytes, 0, bytes.length)
+      // val pix = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixmap(0,0,w,h)
+      // val buffer = IBuffer.make(null, pix.getPixels, 0, w*h*4)
+      val picture = IVideoPicture.make(buffer,IPixelFormat.Type.RGBA,w,h)
 
-    Video.writer ! Frame(picture)
-    // writer.addFrame(picture)
+      Video.writer ! Frame(picture)
+      // writer.addFrame(picture)
+
+      dtAccum -= timeStep
+    }
+
+    
   }
   
 }

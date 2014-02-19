@@ -9,6 +9,42 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
+object Plane extends Primitive {
+  override def generateMesh():Mesh = generateMesh(2,2,2,2,Quat())
+  def generateMesh(w:Float=2.f,h:Float=2.f,nx:Int=2,ny:Int=2,normal:Quat=Quat()):Mesh = generateMesh(new Mesh(),w,h,nx,ny,normal)
+  def generateMesh(mesh:Mesh, w:Float,h:Float,nx:Int,ny:Int,normal:Quat):Mesh = {
+
+    implicit def int2short(i:Int) = i.toShort
+
+    mesh.primitive = Triangles
+    val dx = w / (nx-1).toFloat
+    val dy = h / (ny-1).toFloat
+    val bl = normal.toX() * -w/2.f + normal.toY * -h/2.f
+    val vx = normal.toX() * dx
+    val vy = normal.toY() * dy
+    for(y <-(0 until ny); x <-(0 until nx)){
+      mesh.vertices += bl + vx*x + vy*y
+      mesh.texCoords += Vec2( x.toFloat/(nx-1), y.toFloat/(ny-1) )
+      mesh.normals += normal.toZ()
+    }
+    for(y <-(0 until ny-1); x <-(0 until nx-1)){
+      val i = y*nx + x
+      mesh.indices ++= List(i,i+1,i+nx)
+      mesh.indices ++= List(i+1,i+nx+1,i+nx)
+    }
+    for(y <-(0 until ny); x <-(0 until nx)){
+      val i = y*nx + x
+      if( x < nx-1 ) mesh.wireIndices ++= List(i,i+1)
+      if( y < ny-1 ){
+        mesh.wireIndices ++= List(i,i+nx)
+        if( x == nx-1) mesh.wireIndices ++= List(i+1,i+nx+1)
+      }
+    }
+    mesh.init
+    mesh
+  }
+}
+
 
 object Quad {
   var quad = None:Option[Quad]
@@ -75,9 +111,9 @@ class Quad(style:String="triangles") extends Drawable {
   }
 }
 
+
+
 object Primitive2D extends GLThis {
-
-
   def quad = {
     val mesh = new GdxMesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
     mesh.setVertices( Array[Float](
@@ -93,8 +129,6 @@ object Primitive2D extends GLThis {
     val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
     mesh //new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
-
-
 }
 
 

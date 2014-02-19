@@ -57,7 +57,7 @@ object Main extends App with Animatable with AudioSource {
 
   var theta = 0.f
   var dw = 0.f
-  var blurDist = 0.0f
+  var blurDist = 0.1f
 
   SimpleAppRun() 
 
@@ -78,6 +78,10 @@ object Main extends App with Animatable with AudioSource {
     s = Shader.load("secondPass", Gdx.files.internal("res/shaders/secondPass.vert"), Gdx.files.internal("res/shaders/secondPass.frag"))
     s.monitor()
     s = Shader.load("test", Gdx.files.internal("res/shaders/test.vert"), Gdx.files.internal("res/shaders/test.frag"))
+    s.monitor()
+    s = Shader.load("texture", Gdx.files.internal("res/shaders/texture.vert"), Gdx.files.internal("res/shaders/texture.frag"))
+    s.monitor()
+    s = Shader.load("composite", Gdx.files.internal("res/shaders/composite.vert"), Gdx.files.internal("res/shaders/composite.frag"))
     s.monitor()
     Shader.multiPass = true;
 
@@ -108,7 +112,24 @@ object Main extends App with Animatable with AudioSource {
       }
     }
     node2.scene.push( quad2 )
-    node.outputTo(node2)
+    // node.outputTo(node2)
+
+    val compNode = new RenderNode
+    compNode.shader = "composite"
+    compNode.clear = false
+    val quag = new Drawable {
+      val m = Mesh(Primitive2D.quad)
+      override def draw(){
+        // Shader("composite").setUniformf("u_blend0", 1.0f)
+        // Shader("composite").setUniformf("u_blend1", 1.0f)
+        Shader("composite").setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+        m.draw()
+      }
+    }
+    compNode.scene.push( quag )
+    node.outputTo(compNode)
+    compNode.outputTo(compNode)
+    compNode.outputTo(ScreenNode)
 
     // Kinect.init()
     tree.init()
@@ -119,27 +140,27 @@ object Main extends App with Animatable with AudioSource {
     MatrixStack.rotate(0.f,theta,0.f)
 
     if(day.x == 1.f){
-      Shader().setUniformf("u_useLocalZ", dayUniforms.z)
-      Shader().setUniformf("u_near", dayUniforms.x)
-      Shader().setUniformf("u_far", dayUniforms.y)
-      Shader().setUniformf("u_useTexture", 0.f)
+      Shader("firstPass").setUniformf("u_useLocalZ", dayUniforms.z)
+      Shader("firstPass").setUniformf("u_near", dayUniforms.x)
+      Shader("firstPass").setUniformf("u_far", dayUniforms.y)
+      Shader("firstPass").setUniformf("u_useTexture", 0.f)
       ground.draw()
-      Shader().setUniformf("u_useLocalZ", dayUniforms.z)
-      Shader().setUniformf("u_near", dayUniforms.x)
-      Shader().setUniformf("u_far", dayUniforms.y)
-      Shader().setUniformf("u_useTexture", 1.f)
+      Shader("firstPass").setUniformf("u_useLocalZ", dayUniforms.z)
+      Shader("firstPass").setUniformf("u_near", dayUniforms.x)
+      Shader("firstPass").setUniformf("u_far", dayUniforms.y)
+      Shader("firstPass").setUniformf("u_useTexture", 1.f)
       // if(day.z == 1.f) Kinect.draw()
       tree.draw()
     }else{
-      Shader().setUniformf("u_useLocalZ", 0.f)
-      Shader().setUniformf("u_near", 0.f)
-      Shader().setUniformf("u_far", 4.1f)
-      Shader().setUniformf("u_useTexture", 0.f)
+      Shader("firstPass").setUniformf("u_useLocalZ", 0.f)
+      Shader("firstPass").setUniformf("u_near", 0.f)
+      Shader("firstPass").setUniformf("u_far", 4.1f)
+      Shader("firstPass").setUniformf("u_useTexture", 0.f)
       ground.draw()
-      Shader().setUniformf("u_useLocalZ", nightUniforms.z)
-      Shader().setUniformf("u_near", nightUniforms.x)
-      Shader().setUniformf("u_far", nightUniforms.y)
-      Shader().setUniformf("u_useTexture", 1.f)
+      Shader("firstPass").setUniformf("u_useLocalZ", nightUniforms.z)
+      Shader("firstPass").setUniformf("u_near", nightUniforms.x)
+      Shader("firstPass").setUniformf("u_far", nightUniforms.y)
+      Shader("firstPass").setUniformf("u_useTexture", 1.f)
       //Kinect.draw()
       tree.draw()
     }

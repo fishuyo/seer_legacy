@@ -62,6 +62,10 @@ class SimpleAppListener extends ApplicationListener {
 
     //Shader(path+"simple.vert", path+"simple.frag")
     Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
+    Shader.load("texture", DefaultShaders.texture._1, DefaultShaders.texture._2)
+    Shader.load("composite", DefaultShaders.composite._1, DefaultShaders.composite._2)
+    Shader.load("text", DefaultShaders.text._1, DefaultShaders.text._2)
+
     // Shader.load("firstPass", DefaultShaders.firstPass._1, DefaultShaders.firstPass._2)
     // Shader.load("secondPass", DefaultShaders.secondPass._1, DefaultShaders.secondPass._2)
 
@@ -92,7 +96,7 @@ class SimpleAppListener extends ApplicationListener {
     }
 
     if( logfps ) fps.log
-    val timeStep = 1.f/30.f
+    val timeStep = 1.f/60.f
     dtAccum += Gdx.graphics.getDeltaTime()
     while( dtAccum > timeStep ){
       SceneGraph.animate(timeStep)

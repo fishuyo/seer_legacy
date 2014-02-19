@@ -95,6 +95,7 @@ class VideoLoop extends VideoSource {
         if( images.length > 0){
           val dest = new Mat()
           Core.addWeighted(in, alpha, images(idx), beta, 0.0, dest)
+          images(idx).release
           images(idx) = dest
         }
       }
@@ -120,7 +121,7 @@ class VideoLoop extends VideoSource {
     val bi = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR)
     val buf = new Array[Byte](w*h*4)
 
-    val writer = new VideoWriter(path, ww, hh, 1.f, 30, codec)
+    val writer = new VideoWriter(path, ww, hh, 1.f, 60, codec)
     for( i<-(0 until images.length)){
 
       val mat = images(i)

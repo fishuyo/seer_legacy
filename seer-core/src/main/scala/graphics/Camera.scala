@@ -39,6 +39,4 @@ class PerspectiveCamera extends GdxPCam(67.f, SimpleAppSize.aspect, 1.f) with Na
 
 class OrthographicCamera(w:Int,h:Int) extends GdxOCam(w,h) with NavCamera
  
-object Camera extends PerspectiveCamera with NavCamera
-// object Camera extends PerspectiveCamera with Camera
-
+object Camera extends PerspectiveCamera

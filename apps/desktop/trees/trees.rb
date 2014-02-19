@@ -86,6 +86,10 @@ $Pad.bind( lambda{|i,f|
 		t.root.applyForce( ur*(f[0]-0.5)*2.0*f[4])
 		t.root.applyForce( uf*(f[1]-0.5)*-2.0*f[4])
 
+		Shader.apply("composite")
+		Shader.shader.get.uniforms.update("u_blend0", f[0])
+		Shader.shader.get.uniforms.update("u_blend1", f[1])
+
 	elsif i == 2
 		mx = mx + f[2]*0.05  
 		mz = mz + f[3]*-0.05
@@ -226,7 +230,7 @@ def animate(dt)
 	# Main.blurDist(0)
 
 	t = Main.tree
-	t.root.pose.pos.set(0,-0.5,0)
+	# t.root.pose.pos.set(0,-0.5,0)
 
 	if SimpleAppRun.app.frameCount % 10
 		Main.wind.setVolume(Main.volume.x)
@@ -321,6 +325,7 @@ def animate(dt)
 	Kinect.cube.pose.quat.set(-0.7918381, 0.60365784, -0.08232442, -0.042571533)
 
 
+	puts ScreenNode.inputs.apply(0).camera.nav.pos
 
 
 end

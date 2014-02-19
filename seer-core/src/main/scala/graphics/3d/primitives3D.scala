@@ -26,12 +26,11 @@ trait Primitive {
 object Sphere extends Primitive {
   var radius = 1.f
   var bands = 30
-  var primitive = Triangles
 
-  override def generateMesh():Mesh = generateMesh(radius, bands, primitive)
-  def generateMesh(radius:Float=1.f, bands:Int=30, prim:Int=Triangles):Mesh = generateMesh(new Mesh(), radius, bands, prim)
-  def generateMesh( mesh:Mesh, radius:Float, bands:Int, prim:Int):Mesh = {
-    mesh.primitive = prim
+  override def generateMesh():Mesh = generateMesh(radius, bands)
+  def generateMesh(radius:Float=1.f, bands:Int=30):Mesh = generateMesh(new Mesh(), radius, bands)
+  def generateMesh( mesh:Mesh, radius:Float, bands:Int):Mesh = {
+    mesh.primitive = Triangles
     for ( lat <- (0 to bands)){
       var theta = lat * math.Pi / bands
       var sinTheta = math.sin(theta)
@@ -73,23 +72,11 @@ class Sphere extends Model {
   addPrimitive(mesh)
 }
 
-object Cube {
-  var mesh = None:Option[Mesh]
-  var meshLines = None:Option[Mesh]
+object Cube extends Primitive {
 
-  def apply():Model = apply(Triangles)
-  def apply(prim:Int):Model = {
-    var m:Mesh = null
-    prim match {
-      case Lines => m = meshLines.getOrElse({ meshLines = Some(generateMesh(prim)); meshLines.get })
-      case _ => m = mesh.getOrElse({ mesh = Some(generateMesh(prim)); mesh.get })
-    }
-    Model(m)
-  }
-
-  def generateMesh(prim:Int=Triangles):Mesh = generateMesh(new Mesh(), prim)
-  def generateMesh( mesh:Mesh, prim:Int):Mesh = {
-    mesh.primitive = prim
+  override def generateMesh():Mesh = generateMesh(new Mesh())
+  def generateMesh( mesh:Mesh ):Mesh = {
+    mesh.primitive = Triangles
     for( n<-(0 to 2); i<-List(-1,1); j<-List(-1,1); k<-List(-1,1)){
       val u = (j+1)/2
       val v = (1-k)/2
@@ -103,12 +90,10 @@ object Cube {
                   mesh.normals += Vec3(i,0,0)
       }
     }
+    
+    for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i).toShort
+    for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i).toShort
 
-    prim match {
-      case Triangles => for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i).toShort
-      case Lines => for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.indices += (4*f+i).toShort
-      case _ => ()
-    }
     mesh.init
     mesh
   }
@@ -119,23 +104,21 @@ class Cube extends Model {
 }
 
 
-object Cylinder {
-  var mesh = None:Option[Mesh]
-	var meshLines = None:Option[Mesh]
-  def apply(prim:Int = TriangleStrip) = {
-    prim match {
-      case Lines => Model(meshLines.getOrElse({ meshLines = Some(generateMesh(prim=prim)); meshLines.get }))
-      case _ => Model(mesh.getOrElse({ mesh = Some(generateMesh(prim=prim)); mesh.get }))
-    }
-  }
+object Cylinder extends Primitive {
+  var radius1 = 1.f
+  var radius2 = 1.f
+  var rings = 2
+  var count = 30
 
-  def generateMesh(r1:Float=1.f, r2:Float=1.f, vertCount:Int=30, prim:Int=TriangleStrip):Mesh = generateMesh(new Mesh(),r1,r2,vertCount,prim)
-  def generateMesh(mesh:Mesh, r1:Float, r2:Float, vertCount:Int, prim:Int):Mesh = {
-    mesh.primitive = prim
+  override def generateMesh():Mesh = generateMesh(new Mesh(),radius1,radius2,rings,count)
+  def generateMesh(r1:Float=1.f, r2:Float=1.f, rings:Int=2, vertCount:Int=30):Mesh = generateMesh(new Mesh(),r1,r2,rings,vertCount)
+  def generateMesh(mesh:Mesh, r1:Float, r2:Float, rings:Int, vertCount:Int):Mesh = {
+    mesh.primitive = TriangleStrip
     
     val indxCount = vertCount+2
     var theta = 0.0
 
+    //TODO add rings
     for (j <- (0 until vertCount)){
       val r = (if(j % 2 == 0) r1 else r2)
       val x = math.cos(theta).toFloat
@@ -150,17 +133,16 @@ object Cylinder {
       theta += 2 * math.Pi / (vertCount)
     }
 
-    prim match {
-      case Lines => for( i<-(0 until vertCount)){
-        if( i % 2 == 0){
-          mesh.indices += i.toShort
-          mesh.indices += ((i+1) % vertCount).toShort
-        }
-        mesh.indices += ((i) % vertCount).toShort
-        mesh.indices += ((i+2) % vertCount).toShort
+    for( i<-(0 until vertCount)){
+      if( i % 2 == 0){
+        mesh.wireIndices += i.toShort
+        mesh.wireIndices += ((i+1) % vertCount).toShort
       }
-      case _ => for( i<-(0 until indxCount)) mesh.indices += (i % vertCount).toShort
+      mesh.wireIndices += ((i) % vertCount).toShort
+      mesh.wireIndices += ((i+2) % vertCount).toShort
     }
+    for( i<-(0 until indxCount)) mesh.indices += (i % vertCount).toShort
+    
     mesh.init
     mesh
   }
@@ -242,28 +224,4 @@ class Trace3D( var size:Int ) extends Drawable {
   }
 
 }
-
- // def vertexGenerator(radius:Float=1.f, bands:Int=30 ) = new Generator[Vec3]{
-  //   var (lat,long) = (0,0)
-
-  //   def apply() = {
-  //     if(lat < 0) value = Vec3(0)
-  //     return value
-
-  //     val theta = lat * math.Pi / bands
-  //     val phi = long * 2 * math.Pi / bands
-  //     value = Vec3(math.cos(phi)*math.sin(theta), math.cos(theta), math.sin(phi)*math.cos(theta))
-  //     if(long == bands){
-  //       long = 0
-  //       if(lat == bands){
-  //         lat = -1
-  //       } else lat += 1
-  //     } else long += 1
-  //     value * radius
-  //   }
-
-  //   def vertex() = value * radius
-  //   def normal() = value
-  //   def uv() = Vec2(1.f - (long.toFloat / bands), lat.toFloat / bands)
-  // }
 

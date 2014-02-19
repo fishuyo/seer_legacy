@@ -87,7 +87,7 @@ object Shader {
       // s.uniforms("u_alpha") = alpha
       // s.uniforms("u_fade") = fade
       setLightUniforms()
-    } catch { case e:Exception => println(e)}
+    } catch { case e:Exception => ()} //println(e)}
     s.setUniforms() 
   }
 
@@ -191,6 +191,9 @@ class Shader {
             // case Matrix(m) => s.setUniformMatrix(u._1,m)
             case m:Matrix4 => s.setUniformMatrix(u._1, m)
             case f:Float => s.setUniformf(u._1, f)
+            case f:Double => s.setUniformf(u._1, f.toFloat)
+            case i:Int => s.setUniformi(u._1, i)
+            case i:Long => s.setUniformi(u._1, i.toInt)
             case v:Vec2 => s.setUniformf(u._1, v.x, v.y)
             case v:Vec3 => s.setUniformf(u._1, v.x, v.y, v.z)
             case v:RGBA => s.setUniformf(u._1, v.r, v.g, v.b, v.a)
@@ -310,16 +313,118 @@ object DefaultShaders {
     """
   )
 
-  val firstPass = (
+  val texture = (
     """
+      attribute vec4 a_position;
+      attribute vec2 a_texCoord0;
+
+      uniform mat4 u_projectionViewMatrix;
+
+      varying vec2 v_texCoords;
+
+      void main(){
+
+        // pass through the texture coordinate
+        v_texCoords = a_texCoord0;
+        
+        // pass through the quad position
+        gl_Position = u_projectionViewMatrix * a_position;
+      }
     """,
     """
+      #ifdef GL_ES
+       precision mediump float;
+      #endif
+
+      uniform sampler2D u_texture0;
+      varying vec2 v_texCoords;
+
+      void main(){
+
+        gl_FragColor = texture2D(u_texture0, v_texCoords);
+
+      }
     """
   )
-  val secondPass = (
+
+  val composite = (
     """
+      attribute vec4 a_position;
+      attribute vec2 a_texCoord0;
+
+      uniform mat4 u_projectionViewMatrix;
+
+      varying vec2 v_texCoords;
+
+      void main(){
+
+        // pass through the texture coordinate
+        v_texCoords = a_texCoord0;
+        
+        // pass through the quad position
+        gl_Position = u_projectionViewMatrix * a_position;
+      }
     """,
     """
+      #ifdef GL_ES
+       precision mediump float;
+      #endif
+
+      uniform sampler2D u_texture0;
+      uniform sampler2D u_texture1;
+
+      uniform float u_blend0;
+      uniform float u_blend1;
+
+      uniform int mode;
+
+      varying vec2 v_texCoords;
+
+      void main(){
+
+        // pull everything we want from the textures
+        vec4 color0 = texture2D(u_texture0, v_texCoords) * u_blend0;
+        vec4 color1 = texture2D(u_texture1, v_texCoords) * u_blend1;
+
+        if( mode == 0){
+          gl_FragColor = color0 + color1;
+        }else {
+        gl_FragColor = color0 * color1;
+        }
+      }
     """
-  )  
+  )
+
+  val text = (
+    """
+      attribute vec4 a_position;
+      attribute vec2 a_texCoord0;
+      attribute vec4 a_color;
+
+      uniform mat4 u_projTrans;
+
+      varying vec4 v_color;
+      varying vec2 v_texCoord;
+
+      void main() {
+          gl_Position = u_projTrans * a_position;
+          v_texCoord = a_texCoord0;
+          v_color = a_color;
+      }
+    """,
+    """
+      uniform sampler2D u_texture;
+
+      varying vec4 v_color;
+      varying vec2 v_texCoord;
+
+      uniform float smoothing; // = 1.0/16.0;
+
+      void main() {
+          float distance = texture2D(u_texture, v_texCoord).a;
+          float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
+          gl_FragColor = vec4(v_color.rgb, alpha);
+      }
+    """
+  )
 }

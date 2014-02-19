@@ -3,6 +3,7 @@ looper = Java::com.fishuyo.seer.examples.loop.Main.looper
 $Main = Java::com.fishuyo.seer.examples.loop.Main
 $looper = looper
 l = 0
+b = 0
 
 
 Keyboard.clear()
@@ -165,9 +166,24 @@ OSC.disconnect()
 # OSC.bind("/3/xy2", lambda{|f| b2=f[0]; looper.setBounds(l,b1,b2); looper.setSpeed(l,(1-f[1])*2.0) })
 
 # SoftStep
-OSC.listen(8008)
-OSC.bind("/1/top", lambda{|f| looper.toggleRecord(0) })
-OSC.bind("/1/bot", lambda{|f| looper.stack(0) })
+OSC.listen(8009)
+OSC.bind("/1/top", lambda{|f| looper.toggleRecord(2*b) })
+OSC.bind("/1/bot", lambda{|f| looper.stack(2*b) })
+OSC.bind("/2/top", lambda{|f| looper.setMaster(2*b) })
+OSC.bind("/2/bot", lambda{|f| looper.reverse(2*b) })
+OSC.bind("/6/y", lambda{|f| looper.setSpeed(2*b,4*(f[0]/127.0)) })
+OSC.bind("/7/y", lambda{|f| gain = f[0]/127.0; looper.setGain(2*b,2*gain*gain) })
+
+OSC.bind("/3/top", lambda{|f| looper.toggleRecord(2*b+1) })
+OSC.bind("/3/bot", lambda{|f| looper.stack(2*b+1) })
+OSC.bind("/4/top", lambda{|f| looper.setMaster(2*b+1) })
+OSC.bind("/4/bot", lambda{|f| looper.reverse(2*b+1) })
+OSC.bind("/8/y", lambda{|f| looper.setSpeed(2*b+1,4*(f[0]/127.0)) })
+OSC.bind("/9/y", lambda{|f| gain = f[0]/127.0; looper.setGain(2*b+1,2*gain*gain) })
+
+OSC.bind("/5/y", lambda{|f| b = f[0] })
+OSC.bind("/0/y", lambda{|f| gain = f[0]/127.0; Audio.gain(gain*gain) })
+
 # OSC.bind("/1/x", lambda{|f| looper.toggleRecord(0) })
 # OSC.bind("/1/y", lambda{|f| looper.toggleRecord(0) })
 # OSC.bind("/1/z", lambda{|f| looper.toggleRecord(0) })
@@ -175,24 +191,21 @@ OSC.bind("/1/bot", lambda{|f| looper.stack(0) })
 
 # OSC.bind("/1/top", lambda{|f| looper.toggleRecord(0) })
 # OSC.bind("/1/bot", lambda{|f| looper.stack(0) })
-OSC.bind("/6/y", lambda{|f| looper.setSpeed(0,4*(f[0]/127.0)) })
-# OSC.bind("/6/y", lambda{|f| looper.setGain(0,2*f[0]/127.0) })
 # OSC.bind("/6/z", lambda{|f| looper.setSpeed(0,f[0]/127.0+1) })
 # OSC.bind("/1/doubleTap", lambda{|f| looper.togglePlay(0) })
 
-OSC.bind("/2/top", lambda{|f| looper.toggleRecord(1) })
-OSC.bind("/2/bot", lambda{|f| looper.stack(1) })
+
 # OSC.bind("/1/x", lambda{|f| looper.toggleRecord(0) })
 # OSC.bind("/1/y", lambda{|f| looper.toggleRecord(0) })
-OSC.bind("/2/z", lambda{|f| looper.setSpeed(2,f[0]/127.0+1.0) })
-# OSC.bind("/2/doubleTap", lambda{|f| looper.togglePlay(1) })
+# OSC.bind("/2/z", lambda{|f| looper.setSpeed(2,f[0]/127.0+1.0) })
+# # OSC.bind("/2/doubleTap", lambda{|f| looper.togglePlay(1) })
 
-OSC.bind("/3/top", lambda{|f| looper.toggleRecord(2) })
-OSC.bind("/3/bot", lambda{|f| looper.stack(2) })
-OSC.bind("/4/top", lambda{|f| looper.toggleRecord(3) })
-OSC.bind("/4/bot", lambda{|f| looper.stack(3) })
-OSC.bind("/5/top", lambda{|f| looper.toggleRecord(4) })
-OSC.bind("/5/bot", lambda{|f| looper.stack(4) })
+# OSC.bind("/3/top", lambda{|f| looper.toggleRecord(2) })
+# OSC.bind("/3/bot", lambda{|f| looper.stack(2) })
+# OSC.bind("/4/top", lambda{|f| looper.toggleRecord(3) })
+# OSC.bind("/4/bot", lambda{|f| looper.stack(3) })
+# OSC.bind("/5/top", lambda{|f| looper.toggleRecord(4) })
+# OSC.bind("/5/bot", lambda{|f| looper.stack(4) })
 
 
 def animate dt

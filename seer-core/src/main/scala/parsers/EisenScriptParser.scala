@@ -97,7 +97,7 @@ object EisenScriptParser extends StandardTokenParsers {
 
   def primitive = ( ident ^^ {case id => RuleCall(id)} | box | sphere | grid )
   def box = "box" ^^^ Draw(Cube())
-  def grid = "grid" ^^^ Draw(Cube(Lines))
+  def grid = "grid" ^^^ Draw(Cube()) //TODO wireframe
   def sphere = "sphere" ^^^ Draw(Sphere())
 
 

@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils._
 
 import org.opencv.core._
 import org.opencv.highgui._
+import org.opencv.imgproc._
 
 object Main extends App with Animatable{
 
@@ -43,8 +44,8 @@ object Main extends App with Animatable{
     w = capture.get(Highgui.CV_CAP_PROP_FRAME_WIDTH)
     h = capture.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT)
 
-    pix = new Pixmap(w.toInt,h.toInt, Pixmap.Format.RGB888)
-    rows = new Array[Byte](2*w.toInt*3)
+    pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
+    rows = new Array[Byte](w.toInt/2*3)
   	cube.scale.set(1.f, (h/w).toFloat, 1.f)
 
    //  val sizes = capture.getSupportedPreviewSizes()
@@ -68,13 +69,20 @@ object Main extends App with Animatable{
   	val read = capture.read(img)
 
   	if( !read ) return
+    
+    val rsmall = new Mat()
+    val small = new Mat()
+    Imgproc.resize(img,small, new Size(), 0.5,0.5,0)   // scale down
+    Core.flip(small,rsmall,1)   // flip so mirrored
+    Imgproc.cvtColor(rsmall,small, Imgproc.COLOR_BGR2RGB)   // convert to rgb
 
-    images += img.clone
+
+    images += small //img.clone
     if( images.length > h.toInt/2 ) images.remove(0)
     val bb = pix.getPixels()
 
     for( i <- (0 until images.length)){
-      images(images.length-1-i).get(i*2,0,rows)
+      images(images.length-1-i).get(i,0,rows)
       bb.put(rows)
     }
     bb.rewind()

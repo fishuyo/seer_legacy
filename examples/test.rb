@@ -19,17 +19,19 @@ class Test
 			if i == 1
 				# Main.node.scene.fade(f[1])
 				# Scene.fade(f[0])
-				Main.s.applyForce(Vec3.new(f[0]*100,0,0))
+				Main.s.applyForce(Vec3.new((f[0]-0.5)*10,0,(f[1]-0.5)*10,))
 
 			elsif i == 3
 				@dx += f[2]*0.01
 				@dy += f[3]*0.01
 				Main.cube.pose.pos.set(@dx,@dy,@dz)
+				Text.setSmoothing(@dy)
 
 			elsif i == 2
 				@dx += f[2]*0.01
 				@dz += f[3]*-0.01
 				Main.cube.pose.pos.set(@dx,@dy,@dz)
+				Main.movet(@dx*100,-@dz*100)
 				# Main.pix.setColor(1,0,0.3,0.05)
 				# Main.pix.fillCircle(@dz,@dx,f[4]*4)
 
@@ -77,6 +79,7 @@ class Test
 	end
 
 	def draw
+		puts Main.y
 		# puts @frame
 	end
 

@@ -6,6 +6,7 @@ import io._
 import maths._
 import dynamic._
 import cv._
+import video._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
@@ -39,6 +40,8 @@ object Main extends App with Animatable{
 
   var pix:Pixmap = null //new Pixmap(1280,720, Pixmap.Format.RGB888)
 
+  var player:VideoPlayer = null
+
   SimpleAppRun()  
 
   override def init(){
@@ -56,11 +59,17 @@ object Main extends App with Animatable{
 
     println( s"starting capture w: $w $h")
 
+    // player = new VideoPlayer("/Users/fishuyo/Desktop/thereisaplace.mov")
+    player = new VideoPlayer("/Users/fishuyo/Desktop/out.mov")
+    // player = new VideoPlayer("/Users/fishuyo/projects/Documentation/feedback_puddle/1.mov")
+    // player = new VideoPlayer("/Users/fishuyo/SeerData/video/out-Feb-9,-2014-11-35-36-PM.mp4")
+    // player = new VideoPlayer("/Users/fishuyo/projects/drone/fish.mp4")
+
     pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
     bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
     cube.scale.set(1.f, (h/w).toFloat, 1.f)
 
-  	Texture(pix) 
+  	Texture(player.pixmap) //pix) 
   }
   override def draw(){
 
@@ -94,7 +103,9 @@ object Main extends App with Animatable{
     // blobTracker(bgsub.mask, pix)
     blobTracker(colorThresh.mask, pix)
 
-		Texture(0).draw(pix,0,0)
+    player.animate(dt)
+
+		Texture(0).draw(player.pixmap,0,0) //pix,0,0)
 
     live.animate(dt)
   }

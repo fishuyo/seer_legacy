@@ -27,6 +27,7 @@ class Mesh extends Drawable {
 	val texCoords = new ArrayBuffer[Vec2]
 	val colors = new ArrayBuffer[RGBA]
 	val indices = new ArrayBuffer[Short]
+	val wireIndices = new ArrayBuffer[Short]
 
 	var primitive = Triangles
 
@@ -72,14 +73,18 @@ class Mesh extends Drawable {
 		if(hasColors) buffer = buffer :+ colors.map(c => Seq(c.r,c.g,c.b,c.a))
 
 		gdxMesh.get.setVertices(buffer.transpose.flatten.flatten.toArray)
-		if(indices.length > 0) gdxMesh.get.setIndices(indices.toArray)
+		if( primitive == Lines && wireIndices.length > 0) gdxMesh.get.setIndices(wireIndices.toArray)
+		else if(indices.length > 0) gdxMesh.get.setIndices(indices.toArray)
 	}
 
 	/** draw the mesh */
 	override def draw(){
 		if( gdxMesh.isEmpty ) init()
 
-		val count = (if(indices.length > 0) indices.length else vertices.length )
+		var count = vertices.length
+		if( primitive == Lines && wireIndices.length > 0) count = wireIndices.length
+		else if(indices.length > 0) count = indices.length
+
     gdxMesh.get.render(Shader(), primitive, 0, count )
 	}
 

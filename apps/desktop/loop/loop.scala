@@ -18,8 +18,8 @@ object Main extends App with Animatable{
   var looper = new Looper
   var l = 0
 
-  PortAudio.push( looper )
-  // Audio.push( looper )
+  // PortAudio.push( looper )
+  Audio.push( looper )
 
   Scene.push( looper )
 

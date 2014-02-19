@@ -4,9 +4,11 @@ package examples.opencv.loop
 import graphics._
 import io._
 import maths._
+import particle._
 import dynamic._
 import cv._
 import video._
+import audio._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
@@ -40,12 +42,21 @@ object Main extends App with Animatable{
 	var w = 0.0
 	var h = 0.0
 
+  val s = new SpringMesh( Sphere.generateMesh(),1.f ) //Plane.generateMesh(2,2,10,10), 1.f) //Sphere()
+  s.particles.take(s.particles.length/2).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
+  // s.particles.takeRight(10).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
+  // val cube = Model(s)
+
   val cube = Model(Cube())
   Scene.push(cube)
 
   var pix:Pixmap = null
   
   val live = new Ruby("videoLoop.rb")
+
+  val audioLoop = new Loop(10.f)
+
+  Audio.push(audioLoop)
 
   SimpleAppRun()  
 
@@ -86,6 +97,8 @@ object Main extends App with Animatable{
   }
 
   override def animate(dt:Float){
+
+    s.animate(dt)
 
     if( dirty ){  // resize everything if using sub image
       pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
@@ -147,6 +160,12 @@ object Main extends App with Animatable{
 		Texture(0).draw(pix,0,0)
 
     live.animate(dt)
+
+    img.release
+    subImg.release
+    small.release
+    rsmall.release
+    out.release
   }
 
 }

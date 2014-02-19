@@ -305,16 +305,20 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     numSamples = n
   }
   
+  def gain(g:Float){ gain = g }
   def play(){ playing = true; recording = false}
+  def togglePlay(){ if(playing) stop() else play()}
   def play(t:Int){ b.times=0; times = t; play() }
   def stop(){ playing = false; recording = false}
   def rewind(){ b.rPos = b.rMin }
   def record(){ recording = true; playing = false; dirty = true }
+  def toggleRecord(){ if( recording ) play() else record() }
   def stack() = { stacking = !stacking; dirty = true }
   def reverse() = reversing = !reversing
   def reverse(b:Boolean) = reversing = b
   def undo() = {}
   def clear() = {
+    stop()
     b.rMin = 0
     b.rMax = 0
     b.rPos = 0

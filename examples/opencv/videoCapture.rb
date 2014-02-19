@@ -20,4 +20,5 @@ end
 def animate dt
   # Main.bgsub.updateBackgroundNextFrame()
   Main.bgsub.setThreshold(50.0)
+  # puts Main.player.queue.size
 end

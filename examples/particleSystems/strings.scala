@@ -10,7 +10,8 @@ import maths._
 import particle._
 import io._
 
-import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 
@@ -26,6 +27,24 @@ object Main extends App with Animatable{
 
   SimpleAppRun()  
 
+  override def init(){
+    val compNode = new RenderNode
+    compNode.shader = "composite"
+    compNode.clear = false
+    val quag = new Drawable {
+      val m = Mesh(Primitive2D.quad)
+      override def draw(){
+        // Shader("composite").setUniformf("u_blend0", 1.0f)
+        // Shader("composite").setUniformf("u_blend1", 1.0f)
+        // Shader("composite").setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+        m.draw()
+      }
+    }
+    compNode.scene.push( quag )
+    SceneGraph.root.outputTo(compNode)
+    compNode.outputTo(compNode)
+    compNode.outputTo(ScreenNode)
+  }
   override def draw(){
     Shader.lighting = 0.f
   	strings.foreach( _.draw() )
@@ -73,7 +92,7 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
     }
 
     particles.foreach( (p) => {
-      p.applyForce(Gravity)
+      // p.applyForce(Gravity)
       p.applyDamping(damping)
       p.step() 
     })
@@ -100,6 +119,7 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
   }
 
   override def draw() {
+    Shader.setColor(RGBA(0,1,0,1))
     if( mesh == null) mesh = new GdxMesh(false,2*numLinks,0,VertexAttribute.Position)
     var i = 0
     var off = 0

@@ -23,6 +23,9 @@ class AbsoluteConstraint(val p:KinematicState, var q:KinematicState) extends Con
 		p.velocity = q.velocity
 		p.acceleration = q.acceleration
 	}
+
+	def set(pos:Vec3){ set(Particle(pos))}
+	def set(k:KinematicState){ q = k }
 }
 
 object LinearSpringConstraint {
@@ -37,6 +40,8 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, s
 
   var torn = false
   def isTorn() = torn
+
+  def length(v:Float){ length = v }
 
 	override def solve(){
 		if( torn ) return

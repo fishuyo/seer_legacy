@@ -10,6 +10,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL10
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.graphics.{Texture => GdxTexture}
+
 
 
 /**
@@ -66,7 +68,7 @@ class Scene {
 
 object SceneGraph {
   var roots = ListBuffer[RenderNode]()
-  var root = new BasicNode
+  var root:RenderNode = new BasicNode
   root.scene = Scene
   root.camera = Camera
   roots += root
@@ -79,25 +81,25 @@ object SceneGraph {
   def animate(dt:Float){
     roots.foreach( (n) => animateChildren(n,dt) )
   }
-  def animateChildren(n:RenderNode, dt:Float){
-   n.animate(dt)
-   n.outputs.foreach( (n) => animateChildren(n,dt) )
+  def animateChildren(node:RenderNode, dt:Float){
+   node.animate(dt)
+   node.outputs.foreach( (n) => if(n != node) animateChildren(n,dt) )
   }
 
   def resize(vp:Viewport){
     roots.foreach( (n) => resizeChildren(n,vp))
   }
-  def resizeChildren(n:RenderNode, vp:Viewport){
-   n.resize(vp)
-   n.outputs.foreach( (n) => resizeChildren(n,vp) )
+  def resizeChildren(node:RenderNode, vp:Viewport){
+   node.resize(vp)
+   node.outputs.foreach( (n) => if(n != node) resizeChildren(n,vp) )
   }
 
   def render(){
     roots.foreach( (n) => renderChildren(n) )
   }
-  def renderChildren(n:RenderNode){
-   n.render()
-   n.outputs.foreach( (n) => renderChildren(n) )
+  def renderChildren(node:RenderNode){
+   node.render()
+   node.outputs.foreach( (n) => if( n != node) renderChildren(n) )
   }
 
   def leaves() = {
@@ -108,6 +110,7 @@ object SceneGraph {
 
 class RenderNode {
   var active = true
+  var clear = true
   val inputs = new ListBuffer[RenderNode]
   val outputs = new ListBuffer[RenderNode]
 
@@ -121,6 +124,8 @@ class RenderNode {
   def createBuffer(){
     if(buffer.isEmpty) buffer = Some(FrameBuffer(viewport.w, viewport.h))
   }
+
+  def bindBuffer(i:Int) = buffer.get.getColorBufferTexture().bind(i)
 
   def resize(vp:Viewport){
     viewport = vp
@@ -147,12 +152,18 @@ class RenderNode {
   def render(){
     if( buffer.isDefined ){
       buffer.get.begin()
-      Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+      if( clear ) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+      else Gdx.gl.glClear( GL20.GL_DEPTH_BUFFER_BIT)
     }
 
-    inputs.foreach( _.buffer.get.getColorBufferTexture().bind(0) )
-
     Shader(shader).begin()
+
+    inputs.zipWithIndex.foreach( (i) => {
+      // i._1.buffer.get.getColorBufferTexture().bind(i._2) 
+      i._1.bindBuffer(i._2) 
+      Shader.shader.get.uniforms("u_texture"+i._2) = i._2
+    })
+
     MatrixStack.clear()
     Shader.setMatrices(camera)
     if(active){
@@ -177,6 +188,16 @@ class RenderNode {
 }
 
 class BasicNode extends RenderNode
+
+object ScreenNode extends RenderNode {
+  scene.push(Plane.generateMesh())
+  shader = "texture"
+}
+
+class TextureNode(var texture:GdxTexture) extends RenderNode{
+  override def bindBuffer(i:Int) = texture.bind(i)  
+  override def render(){}
+}
 
 class OutlineNode extends RenderNode {
   val quad = Primitive2D.quad

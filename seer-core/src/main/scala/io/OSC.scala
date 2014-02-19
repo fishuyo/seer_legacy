@@ -6,8 +6,12 @@ import de.sciss.osc._
 import Implicits._
 
 import scala.collection.mutable.Map
+import scala.collection.mutable.ListBuffer
 
 object OSC{
+
+	var bundle = false
+	var messageBuffer = new ListBuffer[Message]()
 
 	// OSC recv config
   var cfg = UDP.Config()
@@ -21,16 +25,19 @@ object OSC{
 
   // callback functions
 	var callbacks = Map[String,(Any*)=>Unit]()
+	val handlers = new ListBuffer[(String,Any*)=>Unit]()
 
 	// dummy function
-	def f(s:String)(v:Any*) = {println(s)}
+	def f(s:String)(v:Any*) = {} //println(s)}
 
 
 	/** Clear all callback functions */
-	def clear() = callbacks.clear()
+	def clear() = { callbacks.clear(); handlers.clear() }
 
 	/** Bind new callback function to OSC address */
 	def bind( s:String, f:(Any*)=>Unit) = callbacks += s -> f
+
+	def bind(f:(String,Any*)=>Unit) = handlers += f
 
 	/** Start listening for OSC message on given port */
 	def listen(port:Int=8000){
@@ -74,7 +81,9 @@ object OSC{
 
   def handleMessage(msg:Message){
     msg match {
-    	case Message( name, vals @ _* ) => callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Any]])
+    	case Message( name, vals @ _* ) =>
+    		callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Any]])
+    		handlers.foreach( _(name,vals.asInstanceOf[Seq[Any]]) )
       case _ => println( "Ignoring: " + msg )
     }
   }
@@ -94,24 +103,46 @@ object OSC{
 	}
 
 	/** Send OSC message to prviously connected ip */
-	def send(address:String, value:Any){
-		value match{
-			case v:Float => out ! Message(address,v)
-			case v:Double => out ! Message(address,v)
-			case v:Int => out ! Message(address,v)
-			case v:Boolean => out ! Message(address,v)
-			case v:String => out ! Message(address,v)
-		}
+	def send(msg:Message){
+		if( bundle ){ 
+			messageBuffer += msg
+			if( messageBuffer.length > 30){ 
+				endBundle()
+				startBundle()
+			}
+		} else out ! msg
 	}
 
-	def send(address:String, f1:Float, f2:Float){ out ! Message(address,f1,f2) }
-	def send(address:String, f1:Float, f2:Float, f3:Float){ out ! Message(address,f1,f2,f3) }
-	def send(address:String, f1:Float, f2:Float, f3:Float, f4:Float){ out ! Message(address,f1,f2,f3,f4) }
+	def send(address:String, value:Any){
+		val msg = value match{
+			case v:Float => Message(address,v)
+			case v:Double => Message(address,v)
+			case v:Int => Message(address,v)
+			case v:Long => Message(address,v.toInt)
+			case v:Boolean => Message(address,v)
+			case v:String => Message(address,v)
+		}
+		send(msg)
+	}
+
+	def send(address:String, f1:Float, f2:Float){ send(Message(address,f1,f2)) }
+	def send(address:String, f1:Float, f2:Float, f3:Float){ send(Message(address,f1,f2,f3)) }
+	def send(address:String, f1:Float, f2:Float, f3:Float, f4:Float){ send(Message(address,f1,f2,f3,f4)) }
 
 	/** Connect and send message */
 	def send(ip:String = "localhost", port:Int=8000, address:String, value:Any){
 		connect(ip,port)
 		send(address,value)                        
+	}
+
+	def startBundle(){ bundle = true }
+	def endBundle(){
+		bundle = false
+		if( messageBuffer.length > 0){
+			// println("sending bundle size " + messageBuffer.length)
+			out ! Bundle.now( messageBuffer : _* )
+			messageBuffer.clear
+		}
 	}
 }
 
