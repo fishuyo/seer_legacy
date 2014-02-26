@@ -11,6 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
 
 	var timeStep = .015f
+  var damping = 20.f 
   var particles = ArrayBuffer[Particle]()
   var springs = ArrayBuffer[LinearSpringConstraint]()
   var pins = ArrayBuffer[AbsoluteConstraint]()
@@ -57,6 +58,10 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
 
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )
 
+  def averageVelocity() = (particles.map(_.velocity).sum / particles.length).mag()
+  def averageSpringLength() = springs.map( (s) => s.dist / s.length).sum / springs.length
+  def averageSpringError() = springs.map(_.error).sum / springs.length
+
   override def init(){
   	mesh.init()
   }
@@ -80,7 +85,7 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
 
       particles.foreach( (p) => {
         p.applyGravity()
-        p.applyDamping(20.f)
+        p.applyDamping(damping)
         p.step() // timeStep
         p.collideGround(-1.f, 0.999999f) 
       })

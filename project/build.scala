@@ -179,7 +179,7 @@ object SeerBuild extends Build {
     "examples",
     file("examples"),
     settings = Settings.desktop
-  ) dependsOn( seer_desktop )
+  ) dependsOn( seer_desktop, seer_opencv )
 
   lazy val examples_fieldViewer = Project (
     "examples-fieldViewer",

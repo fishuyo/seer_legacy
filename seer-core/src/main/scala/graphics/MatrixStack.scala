@@ -63,6 +63,7 @@ object MatrixStack {
 	def projectionModelViewMatrix() = projModelView
 	def modelViewMatrix() = modelView
 	def viewMatrix() = view
+	def modelMatrix() = model
 	def normalMatrix() = normal
 
 }

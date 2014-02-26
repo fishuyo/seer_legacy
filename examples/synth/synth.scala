@@ -47,7 +47,7 @@ object Main extends App with Animatable {
     display(1).setSamples(Audio.out(1))
   } 
   override def draw(){
-    Shader.lighting = 0
+    Shader.lightingMix = 0
   	display.foreach( _.draw())
   }
 }

@@ -36,7 +36,8 @@ class Model extends Drawable with geometry.Pickable {
 	var pose = Pose()
 	var scale = Vec3(1)
   var color = RGBA(1,1,1,1)
-  var material = new BasicMaterial() //RGBA(1,1,1,1)
+  var material:BasicMaterial = new NoMaterial
+  var shader = ""
 
   var children = Vector[Model]()
   var primitives = Vector[Drawable]()
@@ -85,11 +86,22 @@ class Model extends Drawable with geometry.Pickable {
     MatrixStack.transform(pose,scale)
     worldTransform.set(MatrixStack.model)
 
-    Shader.setColor(color)
+    // Shader.setColor(color)
+    val old = Shader.shader.get.name
+    if( shader != "" ){
+      Shader().end()
+      Shader(shader).begin()
+    }
+    Shader.setMaterial(material)
     Shader.setMatrices()
 
     primitives.foreach( _.draw() )
     children.foreach( _.draw() )
+
+    if( shader != ""){
+      Shader().end()
+      Shader(old).begin()
+    }
 
     MatrixStack.pop()
   }

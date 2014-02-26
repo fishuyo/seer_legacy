@@ -41,14 +41,24 @@ object Main extends App with Animatable{
   fabric2.pins += AbsoluteConstraint( fabric2.particles.takeRight(20).head, Vec3(-1,1,0))
   fabric2.pins += AbsoluteConstraint( fabric2.particles.takeRight(10).head, Vec3(-1,1,0))
   fabric2.pins += AbsoluteConstraint( fabric2.particles.last, Vec3(1,1,0))
+
+  val fabric3 = new SpringMesh( Plane.generateMesh(.2f,.4f,10,20), 1.f) //Sphere()
+  fabric3.pins += AbsoluteConstraint( fabric3.particles.head, Vec3(-1,1,0))
+  fabric3.pins += AbsoluteConstraint( fabric3.particles.take(10).last, Vec3(-1,1,0))
+  fabric3.pins += AbsoluteConstraint( fabric3.particles.takeRight(10).head, Vec3(-1,1,0))
+  fabric3.pins += AbsoluteConstraint( fabric3.particles.last, Vec3(1,1,0))
+  fabric3.pins += AbsoluteConstraint( fabric3.particles.take(100).last, Vec3(-1,1,0))
+  fabric3.pins += AbsoluteConstraint( fabric3.particles.take(110).last, Vec3(1,1,0))
   // s.particles.takeRight(10).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
   val model = Model(fabric)
   val model2 = Model(fabric2)
+  val model3 = Model(fabric3)
   var drawFabric = false
   def drawFabric(b:Boolean){drawFabric = b}
   // fabric.mesh.primitive = Lines
   model.color.set(1,0,0,1)
   model2.color.set(1,0,0,1)
+  model3.color.set(1,0,0,1)
   node.camera = Camera
   node.scene.push(fabric)
   // Scene.push(fabric)
@@ -91,6 +101,7 @@ object Main extends App with Animatable{
     if( drawFabric ){
       model.draw()
       model2.draw()
+      // model3.draw()
     }
   }
 
@@ -99,6 +110,7 @@ object Main extends App with Animatable{
     skeletons.foreach( _.animate(dt) )
     fabric.animate(dt)
     fabric2.animate(dt)
+    // fabric3.animate(dt)
   }
 
 }

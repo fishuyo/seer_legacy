@@ -122,7 +122,7 @@ class LoopScene extends InputAdapter with Animatable {
     
   })
 
-  Shader.lighting=0.f
+  Shader.lightingMix=0.f
   Shader.setBgColor(RGBA(1,1,1,1))
   looper.setMode("sync")
 

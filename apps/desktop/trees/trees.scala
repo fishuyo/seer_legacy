@@ -83,7 +83,6 @@ object Main extends App with Animatable with AudioSource {
     s.monitor()
     s = Shader.load("composite", Gdx.files.internal("res/shaders/composite.vert"), Gdx.files.internal("res/shaders/composite.frag"))
     s.monitor()
-    Shader.multiPass = true;
 
     SceneGraph.root.shader = "firstPass"
 
@@ -122,7 +121,7 @@ object Main extends App with Animatable with AudioSource {
       override def draw(){
         // Shader("composite").setUniformf("u_blend0", 1.0f)
         // Shader("composite").setUniformf("u_blend1", 1.0f)
-        Shader("composite").setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+        // Shader("composite").setUniformMatrix("u_projectionViewMatrix", new Matrix4())
         m.draw()
       }
     }

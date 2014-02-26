@@ -21,7 +21,7 @@ object Main extends App with Animatable{
   SimpleAppRun()  
 
   override def draw(){
-    Shader.lighting = 0.f
+    Shader.lightingMix = 0.f
   	fabric.draw()
   }
 

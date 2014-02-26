@@ -23,11 +23,18 @@ object Main extends App with Animatable{
 
   val cube = Cube() //new SpringMesh(Cube.generateMesh(), 1.f)
   val cubes = ListBuffer[Model]()
-  val n = 15
+  val n = 10
+  val size = .1f
   for( i<-(-n until n); j<-(-n until n)){
-    val x = i * .2f
-    val z = j * .2f
-    val c = Cube().scale(.1f).translate(x,0,z)
+    val x = i * size
+    val z = j * size
+    val d = (x*x+z*z)
+
+    val c = Cube().scale(size/2.f).translate(x,0,z)
+    val v = (j+5*math.sin(x)).toInt
+    if( v/3 % 2 == 0) c.color.set(0,0,0,1)
+    if( i*i + j*j < 200 || math.abs(v) < 2) c.color.set(1,.7f,0,1)
+    c.scale.y = Random.float(0,0.5)()
     cubes += c
   }
 
@@ -65,10 +72,10 @@ object Main extends App with Animatable{
   }
   override def draw(){
 
-    Text.render(text,x,y)
+    // Text.render(text,x,y)
 
     live.draw()
-    // cubes.foreach( _.draw() )
+    cubes.foreach( _.draw() )
 
   }
 
@@ -81,7 +88,10 @@ object Main extends App with Animatable{
     }
     t += dt
 
-    s.animate(dt)
+    cubes.foreach( (c) => {
+       c.scale(1,1+Random.float(-1,1)()*0.01,1)
+    })
+    // s.animate(dt)
     live.animate(dt)
   }
 

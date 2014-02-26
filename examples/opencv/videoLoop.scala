@@ -89,8 +89,8 @@ object Main extends App with Animatable{
 
   override def draw(){
 
-    Shader.lighting = 0.f
-  	Shader.texture = 1.f
+    Shader.lightingMix = 0.f
+  	Shader.textureMix = 1.f
   	Texture.bind(0)
   	cube.draw()
 

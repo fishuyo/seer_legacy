@@ -57,12 +57,13 @@ object Texture {
   // def getFloatBuffer(i:Int) = textures(i).getTextureData match { case td:FloatTextureDataExposed => td.getBuffer; case _ => null }
 }
 
-class Texture(w:Int,h:Int) {
+class FloatTexture(w:Int,h:Int) {
 	val data:FloatBuffer = BufferUtils.newFloatBuffer( 4*w*h )
 	val td = new DynamicFloatTexture(w,h,data)
 	val t = new GdxTexture( td )
 
 }
+
 
 
 

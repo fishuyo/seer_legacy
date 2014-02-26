@@ -42,6 +42,8 @@ class Mesh extends Drawable {
 
 	/** Initialize gdx mesh component */
 	override def init(){
+		if( gdxMesh.isDefined ) return
+		
 		var attrs = Vector(VertexAttribute.Position)
 		if(normals.length > 0){
 			hasNormals = true
@@ -117,6 +119,26 @@ class Mesh extends Drawable {
 		// TODO parse out attributes
 		gdxMesh.get.getVertices(verts)
 		vertices ++= new Array[Vec3](numV)
+	}
+
+	def recalculateNormals(){
+		if( indices.length > 0){
+
+	  	val l = indices.grouped(3)
+		  
+		  l.foreach( (xs) => {
+		  	val v = xs.map(vertices(_))
+		  	val n = (v(1)-v(0) cross v(2)-v(0)).normalize
+		  	xs.foreach( normals(_).set(n) )
+		  })
+
+	  } else {
+
+	  	// val l = mesh.vertices.grouped(3)
+		  
+		  // l.foreach( (xs) => {
+		  // })
+	  }
 	}
 
 }

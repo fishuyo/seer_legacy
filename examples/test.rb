@@ -2,7 +2,9 @@
 
 class Test
 	include_package "com.fishuyo.seer.test"
-  	include_package "com.fishuyo.seer.t.util"
+  	# include_package "com.fishuyo.seer.t.util"
+  	include_package "com.fishuyo.seer.video"
+
 
 	def initialize
 		@frame = 0
@@ -57,6 +59,13 @@ class Test
 		Keyboard.bind("r", lambda{
 			Main.s.particles.foreach( lambda{|p| p.reset() })
 		})
+		Keyboard.bind("l", lambda{
+			ScreenCapture.toggleRecord()	
+		})
+
+		Camera.nav.pos.set(3.2720168,4.3370976,-0.3198568)
+		Camera.nav.quat.set(0.6508481,-0.70408297, 0.19278999, -0.20855892)
+
 	end
 
 	def animate(dt)
@@ -65,10 +74,11 @@ class Test
 		Main.node.scene.alpha(1.0)
 		f = com.fishuyo.seer.util.Random.float(-1,1)
 
-		Main.cubes.foreach( lambda{|c|
-			# c.scale.set(0.1)
-			c.scale(1,1+f[]*0.005,1)
-		})
+		Shader.lightPosition.set(1,1,-2)
+		# Main.cubes.foreach( lambda{|c|
+		# 	# c.scale.set(0.1)
+		# 	c.scale(1,1+f[]*0.005,1)
+		# })
 		# Scene.alpha(1.0)
 		# puts Main.node.scene.alpha
     # node.scene.alpha = math.abs(math.sin(SimpleAppRun.app.frameCount/100.f).toFloat)

@@ -65,7 +65,7 @@ class Tree() extends Animatable {
   var bDepth:Int = 8
   def setDepth(i:Int) = bDepth = i
 
-  val branchNum = Chooser(Array(0,1,2),Array(0.f,0,1.f))
+  val branchNum = Chooser(Array(0,1,2),Array(0.f,1.f,0.f))
 
   var size = 0
   // var vertices:Array[Float] = null
@@ -172,7 +172,7 @@ class Tree() extends Animatable {
 object TreeNode {
 
 	var taper=.8f
-	var glprimitive = Model(Cylinder.generateMesh(1.f,taper,10)) //Primitive3D.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
+	var model = Model(Cylinder.generateMesh(1.f,taper,10)) //Primitive3D.cylinder(Pose(),Vec3(1), 1.f, taper, 10)
 
   def apply( p:Pose=Pose(Vec3(0),Quat().fromEuler(Vec3(-math.Pi/2,0,0))), d:Float=1.f, t:Float=.2f, q:Quat=Quat() ) = new TreeNode {
   	restPose = Pose(p);
@@ -192,7 +192,7 @@ object TreeNode {
 
     //k = 10.f * thick*thick*thick / (4*dist*dist*dist)
     k = 10.f * thick/ (4*dist)
-  	//glprimitive = GLPrimitive.cylinder(pose,Vec3(1,1,d), d*thick, d*thick*taper, 10)
+  	//model = GLPrimitive.cylinder(pose,Vec3(1,1,d), d*thick, d*thick*taper, 10)
  	} 
   /*def apply( p:TreeNode, ang: Float, d: Float ) = {
     
@@ -227,16 +227,16 @@ class TreeNode extends Animatable {
   var w = Randf(0,3.14f)()
   var f = 1.f/dist * 1.f
   var k = 10.f * thick*thick*thick / (dist*dist*dist)
-  //var glprimitive:GLPrimitive = _
+  //var model:GLPrimitive = _
 
   //var parent:Option[TreeNode] = None
   var children = List[TreeNode]()
 
   override def draw( ){ //v:Array[Float], idx:Int ):Int = {
 
-		TreeNode.glprimitive.pose = pose
-		TreeNode.glprimitive.scale.set(dist*thick,dist*thick,dist) //*1.05f)
-		TreeNode.glprimitive.draw();
+		TreeNode.model.pose = pose
+		TreeNode.model.scale.set(dist*thick,dist*thick,dist) //*1.05f)
+		TreeNode.model.draw();
     // var i = idx
      children.foreach( (n) => { n.draw() })//{
     //  v(i) = pose.pos.x; v(i+1) = pose.pos.y; v(i+2) = pose.pos.z

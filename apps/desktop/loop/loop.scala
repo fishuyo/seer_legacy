@@ -73,7 +73,7 @@ object Main extends App with Animatable{
 
  
 
-  Shader.lighting=0.0f
+  Shader.lightingMix=0.0f
   Shader.setBgColor(RGBA(1,1,1,1))
 
   SimpleAppRun()  

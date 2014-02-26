@@ -42,6 +42,8 @@ class Skel
 			if f[0] == "head"
 				OSC.endBundle()
 				OSC.startBundle()
+				OSC.send("/l_fabric", Main.fabric.averageVelocity()*10.0, Main.fabric.averageSpringLength())
+				OSC.send("/r_fabric", Main.fabric2.averageVelocity()*10.0, Main.fabric2.averageSpringLength())
 			end
 			OSC.send("/" + id.to_s + "/joint/" + f[0], 2*f[2]-1, 1-f[3], f[4])
 
@@ -57,6 +59,18 @@ class Skel
 				Main.fabric2.pins.apply(1).set( j.pose.pos )
 			elsif f[0] == "l_shoulder"
 				Main.fabric2.pins.apply(2).set( j.pose.pos )
+			elsif f[0] == "r_hip"
+				Main.fabric3.pins.apply(0).set( j.pose.pos )
+			elsif f[0] == "l_hip"
+				Main.fabric3.pins.apply(1).set( j.pose.pos )
+			elsif f[0] == "r_knee"
+				Main.fabric3.pins.apply(4).set( j.pose.pos )
+			elsif f[0] == "l_knee"
+				Main.fabric3.pins.apply(5).set( j.pose.pos )
+			elsif f[0] == "r_foot"
+				Main.fabric3.pins.apply(2).set( j.pose.pos )
+			elsif f[0] == "l_foot"
+				Main.fabric3.pins.apply(3).set( j.pose.pos )
 			end
 		})
 
@@ -70,6 +84,12 @@ class Skel
 				# Shader.shader.get.uniforms.update("u_blend1", f[1])
 				# Shader.shader.get.uniforms.update("u_blend0", 0.25)
 				# Shader.shader.get.uniforms.update("u_blend1", 0.75)
+
+			elsif i == 2
+				@dx += f[2] * 0.01
+				@dy += f[3] * 0.01
+				Main.fabric.pins.apply(0).set( Vec3.new(@dx,@dy,0) )
+
 			end
 		})
 
@@ -93,6 +113,7 @@ class Skel
 		# puts "hi"
 
 		@frame += 1
+		puts Main.fabric.averageVelocity() * 10.0
 		# puts (Main.skeletons.apply(1).joints.apply("r_hip").pose.pos - Main.skeletons.apply(1).joints.apply("r_knee").pose.pos).mag()
 		# OSC.send("/1/joint/r_hand", 1.1, 2.2, 3.3)
 

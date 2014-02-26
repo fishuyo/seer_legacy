@@ -41,7 +41,7 @@ class FieldViewer(var w:Int, var h:Int) extends Animatable {
 
   override def init() = runOnce()
   override def draw() = {
-    Shader.texture = 1.f
+    Shader.textureMix = 1.f
     field.draw
   }
   override def animate(dt:Float) = if(running) runEverytime(dt)

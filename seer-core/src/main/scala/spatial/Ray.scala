@@ -2,6 +2,7 @@ package com.fishuyo.seer
 package spatial
 
 import maths.Vec3
+import maths.Quat
 
 object Ray{
 	def apply(o:Vec3,d:Vec3) = new Ray(o,d)
@@ -32,11 +33,15 @@ class Ray( val o: Vec3, val d: Vec3 ){
     None
   }
 
-  def intersectQuad(cen:Vec3, w:Float, h:Float) : Option[Float] = {
-  	val n = Vec3(0,0,1)
+  def intersectQuad(cen:Vec3, w:Float, h:Float, quat:Quat=Quat()) : Option[Float] = {
+    val n = quat.toZ
     val dn = d dot n
 
-    val vertices = (cen + Vec3(-w,-h,0), cen + Vec3(w,-h,0), cen + Vec3(w,h,0), cen + Vec3(-w,h,0))
+    val nx = quat.toX
+    val ny = quat.toY
+
+    // val vertices = (cen + Vec3(-w,-h,0), cen + Vec3(w,-h,0), cen + Vec3(w,h,0), cen + Vec3(-w,h,0))
+    val vertices = (cen + nx * -w + ny * -h, cen + nx*w + ny * -h, cen + nx*w + ny*h, cen + nx * -w + ny*h)
     
     if( dn == 0) return None
 

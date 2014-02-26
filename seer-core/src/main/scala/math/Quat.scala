@@ -19,10 +19,17 @@ object Quat {
   def apply(x:Float, y:Float, z:Float) = new Quat(1,0,0,0).fromEuler(x,y,z)
   def apply(euler:Vec3) = new Quat(1,0,0,0).fromEuler(euler)
   def apply() = new Quat(1,0,0,0)
+
+  def up = this().fromEuler(-Pi/2.f,0.f,0.f)
+  def down = this().fromEuler(Pi/2.f,0.f,0.f)
+  def left = this().fromEuler(0.f,-Pi/2.f,0.f)
+  def right = this().fromEuler(0.f,Pi/2.f,0.f)
+  def forward = this()
+  def back = this().fromEuler(0.f,Pi,0.f)
 }
 
 class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
-  implicit def toF( d: Double ) = d.toFloat
+  // implicit def toF( d: Double ) = d.toFloat
 
   def unary_- = Quat( -w, -x, -y, -z ) 
   def +(v: Quat) = Quat( w+v.w, x+v.x, y+v.y, z+v.z )
@@ -58,15 +65,16 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
   def zero() = {w=0;x=0;y=0;z=0;this}
   def setIdentity() = {w=1;x=0;y=0;z=0;this}
 
-  def fromAxisX( ang: Float ) = {w=math.cos(ang*.5f);x=math.sin(ang*.5f);y=0;z=0}
-  def fromAxisY( ang: Float ) = {w=math.cos(ang*.5f);x=0;y=math.sin(ang*.5f);z=0}
-  def fromAxisZ( ang: Float ) = {w=math.cos(ang*.5f);x=0;y=0;z=math.sin(ang*.5f)}
+  def fromAxisX( ang: Float ) = {w=math.cos(ang*.5f);x=math.sin(ang*.5f);y=0;z=0; this}
+  def fromAxisY( ang: Float ) = {w=math.cos(ang*.5f);x=0;y=math.sin(ang*.5f);z=0; this}
+  def fromAxisZ( ang: Float ) = {w=math.cos(ang*.5f);x=0;y=0;z=math.sin(ang*.5f); this}
   def fromAxisAngle( ang: Float, axis:Vec3 ) = { 
     val sin2a = math.sin(ang*.5f)
     w = math.cos(ang*.5f)
     x = axis.x * sin2a
     y = axis.y * sin2a
     z = axis.z * sin2a
+    this
   }
   // from euler angles ( elevation, azimuth, bank )
   def fromEuler( x:Float, y:Float, z:Float ): Quat = fromEuler((x,y,z))

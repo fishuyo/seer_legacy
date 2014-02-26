@@ -74,8 +74,8 @@ Kinect.setAngle(10)
 def animate(dt)
 
 
-  Shader.lighting_=(0.0)
-	Shader.texture_=(1.0)
+  Shader.lightingMix_=(0.0)
+	Shader.textureMix_=(1.0)
 
 	# for i in 0..9000
 	# 	# Texture.apply(0).getTextureData().buffer.put(i,1.0)

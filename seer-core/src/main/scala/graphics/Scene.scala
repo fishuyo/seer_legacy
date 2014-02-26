@@ -45,7 +45,6 @@ class Scene {
   //def onDraw( gl: GL2 ) = drawable.foreach( _.onDraw(gl) )
   def draw() = drawable.foreach( _.draw() )
 
-  // def draw2() = drawable.foreach( _.draw2() )
   //def pick( r: Ray ) = pickable.foreach( _.pick(r) )
   
 }
@@ -76,6 +75,10 @@ object SceneGraph {
   def addNode(n:RenderNode){
     n.scene.init()
     roots += n
+  }
+  def prependNode(n:RenderNode){
+    n.scene.init()
+    roots.prepend(n)
   }
 
   def animate(dt:Float){
@@ -111,6 +114,7 @@ object SceneGraph {
 class RenderNode {
   var active = true
   var clear = true
+  var depth = true
   val inputs = new ListBuffer[RenderNode]
   val outputs = new ListBuffer[RenderNode]
 
@@ -156,32 +160,40 @@ class RenderNode {
       else Gdx.gl.glClear( GL20.GL_DEPTH_BUFFER_BIT)
     }
 
-    Shader(shader).begin()
+    try{
+      Shader(shader).begin() 
 
-    inputs.zipWithIndex.foreach( (i) => {
-      // i._1.buffer.get.getColorBufferTexture().bind(i._2) 
-      i._1.bindBuffer(i._2) 
-      Shader.shader.get.uniforms("u_texture"+i._2) = i._2
-    })
+      inputs.zipWithIndex.foreach( (i) => {
+        // i._1.buffer.get.getColorBufferTexture().bind(i._2) 
+        i._1.bindBuffer(i._2) 
+        Shader.shader.get.uniforms("u_texture"+i._2) = i._2
+      })
 
-    MatrixStack.clear()
-    Shader.setMatrices(camera)
-    if(active){
-      Shader.alpha = scene.alpha
-      Shader.fade = scene.fade
-      if( scene.alpha < 1.f ){ 
-        Shader.blend = true
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-      }else {
-        Shader.blend = false
-        Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
-        Gdx.gl.glDisable( GL20.GL_BLEND )
+      MatrixStack.clear()
+      Shader.setCamera(camera)
+      Shader.setMatrices()
+      if(active){
+        Shader.alpha = scene.alpha
+        Shader.fade = scene.fade
+
+        if( scene.alpha < 1.f ){ //TODO depth ordering, conflicts with depth flag
+          Shader.blend = true
+          Gdx.gl.glEnable(GL20.GL_BLEND);
+          Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+        }else {
+          Shader.blend = false
+          Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
+          Gdx.gl.glDisable( GL20.GL_BLEND )
+        }
+
+        if(depth) Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
+        else Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+
+        scene.draw()
       }
-      scene.draw()
-    }
-    
-    Shader().end()
+      
+      Shader().end()
+    } catch{ case e:Exception => println(e)}
 
     if( buffer.isDefined ) buffer.get.end()
   }
