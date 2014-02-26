@@ -266,7 +266,7 @@ class AudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channels:
 
 
 // old audio actor
-object SimpleAudio extends SimpleAudio(44100,512,false)
+// object SimpleAudio extends SimpleAudio(44100,512,false)
 
 class SimpleAudio(val sampleRate:Int=44100, val bufferSize:Int=512, val mono:Boolean=false) extends actors.Actor {
 
