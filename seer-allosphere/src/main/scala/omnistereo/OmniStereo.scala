@@ -91,12 +91,12 @@ object OmniStereo {
 		data.rewind
 	}
 
-	def softEdge(uint8_t * value, double normx, double normy) {
-		static const double mult = 20;
+	// def softEdge(uint8_t * value, double normx, double normy) {
+	// 	static const double mult = 20;
 
-		// fade out at edges:
-		value[0] = 255. * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normx-0.5)))) * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normy-0.5))));
-	}
+	// 	// fade out at edges:
+	// 	value[0] = 255. * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normx-0.5)))) * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normy-0.5))));
+	// }
 
 	// prefix this string to every vertex shader used in rendering the scene
 	// use it as e.g.:
@@ -420,7 +420,7 @@ object OmniStereo {
 // Object to encapsulate rendering omni-stereo worlds via cube-maps:
 class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
-	type DrawMethod = (Pose,Double) => ()  // pose, eye
+	type DrawMethod = (Pose,Double) => Unit  // pose, eye
 
 	// ShaderProgram mCubeProgram, mSphereProgram, mWarpProgram, mDemoProgram;
 
@@ -555,9 +555,9 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				u = new Array[Float](w*h)
 				v = new Array[Float](w*h)
 
-				for( i <- (0 until w*h)) t[i] = readFloat(ds)
-				for( i <- (0 until w*h)) u[i] = readFloat(ds)
-				for( i <- (0 until w*h)) v[i] = readFloat(ds)
+				for( i <- (0 until w*h)) t(i) = readFloat(ds)
+				for( i <- (0 until w*h)) u(i) = readFloat(ds)
+				for( i <- (0 until w*h)) v(i) = readFloat(ds)
 
 				mWarp = new Texture(w,h)
 
@@ -567,7 +567,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
 				println(s"read $path\n")
 
-			catch {
+			} catch {
 				case e: Exception => println("failed to open Projector configuration file " + path + "\n")
 			}
 
@@ -599,7 +599,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				initParameters(verbose)
 				println("read " + path + "\n" )
 
-			catch {
+			} catch {
 				case e: Exception => println("failed to open Projector configuration file " + path + "\n")
 			}
 		}

@@ -11,9 +11,25 @@ class Skel
 		@dy=0.0
 		@dz=0.0
 		@ry=0.0
+		@t=0.0
+		@time=0.0
 
+		@skyshader = nil
+		@skyload=false
+		@skyvert=""
+		@skyfrag=""
+		@bodyshader = nil
+		@bodyload=false
+		@bodyvert=""
+		@bodyfrag=""
 
-		SceneGraph.root.camera.nav.pos.set(0,0.5,0)
+		@color = Vec3.new(0,0.5,0.5)
+		@newColor = Vec3.new(0,0.5,0.5)
+		@dur = 5.0
+
+		@rand = com.fishuyo.seer.util.Random
+
+		# SceneGraph.root.camera.nav.pos.set(0,0.5,0)
 
 		OSC.clear()
 		OSC.disconnect()
@@ -36,6 +52,8 @@ class Skel
 			id = f[1]
 			s = Main.skeletons.apply(id)
 			s.tracking(true)
+			s.setShader("")
+			s.setShader("body")
 			j = s.joints.apply(f[0])
 			j.pose.pos.set(2*f[2]-1,(1.0-f[3]),f[4])
 			id = 1
@@ -74,6 +92,17 @@ class Skel
 			end
 		})
 
+		OSC.bind("/skyshader", lambda{|f| @skyload=true; @skyvert=f[0]; @skyfrag=f[1]})
+		OSC.bind("/skyshader/uniforms", lambda{|f| @skyshader.uniforms.update(f[0],f[1]) })
+		OSC.bind("/bodyshader", lambda{|f| @bodyload=true; @bodyvert=f[0]; @bodyfrag=f[1]})
+		OSC.bind("/bodyshader/uniforms", lambda{|f| @bodyshader.uniforms.update(f[0],f[1]) })
+		
+		OSC.bind("/ground/warp", lambda{|f| Main.warpGround() })
+		OSC.bind("/ground/reset", lambda{|f| Main.resetGround() })
+		OSC.bind("/ground/color", lambda{|f| @t=0.0; @newColor = Vec3.new(f[0],f[1],f[2]) })
+		OSC.bind("/ground/transitionTime", lambda{|f| @dur = f[0] })
+
+
 		Trackpad.clear()
 		Trackpad.connect()
 		Trackpad.bind( lambda{ |i,f| 
@@ -89,15 +118,25 @@ class Skel
 				@dx += f[2] * 0.01
 				@dy += f[3] * 0.01
 				Main.fabric.pins.apply(0).set( Vec3.new(@dx,@dy,0) )
-
+			elsif i == 3
+				@dx += f[2] * 0.01
+				@dz += f[3] * 0.01
 			end
+
+			Main.trace.apply(Vec3.new(@dx,@dy,@dz))
 		})
 
 		Keyboard.clear()
 		Keyboard.use()
-		Keyboard.bind("n", lambda{
+		Keyboard.bind("g", lambda{
+			Main.warpGround()
 		})
 		Keyboard.bind("c", lambda{
+			Main.resetGround()
+		})
+		Keyboard.bind("l", lambda{
+			OSC.connect("localhost",7110)
+			OSC.send("/skyshader", vert(), frag2() )
 		})
 
 
@@ -110,25 +149,153 @@ class Skel
 	end
 
 	def animate(dt)
-		# puts "hi"
+		if @skyshader == nil
+			@skyshader = Shader.load("sky",vert(),frag())
+			@skyshader.uniforms.update("amp",0.05)
+			@skyshader.uniforms.update("thick",0.05)
+		elsif @skyload
+			@skyload = false
+			@skyshader = Shader.load("sky",@skyvert,@skyfrag)
+		end
 
+		if @bodyshader == nil
+			@bodyshader = Shader.load("body",vert(),frag2())
+			@bodyshader.uniforms.update("amp",0.05)
+			@bodyshader.uniforms.update("thick",0.05)
+		elsif @bodyload
+			@bodyload = false
+			@bodyshader = Shader.load("body",@bodyvert,@bodyfrag)
+		end
+
+		@skyshader.uniforms.update("time",@time)
+
+		@bodyshader.uniforms.update("time",@time)
+
+
+		@time += dt
+		@t += dt
 		@frame += 1
-		puts Main.fabric.averageVelocity() * 10.0
+
+		# puts Main.fabric.averageVelocity() * 10.0
 		# puts (Main.skeletons.apply(1).joints.apply("r_hip").pose.pos - Main.skeletons.apply(1).joints.apply("r_knee").pose.pos).mag()
-		# OSC.send("/1/joint/r_hand", 1.1, 2.2, 3.3)
 
 		# Main.node.scene.alpha(1.0)
 		# Scene.alpha(1.0)
 		# puts Main.node.scene.alpha
-    # node.scene.alpha = math.abs(math.sin(SimpleAppRun.app.frameCount/100.f).toFloat)
+    	# node.scene.alpha = math.abs(math.sin(SimpleAppRun.app.frameCount/100.f).toFloat)
 
-		# Shader.blend_=(false)
-		# Main.cube.rotate(3,0,0)
-		# Main.wire.rotate(0,0,-0.1)
+		@dur = 5.0
+		if @t < @dur
+			c = @color.lerp(@newColor, @t/@dur)
+			Main.groundM.color.set(c.x,c.y,c.z)
+		else
+			f = @rand.float
+			@color = @newColor
+			@newColor = Vec3.new(f[],f[],f[])
+			# @newColor = Vec3.new(f[]*0.1,f[]*0.3,f[]*0.5)
+			# @newColor = Vec3.new(0.0,0.2,0.2)
+			@t = 0.0
+		end
 	end
 
 	def draw
 		# puts @frame
+	end
+
+	def vert
+		return "
+			attribute vec4 a_position;
+			attribute vec2 a_texCoord0;
+			attribute vec4 a_color;
+
+			uniform mat4 u_projectionViewMatrix;
+
+			varying vec4 v_color;
+			varying vec2 v_texCoord;
+			varying vec3 v_pos;
+
+			void main() {
+			  v_pos = a_position.xyz;
+			  gl_Position = u_projectionViewMatrix * a_position;
+			  v_texCoord = a_texCoord0;
+			  v_color = a_color;
+			}
+		"
+	end
+
+	def frag
+		return "
+			#ifdef GL_ES
+			    precision mediump float;
+			#endif
+
+			varying vec4 v_color;
+			varying vec2 v_texCoord;
+			varying vec3 v_pos;
+
+			uniform float amp;
+			uniform float time;
+			uniform float thick;
+			uniform float frequency;
+
+			void main() {
+			  vec2 uv;
+			  vec2 uv1 = 2. * v_texCoord - 1.;
+			  uv.x = uv1.y;
+			  uv.y = uv1.x;
+			  
+			  float c = 0.;
+			  float thickness = thick / 10.0;
+			  float freq = 2.0 + frequency;
+
+			  for( float i = 0.; i < 8.; i++ ){
+			    uv.x += sin( uv.y + time * freq ) * amp;
+			    //uv.x = abs( 1./uv.x ) * amp;    
+			    c += abs( thickness / uv.x );    
+			  }
+
+			  gl_FragColor = vec4( vec3(c,amp,amp),1 );
+			}
+		"
+	end
+
+	def frag2
+		return "
+			#ifdef GL_ES
+			    precision mediump float;
+			#endif
+
+			varying vec4 v_color;
+			varying vec2 v_texCoord;
+			varying vec3 v_pos;
+
+			uniform float amp;
+			uniform float time;
+			uniform float thick;
+			uniform float frequency;
+
+			void main() {
+			  vec2 uv;
+			  vec2 uv1 = 2. * v_texCoord - 1.;
+			  uv.x = uv1.y;
+			  uv.y = uv1.x;
+			  			  
+			  float c = 0.;
+			  float thickness = thick / 10.0;
+			  float freq = 2.0 + frequency;
+
+			  for( float i = 0.; i < 8.; i++ ){
+			    uv.x += sin( uv.y + time * freq ) * amp;
+			    uv.x = abs( 1./uv.x ) * amp;    
+			    c += abs( thickness / uv.x );    
+			  }
+
+			  //c = cos(uv.x) + sin(uv.y);
+			  //c = c*c;
+
+			  gl_FragColor = vec4(vec3(c,amp,c),1 );
+			}
+		"
 	end
 
 end

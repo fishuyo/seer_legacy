@@ -6,6 +6,7 @@ module M
   include_package "com.fishuyo.seer.graphics"
   include_package "com.fishuyo.seer.examples.opencv.loop"
   include_package "com.fishuyo.seer.video"
+  include_package "com.fishuyo.seer"
 
 end
 
@@ -20,6 +21,32 @@ end
 
 ScreenCapture.scale_=(0.5)
 
+Mouse.clear()
+Mouse.use()
+Mouse.bind("drag", lambda{|i|
+  x = i[0] / (1.0*Window.width)
+  y = i[1] / (1.0*Window.height)
+  speed = (400 - i[1]) / 100.0
+  decay = (i[0] - 400) / 100.0
+
+  # Main.loop.setSpeed(1.0) #speed)
+  # Main.loop.setAlphaBeta(decay, speed)
+  Main.loop.setAlpha(x)
+})
+l=0.0
+t=0.0
+doResize=false
+Mouse.bind("down", lambda{|i|
+  l = i[0] / (1.0*Window.width)
+  t = i[1] / (1.0*Window.height)
+})
+Mouse.bind("up", lambda{|i|
+  x = i[0] / (1.0*Window.width)
+  y = i[1] / (1.0*Window.height)
+  Main.resizeC(l,t,x,y) if doResize
+  doResize = false
+})
+
 Keyboard.clear()
 Keyboard.use()
 Keyboard.bind("r",lambda{ puts "r"; Main.loop.toggleRecord(); Main.audioLoop.toggleRecord() })
@@ -32,6 +59,8 @@ Keyboard.bind("z",lambda{ Main.loop.rewind(); Main.audioLoop.rewind() })
 Keyboard.bind("o",lambda{ Main.loop.writeToFile("",1.0,"mpeg4") })
 Keyboard.bind("i",lambda{ Main.loop.writeToPointCloud("") })
 Keyboard.bind("p",lambda{ puts "p"; ScreenCapture.toggleRecord() })
+Keyboard.bind("1",lambda{ Main.resizeFull(); doResize=true })
+
 
 sub = false
 Keyboard.bind("y",lambda{
@@ -54,38 +83,6 @@ Main.bgsub.setThreshold(10.0)
 
 touchip="192.168.3.103"
 
-Mouse.clear()
-Mouse.use()
-Mouse.bind("drag", lambda{|i|
-	speed = (400 - i[1]) / 100.0
-  decay = (i[0] - 400) / 100.0
-
-  # if decay > 0.0 and decay < 1.0
-  #   OSC.send(touchip,9000,"1/fader1", decay)
-  # elsif decay < 0.0 and decay > -1.0
-  #   OSC.send(touchip,9000,"1/rotary3", -decay)
-  # elsif decay < -1.0
-  #   OSC.send(touchip,9000,"1/rotary2", -decay)
-  # elsif decay > 1.0
-  #   OSC.send(touchip,9000,"1/rotary1", decay)
-  # end
-
-  # if speed > 0.0 and speed < 1.0
-  #   OSC.send(touchip,9000,"1/fader2", speed)
-  # elsif speed < 0.0 and speed > -1.0
-  #   OSC.send(touchip,9000,"1/rotary6", -speed)
-  # elsif speed < -1.0
-  #   OSC.send(touchip,9000,"1/rotary5", -speed)
-  # elsif speed > 1.0
-  #   OSC.send(touchip,9000,"1/rotary4", speed)
-  # end
-
-  # decay = (decay + 4)/8
-  Main.loop.setSpeed(1.0) #speed)
-	# Main.loop.setAlphaBeta(decay, speed)
-  # puts decay
-  Main.loop.setAlpha(decay)
-})
 
 
 OSC.clear()

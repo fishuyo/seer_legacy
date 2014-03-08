@@ -182,14 +182,19 @@ class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh
 
 
 class Trace3D( var size:Int ) extends Drawable {
-  var color1 = Vec3(1.f,0.f,0.f)
-  var color2 = Vec3(0.f,0.f,1.f)
-  var pose = Pose()
-  var scale = Vec3(1.f)
-  val mesh = new GdxMesh(false,size,0, VertexAttribute.Position, VertexAttribute.ColorUnpacked)
+  var thickness = 4.f
+  var smooth = true
+  val mesh = Mesh()
+  val model = Model(mesh)
+  model.material = new BasicMaterial
   var data = Queue[Vec3]()
-  for( i<-(0 until size)) data.enqueue(Vec3())
-  val vertices = new Array[Float](size*(3+4))
+  for( i<-(0 until size)){
+    data.enqueue(Vec3())
+    mesh.vertices += Vec3()
+    mesh.colors += RGBA(1,1,1,1)
+    // mesh.primitive = TriangleStrip
+    mesh.primitive = LineStrip
+  }
   var dirty = true
 
   def apply(v:Vec3) = {
@@ -197,30 +202,32 @@ class Trace3D( var size:Int ) extends Drawable {
     data.enqueue(u)
     data.dequeue()
 
-    for( i<-(0 until size)){
-      val c = color1.lerp(color2, i/size.toFloat)
-      vertices(7*i) = data(i).x
-      vertices(7*i+1) = data(i).y
-      vertices(7*i+2) = data(i).z
-      vertices(7*i+3) = c.x
-      vertices(7*i+4) = c.y
-      vertices(7*i+5) = c.z
-      vertices(7*i+6) = 1.f
-    }
+    mesh.vertices.clear
+    mesh.vertices ++= data
     dirty = true
   }
 
+  def setColors(c1:Vec3,c2:Vec3){
+    for( i<-(0 until size)){
+      val c = c1.lerp(c2, i/size.toFloat)
+      mesh.colors(i) = RGBA(c,1.f)
+    }
+    dirty = true  
+  }
+
+  override def init(){
+    mesh.init
+  }
   override def draw(){ 
     if( dirty ){
-      mesh.setVertices( vertices )
+      mesh.update
       dirty = false
     }
-    Shader.setColor(RGBA(color1,1.f))
-    MatrixStack.push()
-    MatrixStack.transform(pose,scale)
-    Shader.setMatrices()
-    mesh.render(Shader(), GL10.GL_LINE_STRIP)
-    MatrixStack.pop()
+    if(smooth){
+      Gdx.gl.glEnable(GL10.GL_LINE_SMOOTH)
+    }
+    Gdx.gl.glLineWidth(thickness)
+    model.draw()
   }
 
 }

@@ -33,10 +33,10 @@ object LinearSpringConstraint {
 }
 
 class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, stiffness:Float, tearThreshold:Float) extends Constraint {
-	val imP = 1.f/p.mass
-  val imQ = 1.f/q.mass
-  val wP = ( imP / (imP+imQ) ) * stiffness;
-  val wQ = ( imQ / (imP+imQ) ) * stiffness;
+	var imP = 1.f/p.mass
+  var imQ = 1.f/q.mass
+  var wP = ( imP / (imP+imQ) ) * stiffness;
+  var wQ = ( imQ / (imP+imQ) ) * stiffness;
 
   var dist = 0.f
   var error = 0.f
@@ -44,6 +44,13 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, s
 
   def isTorn() = torn
   def length(v:Float){ length = v }
+
+  def updateWeights(){
+		imP = 1.f/p.mass
+		imQ = 1.f/q.mass
+		wP = ( imP / (imP+imQ) ) * stiffness;
+		wQ = ( imQ / (imP+imQ) ) * stiffness;
+  }
 
 	override def solve(){
 		if( torn ) return

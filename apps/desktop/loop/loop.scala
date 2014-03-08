@@ -78,6 +78,9 @@ object Main extends App with Animatable{
 
   SimpleAppRun()  
 
+  override def init(){
+    Audio.start
+  }
   override def animate(dt:Float){
 
     live.animate(dt)

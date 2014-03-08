@@ -9,6 +9,7 @@ import dynamic._
 import cv._
 import video._
 import audio._
+import util._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
@@ -39,8 +40,7 @@ object Main extends App with Animatable{
   def setOutput(s:String) = output = s
 
 	var bytes:Array[Byte] = null
-	var w = 0.0
-	var h = 0.0
+  var (w,ww,h,hh) = (0.0,0.0,0.0,0.0)
 
   val s = new SpringMesh( Sphere.generateMesh(),1.f ) //Plane.generateMesh(2,2,10,10), 1.f) //Sphere()
   s.particles.take(s.particles.length/2).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
@@ -51,6 +51,7 @@ object Main extends App with Animatable{
   Scene.push(cube)
 
   var pix:Pixmap = null
+  var tId = 0
   
   val live = new Ruby("videoLoop.rb")
 
@@ -67,6 +68,8 @@ object Main extends App with Animatable{
 
     w = capture.get(Highgui.CV_CAP_PROP_FRAME_WIDTH)
     h = capture.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT)
+    ww=w
+    hh=h
 
     println( s"starting capture w: $w $h")
 
@@ -76,15 +79,28 @@ object Main extends App with Animatable{
     bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
   	cube.scale.set(1.f, (h/w).toFloat, 1.f)
 
-  	Texture(pix) 
+  	tId = Texture(pix)
   }
 
+  def resizeC(x1:Float,y1:Float, x2:Float, y2:Float){
+    implicit def f2i(f:Float) = f.toInt
+    val c = clamper(0.f,1.f)_
+    val (l,r) = (if(x1>x2) (c(x2),c(x1)) else (c(x1),c(x2)) )
+    val (t,b) = (if(y1>y2) (c(y2),c(y1)) else (c(y1),c(y2)) )
+    println(s"resize: ${l*w} ${t*h} ${(r-l)*w} ${(b-t)*h}")
+    resize( l*w, t*h, (r-l)*w, (b-t)*h )
+  }
+  
   def resize(x:Int, y:Int, width:Int, height:Int){
     w = width.toDouble
     h = height.toDouble
     subRect = new Rect(x,y,width,height)
     loop.clear()
     dirty = true
+  }
+
+  def resizeFull(){
+    resize(0,0,ww.toInt,hh.toInt)
   }
 
   override def draw(){
@@ -151,10 +167,12 @@ object Main extends App with Animatable{
     }
 
     // copy MAT to pixmap
-  	out.get(0,0,bytes)
-		val bb = pix.getPixels()
-		bb.put(bytes)
-		bb.rewind()
+    out.get(0,0,bytes)  
+    val bb = pix.getPixels()
+    try{
+  		bb.put(bytes)
+  		bb.rewind()
+    } catch{ case e:Exception => println(e); println(w+ " " +h); println( bytes.length); println(bb.capacity) }
 
     // update texture from pixmap
 		Texture(0).draw(pix,0,0)

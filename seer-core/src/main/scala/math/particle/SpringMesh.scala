@@ -17,6 +17,8 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
   var pins = ArrayBuffer[AbsoluteConstraint]()
   var xt = 0.f
 
+  var updateNormals = true
+
   if( mesh.indices.length > 0){
 
   	mesh.vertices.foreach( (v) => { 
@@ -96,6 +98,7 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
     particles.zipWithIndex.foreach( (p) => {
     	mesh.vertices(p._2) = p._1.position
     })
+    if(updateNormals) mesh.recalculateNormals
     mesh.update
   }
 }

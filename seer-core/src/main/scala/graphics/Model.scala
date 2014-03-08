@@ -86,7 +86,7 @@ class Model extends Drawable with geometry.Pickable {
     MatrixStack.transform(pose,scale)
     worldTransform.set(MatrixStack.model)
 
-    // Shader.setColor(color)
+    Shader.setColor(color)
     val old = Shader.shader.get.name
     if( shader != "" ){
       Shader().end()

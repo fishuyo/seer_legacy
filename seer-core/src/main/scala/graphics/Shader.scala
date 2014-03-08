@@ -238,9 +238,9 @@ class Shader {
             case f:Double => s.setUniformf(u._1, f.toFloat)
             case i:Int => s.setUniformi(u._1, i)
             case i:Long => s.setUniformi(u._1, i.toInt)
+            case v:RGBA => s.setUniformf(u._1, v.r, v.g, v.b, v.a)
             case v:Vec2 => s.setUniformf(u._1, v.x, v.y)
             case v:Vec3 => s.setUniformf(u._1, v.x, v.y, v.z)
-            case v:RGBA => s.setUniformf(u._1, v.r, v.g, v.b, v.a)
             case _ => println("TODO: implement uniform type: " + u._1 + " " + u._2)
           }
           currentUniforms += u
@@ -278,16 +278,16 @@ class Shader {
 
 object VertexSegments {
   val attributes = """
-      attribute vec4 a_position;
-      attribute vec4 a_normal;
+      attribute vec3 a_position;
+      attribute vec3 a_normal;
       attribute vec4 a_color;
       attribute vec2 a_texCoord0;
   """
 
   val matrixUniforms = """
       uniform mat4 u_projectionViewMatrix;
-      // uniform mat4 u_modelViewMatrix;
-      // uniform mat4 u_viewMatrix;
+      uniform mat4 u_modelViewMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_modelMatrix;
       uniform mat4 u_normalMatrix;
       uniform vec4 u_cameraPosition;
@@ -300,21 +300,25 @@ object VertexSegments {
 
   val basicVarying = """
       varying vec4 v_color;
-      varying vec3 v_normal, v_lightDir, v_eyeVec;
+      varying vec3 v_normal, v_pos, v_lightDir, v_eyeVec;
       varying vec2 v_texCoord;
+      varying float v_fog;
   """
 }
 
 object DefaultShaders {
 
+  import VertexSegments._
+
   val basic = (
     // Vertex Shader
     """
-    attribute vec3 a_position;
+      attribute vec3 a_position;
       attribute vec3 a_normal;
       attribute vec4 a_color;
       attribute vec2 a_texCoord0;
 
+      uniform int u_hasColor;
       uniform vec4 u_color;
       uniform mat4 u_projectionViewMatrix;
       uniform mat4 u_modelViewMatrix;
@@ -331,7 +335,12 @@ object DefaultShaders {
       varying float v_fog;
 
       void main(){
-        v_color = u_color;
+        // if( u_hasColor == 0){
+        if( a_color.xyz == vec3(0,0,0)){
+          v_color = u_color;
+        } else {
+          v_color = a_color;
+        }
 
         vec4 pos = u_modelViewMatrix * vec4(a_position,1);
         v_pos = vec3(pos) / pos.w;
@@ -406,6 +415,69 @@ object DefaultShaders {
         gl_FragColor *= (1.0 - u_fade);
         gl_FragColor.a *= u_alpha;
       }
+    """
+  )
+
+  val toon = (
+    attributes + matrixUniforms +
+    """
+      attribute vec4 a_position;
+      attribute vec4 a_normal;
+      attribute vec4 a_color;
+      attribute vec2 a_texCoord0;
+
+      uniform vec4 u_color;
+      uniform mat4 u_projectionViewMatrix;
+      uniform mat4 u_modelViewMatrix;
+      uniform mat4 u_normalMatrix;
+      uniform mat4 u_viewMatrix;
+
+      uniform float u_useLocalZ;
+
+      //invariant gl_Position;
+
+      varying float v_depth;
+      varying vec3 v_normal;
+      varying vec3 v_eye;
+      varying vec3 v_lightPosition;
+      varying vec4 v_color;
+
+      varying vec2 v_texCoords;
+
+      void main()
+      {
+        // get the depth and eye position
+        vec4 transformedVertex = u_projectionViewMatrix * a_position;
+        vec4 transformedVertex2 = u_viewMatrix * a_position;
+
+        if( u_useLocalZ == 1.0 ){
+          v_depth = a_position.z;
+        } else {
+          v_depth = transformedVertex.z;
+        }
+        //v_depth = transformedVertex.z; //a_position.z;
+
+
+        v_texCoords = a_texCoord0;
+
+        v_eye = -(u_modelViewMatrix * a_position).xyz;//-transformedVertex.xyz;
+
+        // transform normals to the current view
+        v_normal = a_normal.xyz; //normalize(u_normalMatrix * a_normal).xyz;
+
+        // pass the light position through
+        v_lightPosition = vec3(10.0,10.0,10.0);
+
+        if( a_color != vec4(0.0,0.0,0.0,1.0)){
+          v_color = a_color;
+        }else{
+          v_color = u_color;  
+        }
+
+        gl_Position = u_projectionViewMatrix * a_position;
+      }
+    """,
+    """
     """
   )
 

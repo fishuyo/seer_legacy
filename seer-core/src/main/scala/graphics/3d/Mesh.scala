@@ -87,6 +87,7 @@ class Mesh extends Drawable {
 		if( primitive == Lines && wireIndices.length > 0) count = wireIndices.length
 		else if(indices.length > 0) count = indices.length
 
+		if( hasColors ) Shader.shader.get.uniforms("u_hasColor") = 1
     gdxMesh.get.render(Shader(), primitive, 0, count )
 	}
 

@@ -212,6 +212,12 @@ object SeerBuild extends Build {
   ) dependsOn( seer_desktop, seer_video )
 
 
+  // experiments
+  lazy val experiments = Project (
+    "experiments",
+    file("experiments"),
+    settings = Settings.desktop
+  ) dependsOn( seer_desktop, seer_opencv )
 
 
   // apps

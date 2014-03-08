@@ -117,6 +117,7 @@ class RenderNode {
   var depth = true
   val inputs = new ListBuffer[RenderNode]
   val outputs = new ListBuffer[RenderNode]
+  val nodes = new ListBuffer[RenderNode]
 
   var viewport = new Viewport(0,0,800,800)
   var scene = new Scene
@@ -156,8 +157,12 @@ class RenderNode {
   def render(){
     if( buffer.isDefined ){
       buffer.get.begin()
+
       if( clear ) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
       else Gdx.gl.glClear( GL20.GL_DEPTH_BUFFER_BIT)
+
+      nodes.foreach(_.render()) //hacky
+      
     }
 
     try{
@@ -202,6 +207,7 @@ class RenderNode {
 class BasicNode extends RenderNode
 
 object ScreenNode extends RenderNode {
+  // clear = false
   scene.push(Plane.generateMesh())
   shader = "texture"
 }

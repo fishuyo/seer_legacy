@@ -128,6 +128,7 @@ object OSC{
 	def send(address:String, f1:Float, f2:Float){ send(Message(address,f1,f2)) }
 	def send(address:String, f1:Float, f2:Float, f3:Float){ send(Message(address,f1,f2,f3)) }
 	def send(address:String, f1:Float, f2:Float, f3:Float, f4:Float){ send(Message(address,f1,f2,f3,f4)) }
+	def send(address:String, s1:String, s2:String){ send(Message(address,s1,s2)) }
 
 	/** Connect and send message */
 	def send(ip:String = "localhost", port:Int=8000, address:String, value:Any){

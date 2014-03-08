@@ -7,6 +7,7 @@ import maths._
 import particle._
 import dynamic._
 import audio._
+import util._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Map
@@ -19,11 +20,13 @@ import com.badlogic.gdx.Gdx
 object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
-
   Scene.push(this)
 
-  val ground = Cube().scale(2.f,0.1f,7.f).translate(0,-0.2f,3.5f)
-  ground.color.set(0.f,.1f,.4f,.5f)
+  val ground = Plane.generateMesh(20,20,100,100,Quat.up) //Cube().scale(2.f,0.1f,7.f).translate(0,-0.2f,3.5f)
+  val groundM = Model(ground)
+  groundM.color.set(0.f,.1f,.4f,.5f)
+
+  val trace = new Trace3D(100)
 
   val skeletons = new ListBuffer[Skeleton]()
   for( i <- (0 until 5)) skeletons += new Skeleton(i)
@@ -32,12 +35,20 @@ object Main extends App with Animatable{
   skeletons(3).setColor(RGBA(.8f,.2f,.2f,.5f))
   skeletons(4).setColor(RGBA(.8f,.8f,.0f,.5f))
 
-  val node = new RenderNode
-  val fabric = new SpringMesh( Plane.generateMesh(.4f,.2f,20,10), 1.f) //Sphere()
+
+  val stream = new ListBuffer[Skeleton]()
+  for( i<-(0 until 10)) stream += new Skeleton(i)
+
+  val fabricNode = new RenderNode
+  val fabric = new SpringMesh( Plane.generateMesh(.4f,.6f,20,30), 1.f) //Sphere()
+  fabric.particles.grouped(20).zipWithIndex.foreach{ case (xs,i) => xs.foreach(_.mass = (i+1)/30.f) }
+  fabric.springs.foreach( _.updateWeights())
   fabric.pins += AbsoluteConstraint( fabric.particles.takeRight(20).head, Vec3(-1,1,0))
   fabric.pins += AbsoluteConstraint( fabric.particles.takeRight(10).head, Vec3(1,1,0))
   fabric.pins += AbsoluteConstraint( fabric.particles.last, Vec3(1,1,0))
-  val fabric2 = new SpringMesh( Plane.generateMesh(.4f,.2f,20,10), 1.f) //Sphere()
+  val fabric2 = new SpringMesh( Plane.generateMesh(.4f,.6f,20,30), 1.f) //Sphere()
+  fabric2.particles.grouped(20).zipWithIndex.foreach{ case (xs,i) => xs.foreach(_.mass = (i+1)/30.f) } 
+  fabric2.springs.foreach( _.updateWeights())
   fabric2.pins += AbsoluteConstraint( fabric2.particles.takeRight(20).head, Vec3(-1,1,0))
   fabric2.pins += AbsoluteConstraint( fabric2.particles.takeRight(10).head, Vec3(-1,1,0))
   fabric2.pins += AbsoluteConstraint( fabric2.particles.last, Vec3(1,1,0))
@@ -47,23 +58,27 @@ object Main extends App with Animatable{
   fabric3.pins += AbsoluteConstraint( fabric3.particles.take(10).last, Vec3(-1,1,0))
   fabric3.pins += AbsoluteConstraint( fabric3.particles.takeRight(10).head, Vec3(-1,1,0))
   fabric3.pins += AbsoluteConstraint( fabric3.particles.last, Vec3(1,1,0))
-  fabric3.pins += AbsoluteConstraint( fabric3.particles.take(100).last, Vec3(-1,1,0))
-  fabric3.pins += AbsoluteConstraint( fabric3.particles.take(110).last, Vec3(1,1,0))
-  // s.particles.takeRight(10).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
-  val model = Model(fabric)
-  val model2 = Model(fabric2)
-  val model3 = Model(fabric3)
+  fabric3.pins += AbsoluteConstraint( fabric3.particles(90), Vec3(-1,1,0))
+  fabric3.pins += AbsoluteConstraint( fabric3.particles(99), Vec3(1,1,0))
+  val fabricM = Model(fabric)
+  val fabricM2 = Model(fabric2)
+  val fabricM3 = Model(fabric3)
   var drawFabric = false
   def drawFabric(b:Boolean){drawFabric = b}
   // fabric.mesh.primitive = Lines
-  model.color.set(1,0,0,1)
-  model2.color.set(1,0,0,1)
-  model3.color.set(1,0,0,1)
-  node.camera = Camera
-  node.scene.push(fabric)
-  // Scene.push(fabric)
+  // fabric2.mesh.primitive = Lines
+  fabricM.color.set(1,0,0,1)
+  fabricM2.color.set(1,0,0,1)
+  fabricM3.color.set(1,0,0,1)
+  fabricNode.camera = Camera
+  fabricNode.scene.push(fabric)
+  fabricNode.scene.push(fabric2)
   // SceneGraph.addNode(node)
 
+  var t = 0.f
+  var skeletonTrail = false
+  var trailDelay = 0.5f
+  var trailOffset = Vec3(0,0,-.25f)
 
   val live = new Ruby("skeleton.rb")
 
@@ -71,22 +86,23 @@ object Main extends App with Animatable{
 
 
   override def init(){
-    val compNode = new RenderNode
-    compNode.shader = "composite"
-    compNode.clear = false
-    val quag = new Drawable {
-      val m = Mesh(Primitive2D.quad)
-      override def draw(){
-        // Shader("composite").setUniformf("u_blend0", 0.25f)
-        // Shader("composite").setUniformf("u_blend1", 0f.75f)
-        // Shader("composite").setUniformMatrix("u_projectionViewMatrix", new Matrix4())
-        m.draw()
-      }
-    }
-    compNode.scene.push( quag )
-    SceneGraph.root.outputTo(compNode)
-    compNode.outputTo(compNode)
-    compNode.outputTo(ScreenNode)
+
+    val skyNode = new RenderNode
+    skyNode.shader = "sky"
+    skyNode.depth = false
+    skyNode.scene.push( Plane() )
+    // SceneGraph.prependNode(skyNode)
+    SceneGraph.root.nodes.prepend(skyNode)
+
+    val feedback = new RenderNode
+    feedback.shader = "composite"
+    feedback.clear = false
+    feedback.scene.push(Plane())
+
+
+    SceneGraph.root.outputTo(feedback)
+    feedback.outputTo(feedback)
+    feedback.outputTo(ScreenNode)
 
     live.init()
   }
@@ -94,23 +110,53 @@ object Main extends App with Animatable{
   override def draw(){
 
     live.draw()
-    ground.draw()
+    groundM.draw()
+    // trace.draw()
     
     skeletons.foreach( _.draw() )
-    
+    if( skeletonTrail ){
+      skeletons.foreach( s => {
+        MatrixStack.push()
+        stream.foreach( x => {
+          MatrixStack.translate(trailOffset)
+          x.draw()
+        })
+        MatrixStack.pop()
+      })
+    }
     if( drawFabric ){
-      model.draw()
-      model2.draw()
-      // model3.draw()
+      fabricM.draw()
+      fabricM2.draw()
+      // fabricM3.draw()
     }
   }
 
   override def animate(dt:Float){
+    t += dt
     live.animate(dt)
     skeletons.foreach( _.animate(dt) )
+    if( skeletonTrail && t > trailDelay ){
+      skeletons.foreach( s => {
+        val xs = (s :: stream.toList).zip(stream).reverse
+        xs.foreach( ss => {ss._2.joints = ss._1.joints.clone; ss._2.tracking = true } )
+      })
+      t = 0.f
+    }
     fabric.animate(dt)
     fabric2.animate(dt)
     // fabric3.animate(dt)
+  }
+
+
+  def warpGround(){
+      ground.vertices.foreach( (v) => v.set(v.x,v.y+ Random.float(-1,1)()*0.02*(v.x).abs, v.z) )
+      ground.recalculateNormals()
+      ground.update()
+  }
+
+  def resetGround(){
+    ground.clear()
+    Plane.generateMesh(ground,20,20,100,100,Quat.up)
   }
 
 }
@@ -128,7 +174,7 @@ class Skeleton(val id:Int) extends Animatable {
   loadingModel.color = color
 
   var tracking = false
-  val joints = Map[String,Model]()
+  var joints = Map[String,Model]()
 
   joints += "head" -> Sphere().scale(.05f,.065f,.05f)
   joints += "neck" -> Sphere().scale(.02f)
@@ -154,6 +200,15 @@ class Skeleton(val id:Int) extends Animatable {
   for( i <- (0 until 8)) bones += Cylinder()
   bones.foreach( (b) => { b.color = color; b.scale.set(.015f,.015f,.15f) })
 
+
+  def setShader(s:String){
+    joints.values.foreach(_.shader = s)
+    bones.foreach(_.shader = s)
+  }
+
+  def setJoints(s:Skeleton){
+    joints = s.joints.clone
+  }
 
   override def draw(){
     if(calibrating) loadingModel.draw()

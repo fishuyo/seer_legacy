@@ -166,7 +166,7 @@ OSC.disconnect()
 # OSC.bind("/3/xy2", lambda{|f| b2=f[0]; looper.setBounds(l,b1,b2); looper.setSpeed(l,(1-f[1])*2.0) })
 
 # SoftStep
-OSC.listen(8009)
+OSC.listen(8008)
 OSC.bind("/1/top", lambda{|f| looper.toggleRecord(2*b) })
 OSC.bind("/1/bot", lambda{|f| looper.stack(2*b) })
 OSC.bind("/2/top", lambda{|f| looper.setMaster(2*b) })
@@ -206,6 +206,22 @@ OSC.bind("/0/y", lambda{|f| gain = f[0]/127.0; Audio.gain(gain*gain) })
 # OSC.bind("/4/bot", lambda{|f| looper.stack(3) })
 # OSC.bind("/5/top", lambda{|f| looper.toggleRecord(4) })
 # OSC.bind("/5/bot", lambda{|f| looper.stack(4) })
+
+left = 0
+right = 1
+OSC.bind("/1/joint/r_hand", lambda{|f|
+	looper.setGain(l,f[1])
+	# looper.setSpeed(l,f[8]*2.0)
+	left = (f[0]+1)/2
+	looper.setBounds(l,left,right)
+})
+
+OSC.bind("/1/joint/l_hand", lambda{|f|
+	# looper.setGain(l,f[1])
+	looper.setSpeed(l,f[1]*2.0)
+	right = (f[0]+1)/2
+	looper.setBounds(l,left,right)
+})
 
 
 def animate dt
