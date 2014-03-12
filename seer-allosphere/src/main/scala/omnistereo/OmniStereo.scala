@@ -8,22 +8,31 @@ import graphics._
 import maths._
 import spatial._
 
-import com.badlogic.gdx.graphics.{Texture => GdxTexture}
+
 
 import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.math.Matrix4
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.Gdx.{gl20 => gl }
 
-// import org.lwjgl.opengl.GL43._
+import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL12
+import org.lwjgl.opengl.GL43
 
+import java.nio.FloatBuffer
+import java.io.DataInputStream
+import java.io.FileInputStream
 
 /* AlloSystem OmniStereo port */
 
 object OmniStereo {
-	val fovy = math.Pi
-	val aspect = 2.0
+	var fovy = math.Pi
+	var aspect = 2.0
 
 	def fillFishEye(data:FloatBuffer, w:Int, h:Int) {
 		data.rewind
@@ -42,10 +51,11 @@ object OmniStereo {
 			val saz = math.sin(az)
 			val caz = math.cos(az)
 
-			val v = Vec3f(cel*saz,sel,-cel*caz)
+			val v = Vec3(cel*saz,sel,-cel*caz)
 			v.normalize
 
-			data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+			// data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+			data.put(Array(v.x,v.y,v.z,1.f), y*w+x, 4)
 
 		}
 		data.rewind
@@ -67,10 +77,11 @@ object OmniStereo {
 			val saz = math.sin(az)
 			val caz = math.cos(az)
 
-			val v = Vec3f(y0*saz,y1,-y0*caz)
+			val v = Vec3(y0*saz,y1,-y0*caz)
 			v.normalize
 
-			data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+			// data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+			data.put(Array(v.x,v.y,v.z,1.f), y*w+x, 4)
 
 		}
 		data.rewind
@@ -87,10 +98,10 @@ object OmniStereo {
 			val sy = normy - 0.5
 			val f = 1.0/ math.tan(fovy * 0.5)
 
-			val v = Vec3f(f*sx*aspect,f*sy,-1)
+			val v = Vec3(f*sx*aspect,f*sy,-1)
 			v.normalize
 
-			data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
+			data.put(Array(v.x,v.y,v.z,1.f), y*w+x, 4)
 
 		}
 		data.rewind
@@ -423,7 +434,7 @@ object OmniStereo {
 }
 
 // Object to encapsulate rendering omni-stereo worlds via cube-maps:
-class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
+class OmniStereo(res:Int=1024, useMipMaps:Boolean=true) {
 
 	type DrawMethod = (Pose,Double) => Unit  // pose, eye
 
@@ -443,12 +454,12 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 	var mEyeParallax = 0.f
 	var mNear = 0.1f
 	var mFar = 100.f
-	var mResolution = resolution
+	var mResolution = res
 	var mNumProjections = 1
 	var mFrame = 0
-	var mMode:StereoMode = MONO
+	var mMode = StereoMode.MONO
 	var mStereo = 0
-	var mAnaglyphMode:AnaglyphMode = RED_CYAN
+	var mAnaglyphMode = AnaglyphMode.RED_CYAN
 	var mMipmap = useMipMaps
 	var mFullScreen = false
 
@@ -457,8 +468,8 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
 	var mTex = Array(0,0)
 
-	configure(FISHEYE)
-	configure(SOFTEDGE)
+	configure(WarpMode.FISHEYE)
+	configure(BlendMode.SOFTEDGE)
 
 	val mQuad = Quad()
 	// mQuad.reset();
@@ -475,9 +486,9 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
 
 	///	Abstract base class for any object that can be rendered via OmniStereo:
-	class OmniDrawable  {
+	trait OmniDrawable  {
 		/// Place drawing code here
-		def onDrawOmni(omni: OmniStereo)
+		def onDrawOmni(omni: OmniStereo){}
 	}
 
 	/// Encapsulate the trio of fractional viewport, warp & blend maps:
@@ -503,13 +514,13 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 			}
 		};
 
-		val mViewport = Viewport(0, 0, 1, 1)
+		var mViewport = Viewport(0, 0, 1, 1)
 		def viewport() = mViewport
 
 		// allocate blend map:
 
-		val mBlend:GdxTexture = null
-		val mWarp:FloatTexture = null
+		var mBlend:GdxTexture = null
+		var mWarp:FloatTexture = null
 
 		def blend() = mBlend
 		def warp() = mWarp
@@ -541,11 +552,11 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
 
 		def onCreate(){
-			mWarp.t.setFilter( TextureFilter.MipMap, TextureFilter.Linear)
+			mWarp.t.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.Linear)
 			// mWarp.texelFormat(GL_RGB32F_ARB);
 			// mWarp.dirty();
 
-			mBlend.setFilter( TextureFilter.MipMap, TextureFilter.Linear)
+			mBlend.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.Linear)
 			// mBlend.dirty();
 		}
 
@@ -572,7 +583,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				for( i <- (0 until w*h)) u(i) = readFloat(ds)
 				for( i <- (0 until w*h)) v(i) = readFloat(ds)
 
-				mWarp = new Texture(w,h)
+				mWarp = new FloatTexture(w,h)
 
 				updatedWarp()
 
@@ -593,7 +604,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 			i
 		}
 		def readFloat(ds:DataInputStream) = {
-			intBitsToFloat(readInt(ds))
+			java.lang.Float.intBitsToFloat(readInt(ds))
 		}
 
 		def readParameters(path:String, verbose:Boolean=true){
@@ -605,7 +616,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				val ds = new DataInputStream( new FileInputStream(path))
 				var list = List[Float]()
 
-				while(ds.available >= 4) list = readFloat(ds) . list
+				while(ds.available >= 4) list = readFloat(ds) :: list
 				params.fromList(list)
 				ds.close()
 
@@ -660,7 +671,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 			}
 
 		  mWarp.data.rewind
-			mWarp.td.consumeCompressedData();
+			mWarp.td.consumeCompressedData(0);
 		}
 
 	}
@@ -676,6 +687,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		LEFT_EYE,		/**< Left eye only */
 		RIGHT_EYE = Value		/**< Right eye only */
 	}
+	import StereoMode._
 
 	/// Anaglyph mode
 	object AnaglyphMode extends Enumeration {
@@ -687,6 +699,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		GREEN_RED,		/**< */
 		CYAN_RED = Value		/**< */
 	}
+	import AnaglyphMode._
 
 	object WarpMode extends Enumeration {
 		type WarpModeType = Value
@@ -694,17 +707,19 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		CYLINDER,
 		RECT = Value
 	};
+	import WarpMode._
 
 	object BlendMode extends Enumeration{
 		type BlendModeType = Value
 		val NOBLEND,
 		SOFTEDGE = Value
 	};
+	import BlendMode._
 
 
 	// @resolution should be a power of 2
-	def resolution(resolution:Int) = {
-		mResolution = r;
+	def resolution(res:Int) = {
+		mResolution = res;
 		// force GPU reallocation:
 		mFbo = 0;
 		mRbo = 0;
@@ -715,7 +730,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 	def resolution() = mResolution
 
 	// configure the projections according to files
-	def configure(configpath:String, configname:String="default"){
+	def configure(configpath:String, configname:String){
 
 		// configpath += "/calibration-current/";
 
@@ -855,33 +870,33 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 	}
 
 	// configure generatively:
-	def configure(wm:WarpMode, a:Float=2.f, f:Float=math.Pi){
+	def configure(wm:WarpModeType, a:Float=2.f, f:Float=math.Pi) = {
 		mNumProjections = 1
 		val p = mProjections(0)
 		wm match {
 			case FISHEYE =>
 				OmniStereo.fovy = f;
 				OmniStereo.aspect = a;
-				p.warp().array().fill(fillFishEye);
-				p.warp().dirty();
-				break;
+				// p.warp().array().fill(fillFishEye);
+				// p.warp().dirty();
+				// break;
 			case CYLINDER =>
-				OmniStereo.fovy = f / M_PI;
+				OmniStereo.fovy = f / math.Pi;
 				OmniStereo.aspect = a;
-				p.warp().array().fill(fillCylinder);
-				p.warp().dirty();
-				break;
+				// p.warp().array().fill(fillCylinder);
+				// p.warp().dirty();
+				// break;
 			case _ =>
 				OmniStereo.fovy = f / 2.;
 				OmniStereo.aspect = a;
-				p.warp().array().fill(fillRect);
-				p.warp().dirty();
-				break;
+				// p.warp().array().fill(fillRect);
+				// p.warp().dirty();
+				// break;
 		}
-		return this;
+		this
 	}
 
-	def configure(bm:BlendMode){
+	def configure(bm:BlendModeType) = {
 		mNumProjections = 1;
 		val p = mProjections(0)
 		// bm match { // TODO
@@ -897,7 +912,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		// 		p.blend().dirty();
 		// 		break;
 		// }
-		return this
+		this
 	}
 
 	// typically they would be combined like this:
@@ -913,7 +928,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		program.uniforms("omni_near") = mNear
 		program.uniforms("omni_far") = mFar
 		program.setUniforms()
-		gl.error("sending OmniStereo uniforms");
+		// gl.error("sending OmniStereo uniforms");
 	}
 
 
@@ -921,23 +936,23 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		val eye = lens.eyeSep;
 		mMode match {
 			case SEQUENTIAL =>
-				if (mFrame & 1) {
+				if ((mFrame & 1) > 0) {
 					f(pose, eye);
 				} else {
 					f(pose, -eye);
 				}
 
 			case ACTIVE =>
-				// glDrawBuffer(GL_BACK_RIGHT);
-				gl.error("OmniStereo drawStereo GL_BACK_RIGHT");
+				GL11.glDrawBuffer(GL11.GL_BACK_RIGHT);
+				// gl.error("OmniStereo drawStereo GL_BACK_RIGHT");
 				f(pose, eye);
 
-				// glDrawBuffer(GL_BACK_LEFT);
-				gl.error("OmniStereo drawStereo GL_BACK_LEFT");
+				GL11.glDrawBuffer(GL11.GL_BACK_LEFT);
+				// gl.error("OmniStereo drawStereo GL_BACK_LEFT");
 				f(pose, -eye);
 
-				// glDrawBuffer(GL_BACK);
-				gl.error("OmniStereo drawStereo GL_BACK");
+				GL11.glDrawBuffer(GL11.GL_BACK);
+				// gl.error("OmniStereo drawStereo GL_BACK");
 				// break;
 
 			// case DUAL =>
@@ -1062,27 +1077,29 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		// Graphics.error("cube program onCreate");
 
 		// create cubemap textures:
-		mTex(0) = glGenTextures()
-		mTex(1) = glGenTextures()
+		val b = BufferUtils.newIntBuffer(2)
+		gl.glGenTextures(2,b)
+		mTex(0) = b.get
+		mTex(1) = b.get
 
 		for (i<-(0 until 2)) {
 			// create cubemap texture:
-			glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(i));
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(i));
 
 			// each cube face should clamp at texture edges:
-			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL20.GL_CLAMP_TO_EDGE);
+			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_T, GL20.GL_CLAMP_TO_EDGE);
+			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL30.GL_TEXTURE_WRAP_R, GL20.GL_CLAMP_TO_EDGE);
 
 			// filtering
-			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
+			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL20.GL_TEXTURE_MIN_FILTER, GL20.GL_LINEAR_MIPMAP_LINEAR);
 
 			// TODO: verify?
 			// Domagoj also has:
-			glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			GL11.glTexGeni( GL11.GL_S, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_OBJECT_LINEAR );
+			GL11.glTexGeni( GL11.GL_T, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_OBJECT_LINEAR );
+			GL11.glTexGeni( GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_OBJECT_LINEAR );
 			
 			// float X[4] = { 1,0,0,0 };
 			// float Y[4] = { 0,1,0,0 };
@@ -1091,34 +1108,34 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 			var array = Array(1.f,0.f,0.f,0.f)
 			buf.put(array)
 			buf.rewind
-			glTexGen( GL_S, GL_OBJECT_PLANE, buf );
+			GL11.glTexGen( GL11.GL_S, GL11.GL_OBJECT_PLANE, buf );
 			array = Array(0.f,1.f,0.f,0.f)
 			buf.put(array)
 			buf.rewind
-			glTexGen( GL_T, GL_OBJECT_PLANE, buf );
+			GL11.glTexGen( GL11.GL_T, GL11.GL_OBJECT_PLANE, buf );
 			array = Array(0.f,0.f,1.f,0.f)
 			buf.put(array)
 			buf.rewind
-			glTexGen( GL_R, GL_OBJECT_PLANE, buf );
+			GL11.glTexGen( GL11.GL_R, GL11.GL_OBJECT_PLANE, buf );
 
 			// RGBA8 Cubemap texture, 24 bit depth texture, mResolution x mResolution
 			// NULL means reserve texture memory, but texels are undefined
 			for (f<-(0 until 6)){
-				glTexImage2D(
-					GL_TEXTURE_CUBE_MAP_POSITIVE_X+f,
-					0, GL_RGBA8,
+				gl.glTexImage2D(
+					GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X+f,
+					0, GL11.GL_RGBA8,
 					mResolution, mResolution,
-					0, GL_BGRA, GL_UNSIGNED_BYTE,
-					NULL);
+					0, GL12.GL_BGRA, GL20.GL_UNSIGNED_BYTE,
+					null);
 			}
 
 			// clean up:
-			glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, 0);
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, 0);
 			//Graphics.error("creating cubemap texture");
 		}
 
 		// one FBO to rule them all...
-		val b = BufferUtils.newIntBuffer(1)
+		b.rewind
 		gl.glGenFramebuffers(1, b);
 		mFbo = b.get()
 
@@ -1130,10 +1147,10 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		gl.glGenRenderbuffers(1, b);
 		mRbo = b.get()
 
-		gl.glBindRenderbuffer(GL_RENDERBUFFER, mRbo);
-		gl.glRenderbufferStorage(GL_RENDERBUFFER,GL20.GL_DEPTH_COMPONENT24, mResolution, mResolution);
+		gl.glBindRenderbuffer(GL43.GL_RENDERBUFFER, mRbo);
+		gl.glRenderbufferStorage(GL43.GL_RENDERBUFFER,GL30.GL_DEPTH_COMPONENT24, mResolution, mResolution);
 		// Attach depth buffer to FBO
-		gl.glFramebufferRenderbuffer(GL20.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRbo);
+		gl.glFramebufferRenderbuffer(GL20.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL43.GL_RENDERBUFFER, mRbo);
 
 		// ...and in the darkness bind them:
 		for (mFace <- (0 until 6)){
@@ -1148,7 +1165,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		}
 
 		// cleanup:
-		gl.glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		gl.glBindRenderbuffer(GL43.GL_RENDERBUFFER, 0);
 		gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, 0);
 
 		// Graphics.error("OmniStereo onCreate");
@@ -1184,7 +1201,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		mFar = lens.far
 		val eyeSep = (if(mStereo==1) lens.eyeSep else 0.0)
 
-		gl.projection(Matrix4.identity()); 
+		// gl.projection(Matrix4.identity()); 
 
 		// apply camera transform:
 		// gl.pushMatrix(gl.MODELVIEW);
@@ -1200,7 +1217,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 			mEyeParallax = eyeSep * (i-0.5);
 			for (mFace <- (0 until 6)) {
 
-				gl.glDrawBuffer(GL20.GL_COLOR_ATTACHMENT0 + mFace);
+				GL11.glDrawBuffer(GL20.GL_COLOR_ATTACHMENT0 + mFace);
 				gl.glFramebufferTexture2D(
 					GL20.GL_FRAMEBUFFER,
 					GL20.GL_COLOR_ATTACHMENT0 + mFace,
@@ -1260,7 +1277,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 			gl.glEnable(GL20.GL_SCISSOR_TEST);
 			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
 
-			gl.projection(Matrix4.perspective(lens.fovy(), viewport.w / viewport.h, lens.near, lens.far))
+			// gl.projection(Matrix4.perspective(lens.fovy(), viewport.w / viewport.h, lens.near, lens.far))
 
 			mFace = 5; // draw negative z
 
@@ -1275,7 +1292,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				//const double eyeSep = mStereo ? lens.eyeSep() : 0.;
 
 				// apply camera transform:
-				gl.modelView(mModelView);
+				// gl.modelView(mModelView);
 				gl.glClearColor(mClearColor.r,mClearColor.g,mClearColor.b,mClearColor.a);
 				gl.glEnable(GL20.GL_DEPTH_TEST)
 				gl.glDepthMask(true);
@@ -1488,13 +1505,13 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				v.w * vp.w,
 				v.h * vp.h
 			);
-	gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
-				gl.glEnable(GL20.GL_SCISSOR_TEST);
-				gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glEnable(GL20.GL_SCISSOR_TEST);
+			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
 			gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-			gl.projection(Matrix4.ortho(0, 1, 0, 1, -1, 1));
-			gl.modelView(Matrix4.identity());
+			// gl.projection(Matrix4.ortho(0, 1, 0, 1, -1, 1));
+			// gl.modelView(Matrix4.identity());
 
 			p.blend().bind(0);
 

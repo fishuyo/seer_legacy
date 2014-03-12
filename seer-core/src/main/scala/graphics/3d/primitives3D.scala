@@ -63,7 +63,7 @@ object Sphere extends Primitive {
         mesh.indices += (first + 1).toShort
       }
     }
-    mesh.init
+    // mesh.init
     mesh
   }
 
@@ -95,7 +95,7 @@ object Cube extends Primitive {
     for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i).toShort
     for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i).toShort
 
-    mesh.init
+    // mesh.init
     mesh
   }
 }
@@ -144,7 +144,7 @@ object Cylinder extends Primitive {
     }
     for( i<-(0 until indxCount)) mesh.indices += (i % vertCount).toShort
     
-    mesh.init
+    // mesh.init
     mesh
   }
 }

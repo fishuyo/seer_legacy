@@ -40,7 +40,7 @@ object Plane extends Primitive {
         if( x == nx-1) mesh.wireIndices ++= List(i+1,i+nx+1)
       }
     }
-    mesh.init
+    // mesh.init
     mesh
   }
 }

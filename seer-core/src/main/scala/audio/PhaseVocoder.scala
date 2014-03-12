@@ -1,0 +1,336 @@
+
+package com.fishuyo.seer
+package audio
+
+import maths._
+import graphics._
+
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.{Texture => GdxTexture}
+
+import edu.emory.mathcs.jtransforms.fft._
+
+
+object FFT {
+	var length = 2048
+	var rect = Array.fill(length)(1.f)
+	var hann = Array.fill(length)(0.f)
+	for(i<-(0 until length)) hann(i) = 0.5f*(1.f-math.cos(2.0*math.Pi*i/(length-1.0)))
+
+	var window = hann
+
+	var fft = new FloatFFT_1D(length)
+
+	def resize(size:Int){
+		length = size
+		fft = new FloatFFT_1D(length)
+		rect = Array.fill(length)(1.f)
+		hann = Array.fill(length)(0.f)
+		for(i<-(0 until length)) hann(i) = 0.5f*(1.f-math.cos(2.0*math.Pi*i/(length-1.0)))
+
+	}
+
+	def forward(a:Array[Float]) = fft.realForward(a)
+	def reverse(a:Array[Float]) = fft.realInverse(a,true)
+}
+
+
+
+
+class PhaseVocoder extends AudioSource {
+
+	var length = FFT.length
+	var hopFactor = 1.f/4.f
+	var hopSize = (length*hopFactor).toInt
+	var numWindows = 0
+	var spectrumData:Array[Array[Float]] = null
+	var prevBuffer = new Array[Float](length)
+	var prevPhase = new Array[Float](length/2+1)
+	var phaseAccum = new Array[Float](length/2+1)
+
+	var (minWin, maxWin) = (0,0)
+	var nextWindow = 0.f
+	var timeShift = 1.f
+	var pitchShift = 1.f
+
+	var update = false
+
+	var convert = true
+
+	def timeShift(f:Float){ timeShift = f}
+	def pitchShift(f:Float){ pitchShift = f}
+
+	def clear(){ spectrumData = null }
+
+	def setBounds(b1:Float,b2:Float){
+		var min = (if( b1 < b2) b1 else b2)
+		var max = (if( b1 < b2) b2 else b1)
+		minWin = (min*numWindows).toInt
+		maxWin = (max*numWindows).toInt
+	}
+
+	def setSamples(buffer:Array[Float], size:Int){
+		val samples = buffer.take(size)
+		numWindows = samples.length / hopSize		
+		println( s"Analyzing ${samples.length} samples($hopSize) $numWindows windows")				
+
+		// use sliding window over sample data
+		spectrumData = samples.sliding(length,hopSize).map( s => {
+			val windowed = s.padTo(length,0.f) zip FFT.window map { case (a,b) => a*b } // apply window
+			// val shiftedWin = Array.concat( windowed.takeRight(length/2), windowed.take(length/2)) // shift window
+			FFT.forward(windowed) // do fft in place
+			prevPhase = new Array[Float](length/2+1) // new empty phase buffer
+			val data = convertMagPhase(windowed) // convert mag phase to mag freq
+			data // return converted data
+		}).toArray
+
+		numWindows = spectrumData.length
+		maxWin = numWindows
+		println(s"spectrumData.length: ${spectrumData.length}")
+		update = true
+	}
+
+	def convertMagPhase(win:Array[Float]):Array[Float] = {
+
+		if( !convert ) return win
+		var (phase, phaseDiff) = (0.f,0.f)
+		var expPhaseDiff = 2.0*math.Pi*hopFactor
+		var resolution = 44100.f / length
+
+		val out = new Array[Float](length+2)
+
+		//BERNSEE METHOD
+		for(i <-(0 to length/2)){		//Go from 0 to N/2 because fftw places (N/2)+1 complex values in spectral array using r2c fft
+
+			var (re,im) = (0.f,0.f)
+			if(i == 0){  
+				re = win(0)
+				im = 0.f
+			} else if( i < length/2){
+				re = win(2*i)
+				im = win(2*i+1)
+			} else {
+				re = win(1)
+				im = 0.f
+			}
+
+			//compute magnitude from real and imaginary components
+			out(2*i) = 2.*math.sqrt(re*re + im*im)
+
+			// compute phase from real and imaginary components
+			phase = math.atan2(im,re)		//Important to have the negative sign for correct phase
+
+			// get phase difference
+			phaseDiff = phase - prevPhase(i)
+
+			// store current bin phase for next window
+			prevPhase(i) = phase
+
+			// subtract expected phase difference according to hop size --> expPhaseDiff = TWOPI*(window_step/fft_length);
+			phaseDiff = phaseDiff - (i*expPhaseDiff)
+
+			// unwrap phase difference
+			while(phaseDiff > math.Pi) phaseDiff -= 2.0*math.Pi
+			while (phaseDiff < -math.Pi) phaseDiff += 2.0*math.Pi
+
+			//Get deviation from bin frequency from the +/- Pi interval
+			phaseDiff = phaseDiff/expPhaseDiff  // 2.0*math.Pi*hopFactor
+
+			//compute the i-th partials' true frequency
+			out(2*i+1) = phaseDiff*resolution + i*resolution
+		}
+		out
+	}
+
+	def unconvertMagPhase(win:Array[Float]):Array[Float] = {
+
+		if(!convert) return win
+		var (phase, phaseDiff) = (0.f,0.f)
+		var expPhaseDiff = 2.0*math.Pi*hopFactor
+		var resolution = 44100.f / length
+
+		val out = new Array[Float](length)
+
+		//BERNSEE METHOD
+		for(i <-(0 to length/2)){		
+
+			/// get frequency from synthesis array
+			phaseDiff = win(2*i+1)
+
+			// subtract bin mid frequency
+			phaseDiff -= i*resolution
+
+			// get bin deviation from freq deviation
+			phaseDiff /= resolution
+
+			// take hopFactor into account
+			phaseDiff = phaseDiff*expPhaseDiff
+
+			// add the overlap phase advance back in
+			phaseDiff += i*expPhaseDiff
+
+			// accumulate delta phase to get bin phase
+			phaseAccum(i) += phaseDiff 
+			phaseDiff = phaseAccum(i)
+
+			// get real and imag part
+			if( i < length/2){
+				out(2*i) = win(2*i)*math.cos(phaseDiff)
+				out(2*i+1) = win(2*i)*math.sin(phaseDiff)
+				// if( i == 0) println(s"bin 0 im: ${out(1)}, phasediff: $phaseDiff")
+			} else {
+				out(1) = win(2*i)*math.cos(phaseDiff)
+				// println(s"bin l/2 im: ${win(2*i)*math.sin(phaseDiff)}, phasediff: $phaseDiff")
+			}
+		}
+		out
+	}
+
+	def shiftPitch(data:Array[Float]): Array[Float] = {
+
+		if(!convert) return data
+		val out = new Array[Float](length+2)
+		for (i <- (0 to length/2)){ 
+			var index = math.max((i*pitchShift).toInt,0)
+			if (index <= length/2) { 
+				out(2*index) += data(2*i) 
+				out(2*index+1) =  data(2*i+1) * pitchShift
+			} 
+		}
+		out
+	}
+
+	def resynth(index:Float) = {
+
+		//Copy samples from last buffer
+		// memcpy(output[0], prevBuffer, sizeof(float)*fft.length);
+		// zeromem(prevBuffer, sizeof(float)*fft.length);
+		
+		// float scale = 1.0 / (float)fft.length;
+		// int totOverlap = fft.length/fft.hopSize; //timeShift * fft.length / fft.hopSize;
+		//if(totOverlap <= 0) totOverlap = 1;
+
+		val out = prevBuffer
+		prevBuffer = new Array[Float](length)
+
+		// for each overlapping window accumulate resynthesis
+		for( overlap <- (0 until length/hopSize)){
+			var win = (index.toInt + overlap) % numWindows
+			if( win == 0 ) phaseAccum = new Array[Float](length/2+1)
+
+			var data:Array[Float] = null
+			try{
+				data = spectrumData(win).clone
+			} catch { case e:Exception => println(e); println(s"fft win index: $win")}
+			val shifted = shiftPitch(data)
+			val spect = unconvertMagPhase(shifted)
+			FFT.reverse(spect)
+			// val shifted = Array.concat( spect.takeRight(length/2), spect.take(length/2))
+			val windowed = spect zip FFT.window map { case (a,b) => a*b }
+
+			// accumulate overlapped windows
+			var c = 0
+			for( i<-(overlap * hopSize until length )){
+				out(i) += windowed(c)
+				c += 1
+			}
+
+			c = 0
+			for( i<-(length - (overlap * hopSize) until length )){
+				prevBuffer(c) += windowed(i)
+				c += 1
+			}
+		}
+		out
+
+		// for( int k = 0; k < totOverlap; k++){
+			
+		// 	if(startWin + k >= fft.numWin) startWin = -k;		//loop first window to follow last
+		// 	if(startWin + k == 0) zeromem( phaseAccum, (fft.length/2+1) * sizeof(float)); //if first window zero phaseAccum
+
+		// 	pitchShift(spectrumData[startWin+k]);		//applies pitch shift and puts in outSpectrum
+
+		// 	//Convert back to complex format and execute ifft
+		// 	unconvertMagPhase(outSpectrum);
+		// 	fftwf_execute(fft.rplan);
+
+		// 	//Shift data back around and apply window for overlap-add
+		// 	shiftWindow(fft.in);
+		// 	applyWindow(fft.in);
+
+		// 	//Add correct portion of resynthesis to output
+		// 	int counter = 0;
+		// 	for(int i = k*fft.hopSize; i < fft.length; i++)
+		// 		output[0][i] += scale*fft.in[counter++];
+
+		// 	counter = 0;
+		// 	for(int i = (totOverlap-k)*fft.hopSize; i < fft.length; i++)
+		// 		prevBuffer[counter++] += scale*fft.in[i];
+
+		// }
+	}
+
+  override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+
+  	if( spectrumData == null ) return
+  	val o = resynth(nextWindow)
+	  for( i <- (0 until numSamples)){
+      out(0)(i) += o(i)
+      out(1)(i) += o(i)
+    }
+
+		nextWindow += timeShift * (length/hopSize)
+		if(nextWindow < minWin){ 
+			nextWindow = maxWin + nextWindow
+			if(nextWindow < minWin) nextWindow = minWin
+			phaseAccum = new Array[Float](length/2+1)
+		}
+		if( nextWindow >= maxWin){
+			nextWindow = nextWindow - maxWin + minWin
+			if(nextWindow < minWin) nextWindow = minWin
+			if(nextWindow >= maxWin) nextWindow = maxWin-1
+			phaseAccum = new Array[Float](length/2+1)
+		}
+  }
+}
+
+class Spectrogram extends Drawable {
+
+	var numWin = 0
+	var numBins = 0
+
+	var pix:Pixmap = null
+	var texture:GdxTexture = null
+
+	var tID = 0
+	val model = Plane()
+	model.scale.set(0.25)
+	model.material = new BasicMaterial()
+	model.material.textureMix = 1.f
+
+	def setData(data:Array[Array[Float]], complex:Boolean=false){
+		numWin = data.length
+		numBins = data(0).length / 2
+
+		pix = new Pixmap(numWin,numBins, Pixmap.Format.RGBA8888)
+		for( x <- (0 until numWin); y <- (0 until numBins)){
+			val (re,im) = (data(x)(2*y),data(x)(2*y+1)) // re/im or mag/phase
+			val mag = (if(complex) math.sqrt(re*re+im*im) else re)
+			val c = math.max(1.0 - mag,0.f)
+			val f = math.min((im / 22050.f * numBins),numBins-1)
+			pix.setColor(c,c,c,c)
+			pix.drawPixel(x,y) //f.toInt)
+		}
+
+		texture = new GdxTexture(pix)
+		texture.setFilter( GdxTexture.TextureFilter.Linear, GdxTexture.TextureFilter.Linear)
+		model.material.texture = Some(texture)
+	}
+
+  override def init(){
+  }
+	override def draw(){
+		model.draw()
+	}
+
+}

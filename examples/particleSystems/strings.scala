@@ -46,7 +46,7 @@ object Main extends App with Animatable{
     compNode.outputTo(ScreenNode)
   }
   override def draw(){
-    Shader.lightingMixMix = 0.f
+    Shader.lightingMix = 0.f
   	strings.foreach( _.draw() )
   }
 
