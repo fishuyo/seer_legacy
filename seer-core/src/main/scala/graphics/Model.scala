@@ -36,7 +36,7 @@ class Model extends Drawable with geometry.Pickable {
 	var pose = Pose()
 	var scale = Vec3(1)
   var color = RGBA(1,1,1,1)
-  var material:BasicMaterial = new NoMaterial
+  var material:BasicMaterial = new SpecularMaterial
   var shader = ""
 
   var children = Vector[Model]()

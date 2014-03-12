@@ -61,7 +61,8 @@ trait UnhandledExceptionLogging{
 }
 
 object Audio {
-  val bufferSize = 512
+  // val bufferSize = 512
+  val bufferSize = 2048
   val sources = new ListBuffer[AudioSource]
   
   // make a Config with just your special setting

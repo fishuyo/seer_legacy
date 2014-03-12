@@ -4,6 +4,7 @@ package graphics
 
 import maths._
 import spatial._
+import util._
 
 
 import scala.collection.mutable.ListBuffer
@@ -182,12 +183,13 @@ class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh
 
 
 class Trace3D( var size:Int ) extends Drawable {
-  var thickness = 4.f
-  var smooth = true
+  var thickness = 1.f
+  var smooth = false
   val mesh = Mesh()
   val model = Model(mesh)
   model.material = new BasicMaterial
   var data = Queue[Vec3]()
+  val vel = Vec3()
   for( i<-(0 until size)){
     data.enqueue(Vec3())
     mesh.vertices += Vec3()
@@ -195,10 +197,12 @@ class Trace3D( var size:Int ) extends Drawable {
     // mesh.primitive = TriangleStrip
     mesh.primitive = LineStrip
   }
+  setColors(Vec3(1),Vec3(0.2))
   var dirty = true
 
   def apply(v:Vec3) = {
     val u = Vec3(v)
+    vel.lerpTo(u-data.last, 0.1f)
     data.enqueue(u)
     data.dequeue()
 
@@ -209,7 +213,7 @@ class Trace3D( var size:Int ) extends Drawable {
 
   def setColors(c1:Vec3,c2:Vec3){
     for( i<-(0 until size)){
-      val c = c1.lerp(c2, i/size.toFloat)
+      val c = c2.lerp(c1, i/size.toFloat)
       mesh.colors(i) = RGBA(c,1.f)
     }
     dirty = true  
@@ -226,6 +230,7 @@ class Trace3D( var size:Int ) extends Drawable {
     if(smooth){
       Gdx.gl.glEnable(GL10.GL_LINE_SMOOTH)
     }
+    val thick = map(vel.mag, 0.f,0.01f,0.f,6.f)
     Gdx.gl.glLineWidth(thickness)
     model.draw()
   }

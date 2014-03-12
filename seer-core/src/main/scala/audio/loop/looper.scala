@@ -9,8 +9,11 @@ import com.badlogic.gdx.Gdx
 
 
 class Looper extends AudioSource with Drawable {
+	
 	var loops = List[Loop]()
 	var plots = List[AudioDisplay]()
+	var spects = List[Spectrogram]()
+
 	for( i<-(0 until 8)) newLoop
 	
 	var master = 0
@@ -33,10 +36,13 @@ class Looper extends AudioSource with Drawable {
 		val l = new Loop(10.f)
 		loops = l :: loops
 		val p = new AudioDisplay(500)
-		p.pose.pos = Vec3( -0.75f*(plots.size%4)+1.5f,  -0.75f+0.75f*(plots.size/4), 0.f)
+		val pos = Vec3( -0.75f*(plots.size%4)+1.5f,  -0.75f+0.75f*(plots.size/4), 0.f)
+		p.pose.pos = pos
 		p.color = RGBA(0,0,0,1)
 		p.cursorColor = RGBA(0,0,0,1)
 		plots = p :: plots
+		spects = new Spectrogram() :: spects
+		spects(0).model.pose.pos = pos
 	}
 
 	def play(i:Int, times:Int=0) = {
@@ -87,6 +93,7 @@ class Looper extends AudioSource with Drawable {
 		val b2 = max*loops(i).b.curSize
 		loops(i).reverse( min > max)
 		loops(i).b.setBounds(b1.toInt,b2.toInt)
+		loops(i).vocoder.setBounds(min,max)
 		plots(i).setCursor(0,b1.toInt)
 		plots(i).setCursor(1,b2.toInt)
 	}
@@ -118,15 +125,29 @@ class Looper extends AudioSource with Drawable {
 
 	override def draw(){
 		for( i<-(0 until plots.size)){
-			val p = plots(i)
-			if( loops(i).recording || loops(i).stacking ) p.setSamplesSimple(loops(i).b.samples, 0, loops(i).b.curSize)
-			else if( loops(i).dirty ){
-				p.setSamples(loops(i).b.samples, 0, loops(i).b.curSize) //loops(i).b.rMin,loops(i).b.rMax)
-				loops(i).dirty = false
+			if( loops(i).vocoderActive){
+				if(loops(i).vocoder.update){
+					spects(i).setData(loops(i).vocoder.spectrumData)
+					loops(i).vocoder.update = false
+				}
+				spects(i).draw()
+			} else{
+				val p = plots(i)
+				if( loops(i).recording || loops(i).stacking ) p.setSamplesSimple(loops(i).b.samples, 0, loops(i).b.curSize)
+				else if( loops(i).dirty ){
+					p.setSamples(loops(i).b.samples, 0, loops(i).b.curSize) //loops(i).b.rMin,loops(i).b.rMax)
+					loops(i).dirty = false
+				}
+				p.setCursor(2,loops(i).b.rPos.toInt)
 			}
-			p.setCursor(2,loops(i).b.rPos.toInt)
-			p.draw()
+
+			if( loops(i).vocoderActive){
+				val s = loops(i).vocoder.nextWindow / loops(i).vocoder.numWindows.toFloat
+				plots(i).setCursor(2,(loops(i).b.curSize * s).toInt)
+			}
+			plots(i).draw()
 		}
+
 	}
 
 

@@ -38,7 +38,7 @@ class Skel
 		OSC.connect("192.168.0.255", 8008)
 		# OSC.connect("192.168.1.255", 8008)
 
-		Main.drawFabric(true)
+		Main.drawFabric(false)
 
 		OSC.bind("/new_user", lambda{|f| puts "new user"; Main.skeletons.apply(f[0]).calibrating(true) })
 		OSC.bind("/user/1", lambda{|f| Main.skeletons.apply(0).loadingModel.pose.pos.set(2*f[0]-1,1-f[1],f[2]) })
@@ -55,7 +55,13 @@ class Skel
 			s.setShader("")
 			s.setShader("body")
 			j = s.joints.apply(f[0])
-			j.pose.pos.set(2*f[2]-1,(1.0-f[3]),f[4])
+			x=2*f[2]-1
+			y=1.0-f[3]
+			z=f[4]
+			# j.pose.pos.set(2*f[2]-1,(1.0-f[3]),f[4])
+			pos = Vec3.new(x,y,z)
+			j.apply(pos)
+			# puts j.vel.mag if f[0] == "l_hand"
 			id = 1
 			if f[0] == "head"
 				OSC.endBundle()
@@ -66,29 +72,29 @@ class Skel
 			OSC.send("/" + id.to_s + "/joint/" + f[0], 2*f[2]-1, 1-f[3], f[4])
 
 			if f[0] == "r_hand"
-				Main.fabric.pins.apply(0).set( j.pose.pos )
+				Main.fabric.pins.apply(0).set( pos )
 			elsif f[0] == "r_elbow"
-				Main.fabric.pins.apply(1).set( j.pose.pos )
+				Main.fabric.pins.apply(1).set( pos )
 			elsif f[0] == "r_shoulder"
-				Main.fabric.pins.apply(2).set( j.pose.pos )
+				Main.fabric.pins.apply(2).set( pos )
 			elsif f[0] == "l_hand"
-				Main.fabric2.pins.apply(0).set( j.pose.pos )
+				Main.fabric2.pins.apply(0).set( pos )
 			elsif f[0] == "l_elbow"
-				Main.fabric2.pins.apply(1).set( j.pose.pos )
+				Main.fabric2.pins.apply(1).set( pos )
 			elsif f[0] == "l_shoulder"
-				Main.fabric2.pins.apply(2).set( j.pose.pos )
+				Main.fabric2.pins.apply(2).set( pos )
 			elsif f[0] == "r_hip"
-				Main.fabric3.pins.apply(0).set( j.pose.pos )
+				Main.fabric3.pins.apply(0).set( pos )
 			elsif f[0] == "l_hip"
-				Main.fabric3.pins.apply(1).set( j.pose.pos )
+				Main.fabric3.pins.apply(1).set( pos )
 			elsif f[0] == "r_knee"
-				Main.fabric3.pins.apply(4).set( j.pose.pos )
+				Main.fabric3.pins.apply(4).set( pos )
 			elsif f[0] == "l_knee"
-				Main.fabric3.pins.apply(5).set( j.pose.pos )
+				Main.fabric3.pins.apply(5).set( pos )
 			elsif f[0] == "r_foot"
-				Main.fabric3.pins.apply(2).set( j.pose.pos )
+				Main.fabric3.pins.apply(2).set( pos )
 			elsif f[0] == "l_foot"
-				Main.fabric3.pins.apply(3).set( j.pose.pos )
+				Main.fabric3.pins.apply(3).set( pos )
 			end
 		})
 
@@ -187,7 +193,7 @@ class Skel
 		@dur = 5.0
 		if @t < @dur
 			c = @color.lerp(@newColor, @t/@dur)
-			Main.groundM.color.set(c.x,c.y,c.z)
+			Main.groundM.material.color.set(c.x,c.y,c.z)
 		else
 			f = @rand.float
 			@color = @newColor

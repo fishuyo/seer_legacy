@@ -23,7 +23,7 @@ object Shader {
   var shader:Option[Shader] = None
   val loadedShaders = new HashMap[String,Shader]()
 
-  var defaultMaterial:Material = new DiffuseMaterial
+  var defaultMaterial:Material = new SpecularMaterial
 
   var bg = RGBA(0,0,0,1)
   var color = RGBA(1,1,1,1)
@@ -73,7 +73,7 @@ object Shader {
       case m:ShaderMaterial => setBasicMaterial(m);
       case m:SpecularMaterial => setBasicMaterial(m); lightingMix=1.f; shininess = m.shininess
       case m:DiffuseMaterial => setBasicMaterial(m); lightingMix=1.f; shininess = 0.f
-      case m:NoMaterial => ()
+      case m:NoMaterial => setMaterial(defaultMaterial)
       case m:BasicMaterial => setBasicMaterial(m)
       case _ => () //setMaterial(defaultMaterial)
     }

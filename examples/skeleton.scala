@@ -24,7 +24,8 @@ object Main extends App with Animatable{
 
   val ground = Plane.generateMesh(20,20,100,100,Quat.up) //Cube().scale(2.f,0.1f,7.f).translate(0,-0.2f,3.5f)
   val groundM = Model(ground)
-  groundM.color.set(0.f,.1f,.4f,.5f)
+  groundM.material = new SpecularMaterial
+  groundM.material.color.set(0.f,.1f,.4f,.5f)
 
   val trace = new Trace3D(100)
 
@@ -67,9 +68,9 @@ object Main extends App with Animatable{
   def drawFabric(b:Boolean){drawFabric = b}
   // fabric.mesh.primitive = Lines
   // fabric2.mesh.primitive = Lines
-  fabricM.color.set(1,0,0,1)
-  fabricM2.color.set(1,0,0,1)
-  fabricM3.color.set(1,0,0,1)
+  fabricM.material.color.set(1,0,0,1)
+  fabricM2.material.color.set(1,0,0,1)
+  fabricM3.material.color.set(1,0,0,1)
   fabricNode.camera = Camera
   fabricNode.scene.push(fabric)
   fabricNode.scene.push(fabric2)
@@ -170,11 +171,12 @@ class Skeleton(val id:Int) extends Animatable {
   val loadingModel = Cube().scale(0.1f).translate(0,0.5f,0)
   val m = Cube().rotate(45.f.toRadians,0,45.f.toRadians)
   loadingModel.addPrimitive(m)
-  m.color = color
-  loadingModel.color = color
+  m.material.color = color
+  loadingModel.material.color = color
 
   var tracking = false
   var joints = Map[String,Model]()
+  // var joints = Map[String,Trace3D]()
 
   joints += "head" -> Sphere().scale(.05f,.065f,.05f)
   joints += "neck" -> Sphere().scale(.02f)
@@ -193,12 +195,30 @@ class Skeleton(val id:Int) extends Animatable {
   joints += "l_knee" -> Sphere().scale(.02f)
   // joints += "l_ankle" -> Sphere().scale(.02f)
   joints += "l_foot" -> Sphere().scale(.02f)
+  
+  // joints += "head" -> new Trace3D(100)
+  // joints += "neck" -> new Trace3D(100)
+  // joints += "torso" -> new Trace3D(100)
+  // joints += "r_shoulder" -> new Trace3D(100)
+  // joints += "r_elbow" -> new Trace3D(100)
+  // joints += "r_hand" -> new Trace3D(100)
+  // joints += "l_shoulder" -> new Trace3D(100)
+  // joints += "l_elbow" -> new Trace3D(100)
+  // joints += "l_hand" -> new Trace3D(100)
+  // joints += "r_hip" -> new Trace3D(100)
+  // joints += "r_knee" -> new Trace3D(100)
+  // // joints += "r_ankle" -> new Trace3D(100)
+  // joints += "r_foot" -> new Trace3D(100)
+  // joints += "l_hip" -> new Trace3D(100)
+  // joints += "l_knee" -> new Trace3D(100)
+  // // joints += "l_ankle" -> new Trace3D(100)
+  // joints += "l_foot" -> new Trace3D(100)
 
-  joints.values.foreach( _.color = color )
+  joints.values.foreach( _.material.color = color )
 
   val bones = new ListBuffer[Model]()
   for( i <- (0 until 8)) bones += Cylinder()
-  bones.foreach( (b) => { b.color = color; b.scale.set(.015f,.015f,.15f) })
+  bones.foreach( (b) => { b.material.color = color; b.scale.set(.015f,.015f,.15f) })
 
 
   def setShader(s:String){
@@ -214,7 +234,6 @@ class Skeleton(val id:Int) extends Animatable {
     if(calibrating) loadingModel.draw()
     if(tracking){ 
       joints.values.foreach(_.draw())
-      // strings.foreach(_.draw())
       bones.foreach(_.draw())
     }
   }
@@ -222,6 +241,9 @@ class Skeleton(val id:Int) extends Animatable {
   override def animate(dt:Float){
     loadingModel.rotate(0,0.10f,0)
     if(tracking){
+      // joints.values.foreach( j => {
+// 
+      // })
       bones(0).pose.pos.set(joints("l_shoulder").pose.pos)
       var a = joints("l_elbow").pose.pos - joints("l_shoulder").pose.pos
       bones(0).scale.z = a.mag()
@@ -262,30 +284,15 @@ class Skeleton(val id:Int) extends Animatable {
       bones(7).scale.z = a.mag()
       bones(7).pose.quat = Quat().getRotationTo(Vec3(0,0,1), a.normalized)
 
-      // bones(1).pins(0).set(joints("l_elbow").pose.pos)
-      // bones(1).pins(1).set(joints("l_shoulder").pose.pos)
-      // bones(2).pins(0).set(joints("r_hand").pose.pos)
-      // bones(2).pins(1).set(joints("r_elbow").pose.pos)
-      // bones(3).pins(0).set(joints("r_elbow").pose.pos)
-      // bones(3).pins(1).set(joints("r_shoulder").pose.pos)
-      // bones(4).pins(0).set(joints("l_foot").pose.pos)
-      // bones(4).pins(1).set(joints("l_knee").pose.pos)
-      // bones(5).pins(0).set(joints("l_knee").pose.pos)
-      // bones(5).pins(1).set(joints("l_hip").pose.pos)
-      // bones(6).pins(0).set(joints("r_foot").pose.pos)
-      // bones(6).pins(1).set(joints("r_knee").pose.pos)
-      // bones(7).pins(0).set(joints("r_knee").pose.pos)
-      // bones(7).pins(1).set(joints("r_hip").pose.pos)
-      // strings.foreach(_.animate(dt))
     }
   }
 
   def setColor(c:RGBA){
     color = c
-    loadingModel.color = c
-    m.color = c
-    joints.values.foreach( _.color = color)
-    bones.foreach( _.color = color)
+    loadingModel.material.color = c
+    m.material.color = c
+    // joints.values.foreach( _.material.color = color)
+    bones.foreach( _.material.color = color)
   }
   def calibrating(v:Boolean){ calibrating = v }
   def tracking(v:Boolean){ tracking = v }

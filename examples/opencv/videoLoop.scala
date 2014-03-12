@@ -47,7 +47,9 @@ object Main extends App with Animatable{
   // s.particles.takeRight(10).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
   // val cube = Model(s)
 
-  val cube = Model(Cube())
+  val cube = Model(Plane())
+  // cube.material = new BasicMaterial
+  cube.material.textureMix = 1.f
   Scene.push(cube)
 
   var pix:Pixmap = null
@@ -77,7 +79,10 @@ object Main extends App with Animatable{
 
     pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
     bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
-  	cube.scale.set(1.f, (h/w).toFloat, 1.f)
+    // cube.scale.set(1.f, (h/w).toFloat, 1.f)
+  	cube.translate(0,0,-1.f) //.set(1.f, (h/w).toFloat, 1.f)
+
+    SceneGraph.root.camera = new OrthographicCamera(800,800)
 
   	tId = Texture(pix)
   }

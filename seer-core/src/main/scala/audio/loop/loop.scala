@@ -287,6 +287,10 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
 
   var dirty = true
 
+  val vocoder = new PhaseVocoder
+  var vocoderActive = false
+  var vocoderAnalyze = true
+
   allocate(numSamples)
 
   gen = ()=>{
@@ -306,7 +310,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   }
   
   def gain(g:Float){ gain = g }
-  def play(){ playing = true; recording = false}
+  def play(){ playing = true; recording = false;}
   def togglePlay(){ if(playing) stop() else play()}
   def play(t:Int){ b.times=0; times = t; play() }
   def stop(){ playing = false; recording = false}
@@ -325,6 +329,16 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     b.curSize = 0
   }
 
+  def analyze(){
+    if(b.curSize > 0 && vocoderAnalyze){
+      vocoder.clear
+      vocoder.setSamples(b.samples,b.curSize)
+      vocoderActive = true
+      vocoderAnalyze = false
+    }
+  }
+  def vocoderActive(b:Boolean){ vocoderActive = b}
+
   def duplicate(times:Int){
     val size = b.curSize
     for( i <- (0 until times)) b.append( b.samples, size)
@@ -341,48 +355,51 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     val r = pan
     
     if(recording){ //fresh loop
-
+      vocoderActive = false
+      vocoderAnalyze = true
       b.append( in, count )
       
     }else if(playing && numSamples > 0){ //playback and stack
       
-      lPos = b.rPos
-      
-      if(reversing){
+      if( vocoderActive ) vocoder.audioIO(in, out, numOut, count)
+      else{
+        lPos = b.rPos
         
-        b.readR( iobuffer, count, gain )
-        
-        if(stacking){ 
-          b.applyGain( decay, count, b.rPos+1 )
-          b.addFromR( in, count, lPos )
+        if(reversing){
+          
+          b.readR( iobuffer, count, gain )
+          
+          if(stacking){ 
+            b.applyGain( decay, count, b.rPos+1 )
+            b.addFromR( in, count, lPos )
+          }
+          
+        }else {
+          
+          b.read( iobuffer, count, gain )
+          
+          if(stacking){
+              b.applyGain( decay, count, lPos)
+              b.addFrom( in, count, lPos )
+          }     
         }
         
-      }else {
+        //up mix to 2 channels
+        for( i <- (0 until count)){
+          out(0)(i) += iobuffer(i)*l
+          out(1)(i) += iobuffer(i)*r
+        }
         
-        b.read( iobuffer, count, gain )
-        
-        if(stacking){
-            b.applyGain( decay, count, lPos)
-            b.addFrom( in, count, lPos )
-        }     
+        if( sync != b.times){
+          sync = b.times
+          onSync()
+        }
+        if( times > 0 && b.times >= times ){
+          b.times = 0; times = 0;
+          stop()
+          onDone()
+        }
       }
-      
-      //up mix to 2 channels
-      for( i <- (0 until count)){
-        out(0)(i) += iobuffer(i)*l
-        out(1)(i) += iobuffer(i)*r
-      }
-      
-      if( sync != b.times){
-        sync = b.times
-        onSync()
-      }
-      if( times > 0 && b.times >= times ){
-        b.times = 0; times = 0;
-        stop()
-        onDone()
-      }
-      
     }//end else if(playing)
   }
 

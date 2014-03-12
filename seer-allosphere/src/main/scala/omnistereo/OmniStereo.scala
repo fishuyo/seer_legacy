@@ -2,16 +2,21 @@
 
 
 package com.fishuyo.seer
-package seer
 package allosphere
 
 import graphics._
+import maths._
+import spatial._
 
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 
 import com.badlogic.gdx.utils.BufferUtils
+import com.badlogic.gdx.math.Matrix4
 
-import org.lwjgl.opengl.GL43._
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.Gdx.{gl20 => gl }
+
+// import org.lwjgl.opengl.GL43._
 
 
 /* AlloSystem OmniStereo port */
@@ -95,7 +100,7 @@ object OmniStereo {
 	// 	static const double mult = 20;
 
 	// 	// fade out at edges:
-	// 	value[0] = 255. * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normx-0.5)))) * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normy-0.5))));
+	// 	value[0] = 255. * sin(M_PI_2 * al.min(1., mult*(0.5 - fabs(normx-0.5)))) * sin(M_PI_2 * al.min(1., mult*(0.5 - fabs(normy-0.5))));
 	// }
 
 	// prefix this string to every vertex shader used in rendering the scene
@@ -108,7 +113,7 @@ object OmniStereo {
 		//	Pass this uniform to the shader in the OmniStereoDrawable callback
 		uniform float omni_eye;
 
-		// @omni_face: the GL_TEXTURE_CUBE_MAP face being rendered.
+		// @omni_face: the GL20.GL_TEXTURE_CUBE_MAP face being rendered.
 		//	For a typical forward-facing view, this should == 5.
 		//	Pass this uniform to the shader in the OmniStereoDrawable callback
 		uniform int omni_face;
@@ -422,10 +427,14 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
 	type DrawMethod = (Pose,Double) => Unit  // pose, eye
 
-	// ShaderProgram mCubeProgram, mSphereProgram, mWarpProgram, mDemoProgram;
+	var mCubeProgram:Shader = null
+	var mSphereProgram:Shader = null
+	var mWarpProgram:Shader = null
+	var mDemoProgram:Shader = null
 
 	// supports up to 4 warps/viewports
 	val mProjections = new Array[Projection](4)
+	def projection(i:Int) = mProjections(i)
 
 	val mModelView = 0 //TODO;
 	var mClearColor = RGBA(0,0,0,0);
@@ -446,7 +455,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 	var mFbo = 0
 	var mRbo = 0
 
-	mTex = Array(0,0)
+	var mTex = Array(0,0)
 
 	configure(FISHEYE)
 	configure(SOFTEDGE)
@@ -495,18 +504,22 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		};
 
 		val mViewport = Viewport(0, 0, 1, 1)
+		def viewport() = mViewport
 
 		// allocate blend map:
 
 		val mBlend:GdxTexture = null
-		val mWarp:Texture = null
+		val mWarp:FloatTexture = null
+
+		def blend() = mBlend
+		def warp() = mWarp
 
 		// allocate warp map:
 		// mWarp.resize(256, 256)
-		// 	.target(Texture::TEXTURE_2D)
-		// 	.format(Graphics::RGBA)
-		// 	.type(Graphics::FLOAT)
-		// 	.filterMin(Texture::LINEAR)
+		// 	.target(Texture.TEXTURE_2D)
+		// 	.format(Graphics.RGBA)
+		// 	.type(Graphics.FLOAT)
+		// 	.filterMin(Texture.LINEAR)
 		// 	.allocate();
 
 		var t:Array[Float] = _
@@ -592,7 +605,7 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				val ds = new DataInputStream( new FileInputStream(path))
 				var list = List[Float]()
 
-				while(ds.available >= 4) list = readFloat(ds) :: list
+				while(ds.available >= 4) list = readFloat(ds) . list
 				params.fromList(list)
 				ds.close()
 
@@ -887,44 +900,25 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		return this
 	}
 
-	// capture a scene to the cubemap textures
-	// this is likely to be an expensive call, as it will render the scene
-	// six (twelve for stereo) times, by calling back into @draw
-	// @draw should render without changing the viewport, modelview or projection matrices
-	// @lens is used for near/far clipping planes, and eye separation
-	// @pose sets the camera position/orientation
-	def capture(drawable:OmniDrawable, lens:Lens, pose:Pose){
-
-	}
-
-
-	// render the captured scene to multiple warp maps and viewports
-	// @viewport is the pixel dimensions of the window
-	def draw(lens:Lens, pose:Pose, vp:Viewport){
-
-	}
-
 	// typically they would be combined like this:
 	def onFrame(drawable:OmniDrawable, lens:Lens, pose:Pose, vp:Viewport) {
 		capture(drawable, lens, pose);
 		draw(lens, pose, vp);
 	}
 
-	// render front-view only (bypass FBO)
-	def onFrameFront(drawable:OmniDrawable, lens:Lens, pose:Pose, vp:Viewport){}
-
 	// send the proper uniforms to the shader:
-	def uniforms(program:ShaderProgram){
-		program.uniform("omni_face", mFace);
-		program.uniform("omni_eye", mEyeParallax);
-		program.uniform("omni_near", mNear);
-		program.uniform("omni_far", mFar);
-		// gl.error("sending OmniStereo uniforms");
+	def uniforms(program:Shader){
+		program.uniforms("omni_face") = mFace
+		program.uniforms("omni_eye") = mEyeParallax
+		program.uniforms("omni_near") = mNear
+		program.uniforms("omni_far") = mFar
+		program.setUniforms()
+		gl.error("sending OmniStereo uniforms");
 	}
 
 
 	def drawStereo(f:DrawMethod)(lens:Lens, pose:Pose, vp:Viewport) {
-		val eye = lens.eyeSep();
+		val eye = lens.eyeSep;
 		mMode match {
 			case SEQUENTIAL =>
 				if (mFrame & 1) {
@@ -935,25 +929,25 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 
 			case ACTIVE =>
 				// glDrawBuffer(GL_BACK_RIGHT);
-				// gl.error("OmniStereo drawStereo GL_BACK_RIGHT");
-				// f(pose, eye);
+				gl.error("OmniStereo drawStereo GL_BACK_RIGHT");
+				f(pose, eye);
 
 				// glDrawBuffer(GL_BACK_LEFT);
-				// gl.error("OmniStereo drawStereo GL_BACK_LEFT");
-				// f(pose, -eye);
+				gl.error("OmniStereo drawStereo GL_BACK_LEFT");
+				f(pose, -eye);
 
 				// glDrawBuffer(GL_BACK);
-				// gl.error("OmniStereo drawStereo GL_BACK");
+				gl.error("OmniStereo drawStereo GL_BACK");
 				// break;
 
-			case DUAL =>
+			// case DUAL =>
 				// gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
 				// f(pose, eye);
 				// gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
 				// f(pose, -eye);
 				// break;
 
-			case ANAGLYPH =>
+			// case ANAGLYPH =>
 				// switch(mAnaglyphMode){
 				// 	case RED_BLUE:
 				// 	case RED_GREEN:
@@ -975,9 +969,9 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 				// 	default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
 				// }
 				// // clear depth before this pass:
-				// gl.depthMask(1);
-				// gl.depthTesting(1);
-				// gl.clear(gl.DEPTH_BUFFER_BIT);
+				// gl.glDepthMask(true);
+				// gl.glEnable(GL20.GL_DEPTH_TEST)
+				// gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
 				// f(pose, -eye);
 
 				// break;
@@ -993,503 +987,634 @@ class OmniStereo(resolution:Int=1024, useMipMaps:Boolean=true) {
 		}
 	}
 
-}
+	def onCreate() {
 
-void OmniStereo::onCreate() {
-
-	// force allocation of warp/blend textures:
-	for(i<-(0 until 4)) {
-		mProjections(i) = new Projection
-		mProjections(i).onCreate()
-	}
-
-	// Shader cubeV, cubeF;
-	// cubeV.source(vGeneric, Shader::VERTEX).compile();
-	// cubeF.source(fCube, Shader::FRAGMENT).compile();
-	// mCubeProgram.attach(cubeV).attach(cubeF);
-	// mCubeProgram.link(false);	// false means do not validate
-	// // set uniforms before validating to prevent validation error
-	// mCubeProgram.begin();
-	// 	mCubeProgram.uniform("alphaMap", 2);
-	// 	mCubeProgram.uniform("pixelMap", 1);
-	// 	mCubeProgram.uniform("cubeMap", 0);
-	// mCubeProgram.end();
-	// mCubeProgram.validate();
-	// cubeV.printLog();
-	// cubeF.printLog();
-	// mCubeProgram.printLog();
-	// Graphics::error("cube program onCreate");
-
-	// Shader sphereV, sphereF;
-	// sphereV.source(vGeneric, Shader::VERTEX).compile();
-	// sphereF.source(fSphere, Shader::FRAGMENT).compile();
-	// mSphereProgram.attach(sphereV).attach(sphereF);
-	// mSphereProgram.link(false);	// false means do not validate
-	// // set uniforms before validating to prevent validation error
-	// mSphereProgram.begin();
-	// 	mSphereProgram.uniform("alphaMap", 2);
-	// 	mSphereProgram.uniform("pixelMap", 1);
-	// 	mSphereProgram.uniform("sphereMap", 0);
-	// mSphereProgram.end();
-	// mSphereProgram.validate();
-	// sphereV.printLog();
-	// sphereF.printLog();
-	// mSphereProgram.printLog();
-	// Graphics::error("cube program onCreate");
-
-	// Shader warpV, warpF;
-	// warpV.source(vGeneric, Shader::VERTEX).compile();
-	// warpF.source(fWarp, Shader::FRAGMENT).compile();
-	// mWarpProgram.attach(warpV).attach(warpF);
-	// mWarpProgram.link(false);	// false means do not validate
-	// // set uniforms before validating to prevent validation error
-	// mWarpProgram.begin();
-	// 	mWarpProgram.uniform("alphaMap", 2);
-	// 	mWarpProgram.uniform("pixelMap", 1);
-	// mWarpProgram.end();
-	// mWarpProgram.validate();
-	// warpV.printLog();
-	// warpF.printLog();
-	// mWarpProgram.printLog();
-	// Graphics::error("cube program onCreate");
-
-	// Shader demoV, demoF;
-	// demoV.source(vGeneric, Shader::VERTEX).compile();
-	// demoF.source(fDemo, Shader::FRAGMENT).compile();
-	// mDemoProgram.attach(demoV).attach(demoF);
-	// mDemoProgram.link(false);	// false means do not validate
-	// // set uniforms before validating to prevent validation error
-	// mDemoProgram.begin();
-	// 	mDemoProgram.uniform("alphaMap", 2);
-	// 	mDemoProgram.uniform("pixelMap", 1);
-	// mDemoProgram.end();
-	// mDemoProgram.validate();
-	// demoV.printLog();
-	// demoF.printLog();
-	// mDemoProgram.printLog();
-	// Graphics::error("cube program onCreate");
-
-	// create cubemap textures:
-	mTex(0) = glGenTextures()
-	mTex(1) = glGenTextures()
-
-	for (i<-(0 until 2)) {
-		// create cubemap texture:
-		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex(i));
-
-		// each cube face should clamp at texture edges:
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		// filtering
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-		// TODO: verify?
-		// Domagoj also has:
-		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-		glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-		float X[4] = { 1,0,0,0 };
-		float Y[4] = { 0,1,0,0 };
-		float Z[4] = { 0,0,1,0 };
-		val buf = BufferUtils.newFloatBuffer(4)
-		var array = Array(1.f,0.f,0.f,0.f)
-		buf.put(array)
-		buf.rewind
-		glTexGen( GL_S, GL_OBJECT_PLANE, buf );
-		array = Array(0.f,1.f,0.f,0.f)
-		buf.put(array)
-		buf.rewind
-		glTexGen( GL_T, GL_OBJECT_PLANE, buf );
-		array = Array(0.f,0.f,1.f,0.f)
-		buf.put(array)
-		buf.rewind
-		glTexGen( GL_R, GL_OBJECT_PLANE, buf );
-
-		// RGBA8 Cubemap texture, 24 bit depth texture, mResolution x mResolution
-		// NULL means reserve texture memory, but texels are undefined
-		for (f<-(0 until 6)){
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X+f,
-				0, GL_RGBA8,
-				mResolution, mResolution,
-				0, GL_BGRA, GL_UNSIGNED_BYTE,
-				NULL);
+		// force allocation of warp/blend textures:
+		for(i<-(0 until 4)) {
+			mProjections(i) = new Projection
+			mProjections(i).onCreate()
 		}
 
-		// clean up:
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		Graphics::error("creating cubemap texture");
+		// Shader cubeV, cubeF;
+		// cubeV.source(vGeneric, Shader.VERTEX).compile();
+		// cubeF.source(fCube, Shader.FRAGMENT).compile();
+		// mCubeProgram.attach(cubeV).attach(cubeF);
+		// mCubeProgram.link(false);	// false means do not validate
+		// // set uniforms before validating to prevent validation error
+		// mCubeProgram.begin();
+		// 	mCubeProgram.uniform("alphaMap", 2);
+		// 	mCubeProgram.uniform("pixelMap", 1);
+		// 	mCubeProgram.uniform("cubeMap", 0);
+		// mCubeProgram.end();
+		// mCubeProgram.validate();
+		// cubeV.printLog();
+		// cubeF.printLog();
+		// mCubeProgram.printLog();
+		// Graphics.error("cube program onCreate");
+
+		// Shader sphereV, sphereF;
+		// sphereV.source(vGeneric, Shader.VERTEX).compile();
+		// sphereF.source(fSphere, Shader.FRAGMENT).compile();
+		// mSphereProgram.attach(sphereV).attach(sphereF);
+		// mSphereProgram.link(false);	// false means do not validate
+		// // set uniforms before validating to prevent validation error
+		// mSphereProgram.begin();
+		// 	mSphereProgram.uniform("alphaMap", 2);
+		// 	mSphereProgram.uniform("pixelMap", 1);
+		// 	mSphereProgram.uniform("sphereMap", 0);
+		// mSphereProgram.end();
+		// mSphereProgram.validate();
+		// sphereV.printLog();
+		// sphereF.printLog();
+		// mSphereProgram.printLog();
+		// Graphics.error("cube program onCreate");
+
+		// Shader warpV, warpF;
+		// warpV.source(vGeneric, Shader.VERTEX).compile();
+		// warpF.source(fWarp, Shader.FRAGMENT).compile();
+		// mWarpProgram.attach(warpV).attach(warpF);
+		// mWarpProgram.link(false);	// false means do not validate
+		// // set uniforms before validating to prevent validation error
+		// mWarpProgram.begin();
+		// 	mWarpProgram.uniform("alphaMap", 2);
+		// 	mWarpProgram.uniform("pixelMap", 1);
+		// mWarpProgram.end();
+		// mWarpProgram.validate();
+		// warpV.printLog();
+		// warpF.printLog();
+		// mWarpProgram.printLog();
+		// Graphics.error("cube program onCreate");
+
+		// Shader demoV, demoF;
+		// demoV.source(vGeneric, Shader.VERTEX).compile();
+		// demoF.source(fDemo, Shader.FRAGMENT).compile();
+		// mDemoProgram.attach(demoV).attach(demoF);
+		// mDemoProgram.link(false);	// false means do not validate
+		// // set uniforms before validating to prevent validation error
+		// mDemoProgram.begin();
+		// 	mDemoProgram.uniform("alphaMap", 2);
+		// 	mDemoProgram.uniform("pixelMap", 1);
+		// mDemoProgram.end();
+		// mDemoProgram.validate();
+		// demoV.printLog();
+		// demoF.printLog();
+		// mDemoProgram.printLog();
+		// Graphics.error("cube program onCreate");
+
+		// create cubemap textures:
+		mTex(0) = glGenTextures()
+		mTex(1) = glGenTextures()
+
+		for (i<-(0 until 2)) {
+			// create cubemap texture:
+			glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(i));
+
+			// each cube face should clamp at texture edges:
+			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+			// filtering
+			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+			// TODO: verify?
+			// Domagoj also has:
+			glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			
+			// float X[4] = { 1,0,0,0 };
+			// float Y[4] = { 0,1,0,0 };
+			// float Z[4] = { 0,0,1,0 };
+			val buf = BufferUtils.newFloatBuffer(4)
+			var array = Array(1.f,0.f,0.f,0.f)
+			buf.put(array)
+			buf.rewind
+			glTexGen( GL_S, GL_OBJECT_PLANE, buf );
+			array = Array(0.f,1.f,0.f,0.f)
+			buf.put(array)
+			buf.rewind
+			glTexGen( GL_T, GL_OBJECT_PLANE, buf );
+			array = Array(0.f,0.f,1.f,0.f)
+			buf.put(array)
+			buf.rewind
+			glTexGen( GL_R, GL_OBJECT_PLANE, buf );
+
+			// RGBA8 Cubemap texture, 24 bit depth texture, mResolution x mResolution
+			// NULL means reserve texture memory, but texels are undefined
+			for (f<-(0 until 6)){
+				glTexImage2D(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X+f,
+					0, GL_RGBA8,
+					mResolution, mResolution,
+					0, GL_BGRA, GL_UNSIGNED_BYTE,
+					NULL);
+			}
+
+			// clean up:
+			glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, 0);
+			//Graphics.error("creating cubemap texture");
+		}
+
+		// one FBO to rule them all...
+		val b = BufferUtils.newIntBuffer(1)
+		gl.glGenFramebuffers(1, b);
+		mFbo = b.get()
+
+		gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, mFbo);
+		//Attach one of the faces of the Cubemap texture to this FBO
+		gl.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X, mTex(0), 0);
+
+		b.rewind;
+		gl.glGenRenderbuffers(1, b);
+		mRbo = b.get()
+
+		gl.glBindRenderbuffer(GL_RENDERBUFFER, mRbo);
+		gl.glRenderbufferStorage(GL_RENDERBUFFER,GL20.GL_DEPTH_COMPONENT24, mResolution, mResolution);
+		// Attach depth buffer to FBO
+		gl.glFramebufferRenderbuffer(GL20.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRbo);
+
+		// ...and in the darkness bind them:
+		for (mFace <- (0 until 6)){
+			gl.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0+mFace, GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X+mFace, mTex(0), 0);
+		}
+
+		//Does the GPU support current FBO configuration?
+		var status = gl.glCheckFramebufferStatus(GL20.GL_FRAMEBUFFER);
+		if (status != GL20.GL_FRAMEBUFFER_COMPLETE) {
+			printf("GPU does not support required FBO configuration\n");
+			exit(0);
+		}
+
+		// cleanup:
+		gl.glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, 0);
+
+		// Graphics.error("OmniStereo onCreate");
 	}
 
-	// one FBO to rule them all...
-	glGenFramebuffers(1, &mFbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
-	//Attach one of the faces of the Cubemap texture to this FBO
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, mTex[0], 0);
+	def onDestroy() {
+		mCubeProgram.program.get.dispose()
 
-	glGenRenderbuffers(1, &mRbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mResolution, mResolution);
-	// Attach depth buffer to FBO
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRbo);
+		val b = BufferUtils.newIntBuffer(2)
+		b.put(mTex)
+		gl.glDeleteTextures(2, b);
+		mTex(0) = 0
+		mTex(1) = 0
 
-	// ...and in the darkness bind them:
-	for (mFace=0; mFace<6; mFace++) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+mFace, GL_TEXTURE_CUBE_MAP_POSITIVE_X+mFace, mTex[0], 0);
+		b.rewind; b.put(mRbo)
+		gl.glDeleteRenderbuffers(1, b);
+		b.rewind; b.put(mFbo)
+		gl.glDeleteFramebuffers(1, b);
+		mRbo = 0;
+		mFbo = 0;
 	}
 
-	//Does the GPU support current FBO configuration?
-	GLenum status;
-	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		printf("GPU does not support required FBO configuration\n");
-		exit(0);
+	def capture(drawable:OmniDrawable, lens:Lens, pose:Pose) {
+		if (mCubeProgram == null) onCreate();
+		// gl.error("OmniStereo capture begin");
+
+		val pos = pose.pos;
+		// Vec3d ux, uy, uz;
+		// pose.unitVectors(ux, uy, uz);
+		// mModelView = Matrix4.lookAt(ux, uy, uz, pos);
+
+		mNear = lens.near
+		mFar = lens.far
+		val eyeSep = (if(mStereo==1) lens.eyeSep else 0.0)
+
+		gl.projection(Matrix4.identity()); 
+
+		// apply camera transform:
+		// gl.pushMatrix(gl.MODELVIEW);
+		// gl.loadMatrix(mModelView);
+		// glPushAttrib(GL_ALL_ATTRIB_BITS);
+		gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, mFbo);
+		gl.glViewport(0,0,mResolution, mResolution);
+		gl.glEnable(GL20.GL_SCISSOR_TEST);
+		gl.glScissor(0,0,mResolution, mResolution);
+
+
+		for (i <-(0 until (mStereo+1))) {
+			mEyeParallax = eyeSep * (i-0.5);
+			for (mFace <- (0 until 6)) {
+
+				gl.glDrawBuffer(GL20.GL_COLOR_ATTACHMENT0 + mFace);
+				gl.glFramebufferTexture2D(
+					GL20.GL_FRAMEBUFFER,
+					GL20.GL_COLOR_ATTACHMENT0 + mFace,
+					GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
+					mTex(i), 0);
+
+				gl.glClearColor(mClearColor.r,mClearColor.g,mClearColor.b,mClearColor.a);
+				gl.glEnable(GL20.GL_DEPTH_TEST)
+				gl.glDepthMask(true);
+				gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+				drawable.onDrawOmni(this);
+			}
+		}
+
+		// glBindFramebuffer(GL20.GL_FRAMEBUFFER, 0);
+		// glPopAttrib()
+		// glPopMatrix(gl.MODELVIEW)
+		// gl.error("OmniStereo capture end");
+
+		// FBOs don't generate mipmaps by default; do it here:
+		if (mMipmap) {
+			gl.glActiveTexture(GL20.GL_TEXTURE0);
+			gl.glEnable(GL20.GL_TEXTURE_CUBE_MAP);
+
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(0));
+			gl.glGenerateMipmap(GL20.GL_TEXTURE_CUBE_MAP);
+			// gl.error("generating mipmap");
+
+			if (mStereo==1) {
+				gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(1));
+				gl.glGenerateMipmap(GL20.GL_TEXTURE_CUBE_MAP);
+				// gl.error("generating mipmap");
+			}
+
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, 0);
+			gl.glDisable(GL20.GL_TEXTURE_CUBE_MAP);
+		}
+		// gl.error("OmniStereo FBO mipmap end");
 	}
 
-	// cleanup:
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	def onFrameFront(drawable:OmniDrawable, lens:Lens, pose:Pose, vp:Viewport) {
+		mFrame += 1
+		if (mCubeProgram == null) onCreate();
 
-	Graphics::error("OmniStereo onCreate");
-}
+		// gl.error("OmniStereo onFrameFront begin");
 
-void OmniStereo::onDestroy() {
-	mCubeProgram.destroy();
+		for (i <-(0 until mNumProjections)) {
+			val p = projection(i);
+			val v = p.viewport();
+			val viewport = Viewport(
+				vp.l + v.l * vp.w,
+				vp.b + v.b * vp.h,
+				v.w * vp.w,
+				v.h * vp.h
+			)
+			gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glEnable(GL20.GL_SCISSOR_TEST);
+			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
 
-	glDeleteTextures(2, mTex);
-	mTex[0] = mTex[1] = 0;
+			gl.projection(Matrix4.perspective(lens.fovy(), viewport.w / viewport.h, lens.near, lens.far))
 
-	glDeleteRenderbuffers(1, &mRbo);
-	glDeleteFramebuffers(1, &mFbo);
-	mRbo = mFbo = 0;
-}
+			mFace = 5; // draw negative z
 
-void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose) {
-	if (mCubeProgram.id() == 0) onCreate();
-	gl.error("OmniStereo capture begin");
+			{
+				val pos = pose.pos
+				// Vec3d ux, uy, uz;
+				// pose.unitVectors(ux, uy, uz);
+				// mModelView = Matrix4.lookAt(-ux, -uy, uz, pos);
 
-	Vec3d pos = pose.pos();
-	Vec3d ux, uy, uz;
-	pose.unitVectors(ux, uy, uz);
-	mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
+				mNear = lens.near
+				mFar = lens.far
+				//const double eyeSep = mStereo ? lens.eyeSep() : 0.;
 
-	mNear = lens.near();
-	mFar = lens.far();
-	const double eyeSep = mStereo ? lens.eyeSep() : 0.;
+				// apply camera transform:
+				gl.modelView(mModelView);
+				gl.glClearColor(mClearColor.r,mClearColor.g,mClearColor.b,mClearColor.a);
+				gl.glEnable(GL20.GL_DEPTH_TEST)
+				gl.glDepthMask(true);
+				gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-	gl.projection(Matrix4d::identity());
+				drawable.onDrawOmni(this);
+			}
+		}
+		// gl.error("OmniStereo onFrameFront end");
+	}
 
-	// apply camera transform:
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
-	gl.viewport(0, 0, mResolution, mResolution);
+	def drawEye(pose:Pose, eye:Double) {
+		if (eye > 0.) {
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(1));
+		} else {
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(0));
+		}
+		// gl.error("OmniStereo drawEye after texture");
+		mQuad.draw()
+		// gl.error("OmniStereo drawEye after quad");
+	}
 
-	for (int i=0; i<(mStereo+1); i++) {
-		mEyeParallax = eyeSep * (i-0.5);
-		for (mFace=0; mFace<6; mFace++) {
+	def draw(lens:Lens, pose:Pose, vp:Viewport) {
+		mFrame+=1;
+		if (mCubeProgram == null) onCreate();
 
-			glDrawBuffer(GL_COLOR_ATTACHMENT0 + mFace);
-			glFramebufferTexture2D(
-				GL_FRAMEBUFFER,
-				GL_COLOR_ATTACHMENT0 + mFace,
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
-				mTex[i], 0);
+		// gl.error("OmniStereo draw begin");
 
-			gl.clearColor(mClearColor);
-			gl.depthTesting(1);
-			gl.depthMask(1);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			drawable.onDrawOmni(*this);
+		gl.glViewport(vp.l, vp.b, vp.w, vp.h);
+		gl.glEnable(GL20.GL_SCISSOR_TEST);
+		gl.glScissor(vp.l, vp.b, vp.w, vp.h);
+
+		gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		for (i <- (0 until mNumProjections)) {
+			val p = projection(i);
+			val v = p.viewport();
+			val viewport = Viewport(
+				vp.l + v.l * vp.w,
+				vp.b + v.b * vp.h,
+				v.w * vp.w,
+				v.h * vp.h
+			);
+			gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glEnable(GL20.GL_SCISSOR_TEST);	
+			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+			p.blend().bind(2);
+			p.warp().t.bind(1);
+
+			// gl.error("OmniStereo cube draw begin");
+
+			mCubeProgram.begin();
+			gl.glActiveTexture(GL20.GL_TEXTURE0);
+			gl.glEnable(GL20.GL_TEXTURE_CUBE_MAP);
+
+			// gl.error("OmniStereo cube drawStereo begin");
+
+			drawStereo(drawEye)(lens, pose, viewport);
+
+			// gl.error("OmniStereo cube drawStereo end");
+
+			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, 0);
+			gl.glDisable(GL20.GL_TEXTURE_CUBE_MAP);
+
+			mCubeProgram.end();
+			// gl.error("OmniStereo cube draw end");
+
+			// p.blend().unbind(2);
+			// p.warp().unbind(1);
+		}
+		// gl.error("OmniStereo draw end");
+	}
+
+	def drawQuadEye(pose:Pose, eye:Double) {
+		mQuad.draw()
+	}
+
+	def drawSphereMap(map:GdxTexture, lens:Lens, pose:Pose, vp:Viewport) {
+		mFrame+=1;
+		if (mCubeProgram == null) onCreate();
+
+		gl.glViewport(vp.l, vp.b, vp.w, vp.h);
+		gl.glEnable(GL20.GL_SCISSOR_TEST);
+		gl.glScissor(vp.l, vp.b, vp.w, vp.h);
+		gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		for (i <- (0 until mNumProjections)) {
+			val p = projection(i);
+			val v = p.viewport();
+			val viewport = Viewport(
+				vp.l + v.l * vp.w,
+				vp.b + v.b * vp.h,
+				v.w * vp.w,
+				v.h * vp.h
+			);
+			gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glEnable(GL20.GL_SCISSOR_TEST);
+			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+			p.blend().bind(2);
+			p.warp().t.bind(1);
+
+			map.bind(0);
+			mSphereProgram.begin();
+			mSphereProgram.uniforms("quat") = pose.quat
+			mSphereProgram.setUniforms()
+
+			drawQuad();
+
+			mSphereProgram.end();
+			// map.unbind(0);
+
+			// p.blend().unbind(2);
+			// p.warp().unbind(1);
 		}
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glPopAttrib();
-	gl.popMatrix(gl.MODELVIEW);
-	gl.error("OmniStereo capture end");
-
-	// FBOs don't generate mipmaps by default; do it here:
-	if (mMipmap) {
-		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_CUBE_MAP);
-
-		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		gl.error("generating mipmap");
-
-		if (mStereo) {
-			glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			gl.error("generating mipmap");
-		}
-
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glDisable(GL_TEXTURE_CUBE_MAP);
+	def drawDemoEye(pose:Pose, eye:Double) {
+		mDemoProgram.uniforms("eyesep") = eye
+		mDemoProgram.uniforms("pos") = pose.pos
+		mDemoProgram.uniforms("quat") = pose.quat
+		mDemoProgram.setUniforms()
+		mQuad.draw()
 	}
-	gl.error("OmniStereo FBO mipmap end");
-}
 
-void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
-	mFrame++;
-	if (mCubeProgram.id() == 0) onCreate();
+	def drawDemo(lens:Lens, pose:Pose, vp:Viewport) {
+		mFrame+=1;
+		if (mCubeProgram == null) onCreate();
 
-	gl.error("OmniStereo onFrameFront begin");
+		gl.glViewport(vp.l, vp.b, vp.w, vp.h);
+		gl.glEnable(GL20.GL_SCISSOR_TEST);
+		gl.glScissor(vp.l, vp.b, vp.w, vp.h);
+		gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		for (i <- (0 until mNumProjections)) {
+			val p = projection(i);
+			val v = p.viewport();
+			val viewport = Viewport(
+				vp.l + v.l * vp.w,
+				vp.b + v.b * vp.h,
+				v.w * vp.w,
+				v.h * vp.h
+			);
+			gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glEnable(GL20.GL_SCISSOR_TEST);
+			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+			p.blend().bind(2);
+			p.warp().t.bind(1);
 
-	for (int i=0; i<numProjections(); i++) {
-		Projection& p = projection(i);
-		Viewport& v = p.viewport();
-		Viewport viewport(
-			vp.l + v.l * vp.w,
-			vp.b + v.b * vp.h,
-			v.w * vp.w,
-			v.h * vp.h
-		);
-		gl.viewport(viewport);
+			mDemoProgram.begin();
 
-		gl.projection(Matrix4d::perspective(lens.fovy(), viewport.w / (float)viewport.h, lens.near(), lens.far()));
+			drawStereo(drawDemoEye)(lens, pose, viewport);
 
-		mFace = 5; // draw negative z
+			mDemoProgram.end();
 
-		{
-			Vec3d pos = pose.pos();
-			Vec3d ux, uy, uz;
-			pose.unitVectors(ux, uy, uz);
-			mModelView = Matrix4d::lookAt(-ux, -uy, uz, pos);
-
-			mNear = lens.near();
-			mFar = lens.far();
-			//const double eyeSep = mStereo ? lens.eyeSep() : 0.;
-
-			// apply camera transform:
-			gl.modelView(mModelView);
-			gl.clearColor(mClearColor);
-			gl.depthTesting(1);
-			gl.depthMask(1);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-			drawable.onDrawOmni(*this);
+			// p.blend().unbind(2);
+			// p.warp().unbind(1);
 		}
 	}
-	gl.error("OmniStereo onFrameFront end");
-}
 
-void OmniStereo::drawEye(const Pose& pose, double eye) {
-	if (eye > 0.) {
-		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
-	} else {
-		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
+	def drawWarp(vp:Viewport) {
+		mFrame+=1;
+		if (mCubeProgram == null) onCreate();
+
+		gl.glViewport(vp.l, vp.b, vp.w, vp.h);
+		gl.glEnable(GL20.GL_SCISSOR_TEST);
+		gl.glScissor(vp.l, vp.b, vp.w, vp.h);
+		gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		for (i <- (0 until mNumProjections)){
+			val p = projection(i);
+			val v = p.viewport();
+			val viewport = Viewport(
+				vp.l + v.l * vp.w,
+				vp.b + v.b * vp.h,
+				v.w * vp.w,
+				v.h * vp.h
+			);
+			gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glEnable(GL20.GL_SCISSOR_TEST);
+			gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+			p.blend().bind(2);
+			p.warp().t.bind(1);
+
+			mWarpProgram.begin();
+
+			drawQuad();
+
+			mWarpProgram.end();
+
+			// p.blend().unbind(2);
+			// p.warp().unbind(1);
+		}
 	}
-	gl.error("OmniStereo drawEye after texture");
-	gl.draw(mQuad);
-	gl.error("OmniStereo drawEye after quad");
-}
 
-void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
-	mFrame++;
-	if (mCubeProgram.id() == 0) onCreate();
+	def drawBlend(vp:Viewport) {
+		mFrame+=1;
+		if (mCubeProgram == null) onCreate();
 
-	gl.error("OmniStereo draw begin");
+		gl.glViewport(vp.l, vp.b, vp.w, vp.h);
+		gl.glEnable(GL20.GL_SCISSOR_TEST);
+		gl.glScissor(vp.l, vp.b, vp.w, vp.h);
 
-	gl.viewport(vp);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (int i=0; i<numProjections(); i++) {
-		Projection& p = projection(i);
-		Viewport& v = p.viewport();
-		Viewport viewport(
-			vp.l + v.l * vp.w,
-			vp.b + v.b * vp.h,
-			v.w * vp.w,
-			v.h * vp.h
-		);
-		gl.viewport(viewport);
-		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-		p.blend().bind(2);
-		p.warp().bind(1);
+		gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		for (i <- (0 until mNumProjections)){
+			val p = projection(i);
+			val v = p.viewport();
+			val viewport = Viewport(
+				vp.l + v.l * vp.w,
+				vp.b + v.b * vp.h,
+				v.w * vp.w,
+				v.h * vp.h
+			);
+	gl.glViewport(viewport.l, viewport.b, viewport.w, viewport.h);
+				gl.glEnable(GL20.GL_SCISSOR_TEST);
+				gl.glScissor(viewport.l, viewport.b, viewport.w, viewport.h);
+			gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-		gl.error("OmniStereo cube draw begin");
+			gl.projection(Matrix4.ortho(0, 1, 0, 1, -1, 1));
+			gl.modelView(Matrix4.identity());
 
-		mCubeProgram.begin();
-		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_CUBE_MAP);
+			p.blend().bind(0);
 
-		gl.error("OmniStereo cube drawStereo begin");
+			drawQuad();
 
-		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);
-
-		gl.error("OmniStereo cube drawStereo end");
-
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glDisable(GL_TEXTURE_CUBE_MAP);
-
-		mCubeProgram.end();
-		gl.error("OmniStereo cube draw end");
-
-		p.blend().unbind(2);
-		p.warp().unbind(1);
+			// p.blend().unbind(0);
+		}
 	}
-	gl.error("OmniStereo draw end");
-}
 
-void OmniStereo::drawQuadEye(const Pose& pose, double eye) {
-	gl.draw(mQuad);
-}
+	def drawQuad() {
+		mMode match {
+			// case ACTIVE =>
+			// 	glDrawBuffer(GL_BACK_RIGHT);
+			// 	mQuad.draw()
 
-void OmniStereo::drawSphereMap(Texture& map, const Lens& lens, const Pose& pose, const Viewport& vp) {
-	mFrame++;
-	if (mCubeProgram.id() == 0) onCreate();
+			// 	glDrawBuffer(GL_BACK_LEFT);
+			// 	mQuad.draw()
 
-	gl.viewport(vp);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (int i=0; i<numProjections(); i++) {
-		Projection& p = projection(i);
-		Viewport& v = p.viewport();
-		Viewport viewport(
-			vp.l + v.l * vp.w,
-			vp.b + v.b * vp.h,
-			v.w * vp.w,
-			v.h * vp.h
-		);
-		gl.viewport(viewport);
-		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-		p.blend().bind(2);
-		p.warp().bind(1);
+			// 	glDrawBuffer(GL_BACK);
 
-		map.bind(0);
-		mSphereProgram.begin();
-		mSphereProgram.uniform("quat", pose.quat());
+			// case DUAL => ()
+				// TODO:
 
-		drawQuad();
-
-		mSphereProgram.end();
-		map.unbind(0);
-
-		p.blend().unbind(2);
-		p.warp().unbind(1);
+			case _ => mQuad.draw()
+		}
 	}
 }
 
-void OmniStereo::drawDemoEye(const Pose& pose, double eye) {
-	mDemoProgram.uniform("eyesep", eye);
-	mDemoProgram.uniform("pos", pose.pos());
-	mDemoProgram.uniform("quat", pose.quat());
-	gl.draw(mQuad);
-}
 
-void OmniStereo::drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp) {
-	mFrame++;
-	if (mCubeProgram.id() == 0) onCreate();
+/// Stores optics settings important for rendering
+class Lens(
+		fovy0:Double=30.0,
+		var near:Double=0.1,
+		var far:Double=100.0,
+		var focalLength:Double=6.0,
+		var eyeSep:Double=0.02
+	){
 
-	gl.viewport(vp);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (int i=0; i<numProjections(); i++) {
-		Projection& p = projection(i);
-		Viewport& v = p.viewport();
-		Viewport viewport(
-			vp.l + v.l * vp.w,
-			vp.b + v.b * vp.h,
-			v.w * vp.w,
-			v.h * vp.h
-		);
-		gl.viewport(viewport);
-		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-		p.blend().bind(2);
-		p.warp().bind(1);
+	var mTanFOV = 0.0				// Cached factor for computing frustum dimensions
+	var fovy = fovy0
 
-		mDemoProgram.begin();
+	setFovy(fovy0)
 
-		drawStereo<&OmniStereo::drawDemoEye>(lens, pose, viewport);
+	// setters
+	def setFovy(v:Double) = {
+		val cDeg2Rad = math.Pi / 180.;
+		fovy = v;
+		mTanFOV = math.tan(fovy * cDeg2Rad*0.5);
+		this
+	}							///< Set vertical field of view, in degrees
+	def setFovx(v:Double, aspect:Double) = {
+		setFovy(getFovyForFovX(v, aspect));
+		this
+	}				///< Set horizontal field of view, in degrees
 
-		mDemoProgram.end();
+	def eyeSepAuto() = { focalLength/30.0; } ///< Get automatic inter-ocular distance
 
-		p.blend().unbind(2);
-		p.warp().unbind(1);
+	// void frustum(Frustumd& f, const Pose& p, double aspect) const;
+	
+	/// Returns half the height of the frustum at a given depth
+	/// To get the half-width multiply the half-height by the viewport aspect
+	/// ratio.
+	// double heightAtDepth(double depth) const { return depth*mTanFOV; }
+	
+	/// Returns half the height of the frustum at the near plane
+	// double heightAtNear() const { return heightAtDepth(near()); }
+	
+	// calculate desired fovy, given the Y height of the border at a specified Z depth:
+	// static double getFovyForHeight(double height, double depth) {
+		// return 2.*M_RAD2DEG*atan(height/depth);
+	// }
+
+	/// Calculate required fovy to produce a specific fovx
+	/// @param[fovx] field-of-view in X axis to recreate
+	/// @param[aspect] aspect ratio of viewport
+	/// @return field-of-view in Y axis, usable by Lens.fovy() 
+	def getFovyForFovX(fovx:Double, aspect:Double) = {
+		val farW = math.tan(0.5*fovx.toRadians);
+		2.*math.atan(farW/aspect).toDegrees
 	}
+
+
+	// // @param[in] isStereo		Whether scene is in stereo (widens near/far planes to fit both eyes)
+	// void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool isStereo) const {
+
+	// 	Vec3d ur, uu, uf;
+	// 	p.directionVectors(ur, uu, uf);
+	// 	const Vec3d& pos = p.pos();
+
+	// 	double nh = heightAtDepth(near());
+	// 	double fh = heightAtDepth(far());
+
+	// 	double nw = nh * aspect;
+	// 	double fw = fh * aspect;
+		
+	// //	// This effectively creates a union between the near/far planes of the 
+	// //	// left and right eyes. The offsets are computed by using the law
+	// //	// of similar triangles.
+	// //	if(isStereo){
+	// //		nw += fabs(0.5*eyeSep()*(focalLength()-near())/focalLength());
+	// //		fw += fabs(0.5*eyeSep()*(focalLength()- far())/focalLength());
+	// //	}
+
+	// 	Vec3d nc = pos + uf * near();	// center point of near plane
+	// 	Vec3d fc = pos + uf * far();	// center point of far plane
+
+	// 	f.ntl = nc + uu * nh - ur * nw;
+	// 	f.ntr = nc + uu * nh + ur * nw;
+	// 	f.nbl = nc - uu * nh - ur * nw;
+	// 	f.nbr = nc - uu * nh + ur * nw;
+
+	// 	f.ftl = fc + uu * fh - ur * fw;
+	// 	f.ftr = fc + uu * fh + ur * fw;
+	// 	f.fbl = fc - uu * fh - ur * fw;
+	// 	f.fbr = fc - uu * fh + ur * fw;
+
+	// 	f.computePlanes();
+	// }
+
 }
 
-void OmniStereo::drawWarp(const Viewport& vp) {
-	mFrame++;
-	if (mCubeProgram.id() == 0) onCreate();
 
-	gl.viewport(vp);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (int i=0; i<numProjections(); i++) {
-		Projection& p = projection(i);
-		Viewport& v = p.viewport();
-		Viewport viewport(
-			vp.l + v.l * vp.w,
-			vp.b + v.b * vp.h,
-			v.w * vp.w,
-			v.h * vp.h
-		);
-		gl.viewport(viewport);
-		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-		p.blend().bind(2);
-		p.warp().bind(1);
-
-		mWarpProgram.begin();
-
-		drawQuad();
-
-		mWarpProgram.end();
-
-		p.blend().unbind(2);
-		p.warp().unbind(1);
-	}
-}
-
-void OmniStereo::drawBlend(const Viewport& vp) {
-	mFrame++;
-	if (mCubeProgram.id() == 0) onCreate();
-
-	gl.viewport(vp);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (int i=0; i<numProjections(); i++) {
-		Projection& p = projection(i);
-		Viewport& v = p.viewport();
-		Viewport viewport(
-			vp.l + v.l * vp.w,
-			vp.b + v.b * vp.h,
-			v.w * vp.w,
-			v.h * vp.h
-		);
-		gl.viewport(viewport);
-		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-
-		gl.projection(Matrix4d::ortho(0, 1, 0, 1, -1, 1));
-		gl.modelView(Matrix4d::identity());
-
-		p.blend().bind(0);
-
-		drawQuad();
-
-		p.blend().unbind(0);
-	}
-}
-
-void OmniStereo::drawQuad() {
-	switch (mMode) {
-		case ACTIVE:
-			glDrawBuffer(GL_BACK_RIGHT);
-			gl.draw(mQuad);
-
-			glDrawBuffer(GL_BACK_LEFT);
-			gl.draw(mQuad);
-
-			glDrawBuffer(GL_BACK);
-			break;
-
-		case DUAL:
-			// TODO:
-			break;
-
-		default:
-			gl.draw(mQuad);
-			break;
-	}
-}
 

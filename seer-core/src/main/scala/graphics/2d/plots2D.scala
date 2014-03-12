@@ -150,10 +150,10 @@ class AudioDisplay(val size:Int) extends Drawable {
     val x = (sample - left).toFloat / (right-left).toFloat - .5f
     cursorVert(6*i) = x
     cursorVert(6*i+1) = 0.5f
-    cursorVert(6*i+2) = 0.f
+    cursorVert(6*i+2) = 0.01f
     cursorVert(6*i+3) = x
     cursorVert(6*i+4) = -0.5f
-    cursorVert(6*i+5) = 0.f
+    cursorVert(6*i+5) = 0.01f
     cursorDirty = true
   }
 
@@ -166,6 +166,7 @@ class AudioDisplay(val size:Int) extends Drawable {
       cursorMesh.setVertices( cursorVert)
       cursorDirty = false
     }
+    Shader.textureMix = 0.f
     Shader.setColor(color)
     val s = scale / 2.f
     MatrixStack.push()
