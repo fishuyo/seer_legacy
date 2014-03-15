@@ -82,7 +82,7 @@ object SimpleAppRun {
 
     val cfg = new LwjglApplicationConfiguration()
     cfg.title = "seer"
-    cfg.useGL20 = true
+    // cfg.useGL30 = true
     cfg.width = SimpleAppSize.width
     cfg.height = SimpleAppSize.height
 

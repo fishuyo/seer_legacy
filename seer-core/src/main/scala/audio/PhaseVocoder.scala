@@ -56,6 +56,7 @@ class PhaseVocoder extends AudioSource {
 	var update = false
 
 	var convert = true
+	def convert(b:Boolean){ convert = b }
 
 	def timeShift(f:Float){ timeShift = f}
 	def pitchShift(f:Float){ pitchShift = f}
@@ -92,7 +93,7 @@ class PhaseVocoder extends AudioSource {
 
 	def convertMagPhase(win:Array[Float]):Array[Float] = {
 
-		if( !convert ) return win
+		// if(!convert) return win
 		var (phase, phaseDiff) = (0.f,0.f)
 		var expPhaseDiff = 2.0*math.Pi*hopFactor
 		var resolution = 44100.f / length
@@ -115,7 +116,7 @@ class PhaseVocoder extends AudioSource {
 			}
 
 			//compute magnitude from real and imaginary components
-			out(2*i) = 2.*math.sqrt(re*re + im*im)
+			out(2*i) = math.sqrt(re*re + im*im)
 
 			// compute phase from real and imaginary components
 			phase = math.atan2(im,re)		//Important to have the negative sign for correct phase
@@ -137,14 +138,18 @@ class PhaseVocoder extends AudioSource {
 			phaseDiff = phaseDiff/expPhaseDiff  // 2.0*math.Pi*hopFactor
 
 			//compute the i-th partials' true frequency
-			out(2*i+1) = phaseDiff*resolution + i*resolution
+			if( !convert ){
+				out(2*i+1) = phase
+			} else {
+				out(2*i+1) = phaseDiff*resolution + i*resolution
+			}
 		}
 		out
 	}
 
 	def unconvertMagPhase(win:Array[Float]):Array[Float] = {
 
-		if(!convert) return win
+		// if(!convert) return win
 		var (phase, phaseDiff) = (0.f,0.f)
 		var expPhaseDiff = 2.0*math.Pi*hopFactor
 		var resolution = 44100.f / length
@@ -171,16 +176,18 @@ class PhaseVocoder extends AudioSource {
 
 			// accumulate delta phase to get bin phase
 			phaseAccum(i) += phaseDiff 
-			phaseDiff = phaseAccum(i)
+
+			if(!convert) phase = win(2*i+1)
+			else phase = phaseAccum(i)
 
 			// get real and imag part
 			if( i < length/2){
-				out(2*i) = win(2*i)*math.cos(phaseDiff)
-				out(2*i+1) = win(2*i)*math.sin(phaseDiff)
-				// if( i == 0) println(s"bin 0 im: ${out(1)}, phasediff: $phaseDiff")
+				out(2*i) = win(2*i)*math.cos(phase)
+				out(2*i+1) = win(2*i)*math.sin(phase)
+				// if( i == 0) println(s"bin 0 im: ${out(1)}, phasediff: $phase")
 			} else {
-				out(1) = win(2*i)*math.cos(phaseDiff)
-				// println(s"bin l/2 im: ${win(2*i)*math.sin(phaseDiff)}, phasediff: $phaseDiff")
+				out(1) = win(2*i)*math.cos(phase)
+				// println(s"bin l/2 im: ${win(2*i)*math.sin(phase)}, phasediff: $phase")
 			}
 		}
 		out
@@ -188,13 +195,14 @@ class PhaseVocoder extends AudioSource {
 
 	def shiftPitch(data:Array[Float]): Array[Float] = {
 
-		if(!convert) return data
+		// if(!convert) return data
 		val out = new Array[Float](length+2)
 		for (i <- (0 to length/2)){ 
 			var index = math.max((i*pitchShift).toInt,0)
 			if (index <= length/2) { 
-				out(2*index) += data(2*i) 
-				out(2*index+1) =  data(2*i+1) * pitchShift
+				out(2*index) += data(2*i)
+				if(!convert) out(2*index+1) =  data(2*i+1)
+				else out(2*index+1) =  data(2*i+1) * pitchShift
 			} 
 		}
 		out
@@ -313,13 +321,17 @@ class Spectrogram extends Drawable {
 		numBins = data(0).length / 2
 
 		pix = new Pixmap(numWin,numBins, Pixmap.Format.RGBA8888)
+		pix.setColor(1,1,1,1)
+		// pix.fill()
 		for( x <- (0 until numWin); y <- (0 until numBins)){
 			val (re,im) = (data(x)(2*y),data(x)(2*y+1)) // re/im or mag/phase
 			val mag = (if(complex) math.sqrt(re*re+im*im) else re)
 			val c = math.max(1.0 - mag,0.f)
+			// val c = 20*math.log10(mag/numBins)
 			val f = math.min((im / 22050.f * numBins),numBins-1)
 			pix.setColor(c,c,c,c)
-			pix.drawPixel(x,y) //f.toInt)
+			if(complex) pix.drawPixel(x,y) //f.toInt)
+			else pix.drawPixel(x,y) //f.toInt)
 		}
 
 		texture = new GdxTexture(pix)

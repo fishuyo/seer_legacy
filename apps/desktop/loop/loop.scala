@@ -30,8 +30,9 @@ object Main extends App with Animatable{
 
   for( i<-(-2 to 2)){
     val offset = Vec3(0,2.5f,0)
-    var m = Model(Quad.asLines()).translate(offset*i)
-    m.color = RGBA(0,0,0,1)
+    // var m = Model(Quad.asLines()).translate(offset*i)
+    var m = Plane().translate(offset*i)
+    m.color = RGBA(.9,.9,.9,1.)
     buttons.addChild(m) //translate( offset * i)
     // m.addPrimitive( Quad.asLines() )
     i match {
@@ -88,7 +89,7 @@ object Main extends App with Animatable{
 
   override def draw(){
     live.draw()
-    buttons.draw()
+    // buttons.draw()
   }
 
 }

@@ -30,7 +30,16 @@ Keyboard.bind("y",lambda{
 		looper.loops.apply(l).vocoderActive(false)
 	else
 		looper.loops.apply(l).analyze() 
+		looper.loops.apply(l).vocoder.timeShift(1.0) 
+		looper.loops.apply(l).vocoder.pitchShift(1.0) 
 		looper.loops.apply(l).vocoderActive(true)
+	end
+})
+Keyboard.bind("u",lambda{
+	if(looper.loops.apply(l).vocoder.convert)
+		looper.loops.apply(l).vocoder.convert(false)
+	else
+		looper.loops.apply(l).vocoder.convert(true)
 	end
 })
 

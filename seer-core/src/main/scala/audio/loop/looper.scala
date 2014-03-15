@@ -13,8 +13,6 @@ class Looper extends AudioSource with Drawable {
 	var loops = List[Loop]()
 	var plots = List[AudioDisplay]()
 	var spects = List[Spectrogram]()
-
-	for( i<-(0 until 8)) newLoop
 	
 	var master = 0
 	var mode = "free" // free, sync, sequenced
@@ -117,6 +115,10 @@ class Looper extends AudioSource with Drawable {
 	}
 
 	def rewindAll(){ loops.foreach( _.rewind ) }
+
+	override def init(){
+		for( i<-(0 until 8)) newLoop
+	}
 
 	override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
 

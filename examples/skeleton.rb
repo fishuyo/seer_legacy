@@ -38,7 +38,7 @@ class Skel
 		OSC.connect("192.168.0.255", 8008)
 		# OSC.connect("192.168.1.255", 8008)
 
-		Main.drawFabric(false)
+		Main.drawFabric(true)
 
 		OSC.bind("/new_user", lambda{|f| puts "new user"; Main.skeletons.apply(f[0]).calibrating(true) })
 		OSC.bind("/user/1", lambda{|f| Main.skeletons.apply(0).loadingModel.pose.pos.set(2*f[0]-1,1-f[1],f[2]) })
@@ -58,9 +58,9 @@ class Skel
 			x=2*f[2]-1
 			y=1.0-f[3]
 			z=f[4]
-			# j.pose.pos.set(2*f[2]-1,(1.0-f[3]),f[4])
+			j.pose.pos.set(2*f[2]-1,(1.0-f[3]),f[4])
 			pos = Vec3.new(x,y,z)
-			j.apply(pos)
+			# j.apply(pos)
 			# puts j.vel.mag if f[0] == "l_hand"
 			id = 1
 			if f[0] == "head"
