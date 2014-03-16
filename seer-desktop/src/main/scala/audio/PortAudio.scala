@@ -87,12 +87,12 @@ object PortAudio {
         var file = Gdx.files.external(path).file()
         outFile = AudioFile.openWrite(file, outSpec)
         recording = true
-        println("Audio recording started..")
+        println("PortAudio recording started..")
       } catch { case e:Exception => println(e) }
     } else {
       recording = false
       outFile.close
-      println("Audio recording stopped.")
+      println("PortAudio recording stopped.")
     }
   }
   

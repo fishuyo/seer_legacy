@@ -135,7 +135,7 @@ object SeerBuild extends Build {
     "seer-allosphere",
     file("seer-allosphere"),
     settings = Settings.desktop
-  ) dependsOn seer_core
+  ) dependsOn ( seer_core, seer_desktop )
 
   lazy val seer_sensors = Project (
     "seer-sensors",
@@ -191,7 +191,7 @@ object SeerBuild extends Build {
     "examples-particleSystems",
     file("examples/particleSystems"),
     settings = Settings.desktop
-  ) dependsOn seer_desktop
+  ) dependsOn( seer_desktop, seer_opencv )
 
   lazy val examples_kinect = Project (
     "examples-kinect",

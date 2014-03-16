@@ -3,6 +3,7 @@ package com.fishuyo.seer
 package video
 
 import graphics._
+import io._
 
 import java.awt.image.BufferedImage
 
@@ -160,6 +161,24 @@ object ScreenCapture extends Animatable {
     
   }
   
+}
+
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.Input.Keys
+object ScreenCaptureKey extends InputAdapter {
+
+  override def keyDown(k:Int) = {
+    
+    k match {
+      case Keys.F2 => 
+        ScreenCapture.toggleRecord
+      case Keys.F3 => 
+        audio.Audio.toggleRecording()
+        ScreenCapture.toggleRecord
+      case _ => false
+    }
+    false
+  }
 }
 
 

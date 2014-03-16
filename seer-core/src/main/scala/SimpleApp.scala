@@ -19,18 +19,19 @@ import com.badlogic.gdx.graphics.Mesh
 // import scala.actors.Actor
 // import scala.actors.Actor._
 
-object SimpleAppSize {
-  val width = 800
-  val height = 800
-  val aspect = width * 1.f / height
+object Window {
+  def width = Gdx.graphics.getWidth()
+  def height = Gdx.graphics.getHeight()
+  var w0 = 800
+  var h0 = 800
+  var a0 = 1.f
 }
-
 
 class SimpleAppListener extends ApplicationListener {
 
-  var width = SimpleAppSize.width
-  var height = SimpleAppSize.height
-  var aspect = SimpleAppSize.aspect
+  var width = Window.w0
+  var height = Window.h0
+  var aspect = Window.a0
 
   var scene = Scene
   var camera = Camera //new PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)

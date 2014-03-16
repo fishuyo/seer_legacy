@@ -1,25 +1,23 @@
 package com.fishuyo.seer
 
 import io._
-import audio.PortAudio
+import audio._
+// import audio.PortAudio
 
 import com.badlogic.gdx.utils.GdxNativesLoader
 import com.badlogic.gdx.utils.SharedLibraryLoader
 import com.badlogic.gdx.backends.lwjgl._
-import com.badlogic.gdx._
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input.Keys
 
 import org.lwjgl.opengl.Display
+import org.lwjgl.opengl.AWTGLCanvas
+
 import java.awt._
 import java.awt.event._
-
-object Window {
-  def width = Gdx.graphics.getWidth()
-  def height = Gdx.graphics.getHeight()
-}
 
 object SimpleAppRun {
 
@@ -82,9 +80,9 @@ object SimpleAppRun {
 
     val cfg = new LwjglApplicationConfiguration()
     cfg.title = "seer"
-    // cfg.useGL30 = true
-    cfg.width = SimpleAppSize.width
-    cfg.height = SimpleAppSize.height
+    cfg.useGL30 = true
+    cfg.width = Window.w0
+    cfg.height = Window.h0
 
     usingCanvas = useCanvas
 
@@ -92,6 +90,7 @@ object SimpleAppRun {
       frame = new Frame
       frame.setLayout(new BorderLayout())
       canvas = new Canvas
+      // canvas = new AWTGLCanvas
 
       frame.add(canvas, BorderLayout.CENTER)
       frame.setSize(cfg.width, cfg.height)
@@ -173,7 +172,7 @@ object SimpleAppRun {
     }else{
 
       if( fullscreen ){
-        Gdx.graphics.setDisplayMode( SimpleAppSize.width, SimpleAppSize.height, false)
+        Gdx.graphics.setDisplayMode( Window.w0, Window.h0, false)
       }else{
         Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
       }
@@ -205,6 +204,9 @@ object FullscreenKey extends InputAdapter {
     
     k match {
       case Keys.ESCAPE => SimpleAppRun.toggleFullscreen
+      case Keys.F1 => 
+        if( PortAudio.sources.length > 0) PortAudio.toggleRecording()
+        else Audio.toggleRecording()
       case _ => false
     }
     false

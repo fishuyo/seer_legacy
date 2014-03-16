@@ -47,7 +47,8 @@ object Main extends App with Animatable{
   // s.particles.takeRight(10).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
   // val cube = Model(s)
 
-  val cube = Model(Plane())
+  val cube = Model(Cube())
+  // cube.color.set(1,0,0,1)
   // cube.material = new BasicMaterial
   cube.material.textureMix = 1.f
   Scene.push(cube)
@@ -79,10 +80,10 @@ object Main extends App with Animatable{
 
     pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
     bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
-    // cube.scale.set(1.f, (h/w).toFloat, 1.f)
-  	cube.translate(0,0,-1.f) //.set(1.f, (h/w).toFloat, 1.f)
+    cube.scale.set(1.f, (h/w).toFloat, 1.f)
+  	// cube.translate(0,0,-1.f) //.set(1.f, (h/w).toFloat, 1.f)
 
-    SceneGraph.root.camera = new OrthographicCamera(800,800)
+    // SceneGraph.root.camera = new OrthographicCamera(800,800)
 
   	tId = Texture(pix)
   }
@@ -109,16 +110,14 @@ object Main extends App with Animatable{
   }
 
   override def draw(){
-
     Shader.lightingMix = 0.f
   	Shader.textureMix = 1.f
   	Texture.bind(0)
   	cube.draw()
-
   }
 
   override def animate(dt:Float){
-
+ 
     s.animate(dt)
 
     if( dirty ){  // resize everything if using sub image

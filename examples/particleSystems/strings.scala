@@ -19,6 +19,9 @@ object Main extends App with Animatable{
 
   SimpleAppRun.loadLibs()
   Scene.push(this)
+  Inputs.addProcessor(video.ScreenCaptureKey)
+
+
 
   val strings = ListBuffer[String]()
   for( i<-(0 until 5)) strings += new String(Vec3(), .5f, .01f, 1.0f)

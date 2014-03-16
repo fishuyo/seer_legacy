@@ -149,7 +149,7 @@ class AudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channels:
 
   var outFile:AudioFile = null
 
-  val sources = new ListBuffer[AudioSource]
+  // val sources = new ListBuffer[AudioSource]
 
   override def preStart(){}
 
@@ -177,7 +177,7 @@ class AudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channels:
           for( i <- (0 until bufferSize)) out(c)(i) = 0.f
 
         // call audio callbacks
-        sources.foreach( _.audioIO(in(inRead),out,channels,bufferSize) )
+        Audio.sources.foreach( _.audioIO(in(inRead),out,channels,bufferSize) )
 
         // if playThru set add input to output
         if( playThru ) AudioPass.audioIO(in(inRead),out,channels,bufferSize)
@@ -253,7 +253,7 @@ class AudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channels:
 
   }
 
-  def push(o:AudioSource) = sources += o
+  def push(o:AudioSource) = Audio.sources += o
 }
 
 

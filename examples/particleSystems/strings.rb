@@ -72,11 +72,11 @@ class StringTest
 			z=f[4]
 			len=z*0.01
 
-			pos = Vec3.new(x,y,0)
+			pos = Vec3.new(x,y,z)
 
 			if f[0] == "r_hand"
-				Main.strings[0].pins[0].q.position.lerpTo( pos, 0.1)
-				Main.strings[0].links.foreach(lambda{|l| l.length(len) })
+				# Main.strings[0].pins[0].q.position.lerpTo( pos, 0.1)
+				# Main.strings[0].links.foreach(lambda{|l| l.length(len) })
 			elsif f[0] == "r_elbow"
 			elsif f[0] == "r_shoulder"
 			elsif f[0] == "l_hand"
