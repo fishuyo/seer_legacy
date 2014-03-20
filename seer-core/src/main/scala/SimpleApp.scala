@@ -46,7 +46,7 @@ class SimpleAppListener extends ApplicationListener {
 
   var frameCount = 0
   val fps = new FPSLogger
-  var logfps = true
+  var logfps = false
 
   var dtAccum = 0.f
   var paused = false

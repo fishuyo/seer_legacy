@@ -2,6 +2,8 @@ package com.fishuyo.seer
 
 import io._
 import audio._
+import graphics._
+import dynamic._
 // import audio.PortAudio
 
 import com.badlogic.gdx.utils.GdxNativesLoader
@@ -211,4 +213,13 @@ object FullscreenKey extends InputAdapter {
     }
     false
   }
+}
+
+class SeerApp extends App with Animatable {
+  SimpleAppRun.loadLibs()
+  Scene.push(this)
+  SimpleAppRun()
+  // Repl.repl.intp.addImports(this.getClass.getName.replace("$",""))
+  Repl.actor ! "start"
+
 }

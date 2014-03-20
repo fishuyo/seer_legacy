@@ -2,6 +2,8 @@ import sbt._
 
 import Keys._
 
+import com.typesafe.sbt.SbtNativePackager._
+
 import seer.unmanaged._
 
 // import org.scalasbt.androidplugin._
@@ -34,7 +36,8 @@ object Settings {
       "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
       "org.jruby" % "jruby" % "1.7.3",
       "net.java.dev.jna" % "jna" % "3.5.2",
-      "com.scalarx" % "scalarx_2.10" % "0.1"
+      "com.scalarx" % "scalarx_2.10" % "0.2.3"
+
       //"xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
     ),
@@ -48,9 +51,15 @@ object Settings {
 
   lazy val desktop = Settings.common ++ Seq (
     fork in Compile := true,
+    // connectInput in Compile := true,
+    // fork in run := true,
+    // connectInput in run := true,
+    // run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)) ,
     libraryDependencies ++= Seq(
       "com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
-      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT"
+      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT",
+      "org.scala-lang" % "scala-compiler" % "2.10.2",
+      "org.scala-lang" % "jline" % "2.10.2"
     )
   )
 
@@ -217,14 +226,14 @@ object SeerBuild extends Build {
     "experiments",
     file("experiments"),
     settings = Settings.desktop
-  ) dependsOn( seer_desktop, seer_opencv )
+  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere )
 
 
   // apps
   lazy val loop = Project (
     "loop",
     file("apps/desktop/loop"),
-    settings = Settings.desktop
+    settings = packageArchetype.java_application ++ Settings.desktop
   ) dependsOn( seer_desktop )
 
   lazy val trees = Project (
