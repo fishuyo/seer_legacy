@@ -4,6 +4,7 @@ package audio
 
 import maths._
 import graphics._
+import util._
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
@@ -52,6 +53,7 @@ class PhaseVocoder extends AudioSource {
 	var nextWindow = 0.f
 	var timeShift = 1.f
 	var pitchShift = 1.f
+	var gain = 1.f
 
 	var update = false
 
@@ -60,6 +62,7 @@ class PhaseVocoder extends AudioSource {
 
 	def timeShift(f:Float){ timeShift = f}
 	def pitchShift(f:Float){ pitchShift = f}
+	def gain(f:Float){ gain = f}
 
 	def clear(){ spectrumData = null }
 
@@ -96,7 +99,7 @@ class PhaseVocoder extends AudioSource {
 		// if(!convert) return win
 		var (phase, phaseDiff) = (0.f,0.f)
 		var expPhaseDiff = 2.0*math.Pi*hopFactor
-		var resolution = 44100.f / length
+		var freqPerBin = 44100.f / length
 
 		val out = new Array[Float](length+2)
 
@@ -119,7 +122,7 @@ class PhaseVocoder extends AudioSource {
 			out(2*i) = math.sqrt(re*re + im*im)
 
 			// compute phase from real and imaginary components
-			phase = math.atan2(im,re)		//Important to have the negative sign for correct phase
+			phase = math.atan2(im,re)
 
 			// get phase difference
 			phaseDiff = phase - prevPhase(i)
@@ -141,7 +144,7 @@ class PhaseVocoder extends AudioSource {
 			if( !convert ){
 				out(2*i+1) = phase
 			} else {
-				out(2*i+1) = phaseDiff*resolution + i*resolution
+				out(2*i+1) = phaseDiff*freqPerBin + i*freqPerBin
 			}
 		}
 		out
@@ -152,7 +155,7 @@ class PhaseVocoder extends AudioSource {
 		// if(!convert) return win
 		var (phase, phaseDiff) = (0.f,0.f)
 		var expPhaseDiff = 2.0*math.Pi*hopFactor
-		var resolution = 44100.f / length
+		var freqPerBin = 44100.f / length
 
 		val out = new Array[Float](length)
 
@@ -163,10 +166,10 @@ class PhaseVocoder extends AudioSource {
 			phaseDiff = win(2*i+1)
 
 			// subtract bin mid frequency
-			phaseDiff -= i*resolution
+			phaseDiff -= i*freqPerBin
 
 			// get bin deviation from freq deviation
-			phaseDiff /= resolution
+			phaseDiff /= freqPerBin
 
 			// take hopFactor into account
 			phaseDiff = phaseDiff*expPhaseDiff
@@ -195,8 +198,10 @@ class PhaseVocoder extends AudioSource {
 
 	def shiftPitch(data:Array[Float]): Array[Float] = {
 
-		// if(!convert) return data
 		val out = new Array[Float](length+2)
+
+		// for each bin shift bin indices up by pitch scale amount
+		// if converting to actually frequency also scale the frequency
 		for (i <- (0 to length/2)){ 
 			var index = math.max((i*pitchShift).toInt,0)
 			if (index <= length/2) { 
@@ -211,28 +216,23 @@ class PhaseVocoder extends AudioSource {
 	def resynth(index:Float) = {
 
 		//Copy samples from last buffer
-		// memcpy(output[0], prevBuffer, sizeof(float)*fft.length);
-		// zeromem(prevBuffer, sizeof(float)*fft.length);
-		
-		// float scale = 1.0 / (float)fft.length;
-		// int totOverlap = fft.length/fft.hopSize; //timeShift * fft.length / fft.hopSize;
-		//if(totOverlap <= 0) totOverlap = 1;
-
 		val out = prevBuffer
 		prevBuffer = new Array[Float](length)
 
 		// for each overlapping window accumulate resynthesis
 		for( overlap <- (0 until length/hopSize)){
+
 			var win = (index.toInt + overlap) % numWindows
 			if( win == 0 ) phaseAccum = new Array[Float](length/2+1)
 
 			var data:Array[Float] = null
-			try{
-				data = spectrumData(win).clone
-			} catch { case e:Exception => println(e); println(s"fft win index: $win")}
+			try{ data = spectrumData(win).clone }
+			catch { case e:Exception => println(e); println(s"fft win index: $win")}
+
 			val shifted = shiftPitch(data)
 			val spect = unconvertMagPhase(shifted)
 			FFT.reverse(spect)
+
 			// val shifted = Array.concat( spect.takeRight(length/2), spect.take(length/2))
 			val windowed = spect zip FFT.window map { case (a,b) => a*b }
 
@@ -283,8 +283,9 @@ class PhaseVocoder extends AudioSource {
   	if( spectrumData == null ) return
   	val o = resynth(nextWindow)
 	  for( i <- (0 until numSamples)){
-      out(0)(i) += o(i)
-      out(1)(i) += o(i)
+	  	val s = gain*o(i)
+      out(0)(i) += s
+      out(1)(i) += s
     }
 
 		nextWindow += timeShift * (length/hopSize)
@@ -327,8 +328,8 @@ class Spectrogram extends Drawable {
 			val (re,im) = (data(x)(2*y),data(x)(2*y+1)) // re/im or mag/phase
 			val mag = (if(complex) math.sqrt(re*re+im*im) else re)
 			val c = math.max(1.0 - mag,0.f)
-			// val c = 20*math.log10(mag/numBins)
-			val f = math.min((im / 22050.f * numBins),numBins-1)
+			// val c = clamp(1.f-(10*math.log10(mag)),0.f,1.f)
+			// val f = math.min((im / 22050.f * numBins),numBins-1)
 			pix.setColor(c,c,c,c)
 			if(complex) pix.drawPixel(x,y) //f.toInt)
 			else pix.drawPixel(x,y) //f.toInt)

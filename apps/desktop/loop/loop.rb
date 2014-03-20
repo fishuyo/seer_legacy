@@ -129,6 +129,8 @@ Trackpad.bind( lambda{ |i,f|
 		q = quat2 * quat1
 
 		looper.loops.apply(l).vocoder.timeShift(f[10]*8.0-4.0)
+		looper.loops.apply(l).vocoder.pitchShift(f[8]*4.0)
+		looper.loops.apply(l).vocoder.gain(f[6])
 
 		# looper.plots[l].pose.quat.set(q)
 
@@ -148,6 +150,8 @@ Trackpad.bind( lambda{ |i,f|
 		
 		# looper.loops.apply(l).vocoder.timeShift(1.0) #f[8]*8.0-4.0)
 		looper.loops.apply(l).vocoder.pitchShift(f[8]*4.0)
+		looper.loops.apply(l).vocoder.gain(f[6])
+
 
 		down =false
 	elsif i == 1
