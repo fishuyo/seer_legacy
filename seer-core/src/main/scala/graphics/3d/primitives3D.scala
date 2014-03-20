@@ -69,25 +69,25 @@ object Sphere extends Primitive {
 
 }
 class Sphere extends Model {
-  var mesh = Sphere.generateMesh()
-  addPrimitive(mesh)
+  mesh = Sphere.generateMesh()
 }
 
 object Cube extends Primitive {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
-  def generateMesh( mesh:Mesh ):Mesh = {
+  def generateMesh( mesh:Mesh, l:Float=0.5f ):Mesh = {
     mesh.primitive = Triangles
     for( n<-(0 to 2); i<-List(-1,1); j<-List(-1,1); k<-List(-1,1)){
       val u = (j+1)/2
       val v = (1-k)/2
+      val (x,y,z) = (i*l,j*l,k*l)
       mesh.texCoords += Vec2(u,v)      
       n match {
-        case 0 => mesh.vertices += Vec3(i,j,k)  // left/right
+        case 0 => mesh.vertices += Vec3(x,y,z)  // left/right
                   mesh.normals += Vec3(i,0,0)
-        case 1 => mesh.vertices += Vec3(k,i,j)  // top/bottom
+        case 1 => mesh.vertices += Vec3(z,x,y)  // top/bottom
                   mesh.normals += Vec3(0,i,0)
-        case 2 => mesh.vertices += Vec3(j,k,i)  // front/back
+        case 2 => mesh.vertices += Vec3(y,z,x)  // front/back
                   mesh.normals += Vec3(i,0,0)
       }
     }
@@ -100,8 +100,134 @@ object Cube extends Primitive {
   }
 }
 class Cube extends Model {
-  var mesh = Cube.generateMesh()
-  addPrimitive(mesh)
+  mesh = Cube.generateMesh()
+}
+
+object Tetrahedron extends Primitive {
+
+  override def generateMesh():Mesh = generateMesh(new Mesh())
+  def generateMesh( mesh:Mesh, l:Float = math.sqrt(1.f/3) ):Mesh = {
+    mesh.primitive = Triangles
+    mesh.vertices += Vec3(l,l,l)
+    mesh.vertices += Vec3(-l,l,-l)
+    mesh.vertices += Vec3(l,-l,-l)
+    mesh.vertices += Vec3(-l,-l,l)
+    
+    mesh.indices ++= List(0,2,1, 0,1,3, 1,2,3, 2,0,3)
+    mesh.wireIndices ++= List(0,2,2,1,1,0, 0,3,1,3,2,3)
+
+    // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
+    mesh.recalculateNormals
+    mesh
+  }
+}
+class Tetrahedron extends Model {
+  mesh = Tetrahedron.generateMesh()
+}
+
+object Octahedron extends Primitive {
+
+  override def generateMesh():Mesh = generateMesh(new Mesh())
+  def generateMesh( mesh:Mesh, l:Float = 1.f ):Mesh = {
+    mesh.primitive = Triangles
+    mesh.vertices += Vec3(l,0,0)
+    mesh.vertices += Vec3(0,l,0)
+    mesh.vertices += Vec3(0,0,l)
+    mesh.vertices += Vec3(-l,0,0)
+    mesh.vertices += Vec3(0,-l,0)
+    mesh.vertices += Vec3(0,0,-l)
+    
+    mesh.indices ++= List(0,1,2, 1,3,2, 3,4,2, 4,0,2,
+                          1,0,5, 3,1,5, 4,3,5, 0,4,5)
+
+    // mesh.wireIndices ++= List(0,2,2,1,1,0, 0,3,1,3,2,3)
+
+    // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
+    mesh.recalculateNormals
+    mesh
+  }
+}
+class Octahedron extends Model {
+  mesh = Octahedron.generateMesh()
+}
+
+object Dodecahedron extends Primitive {
+
+  override def generateMesh():Mesh = generateMesh(new Mesh())
+  def generateMesh( mesh:Mesh ):Mesh = {
+    mesh.primitive = Triangles
+    val a = 1.6f * 0.5f;
+    val b = 1.6f / (2 * Phi);
+    mesh.vertices ++= List(
+      Vec3(0, b,-a),  Vec3(b, a, 0), Vec3(-b, a, 0), //  0  1  2
+      Vec3(0, b, a),  Vec3(0,-b, a), Vec3(-a, 0, b), //  3  4  5
+      Vec3(a, 0, b),  Vec3(0,-b,-a), Vec3(a, 0,-b), //  6  7  8
+      Vec3(-a, 0,-b), Vec3(b,-a, 0), Vec3(-b,-a, 0)  //  9 10 11
+    )
+
+    mesh.indices ++= List(
+       1, 0, 2,  2, 3, 1,  4, 3, 5,  6, 3, 4,
+       7, 0, 8,  9, 0, 7, 10, 4,11, 11, 7,10,
+       5, 2, 9,  9,11, 5,  8, 1, 6,  6,10, 8,
+       5, 3, 2,  1, 3, 6,  2, 0, 9,  8, 0, 1,
+       9, 7,11, 10, 7, 8, 11, 4, 5,  6, 4,10
+    )
+
+    // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
+    mesh.recalculateNormals
+    mesh
+  }
+}
+class Dodecahedron extends Model {
+  mesh = Dodecahedron.generateMesh()
+}
+
+object Icosahedron extends Primitive {
+
+  override def generateMesh():Mesh = generateMesh(new Mesh())
+  def generateMesh( mesh:Mesh ):Mesh = {
+    mesh.primitive = Triangles
+    mesh.vertices ++= List(
+      Vec3(-0.57735, -0.57735, 0.57735),
+      Vec3(0.934172,  0.356822, 0),
+      Vec3(0.934172, -0.356822, 0),
+      Vec3(-0.934172, 0.356822, 0),
+      Vec3(-0.934172, -0.356822, 0),
+      Vec3(0,  0.934172,  0.356822),
+      Vec3(0,  0.934172,  -0.356822),
+      Vec3(0.356822,  0,  -0.934172),
+      Vec3(-0.356822,  0,  -0.934172),
+      Vec3(0,  -0.934172,  -0.356822),
+      Vec3(0,  -0.934172,  0.356822),
+      Vec3(0.356822,  0,  0.934172),
+      Vec3(-0.356822,  0,  0.934172),
+      Vec3(0.57735,  0.57735,  -0.57735),
+      Vec3(0.57735,  0.57735, 0.57735),
+      Vec3(-0.57735,  0.57735,  -0.57735),
+      Vec3(-0.57735,  0.57735,  0.57735),
+      Vec3(0.57735,  -0.57735,  -0.57735),
+      Vec3(0.57735,  -0.57735,  0.57735),
+      Vec3(-0.57735,  -0.57735,  -0.57735)
+    )
+
+    mesh.indices ++= List(
+      18, 2, 1, 11,18, 1, 14,11, 1,  7,13, 1, 17, 7, 1,
+       2,17, 1, 19, 4, 3,  8,19, 3, 15, 8, 3, 12,16, 3,
+       0,12, 3,  4, 0, 3,  6,15, 3,  5, 6, 3, 16, 5, 3,
+       5,14, 1,  6, 5, 1, 13, 6, 1,  9,17, 2, 10, 9, 2,
+      18,10, 2, 10, 0, 4,  9,10, 4, 19, 9, 4, 19, 8, 7,
+       9,19, 7, 17, 9, 7,  8,15, 6,  7, 8, 6, 13, 7, 6,
+      11,14, 5, 12,11, 5, 16,12, 5, 12, 0,10, 11,12,10,
+      18,11,10
+    )
+
+    // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
+    mesh.recalculateNormals
+    mesh
+  }
+}
+class Icosahedron extends Model {
+  mesh = Icosahedron.generateMesh()
 }
 
 
@@ -149,8 +275,7 @@ object Cylinder extends Primitive {
   }
 }
 class Cylinder extends Model {
-  var mesh = Cylinder.generateMesh()
-  addPrimitive(mesh)
+  mesh = Cylinder.generateMesh()
 }
 
 

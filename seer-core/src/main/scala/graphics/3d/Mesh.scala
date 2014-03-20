@@ -123,17 +123,31 @@ class Mesh extends Drawable {
 	}
 
 	def recalculateNormals(){
-		if( indices.length > 0){
+		// make sure normals same size as vertices
+		if( normals.length < vertices.length){
+			normals.clear()
+			vertices.foreach( (v) => normals += Vec3())
+		}
 
+		// if indices present
+		if( indices.length > 0 && primitive == Triangles ){
+
+			val count = new Array[Float](vertices.length)
+			// for each face (3 indices)
 	  	val l = indices.grouped(3)
-		  
 		  l.foreach( (xs) => {
-		  	val v = xs.map(vertices(_))
-		  	val n = (v(1)-v(0) cross v(2)-v(0)).normalize
-		  	xs.foreach( normals(_).set(n) )
+		  	val vs = xs.map(vertices(_))
+		  	val n = (vs(1)-vs(0) cross vs(2)-vs(0)).normalize
+		  	xs.foreach( (x) => { // sum normals for vertex
+		  		normals(x) += n 
+		  		count(x) += 1 
+		  	})
 		  })
 
+		  normals.zip(count).foreach{ case (n,c) => n /= c }
+
 	  } else {
+	  	println("calc normals not implemented")
 
 	  	// val l = mesh.vertices.grouped(3)
 		  

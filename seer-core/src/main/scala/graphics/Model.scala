@@ -20,6 +20,7 @@ object Model {
   def apply(pos:Vec3) = new Model{ pose = Pose(pos,Quat()) }
   def apply(p:Pose=Pose(),s:Vec3=Vec3(1)) = new Model{pose=p;scale=s}
 
+  def apply(prim:Mesh) = { val m = new Model(); m.mesh = prim; m }
   def apply(prim:Drawable) = { val m = new Model(); m.addPrimitive(prim) }
 
   /** Makes recursive copy of Model */
@@ -40,7 +41,9 @@ class Model extends Drawable with geometry.Pickable {
   var shader = ""
 
   var children = Vector[Model]()
+  var mesh = Mesh() // simple
   var primitives = Vector[Drawable]()
+
   // var pickable = Vector[geometry.Pickable]()
 
   var worldTransform = new Matrix4
@@ -95,6 +98,7 @@ class Model extends Drawable with geometry.Pickable {
     Shader.setMaterial(material)
     Shader.setMatrices()
 
+    mesh.draw()
     primitives.foreach( _.draw() )
     children.foreach( _.draw() )
 

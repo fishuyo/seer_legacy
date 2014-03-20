@@ -8,8 +8,6 @@ import graphics._
 import maths._
 import spatial._
 
-
-
 import com.badlogic.gdx.utils.BufferUtils
 import com.badlogic.gdx.math.Matrix4
 
@@ -29,6 +27,13 @@ import java.io.DataInputStream
 import java.io.FileInputStream
 
 /* AlloSystem OmniStereo port */
+
+
+///	Abstract base class for any object that can be rendered via OmniStereo:
+trait OmniDrawable  {
+	/// Place drawing code here
+	def onDrawOmni(omni: OmniStereo){}
+}
 
 object OmniStereo {
 	var fovy = math.Pi
@@ -471,7 +476,7 @@ class OmniStereo(res:Int=1024, useMipMaps:Boolean=true) {
 	configure(WarpMode.FISHEYE)
 	configure(BlendMode.SOFTEDGE)
 
-	val mQuad = Quad()
+	val mQuad = Plane.generateMesh()
 	// mQuad.reset();
 	// mQuad.primitive(gl.TRIANGLE_STRIP);
 	// mQuad.texCoord	( 0, 0);
@@ -482,14 +487,6 @@ class OmniStereo(res:Int=1024, useMipMaps:Boolean=true) {
 	// mQuad.vertex	( 0, 1, 0);
 	// mQuad.texCoord	( 1, 1);
 	// mQuad.vertex	( 1, 1, 0);
-
-
-
-	///	Abstract base class for any object that can be rendered via OmniStereo:
-	trait OmniDrawable  {
-		/// Place drawing code here
-		def onDrawOmni(omni: OmniStereo){}
-	}
 
 	/// Encapsulate the trio of fractional viewport, warp & blend maps:
 	class Projection {

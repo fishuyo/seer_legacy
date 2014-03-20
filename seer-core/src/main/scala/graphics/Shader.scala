@@ -36,7 +36,7 @@ object Shader {
   var blend = false
 
   var lightingMix = 1.f
-  var lightPosition = Vec3(1,1,-2)
+  var lightPosition = Vec3(1,1,1)
   var lightAmbient = RGBA(.2f,.2f,.2f,1)
   var lightDiffuse = RGBA(.6f,.6f,.6f,1)
   var lightSpecular = RGBA(.4f,.4f,.4f,1)

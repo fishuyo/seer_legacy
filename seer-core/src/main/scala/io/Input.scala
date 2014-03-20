@@ -13,12 +13,10 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.input._
-import com.badlogic.gdx.math.Vector2
 
 import rx._
 
 class Input extends InputAdapter
-
 object Inputs extends InputMultiplexer
 
 object Keyboard extends InputAdapter {
@@ -33,7 +31,7 @@ object Keyboard extends InputAdapter {
 
 	// def non()() = {}
 
-	def clear() = { observing.foreach( _.active = false ); observing = List(); /*charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear();*/ Inputs.removeProcessor(this) }
+	def clear() = { observing.foreach( _.kill() ); observing = List(); /*charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear();*/ Inputs.removeProcessor(this) }
 	def use() = Inputs.addProcessor(this)
 
 	def bind( s:String, f:()=>Unit){
@@ -78,164 +76,6 @@ object Keyboard extends InputAdapter {
 		false
 	}
 }
-
-object Mouse extends InputAdapter {
-	type Callback = (Array[Int])=>Unit
-	var callbacks = Map[String,List[Callback]]()
-	callbacks += ("up" -> List())
-	callbacks += ("down" -> List())
-	callbacks += ("drag" -> List())
-	callbacks += ("move" -> List())
-	callbacks += ("scroll" -> List())
-
-	val x = Var(0)
-	val y = Var(0)
-	val id = Var(0)
-	val button = Var(0)
-	val scroll = Var(0)
-	val status = Var("up")
-
-	def non()() = {}
-
-	def clear() = { callbacks.keys.foreach(callbacks(_) = List()); Inputs.removeProcessor(this) }
-	def use() = Inputs.addProcessor(this)
-
-	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
-
-  override def touchUp( screenX:Int, screenY:Int, pointer:Int, but:Int) = {
-  	x() = screenX
-  	y() = screenY
-  	id() = pointer
-  	button() = but
-  	status() = "up"
-    try { callbacks("up").foreach( _(Array(screenX,screenY,pointer,but)) ) }
-    catch { case e:Exception => println(e) }
-    false
-  }
- 	override def touchDown( screenX:Int, screenY:Int, pointer:Int, but:Int) = {
- 		// println( com.badlogic.gdx.Gdx.input.getCurrentEventTime )
- 		x() = screenX
-  	y() = screenY
-  	id() = pointer
-  	button() = but
-  	status() = "down"
-    try{ callbacks("down").foreach( _(Array(screenX,screenY,pointer,but)) ) }
-    catch { case e:Exception => println(e) }
-    false
-	}
-  override def touchDragged( screenX:Int, screenY:Int, pointer:Int) = {
-  	x() = screenX
-  	y() = screenY
-  	id() = pointer
-  	status() = "drag"
-    try{ callbacks("drag").foreach( _(Array(screenX,screenY,pointer)) ) }
-    catch { case e:Exception => println(e) }
-    false
-  }
-
-  // mouse only
-  override def mouseMoved( screenX:Int, screenY:Int ) = {
-  	x() = screenX
-  	y() = screenY
-  	status() = "move"
-    try { callbacks("move").foreach( _(Array(screenX,screenY)) ) }
-    catch { case e:Exception => println(e) }
-    false
-  }
-  override def scrolled( amount:Int) = {
-  	scroll() = amount
-    try{ callbacks("scroll").foreach( _(Array(amount)) ) }
-    catch { case e:Exception => println(e) }
-    false
-  }
-}
-
-object Touch extends InputAdapter {
-	type Callback = (Int,Array[Float])=>Unit
-	var callbacks = Map[String,List[Callback]]()
-
-	val down = ListBuffer.fill(20)(false)
-  val pos = new Array[Vec3](20)
-
-	callbacks += ("multi" -> List()) // num [pos]
-	callbacks += ("tap" -> List())
-	callbacks += ("long" -> List())
-	callbacks += ("fling" -> List())
-	callbacks += ("pan" -> List())
-	callbacks += ("zoom" -> List())
-	callbacks += ("pinch" -> List())
-
-	class Gesture extends GestureDetector.GestureAdapter {
-		// override def touchDown (x:Float, y:Float, pointer:Int, button:Int) = {
-		// 	try { callbacks("up").foreach( _(screenX,screenY,pointer,button) ) }
-		// 	catch { case e:Exception => println(e) }
-	 //    false;
-	 //  }
-	  override def tap (x:Float, y:Float, count:Int, button:Int) = {
-			try { callbacks("tap").foreach( _(count,Array(x,y)) ) }
-			catch { case e:Exception => println(e) }
-			false;
-	  }
-	  override def longPress (x:Float, y:Float) = {
-			try { callbacks("long").foreach( _(0,Array(x,y)) ) }
-			catch { case e:Exception => println(e) }
-      false;
-	  }
-	  override def fling (velocityX:Float, velocityY:Float, button:Int) = {
-			try { callbacks("fling").foreach( _(button,Array(velocityX,velocityY)) ) }
-			catch { case e:Exception => println(e) }
-      false;
-	  }
-	  override def pan (x:Float, y:Float, deltaX:Float, deltaY:Float) = {
-			try { callbacks("pan").foreach( _(0,Array(x,y,deltaX,deltaY)) ) }
-			catch { case e:Exception => println(e) }
-      false;
-	  }
-	  override def zoom (originalDistance:Float, currentDistance:Float) = {
-			try { callbacks("zoom").foreach( _(0,Array(originalDistance,currentDistance)) ) }
-			catch { case e:Exception => println(e) }
-      false;
-	  }
-	  override def pinch (initialFirstPointer:Vector2, initialSecondPointer:Vector2, firstPointer:Vector2, secondPointer:Vector2) = {
-			try { callbacks("pinch").foreach( _(0,Array(initialFirstPointer.x,initialFirstPointer.y,initialSecondPointer.x,initialSecondPointer.y,firstPointer.x,firstPointer.y,secondPointer.x,secondPointer.y)) ) }
-			catch { case e:Exception => println(e) }
-      false;
-	  }
-	}
-	val gesture = new GestureDetector(new Gesture())
-
-	def non()() = {}
-
-	def clear() = { callbacks.keys.foreach(callbacks(_) = List()); Inputs.removeProcessor(this); Inputs.removeProcessor(gesture) }
-	def use() = { Inputs.addProcessor(this); Inputs.addProcessor(gesture) }
-
-	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
-
-  override def touchUp( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
-  	down(pointer) = false
-    false
-  }
- 	override def touchDown( screenX:Int, screenY:Int, pointer:Int, button:Int) = {
-  	down(pointer) = true
-  	pos(pointer) = Vec3(screenX,screenY,0.f)
-
-    val indices = down.zipWithIndex.collect{ case (true,i) => i }
-    val p = indices.map( pos(_) )
-    //val centroid = p.sum / p.length
-
-    val coords = p.flatMap( (v:Vec3) => List(v.x,v.y) )
-
-    try { callbacks("multi").foreach( _(p.length, coords.toArray) ) }
-		catch { case e:Exception => println(e) }
-    false
-	}
-  override def touchDragged( screenX:Int, screenY:Int, pointer:Int) = {
-  	touchDown(screenX,screenY,pointer,0);
-    false
-  }
-}
-
-
 
 class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
 
