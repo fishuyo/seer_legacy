@@ -51,3 +51,11 @@ class RGBA( rr:Float, gg:Float, bb:Float, var a:Float ) extends RGB(rr,gg,bb){
 
   override def toString() = "( " + r + " " + g + " " + b + " " + a + " )"
 }
+
+object HSV {
+  def apply(h:Float,s:Float,v:Float) = new HSV(h,s,v)
+}
+class HSV(var h:Float, var s:Float, var v:Float){
+
+}
+
