@@ -24,13 +24,22 @@ package object util{
 	//   v1*(1.f-t)+v2*t
 	// }
 
+	class AutoMapper(var outlow:Float, var outhigh:Float){
+		var (inl,inh) = (0.f,1.f)
+		def apply(v:Float) = {
+			if( v < inl) inl = v
+			if( v > inh) inh = v
+			map(v,inl,inh,outlow,outhigh)	
+		}
+	}
+	def automapper(outlow:Float,outhigh:Float) = new AutoMapper(outlow,outhigh)
+
 	@inline def map(value: Float, inlow: Float, inhigh: Float, outlow:Float, outhigh:Float): Float = {
-	  val tmp = value - inlow * (inhigh-inlow)
+	  val tmp = (value - inlow) / (inhigh-inlow)
 	  tmp*(outhigh-outlow) + outlow
 	}
 
 	@inline def lerp(v1:Float, v2:Float, t:Float): Float = {
 	  v1*(1.f-t)+v2*t
 	}
-
 }
