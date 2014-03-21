@@ -14,6 +14,7 @@ object Settings {
   lazy val common = Defaults.defaultSettings ++ Seq (
     version := "0.1",
     scalaVersion := "2.10.2",
+    exportJars := true,
     resolvers ++= Seq(
       "typesafe" at "http://repo.typesafe.com/typesafe/releases/",
       "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/",
@@ -49,8 +50,8 @@ object Settings {
     libraryDependencies += "xuggle" % "xuggle-xuggler" % "5.4"
   )
 
-  lazy val desktop = Settings.common ++ Seq (
-    fork in Compile := true,
+  lazy val desktop = packageArchetype.java_application ++ Settings.common ++ Seq (
+    // fork in Compile := true,
     // connectInput in Compile := true,
     // fork in run := true,
     // connectInput in run := true,
@@ -233,7 +234,7 @@ object SeerBuild extends Build {
   lazy val loop = Project (
     "loop",
     file("apps/desktop/loop"),
-    settings = packageArchetype.java_application ++ Settings.desktop
+    settings = Settings.desktop
   ) dependsOn( seer_desktop )
 
   lazy val trees = Project (

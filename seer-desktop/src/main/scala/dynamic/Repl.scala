@@ -4,8 +4,8 @@ package dynamic
 
 import scala.tools.nsc.interpreter._
 import scala.tools.nsc.Settings
-
-
+import java.io.CharArrayWriter
+import java.io.PrintWriter
 
 import akka.actor.Actor
 import akka.actor.Props
@@ -26,18 +26,31 @@ object Repl {
     }
   }
 
-  def start() = {
+  var inSBT = isRunFromSBT
+
+  def start(){ actor ! "start"}
+
+  def startNoActor() = {
   	val settings = new Settings
   	settings.Yreplsync.value = true
 
-  	//use when launching normally outside SBT
-  	// settings.usejavacp.value = true      
-
-  	//an alternative to 'usejavacp' setting, when launching from within SBT
-  	settings.embeddedDefaults[Repl.type]
+   // Different settings needed when running from SBT or normally
+    if (isRunFromSBT) {
+      settings.embeddedDefaults[Repl.type]
+    } else {
+      settings.usejavacp.value = true
+    }
 
   	repl.process(settings)
 	}
+
+  def isRunFromSBT = {
+    val c = new CharArrayWriter()
+    new Exception().printStackTrace(new PrintWriter(c))
+    val ret = c.toString().contains("at sbt.")
+    // println(s"Repl starting from sbt? $ret")
+    ret
+  }
 }
 
 class SeerILoop extends ILoop {
@@ -79,16 +92,18 @@ class SeerILoop extends ILoop {
 class ReplActor extends Actor {
   def receive = {
     case "start" => {
-	  	val settings = new Settings
-	  	settings.Yreplsync.value = true
+      val settings = new Settings
+      settings.Yreplsync.value = true
 
-	  	//use when launching normally outside SBT
-	  	// settings.usejavacp.value = true      
+     // Different settings needed when running from SBT or normally
+      if (Repl.inSBT) {
+        settings.embeddedDefaults[Repl.type]
+      } else {
+        settings.usejavacp.value = true
+      }
 
-	  	//an alternative to 'usejavacp' setting, when launching from within SBT
-	  	settings.embeddedDefaults[Repl.type]
-
-	  	Repl.repl.process(settings)
-		}
+      Repl.repl.process(settings)
+    }
   }
+
 }

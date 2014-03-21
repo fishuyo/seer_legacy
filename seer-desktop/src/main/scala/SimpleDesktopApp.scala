@@ -220,6 +220,6 @@ class SeerApp extends App with Animatable {
   Scene.push(this)
   SimpleAppRun()
   // Repl.repl.intp.addImports(this.getClass.getName.replace("$",""))
-  Repl.actor ! "start"
+  Repl.start() //actor ! "start"
 
 }

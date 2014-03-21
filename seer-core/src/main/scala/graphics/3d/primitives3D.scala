@@ -352,9 +352,9 @@ class Trace3D( var size:Int ) extends Drawable {
       mesh.update
       dirty = false
     }
-    if(smooth){
-      Gdx.gl.glEnable(GL10.GL_LINE_SMOOTH)
-    }
+    // if(smooth){
+      // Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH)
+    // }
     val thick = map(vel.mag, 0.f,0.01f,0.f,6.f)
     Gdx.gl.glLineWidth(thickness)
     model.draw()

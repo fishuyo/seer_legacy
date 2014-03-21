@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Map
 
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.Gdx
 
@@ -362,7 +362,7 @@ class SpringString( var pos:Vec3=Vec3(0), var length:Float=0.2f, var dist:Float=
     }
     mesh.setVertices(vertices,0,links.size*6)
     Gdx.gl.glLineWidth(8)
-    mesh.render( Shader(), GL10.GL_LINES)    
+    mesh.render( Shader(), GL20.GL_LINES)    
   }
 
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )

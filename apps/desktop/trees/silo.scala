@@ -16,10 +16,10 @@ import com.badlogic.gdx.Gdx
 import collection.mutable.ListBuffer
 
 
-object Main extends App with Animatable with AudioSource {
+object Main extends SeerApp with AudioSource {
 
-  SimpleAppRun.loadLibs()
-  Scene.push(this)
+  // SimpleAppRun.loadLibs()
+  // Scene.push(this)
   Audio.push(this)
   
   var mesh = Sphere.generateMesh(1.f,60)
@@ -33,14 +33,14 @@ object Main extends App with Animatable with AudioSource {
   var nmove = Vec3(0.f)
   var nrot = Vec3(0.f)
 
-  val live = new Ruby("silo.rb")
+  val live = new Ruby("apps/desktop/trees/silo.rb")
 
-  SimpleAppRun() 
+  // SimpleAppRun() 
 
   override def init(){
     tree.init()
     mesh.vertices.foreach( (v) => v += Random.vec3()*.01f )
-    mesh.update()
+    // mesh.update()
   }
   override def draw(){
     ground.draw()
@@ -51,7 +51,7 @@ object Main extends App with Animatable with AudioSource {
 
     Shader.bg.set(0,0,0,0)
     Shader.lightingMix = 0.0
-    live.animate(dt)
+    // live.animate(dt)
     // Kinect.animate(dt)
     tree.animate(dt)
   }

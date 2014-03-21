@@ -10,7 +10,7 @@
 // import scala.collection.mutable.ListBuffer
 
 // import com.badlogic.gdx._
-// import com.badlogic.gdx.graphics.GL10
+// import com.badlogic.gdx.graphics.GL20
 // import com.badlogic.gdx.graphics._
 // import com.badlogic.gdx.graphics.glutils.VertexBufferObject
 
@@ -93,9 +93,9 @@
 //     gl.glLineWidth( 1.f )
 //     //vbo.setVertices( vertices, 0, vertices.length )
 //     //vbo.bind
-//     //gl11.glDrawArrays( GL10.GL_LINES, 0, vertices.length)
+//     //gl11.glDrawArrays( GL20.GL_LINES, 0, vertices.length)
 //     mesh.setVertices(vertices)
-//     mesh.render( Shader(), GL10.GL_LINES)
+//     mesh.render( Shader(), GL20.GL_LINES)
     
 //   }
 //   //override def onDraw( gl: GL2) = particles.foreach( _.onDraw(gl) )
@@ -126,9 +126,9 @@
 //   var links = List[VParticle]()
 
 //   def draw(v: Array[Float], idx:Int) : Int = {
-//     //gl10.glColor4f(1.f,1.f,1.f,1.f)
+//     //GL20.glColor4f(1.f,1.f,1.f,1.f)
 //     //gl.glLineWidth( thick )
-//     //gli.begin( GL10.GL_LINES )
+//     //gli.begin( GL20.GL_LINES )
 //     var i = idx
 //     links.foreach( (n) => { //gli.vertex(pos.x, pos.y, pos.z); gli.vertex( n.pos.x, n.pos.y, n.pos.z ) } )
 //     //gli.end

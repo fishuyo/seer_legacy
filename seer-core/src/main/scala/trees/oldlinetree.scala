@@ -14,7 +14,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 
 object LineTrees extends Animatable {
 
@@ -117,7 +117,7 @@ class LineTree() extends Animatable {
     gl.glLineWidth( 1.f )
 
     mesh.setVertices(vertices)
-    mesh.render( Shader(), GL10.GL_LINES)
+    mesh.render( Shader(), GL20.GL_LINES)
 
   }
   override def animate(dt:Float) = {

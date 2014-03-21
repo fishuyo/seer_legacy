@@ -23,7 +23,7 @@
 // trait GLThis {
 //   def gli = GLImmediate.renderer
 //   def gl = Gdx.gl
-//   def gl10 = Gdx.gl10
+//   def GL20 = Gdx.GL20
 //   def gl11 = Gdx.gl11
 //   def gl20 = Gdx.gl20
 // }

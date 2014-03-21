@@ -10,7 +10,7 @@ import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL10
+// import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.FPSLogger
 import com.badlogic.gdx.graphics.glutils.{FrameBuffer=>GdxFrameBuffer}
 import com.badlogic.gdx.graphics.Pixmap
@@ -122,10 +122,10 @@ class SimpleAppListener extends ApplicationListener {
     }
     //Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH);
 
-    // Gdx.gl.glEnable(GL10.GL_CULL_FACE);
-    // Gdx.gl.glCullFace(GL10.GL_BACK);
+    // Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+    // Gdx.gl.glCullFace(GL20.GL_BACK);
     
-    // Gdx.gl.glDepthFunc(GL10.GL_LESS);
+    // Gdx.gl.glDepthFunc(GL20.GL_LESS);
     // Gdx.gl.glDepthMask(true);
 
     SceneGraph.render() //renderNodes.foreach( _.render )
@@ -165,7 +165,7 @@ class SimpleAppListener extends ApplicationListener {
     //     //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
     //     // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
     //     // scene.draw2()
-    //     quad.render(Shader(), GL10.GL_TRIANGLES)
+    //     quad.render(Shader(), GL20.GL_TRIANGLES)
     //   }
     //   Shader().end();
     // }

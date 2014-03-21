@@ -15,15 +15,15 @@ import util._
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 
 import collection.mutable.ListBuffer
 
 
-object Main extends App with Animatable with AudioSource {
+object Main extends SeerApp with AudioSource {
 
-  SimpleAppRun.loadLibs()
-  Scene.push(this)
+  // SimpleAppRun.loadLibs()
+  // Scene.push(this)
   //Scene.push(Kinect)
   
   var ground:Model = _
@@ -53,13 +53,13 @@ object Main extends App with Animatable with AudioSource {
   var nmove = Vec3(0.f)
   var nrot = Vec3(0.f)
 
-  val live = new Ruby("trees.rb")
+  val live = new Ruby("apps/desktop/trees/trees.rb")
 
   var theta = 0.f
   var dw = 0.f
   var blurDist = 0.1f
 
-  SimpleAppRun() 
+  // SimpleAppRun() 
 
   override def init(){
     ground = OBJ("res/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))

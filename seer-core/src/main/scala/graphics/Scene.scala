@@ -8,7 +8,7 @@ import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL10
+// import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 
@@ -232,7 +232,7 @@ class OutlineNode extends RenderNode {
     // if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
     // else Shader("secondPass").setUniformf("u_depth", 1.f)
 
-    quad.render(Shader(), GL10.GL_TRIANGLES)
+    quad.render(Shader(), GL20.GL_TRIANGLES)
     
     Shader().end();
   }

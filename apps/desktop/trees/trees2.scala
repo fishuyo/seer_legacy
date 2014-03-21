@@ -14,10 +14,10 @@ import util._
 import collection.mutable.ListBuffer
 
 
-object Main extends App with Animatable with AudioSource {
+object Main extends SeerApp with AudioSource {
 
-  SimpleAppRun.loadLibs()
-  Scene.push(this)
+  // SimpleAppRun.loadLibs()
+  // Scene.push(this)
   //Scene.push(Kinect)
   
   var ground = Plane.generateMesh( 100.f, 100.f, 100, 100, Quat.up)
@@ -41,14 +41,14 @@ object Main extends App with Animatable with AudioSource {
 
   // Audio.push(this) 
 
-  val live = new Ruby("trees2.rb")
-  SimpleAppRun() 
+  val live = new Ruby("apps/desktop/trees/trees2.rb")
+  // SimpleAppRun() 
 
 
   override def init(){
 
-    val s = Shader.load("basic",File("res/shaders/basic.vert"),File("res/shaders/basic.frag"))
-    s.monitor
+    //val s = Shader.load("basic",File("res/shaders/basic.vert"),File("res/shaders/basic.frag"))
+    //s.monitor
 
     val node = new RenderNode
     node.shader = "sky"
@@ -56,7 +56,7 @@ object Main extends App with Animatable with AudioSource {
     node.scene.push( Plane() )
     SceneGraph.prependNode(node)
 
-    val tID = Texture("res/mond.png")
+    val tID = Texture("apps/desktop/trees/res/mond.png")
     gModel.material = new SpecularMaterial()
     gModel.material.texture = Some(Texture(tID))
     gModel.material.textureMix = 1.f
@@ -84,7 +84,7 @@ object Main extends App with Animatable with AudioSource {
 
     sphere.pose.pos = Shader.lightPosition
 
-    live.animate(dt)
+    // live.animate(dt)
     trees.foreach(_.animate(dt))
   }
 

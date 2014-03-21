@@ -54,7 +54,7 @@ object Quad {
 }
 class Quad(style:String="triangles") extends Drawable {
   var mesh:GdxMesh = _
-  var primitive = GL10.GL_TRIANGLES
+  var primitive = GL20.GL_TRIANGLES
   // var drawFunc = () => {}
 
   style match {
@@ -70,8 +70,8 @@ class Quad(style:String="triangles") extends Drawable {
       mesh.setIndices( Array[Short](
         0,1,2,3,0
       ))
-      primitive = GL10.GL_LINE_STRIP
-      // drawFunc = () => { mesh.render(Shader(), GL10.GL_LINE_STRIP)}
+      primitive = GL20.GL_LINE_STRIP
+      // drawFunc = () => { mesh.render(Shader(), GL20.GL_LINE_STRIP)}
 
     case _ => 
       mesh = new GdxMesh(true,4,6, VertexAttribute.Position, VertexAttribute.Normal, VertexAttribute.TexCoords(0))
@@ -85,7 +85,7 @@ class Quad(style:String="triangles") extends Drawable {
       mesh.setIndices( Array[Short](
         0,1,2, 0,2,3
       ))
-      // drawFunc = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+      // drawFunc = () => { mesh.render(Shader(), GL20.GL_TRIANGLES)}
   }
   override def draw(){
     mesh.render(Shader(), primitive)
@@ -126,7 +126,7 @@ object Primitive2D extends GLThis {
     mesh.setIndices( Array[Short](
       0,1,2, 0,2,3
     ))
-    val draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+    val draw = () => { mesh.render(Shader(), GL20.GL_TRIANGLES)}
     mesh //new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)
   }
 }

@@ -73,9 +73,9 @@
 // 		mesh.setVertices(vertices)
 // 		mesh.setIndices(indices)
 
-// 		var draw = () => { mesh.render(Shader(), GL10.GL_LINES)}
+// 		var draw = () => { mesh.render(Shader(), GL20.GL_LINES)}
 // 		mode match {
-// 			case "triangles" => draw = () => { mesh.render(Shader(), GL10.GL_TRIANGLES)}
+// 			case "triangles" => draw = () => { mesh.render(Shader(), GL20.GL_TRIANGLES)}
 // 			case _ => 
 // 		}
 //     new GLPrimitive(Pose(),Vec3(1.f),mesh,draw)

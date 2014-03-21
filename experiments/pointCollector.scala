@@ -14,7 +14,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 
 
 object Main extends App {
@@ -285,11 +285,11 @@ object ParticleCollector extends Animatable {
  
     Shader.setColor( color, 1.f)
     meshCol.setVertices(verticesCol, 0, 3*collection.length)
-    meshCol.render( Shader(), GL10.GL_POINTS)
+    meshCol.render( Shader(), GL20.GL_POINTS)
 
     particles.zipWithIndex.foreach{ case(p,i) => p.draw(vertices,3*i)}
     mesh.setVertices(vertices)
-    mesh.render( Shader(), GL10.GL_POINTS)
+    mesh.render( Shader(), GL20.GL_POINTS)
     // gl.glDisable(L.GL_LIGHTING)
     // gl.glEnable(GL3.GL_PROGRAM_POINT_SIZE)
     // gl.glEnable (GL.GL_BLEND);

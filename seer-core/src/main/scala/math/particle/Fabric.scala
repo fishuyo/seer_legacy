@@ -10,7 +10,7 @@ import particle._
 import scala.collection.mutable.ListBuffer
 
 import com.badlogic.gdx._
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 import com.badlogic.gdx.graphics.glutils.VertexBufferObject
@@ -104,7 +104,7 @@ class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, v
       vertices(6*i+5) = q.z
     }
     mesh.setVertices(vertices)
-    mesh.render( Shader(), GL10.GL_LINES)    
+    mesh.render( Shader(), GL20.GL_LINES)    
   }
 
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )

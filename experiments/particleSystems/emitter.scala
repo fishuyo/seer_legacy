@@ -10,7 +10,7 @@ import particle._
 import util._
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 
 
 import scala.collection.mutable.ListBuffer

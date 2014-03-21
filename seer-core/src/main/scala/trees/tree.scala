@@ -14,7 +14,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture._
 
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 
 object Trees extends Animatable {
 
@@ -113,15 +113,15 @@ class Tree() extends Animatable {
   }
 
   override def init(){
-    val t = Texture("res/bark/bark_20091031_07_256x512_seamless.jpg")
-    val t1 = Texture("res/bark/mond.png")
-    textureID = t
-    textureID1 = t1
+    // val t = Texture("res/bark/bark_20091031_07_256x512_seamless.jpg")
+    // val t1 = Texture("res/bark/mond.png")
+    // textureID = t
+    // textureID1 = t1
 
-    Texture(t).setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    Texture(t).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-    Texture(t1).setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    Texture(t1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    // Texture(t).setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    // Texture(t).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    // Texture(t1).setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    // Texture(t1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
   }
   override def draw(){
     if( size != root.size){
@@ -139,14 +139,14 @@ class Tree() extends Animatable {
     // Shader().setUniformi("u_texture0", t1 );
     // //Shader().setUniformi("u_texture1", t1 );
 
-    Texture.bind(textureID1)
+    // Texture.bind(textureID1)
 
     root.draw() //vertices, idx)
 
     //gl.glLineWidth( 1.f )
 
     //mesh.setVertices(vertices)
-    //mesh.render( Shader(), GL10.GL_LINES)
+    //mesh.render( Shader(), GL20.GL_LINES)
 
   }
   override def animate(dt:Float) = {

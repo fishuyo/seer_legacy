@@ -3,15 +3,15 @@ package com.fishuyo.seer
 package object graphics {
 
 
-	import com.badlogic.gdx.graphics.GL10
+	import com.badlogic.gdx.graphics.GL20
 
-	val Points = GL10.GL_POINTS
-	val Lines = GL10.GL_LINES
-	val LineLoop = GL10.GL_LINE_LOOP
-  val LineStrip = GL10.GL_LINE_STRIP
-  val Triangles = GL10.GL_TRIANGLES
-  val TriangleStrip = GL10.GL_TRIANGLE_STRIP
-  val TriangleFan = GL10.GL_TRIANGLE_FAN
+	val Points = GL20.GL_POINTS
+	val Lines = GL20.GL_LINES
+	val LineLoop = GL20.GL_LINE_LOOP
+  val LineStrip = GL20.GL_LINE_STRIP
+  val Triangles = GL20.GL_TRIANGLES
+  val TriangleStrip = GL20.GL_TRIANGLE_STRIP
+  val TriangleFan = GL20.GL_TRIANGLE_FAN
 
 	implicit def RGBA2Float(c:RGBA) = c.toGray
 	implicit def RGB2RGBA(c:RGB) = RGBA(c.r,c.g,c.b,1)

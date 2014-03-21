@@ -10,7 +10,7 @@ import maths._
 import particle._
 import io._
 
-import com.badlogic.gdx.graphics.GL10
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
@@ -140,7 +140,7 @@ class String( var pos:Vec3=Vec3(0), var length:Float=1.f, var dist:Float=.05f, v
     	// } else off -= 1
     }
     mesh.setVertices(vertices,0,links.size*6)
-    mesh.render( Shader(), GL10.GL_LINES)    
+    mesh.render( Shader(), GL20.GL_LINES)    
   }
 
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )
