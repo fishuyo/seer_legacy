@@ -110,6 +110,8 @@ class Mesh extends Drawable {
 		val numV = gdxMesh.get.getNumVertices
 		val sizeV = gdxMesh.get.getVertexSize / 4 // number of floats per vertex
 
+		println(s"extracting vertex data $numV ($sizeV), $numI")
+
 		val verts = new Array[Float](numV*sizeV)
 		val indxs = new Array[Short](numI)
 
@@ -117,9 +119,23 @@ class Mesh extends Drawable {
 			gdxMesh.get.getIndices(indxs)
 			indices ++= indxs
 		}
-		// TODO parse out attributes
+
 		gdxMesh.get.getVertices(verts)
-		vertices ++= new Array[Vec3](numV)
+
+		val attrs = gdxMesh.get.getVertexAttributes
+		for( i<-(0 until numV)){
+			for( a<-(0 until attrs.size)){
+				import VertexAttributes._
+				val attr = attrs.get(a)
+				val off = attr.offset / 4
+				attr.usage match {
+					case Usage.Position => vertices += Vec3(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2))
+					case Usage.Normal => normals += Vec3(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2))
+					case Usage.TextureCoordinates => texCoords += Vec2(verts(sizeV*i+off),verts(sizeV*i+off+1))
+					case Usage.Color => colors += RGBA(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2),verts(sizeV*i+off+3))
+				}
+			} 
+		}
 	}
 
 	def recalculateNormals(){

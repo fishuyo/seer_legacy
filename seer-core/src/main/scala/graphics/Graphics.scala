@@ -38,7 +38,24 @@ object Graphics {
 		d.draw()
 	}
 
+  def run(f:()=>Any){
 
+  }
+
+}
+
+object Run{
+  def apply[T](f:()=>T) = new RunOnce(f)
+}
+class RunOnce[T](f:()=>T) extends Drawable{
+  var ret:T = null.asInstanceOf[T]
+  var ran = false
+  Scene.push(this)
+  override def draw(){
+    try{
+    if(!ran){ ret=f(); ran = true}
+    } catch{ case e:Exception => println(e)} finally{ Scene.drawable -= this }
+  }
 }
 
 

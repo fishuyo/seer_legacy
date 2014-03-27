@@ -3,6 +3,7 @@ package com.fishuyo.seer
 package graphics
 
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
+import com.badlogic.gdx.Gdx
 
 trait Material
 
@@ -24,6 +25,12 @@ class BasicMaterial extends Material {
 	var normalMap = None:Option[GdxTexture]
 	var specularMap = None:Option[GdxTexture]
 	var textureMix = 0.f
+
+	def loadTexture(path:String){
+		val t = new GdxTexture(Gdx.files.internal(path));
+		texture = Some(t)
+		textureMix = 1.f
+	}
 }
 
 class NoMaterial extends BasicMaterial

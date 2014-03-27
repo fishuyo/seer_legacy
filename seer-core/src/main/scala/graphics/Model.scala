@@ -31,6 +31,8 @@ object Model {
     m.primitives.foreach( (p) => model.primitives = model.primitives :+ p )
     model
   }
+
+  def loadOBJ(s:String) = OBJ(s)
 }
 
 class Model extends Drawable with geometry.Pickable {

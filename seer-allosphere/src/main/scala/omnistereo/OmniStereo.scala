@@ -32,7 +32,7 @@ import java.io.FileInputStream
 ///	Abstract base class for any object that can be rendered via OmniStereo:
 trait OmniDrawable  {
 	/// Place drawing code here
-	def onDrawOmni(omni: OmniStereo){}
+	def onDrawOmni(){}
 }
 
 object OmniStereo {
@@ -1225,7 +1225,7 @@ class OmniStereo(res:Int=1024, useMipMaps:Boolean=true) {
 				gl.glEnable(GL20.GL_DEPTH_TEST)
 				gl.glDepthMask(true);
 				gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-				drawable.onDrawOmni(this);
+				drawable.onDrawOmni();
 			}
 		}
 
@@ -1295,7 +1295,7 @@ class OmniStereo(res:Int=1024, useMipMaps:Boolean=true) {
 				gl.glDepthMask(true);
 				gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-				drawable.onDrawOmni(this);
+				drawable.onDrawOmni();
 			}
 		}
 		// gl.error("OmniStereo onFrameFront end");

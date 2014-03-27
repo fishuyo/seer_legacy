@@ -51,10 +51,14 @@ object Settings {
   )
 
   lazy val desktop = packageArchetype.java_application ++ Settings.common ++ Seq (
+    fork := true,
+    // fullClasspath in run <<= fullClasspath in Compile,
+    // fullClasspath in run <<= fullClasspath in Runtime,
     // fork in Compile := true,
     // connectInput in Compile := true,
     // fork in run := true,
-    // connectInput in run := true,
+    connectInput in run := true,
+    outputStrategy := Some(StdoutOutput),
     // run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)) ,
     libraryDependencies ++= Seq(
       "com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
@@ -191,33 +195,33 @@ object SeerBuild extends Build {
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_opencv )
 
-  lazy val examples_fieldViewer = Project (
-    "examples-fieldViewer",
-    file("examples/fieldViewer"),
+  lazy val experiments_fieldViewer = Project (
+    "experiments-fieldViewer",
+    file("experiments/fieldViewer"),
     settings = Settings.desktop
   ) dependsOn seer_desktop
 
-  lazy val examples_particleSystems = Project (
-    "examples-particleSystems",
-    file("examples/particleSystems"),
+  lazy val experiments_particleSystems = Project (
+    "experiments-particleSystems",
+    file("experiments/particleSystems"),
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_opencv )
 
-  lazy val examples_kinect = Project (
-    "examples-kinect",
-    file("examples/kinect"),
+  lazy val experiments_kinect = Project (
+    "experiments-kinect",
+    file("experiments/kinect"),
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_kinect )
 
-  lazy val examples_opencv = Project (
-    "examples-opencv",
-    file("examples/opencv"),
+  lazy val experiments_opencv = Project (
+    "experiments-opencv",
+    file("experiments/opencv"),
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_opencv )
 
-  lazy val examples_video = Project (
-    "examples-video",
-    file("examples/video"),
+  lazy val experiments_video = Project (
+    "experiments-video",
+    file("experiments/video"),
     settings = Settings.desktop
   ) dependsOn( seer_desktop, seer_video )
 

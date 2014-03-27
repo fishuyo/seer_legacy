@@ -33,30 +33,3 @@ object Main extends SeerApp {
 	}
 
 }
-
-// import scala.tools.nsc.interpreter._
-// import scala.tools.nsc.Settings
-
-
-// object Repl {
-
-//   def repl = new ILoop {
-//     override def loop(): Unit = {
-//       // intp.bind("e", "Double", 2.71828)
-//       super.loop()
-//     }
-//   }
-
-//   def start() = {
-//   	val settings = new Settings
-//   	settings.Yreplsync.value = true
-
-//   	//use when launching normally outside SBT
-//   	// settings.usejavacp.value = true      
-
-//   	//an alternative to 'usejavacp' setting, when launching from within SBT
-//   	settings.embeddedDefaults[Repl.type]
-
-//   	repl.process(settings)
-// 	}
-// }
