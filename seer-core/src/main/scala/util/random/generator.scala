@@ -85,13 +85,14 @@ object Random {
 
 	def oneOf[T](xs: T*) = for(i <- int(0,xs.length)) yield xs(i)
 
-	def decide[T](xs:Seq[T], prob:Seq[Float]) = new Generator[T]{
+	def decide[T](xs:Seq[T], weights:Seq[Float]) = new Generator[T]{
 		def apply():T = {
 			val r = float()
-			var sum = 0.f
-			for( i <- ( 0 until prob.length)){
-				sum += prob(i)
-				if( r < sum) return xs(i)
+			val sum = weights.sum
+			var accum = 0.f
+			for( i <- ( 0 until weights.length)){
+				accum += weights(i) / sum
+				if( r < accum) return xs(i)
 			}
 			xs(0)
 		}

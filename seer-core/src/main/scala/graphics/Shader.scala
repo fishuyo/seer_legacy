@@ -71,8 +71,8 @@ object Shader {
     
     material match {
       case m:ShaderMaterial => setBasicMaterial(m);
-      case m:SpecularMaterial => setBasicMaterial(m); lightingMix=1.f; shininess = m.shininess
-      case m:DiffuseMaterial => setBasicMaterial(m); lightingMix=1.f; shininess = 0.f
+      case m:SpecularMaterial => setBasicMaterial(m); //lightingMix=1.f; shininess = m.shininess
+      case m:DiffuseMaterial => setBasicMaterial(m); //lightingMix=1.f; shininess = 0.f
       case m:NoMaterial => setMaterial(defaultMaterial)
       case m:BasicMaterial => setBasicMaterial(m)
       case _ => () //setMaterial(defaultMaterial)
@@ -94,8 +94,8 @@ object Shader {
     // var normalMap = None:Option[Texture]
     // var specularMap = None:Option[Texture]
 
-    lightingMix = 0.f
-    shininess = 0.f
+    lightingMix = material.lightingMix
+    shininess = material.shininess
   }
 
   def setLightUniforms(){

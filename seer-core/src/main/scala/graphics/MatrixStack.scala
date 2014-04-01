@@ -67,3 +67,19 @@ object MatrixStack {
 	def normalMatrix() = normal
 
 }
+
+
+object ColorStack {
+
+	var stack = new Stack[HSV]()
+	var hsv = HSV(0,1,1)
+
+	def push(){ stack = stack.push(HSV(hsv)) }
+	def pop(){ hsv = stack.top; stack = stack.pop }
+
+	def transform(c:HSV){
+		hsv *= c
+	}
+
+	def clear() = { stack = new Stack[HSV]() }
+}

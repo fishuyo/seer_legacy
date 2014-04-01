@@ -2,6 +2,7 @@
 package com.fishuyo.seer
 package dynamic
 
+import collection.mutable.ListBuffer
 import scala.tools.nsc.interpreter._
 import scala.tools.nsc.Settings
 import java.io.CharArrayWriter
@@ -18,8 +19,12 @@ object Repl {
 
   val system = ActorSystem("Repl")
   val actor = system.actorOf(Props( new ReplActor ), name = "repl")
+  
+  var imports = ListBuffer("com.fishuyo.seer", "com.fishuyo.seer._", "com.fishuyo.seer.graphics._",
+                    "com.fishuyo.seer.maths._", "com.fishuyo.seer.io._", "com.fishuyo.seer.util._" 
+                )
 
-  def repl = new SeerILoop {
+  def repl = new SeerILoop(imports) {
     override def loop(): Unit = {
       // intp.bind("e", "Double", 2.71828)
       super.loop()
@@ -53,31 +58,17 @@ object Repl {
   }
 }
 
-class SeerILoop extends ILoop {
+class SeerILoop(imports:Seq[String]) extends ILoop {
+
   override def prompt = "seer> "
 
   addThunk {
     intp.beQuietDuring {
-      intp.addImports(
-      	"com.fishuyo.seer._",
-      	"com.fishuyo.seer.graphics._",
-      	"com.fishuyo.seer.maths._",
-      	"com.fishuyo.seer.io._",
-      	"com.fishuyo.seer.util._")
+      intp.addImports(imports : _*)
     }
   }
 
   override def printWelcome() {
-    // echo("\n" +
-    //   "         \\,,,/\n" +
-    //   "         (o o)\n" +
-    //   "-----oOOo-(_)-oOOo-----")
-    // echo("\n" +
-    // "    ,-\"\"-.    \n" +
-    // "   / ,--. \\  \n" +
-    // "  | ( () ) |  \n" +
-    // "   \\ `--' /  \n" +
-    // "    `-..-'    \n")
 
     echo("\n"+
     " ___  ___  ___ _ __ \n"+

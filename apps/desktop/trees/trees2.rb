@@ -2,7 +2,7 @@
 
 class TreeScript
 	include_package "com.fishuyo.seer.util"
-	include_package "com.fishuyo.seer.trees"
+	include_package "com.fishuyo.seer.trees2"
 	include_package "com.fishuyo.seer.io.kinect"
 	include_package "com.fishuyo.seer.video"
 
@@ -155,6 +155,9 @@ class TreeScript
 			else
 			end
 		})
+		
+		# @shader = Shader.load("sky",vert(),frag())
+
 	end
 
 	def vert

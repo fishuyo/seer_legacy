@@ -27,6 +27,7 @@ object Model {
   def apply(m:Model):Model = {
     val model = new Model{ pose = Pose(m.pose); scale = Vec3(m.scale) }
     model.color = m.color
+    model.material = m.material
     m.children.foreach( (n) => model.children = model.children :+ Model(n) )
     m.primitives.foreach( (p) => model.primitives = model.primitives :+ p )
     model
@@ -39,7 +40,9 @@ class Model extends Drawable with geometry.Pickable {
 	var pose = Pose()
 	var scale = Vec3(1)
   var color = RGBA(1,1,1,1)
-  var material:BasicMaterial = new BasicMaterial
+  var colorTransform = HSV(0,1,1)
+
+  var material:BasicMaterial = new NoMaterial
   var shader = ""
 
   var children = Vector[Model]()
@@ -49,6 +52,8 @@ class Model extends Drawable with geometry.Pickable {
   // var pickable = Vector[geometry.Pickable]()
 
   var worldTransform = new Matrix4
+
+  def material(m:BasicMaterial){ material = m }
 
   def translate(x:Float,y:Float,z:Float):Model = translate(Vec3(x,y,z))
   def translate(p:Vec3):Model = { pose.pos += p; this }
@@ -77,12 +82,29 @@ class Model extends Drawable with geometry.Pickable {
   //   this
   // }
   def addChild(m:Model) = {
+    // if(m.material.isInstanceOf[NoMaterial]) m.material = this.material
     children = children :+ m
     m
+  }
+
+  def foreach[T](f:(Model)=>T){
+    f(this)
+    children.foreach( _.foreach(f))
   }
   def getLeaves():Vector[Model] = {
     if( children.length == 0) Vector(this)
     else children.flatMap( _.getLeaves )
+  }
+
+  def applyColorTransform():Model = {
+    ColorStack.push()
+    ColorStack.transform(colorTransform)
+
+    material.color = ColorStack.hsv
+    children.foreach( _.applyColorTransform() )
+
+    ColorStack.pop()
+    this
   }
 
   override def draw(){
@@ -91,7 +113,7 @@ class Model extends Drawable with geometry.Pickable {
     MatrixStack.transform(pose,scale)
     worldTransform.set(MatrixStack.model)
 
-    Shader.setColor(color)
+    // Shader.setColor(color)
     val old = Shader.shader.get.name
     if( shader != "" ){
       Shader().end()

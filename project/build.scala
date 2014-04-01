@@ -50,8 +50,15 @@ object Settings {
     libraryDependencies += "xuggle" % "xuggle-xuggler" % "5.4"
   )
 
+  lazy val portaudio = Settings.common ++ Seq(
+    libraryDependencies ++= Seq(
+      "com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
+      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT"
+    )
+  )
+
   lazy val desktop = packageArchetype.java_application ++ Settings.common ++ Seq (
-    fork := true,
+    // fork := true,
     // fullClasspath in run <<= fullClasspath in Compile,
     // fullClasspath in run <<= fullClasspath in Runtime,
     // fork in Compile := true,
@@ -61,70 +68,10 @@ object Settings {
     outputStrategy := Some(StdoutOutput),
     // run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)) ,
     libraryDependencies ++= Seq(
-      "com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
-      "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT",
       "org.scala-lang" % "scala-compiler" % "2.10.2",
       "org.scala-lang" % "jline" % "2.10.2"
     )
   )
-
-  // lazy val android = Settings.common ++
-  //   AndroidProject.androidSettings ++
-  //   AndroidMarketPublish.settings ++ Seq (
-  //     platformName in Android := "android-10",
-  //     keyalias in Android := "change-me",
-  //     mainAssetsPath in Android := file("android/src/main/assets"), //file("common/src/main/resources")
-  //     // useProguard in Android := false,
-  //     proguardOption in Android := """
-  //       -keep class com.badlogic.gdx.backends.android.** { *; }
-
-  //       -keep class com.typesafe.**
-  //       -keep class akka.**
-  //       -keep class scala.collection.immutable.StringLike {
-  //           *;
-  //       }
-  //       -keepclasseswithmembers class * {
-  //           public <init>(java.lang.String, akka.actor.ActorSystem$Settings, akka.event.EventStream, akka.actor.Scheduler, akka.actor.DynamicAccess);
-  //       }
-  //       -keepclasseswithmembers class * {
-  //           public <init>(akka.actor.ExtendedActorSystem);
-  //       }
-  //       -keep class scala.collection.SeqLike {
-  //           public protected *;
-  //       }
-  //     """
-  //       // ## Akka Stuff referenced at runtime
-  //       // -keep class akka.actor.** {*;}
-  //       // -keep public class akka.actor.LightArrayRevolverScheduler { *; }
-  //       // -keep public class akka.actor.LocalActorRefProvider { *;}
-  //       // -keep public class akka.remote.RemoteActorRefProvider {
-  //       //   public <init>(...);
-  //       // }
-  //       // -keep class akka.actor.SerializedActorRef {
-  //       //   *;
-  //       // }
-  //       // -keep class akka.remote.netty.NettyRemoteTransport {
-  //       //   *;
-  //       // }
-  //       // -keep class akka.serialization.JavaSerializer {
-  //       //   *;
-  //       // }
-  //       // -keep class akka.serialization.ProtobufSerializer {
-  //       //   *;
-  //       // }
-  //       // -keep class com.google.protobuf.GeneratedMessage {
-  //       //   *;
-  //       // }
-  //       // -keep class akka.event.Logging*
-  //       // -keep class akka.event.Logging$LogExt{
-  //       //   *;
-  //       // }
-  //     //"""//proguard_options,
-  //     //unmanagedBase <<= baseDirectory( _ /"src/main/libs" ),
-  //     //unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "src/main/libs") }
-  //   )
-
-
 
 }
 
@@ -185,6 +132,12 @@ object SeerBuild extends Build {
     "seer-video",
     file("seer-video"),
     settings = Settings.desktop ++ Settings.xuggle
+  ) dependsOn seer_core 
+
+  lazy val seer_portaudio = Project (
+    "seer-portaudio",
+    file("seer-portaudio"),
+    settings = Settings.desktop ++ Settings.portaudio
   ) dependsOn seer_core 
 
 

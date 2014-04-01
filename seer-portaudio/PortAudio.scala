@@ -14,24 +14,11 @@ import de.sciss.synth.io._
 
 import com.github.rjeschke.jpa._
 
-object PortAudio {
-	val sampleRate = 44100
-  val bufferSize = 512
-  val channelsIn = 1
-  val channelsOut = 2
-
-  val sources = new ListBuffer[AudioSource]
+object PortAudio extends AudioInterface {
 
   val in = new Array[Float](bufferSize)
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
   val outInterleaved = new Array[Float](bufferSize*channelsOut)
-
-  var gain = 1.f
-  var playThru = false
-  var recordThru = true
-  var recording = false
-
-  var outFile:AudioFile = null
 
   var callback = new PaCallback {
   	def paCallback(paIn:PaBuffer, paOut:PaBuffer, nframes:Int){
@@ -74,33 +61,14 @@ object PortAudio {
   	JPA.openDefaultStream(channelsIn, channelsOut, PaSampleFormat.paFloat32, sampleRate, bufferSize)
   }
 
-  def start() = JPA.startStream 
-  def stop() = JPA.stopStream
+  override def start() = JPA.startStream 
+  override def stop() = JPA.stopStream
 
-  def toggleRecording() = {
-    if( !recording ){
-      try{
-        val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
-        var path = "SeerData/audio/recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
-        // if( name != "") path = name
-        Gdx.files.external("SeerData/audio").file().mkdirs()
-        var file = Gdx.files.external(path).file()
-        outFile = AudioFile.openWrite(file, outSpec)
-        recording = true
-        println("PortAudio recording started..")
-      } catch { case e:Exception => println(e) }
-    } else {
-      recording = false
-      outFile.close
-      println("PortAudio recording stopped.")
-    }
-  }
-  
-  def push(o:AudioSource) = sources += o
+  override def push(o:AudioSource) = sources += o
 
-  def gain(f:Float) = {} //actor ! Gain(f)
-  def playThru(b:Boolean) = {} //actor ! PlayThru(b)
-  def recordThru(b:Boolean) = {} //actor ! RecordThru(b)
+  override def gain(f:Float) = {}
+  override def playThru(b:Boolean) = {}
+  override def recordThru(b:Boolean) = {}
 
 }
 

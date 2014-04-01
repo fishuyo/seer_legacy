@@ -177,3 +177,15 @@ object Trackpad extends Observer{
   def bindEach(f:Callback) = callbacksEach += f
 }
 
+// class TrackpadState{
+
+//   var fingers = Map[Int,FingerState]
+//   var down = ListBuffer[(Int,Vec3)]()
+//   val pos = new Array[Vec2](20)
+// }
+
+// class Fing{
+//   var xy = Vec2()
+
+// }
+

@@ -1,5 +1,5 @@
 package com.fishuyo.seer
-package trees
+package trees2
 
 import maths._
 import spatial._
@@ -41,7 +41,7 @@ object Main extends SeerApp with AudioSource {
 
   // Audio.push(this) 
 
-  val live = new Ruby("apps/desktop/trees/trees2.rb")
+  var live:Ruby = _
   // SimpleAppRun() 
 
 
@@ -56,7 +56,7 @@ object Main extends SeerApp with AudioSource {
     node.scene.push( Plane() )
     SceneGraph.prependNode(node)
 
-    val tID = Texture("apps/desktop/trees/res/mond.png")
+    val tID = Texture("res/mond.png")
     gModel.material = new SpecularMaterial()
     gModel.material.texture = Some(Texture(tID))
     gModel.material.textureMix = 1.f
@@ -69,6 +69,7 @@ object Main extends SeerApp with AudioSource {
 
     // groundA = OBJ("res/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
     tree.init()
+    live = new Ruby("trees2.rb")
   }
 
   override def draw(){
@@ -84,7 +85,7 @@ object Main extends SeerApp with AudioSource {
 
     sphere.pose.pos = Shader.lightPosition
 
-    // live.animate(dt)
+    live.animate(dt)
     trees.foreach(_.animate(dt))
   }
 

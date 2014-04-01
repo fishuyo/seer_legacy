@@ -15,7 +15,9 @@ package object graphics {
 
 	implicit def RGBA2Float(c:RGBA) = c.toGray
 	implicit def RGB2RGBA(c:RGB) = RGBA(c.r,c.g,c.b,1)
+	implicit def RGBA2RGB(c:RGBA) = RGB(c.r,c.g,c.b)
 
+	// port of Allosystem color conversion code al_Color.cpp
 	implicit def HSV2RGB(c:HSV):RGB = {
 	
 		if(c.s == 0.f) return RGB(c.v)
@@ -40,6 +42,29 @@ package object graphics {
 		}	
 		RGB(r,g,b)
 	}
+	implicit def RGB2HSV(c:RGB):HSV = {
+		val cmax = List(c.r,c.g,c.b).max
+		val cmin = List(c.r,c.g,c.b).min
+		val del = cmax - cmin
+
+		val hsv = HSV(0,0,cmax)
+
+		if(del != 0.f && cmax != 0.f){		// chromatic data...
+			hsv.s = del / cmax							// set saturation
+		
+			var hl = 0.f
+			if (c.r == cmax) hl = (c.g - c.b)/del;	// between yellow & magenta
+			else if(c.g == cmax)	hl = 2.f + (c.b - c.r)/del;	// between cyan & yellow
+			else hl = 4.f + (c.r - c.g)/del;	// between magenta & cyan
+
+			if(hl < 0.f) hl += 6.f;
+
+			hsv.h = hl * (1.f/6.f);
+		} //else this is a gray, no chroma...
+	
+		hsv
+	}
 	implicit def HSV2RGBA(c:HSV) = RGB2RGBA(HSV2RGB(c))
+	implicit def RGBA2HSV(c:RGBA) = RGB2HSV(RGBA2RGB(c))
 	
 }

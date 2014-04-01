@@ -207,19 +207,22 @@ object FullscreenKey extends InputAdapter {
     k match {
       case Keys.ESCAPE => SimpleAppRun.toggleFullscreen
       case Keys.F1 => 
-        if( PortAudio.sources.length > 0) PortAudio.toggleRecording()
-        else Audio.toggleRecording()
+        // if( PortAudio.sources.length > 0) PortAudio.toggleRecording()
+        // else Audio.toggleRecording()
+        Audio.toggleRecording()
       case _ => false
     }
     false
   }
 }
 
+
 class SeerApp extends App with Animatable {
+
   SimpleAppRun.loadLibs()
   Scene.push(this)
   SimpleAppRun()
-  // Repl.repl.intp.addImports(this.getClass.getName.replace("$",""))
-  Repl.start() //actor ! "start"
+  Repl.imports += this.getClass.getName.replace("$","")
+  Repl.start()
 
 }
