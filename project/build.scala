@@ -184,7 +184,7 @@ object SeerBuild extends Build {
     "experiments",
     file("experiments"),
     settings = Settings.desktop
-  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere )
+  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio )
 
 
   // apps

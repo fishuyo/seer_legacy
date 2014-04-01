@@ -64,11 +64,9 @@ object PortAudio extends AudioInterface {
   override def start() = JPA.startStream 
   override def stop() = JPA.stopStream
 
-  override def push(o:AudioSource) = sources += o
-
-  override def gain(f:Float) = {}
-  override def playThru(b:Boolean) = {}
-  override def recordThru(b:Boolean) = {}
+  // override def gain(f:Float){}
+  // override def playThru(b:Boolean){}
+  // override def recordThru(b:Boolean){}
 
 }
 
