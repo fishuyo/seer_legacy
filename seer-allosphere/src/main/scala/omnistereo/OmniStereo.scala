@@ -549,6 +549,11 @@ class OmniStereo(res:Int=1024, useMipMaps:Boolean=true) {
 
 
 		def onCreate(){
+			//allocate warp and blend textures
+			// mWarp = new GdxTexture(256,256, Pixmap.Format.RGBA8888)
+			mBlend = new GdxTexture(256,256, Pixmap.Format.Intensity)
+
+
 			mWarp.t.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.Linear)
 			// mWarp.texelFormat(GL_RGB32F_ARB);
 			// mWarp.dirty();

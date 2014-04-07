@@ -119,7 +119,7 @@ class Gesture extends Animatable {
 	}
 
 	override def animate(dt:Float){
-		if(buffer.length > 0){		
+		if(buffer.length > 1){		
 			val h = buffer.next
 			var p = h._1 + jump
 			var shift = Vec3()

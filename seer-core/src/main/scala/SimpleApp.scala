@@ -177,7 +177,7 @@ class SimpleAppListener extends ApplicationListener {
     this.width = width
     this.height = height
     aspect = width * 1.f / height
-    camera.viewportWidth = aspect
+    // camera.viewportWidth = aspect
     val oldfbo = fbo
     fbo = FrameBuffer(width, height)
     if(oldfbo != null) oldfbo.dispose
