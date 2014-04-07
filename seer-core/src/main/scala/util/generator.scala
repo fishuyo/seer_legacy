@@ -24,6 +24,13 @@ trait Generator[T]{
 			value
 		}
 	}
+	def filter(f:T => Boolean): Generator[T] = new Generator[T]{
+		def apply() = {
+			value = self.apply()
+			while(!f(value)) value = self.apply()
+			value
+		}
+	}
 
 	def foldLeft[S](s:S)(f:(S,Generator[T]) => S):Generator[S] = new Generator[S]{
 		value = s
@@ -48,55 +55,4 @@ class Single[T](val x:T) extends Generator[T]{
 
 // Single(1.f).foldLeft(0.f)((v,g) => v + g() )
 
-
-object Random {
-	val r = new java.util.Random
-	val rseed = new java.util.Random
-	
-	def seed() = r.setSeed(rseed.nextLong)
-	def seed(s:Long) = r.setSeed(s)
-
-	val int = new Generator[Int]{
-		def apply() = r.nextInt
-	}
-	def int(lo:Int,hi:Int): Generator[Int] = for(x <- int) yield lo + math.abs(x) % (hi - lo)
-
-	val float = new Generator[Float]{
-		def apply() = r.nextFloat
-	}
-	def float(lo:Float,hi:Float): Generator[Float] = for(x <- float) yield x * (hi-lo) + lo
-
-	val double = new Generator[Double]{
-		def apply() = r.nextFloat
-	}
-
-	val bool = new Generator[Boolean]{
-		def apply() = r.nextBoolean
-	}
-
-	val vec3 = new Generator[Vec3]{
-		def apply() = Vec3(float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1.f,1.f)())
-	}
-	def vec3(lo:Vec3, hi:Vec3): Generator[Vec3] = {
-		for(x <- float(lo.x,hi.x);
-				y <- float(lo.y,hi.y);
-				z <- float(lo.z,hi.z)) yield Vec3(x,y,z)
-	}
-
-	def oneOf[T](xs: T*) = for(i <- int(0,xs.length)) yield xs(i)
-
-	def decide[T](xs:Seq[T], weights:Seq[Float]) = new Generator[T]{
-		def apply():T = {
-			val r = float()
-			val sum = weights.sum
-			var accum = 0.f
-			for( i <- ( 0 until weights.length)){
-				accum += weights(i) / sum
-				if( r < accum) return xs(i)
-			}
-			xs(0)
-		}
-	}
-
-}
 

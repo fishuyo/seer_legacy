@@ -35,11 +35,8 @@ object Settings {
       "org.scala-lang" % "scala-actors" % "2.10.2",
       "de.sciss" %% "scalaosc" % "1.1.+",
       "de.sciss" %% "scalaaudiofile" % "1.2.0", //"1.4.+",
-      "org.jruby" % "jruby" % "1.7.3",
       "net.java.dev.jna" % "jna" % "3.5.2",
       "com.scalarx" % "scalarx_2.10" % "0.2.3"
-
-      //"xuggle" % "xuggle-xuggler" % "5.4"
       //"org.scalala" % "scalala_2.9.0" % "1.0.0.RC2-SNAPSHOT",
     ),
     SeerLibs.updateGdxTask,
@@ -48,6 +45,18 @@ object Settings {
 
   lazy val xuggle = Settings.common ++ Seq(
     libraryDependencies += "xuggle" % "xuggle-xuggler" % "5.4"
+  )
+  lazy val jruby = Settings.common ++ Seq(
+    libraryDependencies += "org.jruby" % "jruby" % "1.7.3"
+  )
+  lazy val twitter_eval = Settings.common ++ Seq(
+    libraryDependencies += "com.twitter" %% "util-eval" % "6.12.1"
+  )
+  lazy val scala_repl = Settings.common ++ Seq(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-compiler" % "2.10.2",
+      "org.scala-lang" % "jline" % "2.10.2"
+    )
   )
 
   lazy val portaudio = Settings.common ++ Seq(
@@ -65,12 +74,12 @@ object Settings {
     // connectInput in Compile := true,
     // fork in run := true,
     connectInput in run := true,
-    outputStrategy := Some(StdoutOutput),
+    outputStrategy := Some(StdoutOutput)
     // run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)) ,
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-compiler" % "2.10.2",
-      "org.scala-lang" % "jline" % "2.10.2"
-    )
+    // libraryDependencies ++= Seq(
+    //   "org.scala-lang" % "scala-compiler" % "2.10.2",
+    //   "org.scala-lang" % "jline" % "2.10.2"
+    // )
   )
 
 }
@@ -89,56 +98,73 @@ object SeerBuild extends Build {
   lazy val seer_desktop = Project (
     "seer-desktop",
     file("seer-desktop"),
-    settings = Settings.desktop
-  ) dependsOn ( seer_core, seer_multitouch )
+    settings = Settings.common
+  ) dependsOn ( seer_core, seer_multitouch, seer_repl, seer_jruby, seer_eval )
 
   lazy val seer_allosphere = Project (
     "seer-allosphere",
     file("seer-allosphere"),
-    settings = Settings.desktop
+    settings = Settings.common
   ) dependsOn ( seer_core, seer_desktop )
 
   lazy val seer_sensors = Project (
     "seer-sensors",
     file("seer-sensors"),
-    settings = Settings.desktop
+    settings = Settings.common
   ) aggregate( seer_kinect, seer_leap, seer_multitouch )
 
     lazy val seer_kinect = Project (
       "seer-kinect",
       file("seer-sensors/seer-kinect"),
-      settings = Settings.desktop
+      settings = Settings.common
     ) dependsOn( seer_core, seer_opencv )
 
     lazy val seer_leap = Project (
       "seer-leap",
       file("seer-sensors/seer-leap"),
-      settings = Settings.desktop
+      settings = Settings.common
     ) dependsOn seer_core
 
     lazy val seer_multitouch = Project (
       "seer-multitouch",
       file("seer-sensors/seer-multitouch"),
-      settings = Settings.desktop
+      settings = Settings.common
     ) dependsOn seer_core
 
   lazy val seer_opencv = Project (
     "seer-opencv",
     file("seer-opencv"),
-    settings = Settings.desktop
+    settings = Settings.common
   ) dependsOn( seer_core, seer_video )
 
   lazy val seer_video = Project (
     "seer-video",
     file("seer-video"),
-    settings = Settings.desktop ++ Settings.xuggle
+    settings = Settings.common ++ Settings.xuggle
   ) dependsOn seer_core 
 
   lazy val seer_portaudio = Project (
     "seer-portaudio",
     file("seer-portaudio"),
-    settings = Settings.desktop ++ Settings.portaudio
+    settings = Settings.common ++ Settings.portaudio
+  ) dependsOn seer_core
+
+  lazy val seer_jruby = Project (
+    "seer-jruby",
+    file("seer-dynamic/seer-jruby"),
+    settings = Settings.common ++ Settings.jruby
+  ) dependsOn seer_core
+  lazy val seer_eval = Project (
+    "seer-eval",
+    file("seer-dynamic/seer-eval"),
+    settings = Settings.common ++ Settings.twitter_eval
+  ) dependsOn seer_core
+  lazy val seer_repl = Project (
+    "seer-repl",
+    file("seer-dynamic/seer-repl"),
+    settings = Settings.common ++ Settings.scala_repl
   ) dependsOn seer_core 
+
 
 
   // examples

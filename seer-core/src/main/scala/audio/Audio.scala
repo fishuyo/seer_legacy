@@ -62,7 +62,7 @@ trait UnhandledExceptionLogging{
 
 object Audio {
   // val bufferSize = 512
-  val bufferSize = 2048
+  var bufferSize = 2048
   val sources = new ListBuffer[AudioSource]
   
   // make a Config with just your special setting
@@ -250,7 +250,8 @@ class AudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channels:
     if( recording ) outFile.close()
     record.dispose
     device.dispose
-
+    record = null
+    device = null 
   }
 
   def push(o:AudioSource) = Audio.sources += o

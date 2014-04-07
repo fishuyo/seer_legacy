@@ -45,6 +45,22 @@ object Plane extends Primitive {
   }
 }
 
+object Circle extends Primitive {
+  override def generateMesh():Mesh = generateMesh(1.f,30)
+  def generateMesh(r:Float=1.f, nt:Int=30):Mesh = generateMesh(new Mesh(),r,nt)
+  def generateMesh(mesh:Mesh, r:Float, nt:Int):Mesh = {
+    mesh.primitive = TriangleFan
+    val theta = 2*Pi/nt
+    mesh.vertices += Vec3(0,0,0)
+    for(i <-(0 to nt)){
+      val x = r * math.cos(i * theta)
+      val y = r * math.sin(i * theta)
+      mesh.vertices += Vec3(x,y,0)
+    }
+    mesh
+  }
+}
+
 
 object Quad {
   var quad = None:Option[Quad]

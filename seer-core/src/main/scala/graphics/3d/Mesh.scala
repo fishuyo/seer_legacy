@@ -32,13 +32,13 @@ class Mesh extends Drawable {
 	var primitive = Triangles
 
 	var gdxMesh:Option[GdxMesh] = None 
-	private var isStatic = false
-	private var maxVertices = 0
-	private var maxIndices = 0
+	var isStatic = false
+	var maxVertices = 0
+	var maxIndices = 0
 
-	private var hasNormals = false
-	private var hasTexCoords = false
-	private var hasColors = false
+	var hasNormals = false
+	var hasTexCoords = false
+	var hasColors = false
 
 	/** Initialize gdx mesh component */
 	override def init(){
@@ -58,8 +58,8 @@ class Mesh extends Drawable {
 			attrs = attrs :+ VertexAttribute.ColorUnpacked
 		}
 
-		maxVertices = vertices.length * 2
-		maxIndices = indices.length * 2
+		if(maxVertices == 0) maxVertices = math.max(vertices.length * 2, 100)
+		if(maxIndices == 0) maxIndices = math.max(indices.length * 2, 100)
 	  if( gdxMesh.isDefined ) gdxMesh.get.dispose
 	  gdxMesh = Some(new GdxMesh(isStatic, maxVertices, maxIndices, attrs:_*))
 	  update()
@@ -69,12 +69,16 @@ class Mesh extends Drawable {
 	def update(){
 		if( gdxMesh.isEmpty ) init()
 
-		var buffer = Vector(vertices.map(v => Seq(v.x,v.y,v.z)))
-		if(hasNormals) buffer = buffer :+ normals.map(n => Seq(n.x,n.y,n.z))
-		if(hasTexCoords) buffer = buffer :+ texCoords.map(t => Seq(t.x,t.y))
-		if(hasColors) buffer = buffer :+ colors.map(c => Seq(c.r,c.g,c.b,c.a))
+		var vert:Array[Float] = null
+		if( hasNormals || hasTexCoords || hasColors){
+			var buffer = Vector(vertices.map(v => Seq(v.x,v.y,v.z)))
+			if(hasNormals) buffer = buffer :+ normals.map(n => Seq(n.x,n.y,n.z))
+			if(hasTexCoords) buffer = buffer :+ texCoords.map(t => Seq(t.x,t.y))
+			if(hasColors) buffer = buffer :+ colors.map(c => Seq(c.r,c.g,c.b,c.a))
+			vert = buffer.transpose.flatten.flatten.toArray
+		}else vert = vertices.map(v => List(v.x,v.y,v.z)).flatten.toArray
 
-		gdxMesh.get.setVertices(buffer.transpose.flatten.flatten.toArray)
+		gdxMesh.get.setVertices(vert)
 		if( primitive == Lines && wireIndices.length > 0) gdxMesh.get.setIndices(wireIndices.toArray)
 		else if(indices.length > 0) gdxMesh.get.setIndices(indices.toArray)
 	}
@@ -83,9 +87,9 @@ class Mesh extends Drawable {
 	override def draw(){
 		if( gdxMesh.isEmpty ) init()
 
-		var count = vertices.length
-		if( primitive == Lines && wireIndices.length > 0) count = wireIndices.length
-		else if(indices.length > 0) count = indices.length
+		var count = math.min(vertices.length, maxVertices)
+		if( primitive == Lines && wireIndices.length > 0) count = math.min(wireIndices.length,maxIndices)
+		else if(indices.length > 0) count = math.min(indices.length,maxIndices)
 
 		if( hasColors ) Shader.shader.get.uniforms("u_hasColor") = 1
     gdxMesh.get.render(Shader(), primitive, 0, count )
