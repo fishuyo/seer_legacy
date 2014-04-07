@@ -2,73 +2,57 @@
 package com.fishuyo.seer
 package util
 
-import maths._
+import maths.Vec3
 
-import scala.util.{Random => JRandom }
 
-object Randf{
-	val gen = new JRandom
-	def apply(min:Float=0.f, max:Float=1.f, gaus:Boolean=false) = new Randf(min,max,gaus)
-}
-
-class Randf( var min:Float=0.f, var max:Float=1.f, var gaus:Boolean=false){
-
-	def apply():Float = {
-		if( min == max ) return min
-		if( gaus ){
-			(Randf.gen.nextGaussian.toFloat / (10.f) + .5f) * (max-min) + min
-		}else{
-			Randf.gen.nextFloat * (max-min) + min
-		}
-	}
-	def seed(s:Long) = Randf.gen.setSeed(s)
-	def set( mi:Float ) { setMinMax(mi,mi,gaus) }
-	def setMinMax( mi:Float, ma:Float, gaus:Boolean=false ){
-		min=mi; max=ma;	
-	}
-}
-
-object RandVec3 {
-	def apply(min:Vec3=Vec3(0), max:Vec3=Vec3(1), gaus:Boolean=false) = new RandVec3(min,max,gaus)	
-}
-class RandVec3( min:Vec3=Vec3(0), max:Vec3=Vec3(1), var gaus:Boolean=false){
-	var x = Randf(min.x,max.x,gaus)
-	var y = Randf(min.y,max.y,gaus)
-	var z = Randf(min.z,max.z,gaus)
-
-	def apply() = Vec3(x(),y(),z())
-
-	def seed(s:Long) = Randf.gen.setSeed(s)
-	def set( min:Vec3 ) { setMinMax(min,min,gaus) }
-	def setMinMax( min:Vec3, max:Vec3, gaus:Boolean=false ){
-		x = Randf(min.x,max.x,gaus)
-		y = Randf(min.y,max.y,gaus)
-		z = Randf(min.z,max.z,gaus)	
-	}
-}
-
-object Chooser {
-	def apply[T]( c:Array[T], p:Array[Float]=Array[Float]()) = new Chooser[T](c,p)
-}
-class Chooser[T]( var choices:Array[T], var prob:Array[Float]=Array[Float]()){
-	val equal = prob.length == 0
-
-	def setProb( a:Array[Float] ) = prob = a
-	def setChoices( c:Array[T]) = choices = c
+object Random {
+	val r = new java.util.Random
+	val rseed = new java.util.Random
 	
-	def apply():T = {
-		var i = 0
-		if( equal ){
-			i = JRandom.nextInt(choices.length)
-			return choices(i)
-		} else{
-			val r = JRandom.nextFloat
-			var sum = 0.f
-			for( i <- ( 0 until prob.length)){
-				sum += prob(i)
-				if( r < sum) return choices(i)
-			}
-		}
-		choices(i)
+	def seed() = r.setSeed(rseed.nextLong)
+	def seed(s:Long) = r.setSeed(s)
+
+	val int = new Generator[Int]{
+		def apply() = r.nextInt
 	}
+	def int(lo:Int,hi:Int): Generator[Int] = for(x <- int) yield lo + math.abs(x) % (hi - lo)
+
+	val float = new Generator[Float]{
+		def apply() = r.nextFloat
+	}
+	def float(lo:Float,hi:Float): Generator[Float] = for(x <- float) yield x * (hi-lo) + lo
+
+	val double = new Generator[Double]{
+		def apply() = r.nextFloat
+	}
+
+	val bool = new Generator[Boolean]{
+		def apply() = r.nextBoolean
+	}
+
+	val vec3 = new Generator[Vec3]{
+		def apply() = Vec3(float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1.f,1.f)())
+	}
+	def vec3(lo:Vec3, hi:Vec3): Generator[Vec3] = {
+		for(x <- float(lo.x,hi.x);
+				y <- float(lo.y,hi.y);
+				z <- float(lo.z,hi.z)) yield Vec3(x,y,z)
+	}
+
+	def oneOf[T](xs: T*) = for(i <- int(0,xs.length)) yield xs(i)
+
+	def decide[T](xs:Seq[T], weights:Seq[Float]) = new Generator[T]{
+		def apply():T = {
+			val r = float()
+			val sum = weights.sum
+			var accum = 0.f
+			for( i <- ( 0 until weights.length)){
+				accum += weights(i) / sum
+				if( r < accum) return xs(i)
+			}
+			xs(0)
+		}
+	}
+
 }
+

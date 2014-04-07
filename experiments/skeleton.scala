@@ -68,8 +68,11 @@ object Main extends App with Animatable{
   def drawFabric(b:Boolean){drawFabric = b}
   // fabric.mesh.primitive = Lines
   // fabric2.mesh.primitive = Lines
+  fabricM.material = Material.specular
   fabricM.material.color.set(1,0,0,1)
+  fabricM2.material = Material.specular
   fabricM2.material.color.set(1,0,0,1)
+  fabricM3.material = Material.specular
   fabricM3.material.color.set(1,0,0,1)
   fabricNode.camera = Camera
   fabricNode.scene.push(fabric)
@@ -81,7 +84,7 @@ object Main extends App with Animatable{
   var trailDelay = 0.5f
   var trailOffset = Vec3(0,0,-.25f)
 
-  val live = new Ruby("skeleton.rb")
+  val live = new Ruby("experiments/skeleton.rb")
 
   SimpleAppRun()  
 
