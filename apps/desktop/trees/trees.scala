@@ -53,7 +53,9 @@ object Main extends SeerApp with AudioSource {
   var nmove = Vec3(0.f)
   var nrot = Vec3(0.f)
 
-  val live = new Ruby("apps/desktop/trees/trees.rb")
+  var pref = ""
+
+  var live:Ruby = null
 
   var theta = 0.f
   var dw = 0.f
@@ -62,26 +64,26 @@ object Main extends SeerApp with AudioSource {
   // SimpleAppRun() 
 
   override def init(){
-    ground = OBJ("res/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
+    ground = OBJ(pref + "res/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))
     ground.pose.quat.set(0.42112392f,-0.09659095f, 0.18010217f, -0.8836787f)
     ground.pose.pos.set(0.f,-1.3f,-.0f)
     ground.scale.set(5.f,5.f,5.f)
 
-    val f = Gdx.files.internal("res/wind.mp3")
+    val f = Gdx.files.internal(pref +"res/wind.mp3")
     wind = Gdx.audio.newMusic(f)
     wind.setVolume(0.0f)
     wind.setLooping(true)
     wind.play
 
-    var s = Shader.load("firstPass", Gdx.files.internal("res/shaders/firstPass.vert"), Gdx.files.internal("res/shaders/firstPass.frag"))
+    var s = Shader.load("firstPass", Gdx.files.internal(pref+"res/shaders/firstPass.vert"), Gdx.files.internal(pref+"res/shaders/firstPass.frag"))
     s.monitor()
-    s = Shader.load("secondPass", Gdx.files.internal("res/shaders/secondPass.vert"), Gdx.files.internal("res/shaders/secondPass.frag"))
+    s = Shader.load("secondPass", Gdx.files.internal(pref+"res/shaders/secondPass.vert"), Gdx.files.internal(pref+"res/shaders/secondPass.frag"))
     s.monitor()
-    s = Shader.load("test", Gdx.files.internal("res/shaders/test.vert"), Gdx.files.internal("res/shaders/test.frag"))
+    s = Shader.load("test", Gdx.files.internal(pref+"res/shaders/test.vert"), Gdx.files.internal(pref+"res/shaders/test.frag"))
     s.monitor()
-    s = Shader.load("texture", Gdx.files.internal("res/shaders/texture.vert"), Gdx.files.internal("res/shaders/texture.frag"))
+    s = Shader.load("texture", Gdx.files.internal(pref+"res/shaders/texture.vert"), Gdx.files.internal(pref+"res/shaders/texture.frag"))
     s.monitor()
-    s = Shader.load("composite", Gdx.files.internal("res/shaders/composite.vert"), Gdx.files.internal("res/shaders/composite.frag"))
+    s = Shader.load("composite", Gdx.files.internal(pref+"res/shaders/composite.vert"), Gdx.files.internal(pref+"res/shaders/composite.frag"))
     s.monitor()
 
     SceneGraph.root.shader = "firstPass"
@@ -132,6 +134,7 @@ object Main extends SeerApp with AudioSource {
 
     // Kinect.init()
     tree.init()
+    live = new Ruby(pref+"trees.rb")
   }
   override def draw(){
 

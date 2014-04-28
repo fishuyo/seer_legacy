@@ -52,7 +52,9 @@ class BasicMaterial extends Material {
 	var shininess = 0
 
 	def loadTexture(path:String){
-		val t = new GdxTexture(Gdx.files.internal(path));
+		loadTexture(new GdxTexture(Gdx.files.internal(path)))
+	}
+	def loadTexture(t:GdxTexture){
 		texture = Some(t)
 		textureMix = 1.f
 	}

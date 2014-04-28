@@ -8,36 +8,36 @@ import Implicits._
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
-object OSC{
+object OSC extends OSCReceiver with OSCSender {
+	override def disconnect(){
+		rcv.close
+		out.close
+	}
+}
 
-	var bundle = false
-	var messageBuffer = new ListBuffer[Message]()
+class OSCRecv extends OSCReceiver
+trait OSCReceiver {
 
 	// OSC recv config
   var cfg = UDP.Config()
   var rcv = UDP.Receiver(cfg) 
-  var port = 8000
-
-  // OSC send config
-  var ccfg = UDP.Config()  
-  ccfg.codec = PacketCodec().doublesAsFloats().booleansAsInts()
-  var out = UDP.Client( localhost -> 8001, ccfg )
 
   // callback functions
 	var callbacks = Map[String,(Any*)=>Unit]()
-	val handlers = new ListBuffer[(String,Any*)=>Unit]()
+	val ghandlers = new ListBuffer[(String,Any*)=>Unit]()
+	val phandlers = new ListBuffer[PartialFunction[Message,Unit]]()
 
 	// dummy function
 	def f(s:String)(v:Any*) = {} //println(s)}
 
-
 	/** Clear all callback functions */
-	def clear() = { callbacks.clear(); handlers.clear() }
+	def clear() = { callbacks.clear(); ghandlers.clear(); phandlers.clear() }
 
 	/** Bind new callback function to OSC address */
 	def bind( s:String, f:(Any*)=>Unit) = callbacks += s -> f
 
-	def bind(f:(String,Any*)=>Unit) = handlers += f
+	def bind(f:(String,Any*)=>Unit) = ghandlers += f
+	def bindp(f:PartialFunction[Message,Unit]) = phandlers += f
 
 	/** Start listening for OSC message on given port */
 	def listen(port:Int=8000){
@@ -45,18 +45,7 @@ object OSC{
 		cfg = UDP.Config()
 	  cfg.localPort = port  // 0x53 0x4F or 'SO'
 	  rcv = UDP.Receiver( cfg )
-	  // val sync = new AnyRef
 
-	  //rcv.dump( Dump.Both )
-	  // rcv.action = {
-	  //   case (Message( name, vals @ _* ), _) =>	    
-	  //     callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Any]])
-
-	  //   //case (Message( name, v1:Float ), _) =>
-	  //   //  callbacks.getOrElse(name, (v:Float)=>{println(name)} )(v1)
-	     
-	  //   case (p, addr) => println( "Ignoring: " + p + " from " + addr )
-	  // }
 	  rcv.action = {
 
       case (b:Bundle, _) => handleBundle(b)
@@ -80,10 +69,11 @@ object OSC{
   }
 
   def handleMessage(msg:Message){
+  	phandlers.foreach(_(msg))
     msg match {
     	case Message( name, vals @ _* ) =>
     		callbacks.getOrElse(name, f(name)_ )(vals.asInstanceOf[Seq[Any]])
-    		handlers.foreach( _(name,vals.asInstanceOf[Seq[Any]]) )
+    		ghandlers.foreach( _(name,vals.asInstanceOf[Seq[Any]]) )
       case _ => println( "Ignoring: " + msg )
     }
   }
@@ -91,6 +81,23 @@ object OSC{
 	/** close receiver and sender ports */
 	def disconnect(){
 		rcv.close
+	}
+}
+
+class OSCSend extends OSCSender
+trait OSCSender {
+
+	var bundle = false
+	var maxBundleLength = 30
+	var messageBuffer = new ListBuffer[Message]()
+
+  // OSC send config
+  var ccfg = UDP.Config()  
+  ccfg.codec = PacketCodec().doublesAsFloats().booleansAsInts()
+  var out = UDP.Client( localhost -> 8001, ccfg )
+
+	/** close receiver and sender ports */
+	def disconnect(){
 		out.close
 	}
 
@@ -106,7 +113,7 @@ object OSC{
 	def send(msg:Message){
 		if( bundle ){ 
 			messageBuffer += msg
-			if( messageBuffer.length > 30){ 
+			if( messageBuffer.length > maxBundleLength){ 
 				endBundle()
 				startBundle()
 			}
@@ -136,7 +143,7 @@ object OSC{
 		send(address,value)                        
 	}
 
-	def startBundle(){ bundle = true }
+	def startBundle(count:Int=30){ maxBundleLength = count; bundle = true }
 	def endBundle(){
 		bundle = false
 		if( messageBuffer.length > 0){
@@ -146,5 +153,3 @@ object OSC{
 		}
 	}
 }
-
-

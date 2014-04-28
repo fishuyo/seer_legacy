@@ -148,7 +148,7 @@ Trackpad.bind( lambda{ |i,f|
 		#puts f[6]
 		looper.setBounds(l,f[5],f[7])
 		
-		# looper.loops.apply(l).vocoder.timeShift(1.0) #f[8]*8.0-4.0)
+		# looper.loops.apply(l).vocoder.timeShift(f[8]*8.0-4.0)
 		looper.loops.apply(l).vocoder.pitchShift(f[8]*4.0)
 		looper.loops.apply(l).vocoder.gain(f[6])
 
@@ -239,6 +239,8 @@ OSC.bind("/1/joint/r_hand", lambda{|f|
 	looper.setGain(l,f[1])
 	# looper.setSpeed(l,f[8]*2.0)
 	left = (f[0]+1)/2
+	left = 0.0 if left < 0.0
+	left = 1.0 if left > 1.0
 	looper.setBounds(l,left,right)
 })
 
@@ -246,6 +248,9 @@ OSC.bind("/1/joint/l_hand", lambda{|f|
 	# looper.setGain(l,f[1])
 	looper.setSpeed(l,f[1]*2.0)
 	right = (f[0]+1)/2
+	right = 0.0 if right < 0.0
+	right = 1.0 if right > 1.0
+
 	looper.setBounds(l,left,right)
 })
 

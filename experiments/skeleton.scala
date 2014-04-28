@@ -84,7 +84,7 @@ object Main extends App with Animatable{
   var trailDelay = 0.5f
   var trailOffset = Vec3(0,0,-.25f)
 
-  val live = new Ruby("experiments/skeleton.rb")
+  val live = new Ruby("skeleton.rb")
 
   SimpleAppRun()  
 
@@ -104,9 +104,9 @@ object Main extends App with Animatable{
     feedback.scene.push(Plane())
 
 
-    SceneGraph.root.outputTo(feedback)
-    feedback.outputTo(feedback)
-    feedback.outputTo(ScreenNode)
+    // SceneGraph.root.outputTo(feedback)
+    // feedback.outputTo(feedback)
+    // feedback.outputTo(ScreenNode)
 
     live.init()
   }

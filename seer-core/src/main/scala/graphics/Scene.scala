@@ -134,8 +134,13 @@ class RenderNode {
 
   def resize(vp:Viewport){
     viewport = vp
-    camera.viewportWidth = vp.w
-    camera.viewportHeight = vp.h
+    if(camera.viewportHeight == 1.f){
+      camera.viewportWidth = vp.aspect
+    }else{
+      // camera.viewportWidth = vp.w
+      // camera.viewportHeight = vp.h
+    }
+
     if(buffer.isDefined){
       buffer.get.dispose
       buffer = Some(FrameBuffer(vp.w,vp.h))
@@ -201,7 +206,7 @@ class RenderNode {
       
       Shader().end()
     } catch{ case e:Exception => println(e)
-      println ("\n" + e.printStackTrace + "\n")
+      // println ("\n" + e.printStackTrace + "\n")
     }
 
     if( buffer.isDefined ) buffer.get.end()

@@ -66,21 +66,23 @@ object Settings {
     )
   )
 
-  lazy val desktop = packageArchetype.java_application ++ Settings.common ++ Seq (
-    // fork := true,
-    // fullClasspath in run <<= fullClasspath in Compile,
-    // fullClasspath in run <<= fullClasspath in Runtime,
-    // fork in Compile := true,
-    // connectInput in Compile := true,
-    // fork in run := true,
-    connectInput in run := true,
-    outputStrategy := Some(StdoutOutput)
-    // run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)) ,
-    // libraryDependencies ++= Seq(
-    //   "org.scala-lang" % "scala-compiler" % "2.10.2",
-    //   "org.scala-lang" % "jline" % "2.10.2"
-    // )
+  lazy val openni = Settings.common ++ Seq(
+    // javaOptions in run += "-Djava.library.path=.;./lib;/usr/local/lib/ni2;/usr/local/lib;"
+    javaOptions in run += "-Djava.library.path=/usr/local/lib/ni2:/Users/fishuyo/lib/nite2"
   )
+
+  lazy val desktop = packageArchetype.java_application ++ Settings.common ++ Seq (
+    fork in run := true,
+    // javaOptions in run += "-Djava.library.path=.;./lib;/usr/local/lib", 
+    javaOptions in run <<= (fullClasspath in Compile) map { (cp) => 
+       val cpString = cp.map(_.data).mkString(System.getProperty("path.separator"))
+       Seq("-cp",cpString)
+    },
+    connectInput in run := true,
+    cancelable := true,
+    outputStrategy := Some(StdoutOutput)
+  )
+
 
 }
 
@@ -116,7 +118,7 @@ object SeerBuild extends Build {
     lazy val seer_kinect = Project (
       "seer-kinect",
       file("seer-sensors/seer-kinect"),
-      settings = Settings.common
+      settings = Settings.common ++ Settings.openni
     ) dependsOn( seer_core, seer_opencv )
 
     lazy val seer_leap = Project (
@@ -209,8 +211,8 @@ object SeerBuild extends Build {
   lazy val experiments = Project (
     "experiments",
     file("experiments"),
-    settings = Settings.desktop
-  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio )
+    settings = Settings.desktop ++ Settings.openni
+  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio, seer_kinect )
 
 
   // apps

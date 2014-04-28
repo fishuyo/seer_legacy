@@ -239,8 +239,11 @@ class Shader {
             case i:Int => s.setUniformi(u._1, i)
             case i:Long => s.setUniformi(u._1, i.toInt)
             case v:RGBA => s.setUniformf(u._1, v.r, v.g, v.b, v.a)
+            case v:RGB => s.setUniformf(u._1, v.r, v.g, v.b)
             case v:Vec2 => s.setUniformf(u._1, v.x, v.y)
             case v:Vec3 => s.setUniformf(u._1, v.x, v.y, v.z)
+            case q:Quat => s.setUniformf(u._1, q.w, q.x, q.y, q.z)
+
             case _ => println("TODO: implement uniform type: " + u._1 + " " + u._2)
           }
           currentUniforms += u

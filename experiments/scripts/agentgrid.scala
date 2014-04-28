@@ -28,6 +28,7 @@ class Agent(val body:Model) {
 	var freq = 0.1f
 
 	def draw(){ body.draw }
+	
 	def step(dt:Float){
 		t += dt
 

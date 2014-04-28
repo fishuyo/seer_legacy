@@ -65,7 +65,7 @@ class Skel
 			id = 1
 			if f[0] == "head"
 				OSC.endBundle()
-				OSC.startBundle()
+				OSC.startBundle(30)
 				OSC.send("/l_fabric", Main.fabric.averageVelocity()*10.0, Main.fabric.averageSpringLength())
 				OSC.send("/r_fabric", Main.fabric2.averageVelocity()*10.0, Main.fabric2.averageSpringLength())
 			end

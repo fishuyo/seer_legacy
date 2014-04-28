@@ -180,9 +180,10 @@ object Script extends SeerScript {
 	var record = false
 	Keyboard.bind("r", () => {record = !record; println(record)})
 
-	OSC.clear()
-	OSC.disconnect()
-	OSC.listen(7110)
+	// OSC.clear()
+	// OSC.disconnect()
+	// OSC.listen(7110)
+
 	// OSC.bind("/new_user", (f)=>{ println("new user"); Main.skeletons.apply(f[0]).calibrating(true) })
 	// OSC.bind("/user/1", lambda{|f| Main.skeletons.apply(0).loadingModel.pose.pos.set(2*f[0]-1,1-f[1],f[2]) })
 	// OSC.bind("/user/2", lambda{|f| Main.skeletons.apply(1).loadingModel.pose.pos.set(2*f[0]-1,1-f[1],f[2]) })
@@ -217,6 +218,7 @@ object Script extends SeerScript {
 
 	override def draw(){
 		Gdx.gl.glLineWidth(2)
+		
 		// println(gestures(0).mesh.vertices)
 
 

@@ -86,7 +86,7 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
       }
 
       particles.foreach( (p) => {
-        p.applyGravity()
+        // p.applyGravity()
         p.applyDamping(damping)
         p.step() // timeStep
         p.collideGround(-1.f, 0.999999f) 
