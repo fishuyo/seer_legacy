@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.GdxNativesLoader
 import com.badlogic.gdx.utils.SharedLibraryLoader
 import com.badlogic.gdx.backends.lwjgl._
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.InputAdapter
@@ -21,7 +22,7 @@ import org.lwjgl.opengl.AWTGLCanvas
 import java.awt._
 import java.awt.event._
 
-object SimpleAppRun {
+object DesktopApp {
 
   var displayMode:Option[Long] = _
 
@@ -30,7 +31,7 @@ object SimpleAppRun {
 
   loadLibs() // load gdx before simple app listener
 
-  val app = new SimpleAppListener()
+  var app:ApplicationListener = _ //new SeerAppListener()
 
   Inputs.addProcessor(FullscreenKey)
 
@@ -76,8 +77,11 @@ object SimpleAppRun {
   }
 
   // create and run the lwjgl application
-  def apply(useCanvas:Boolean = false) = {
+  def run(appl:ApplicationListener = null, useCanvas:Boolean = false) = {
     
+    if(appl == null) app = new SeerAppListener
+    else app = appl
+
     loadLibs()
 
     val cfg = new LwjglApplicationConfiguration()
@@ -110,9 +114,6 @@ object SimpleAppRun {
 
       new LwjglApplication( app, cfg )
     }
-    // PortAudio.initialize()
-    // PortAudio.start()
-
   }
 
   def toggleFullscreen(){
@@ -205,7 +206,7 @@ object FullscreenKey extends InputAdapter {
   override def keyDown(k:Int) = {
     
     k match {
-      case Keys.ESCAPE => SimpleAppRun.toggleFullscreen
+      case Keys.ESCAPE => DesktopApp.toggleFullscreen
       case Keys.F1 => 
         // if( PortAudio.sources.length > 0) PortAudio.toggleRecording()
         // else Audio.toggleRecording()
@@ -219,9 +220,9 @@ object FullscreenKey extends InputAdapter {
 
 class SeerApp extends App with Animatable {
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
-  SimpleAppRun()
+  DesktopApp.run()
   Repl.imports += this.getClass.getName.replace("$","")
   Repl.start()
 

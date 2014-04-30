@@ -8,7 +8,7 @@ import maths._
 import io._
 
 object Main extends App with Animatable {
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   val fieldViewer = new ConwayFV(100,100)
@@ -16,7 +16,7 @@ object Main extends App with Animatable {
 
   val live = new Ruby("fieldViewer.rb")
 
-  SimpleAppRun()
+  DesktopApp()
 
   override def animate(dt:Float) = {
     live.runEverytime(dt)

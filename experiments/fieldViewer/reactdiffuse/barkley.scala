@@ -10,7 +10,7 @@ import maths._
 
 object Main extends App with Animatable {
 
-	SimpleAppRun.loadLibs()
+	DesktopApp.loadLibs()
 	Scene.push( this )
 
   val fv = new ReactDiffuseFV
@@ -18,7 +18,7 @@ object Main extends App with Animatable {
 
   val live = new Ruby("src/main/scala/examples/fieldViewer/reactdiffuse/barkley.rb")
 
-  SimpleAppRun()
+  DesktopApp()
 
   override def step(dt:Float) = live.step(dt)
 }

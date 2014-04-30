@@ -24,7 +24,7 @@ import org.opencv.imgproc._
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
 
 	var capture: VideoCapture = _
   var bgsub:BackgroundSubtract = _
@@ -44,7 +44,7 @@ object Main extends App with Animatable{
   Audio.push(synth)
 
   Scene.push(this)
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)

@@ -61,25 +61,28 @@ Keyboard.bind("g", lambda{
 	looper.stack(l)
 })
 
-# Touch.clear()
-# Touch.use()
+Touch.clear()
+Touch.use()
 
-# $newPos = Vec3.new(0.3,-0.3,2.0)
-# Touch.bind("fling", lambda{|button,v|
-# 	thresh = 500
-# 	if v[0] > thresh
-# 		l = l-1
-# 	elsif v[0] < -thresh
-# 		l = l+1
-# 	elsif v[1] > thresh
-# 		l = l-4
-# 	elsif v[1] < -thresh
-# 		l = l+4
-# 	end
-# 	l = l%looper.plots.size
-# 	pos = looper.plots[l].pose.pos + Vec3.new(0,0,0.5)
-# 	$newPos.set(pos)
-# })
+$newPos = Vec3.new(0.3,-0.3,2.0)
+Touch.bind("fling", lambda{|button,v|
+	puts "fling!"
+	puts v[0]
+	puts v[1]
+	thresh = 500
+	if v[0] > thresh
+		l = l-1
+	elsif v[0] < -thresh
+		l = l+1
+	elsif v[1] > thresh
+		l = l-4
+	elsif v[1] < -thresh
+		l = l+4
+	end
+	l = l%looper.plots.size
+	pos = looper.plots[l].pose.pos + Vec3.new(0,0,0.5)
+	$newPos.set(pos)
+})
 
 # Mouse.clear()
 # Mouse.use()
@@ -260,7 +263,7 @@ def animate dt
 	$looper.setMode("sync")
 	Audio.playThru(false)
 	Audio.recordThru(true)
-	# Camera.nav.pos.lerpTo($newPos, 0.15)
+	Camera.nav.pos.lerpTo($newPos, 0.15)
 
 	pos = SceneGraph.root.camera.nav.pos + Vec3.apply(-0.45,0,-0.55) #$model.pose.pos
 	# pos.set(pos.x, pos.y, 0)

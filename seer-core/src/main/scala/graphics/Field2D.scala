@@ -23,13 +23,13 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
 
   var resized = true
 
-  var textureId = 0
-  //val pix = new Pixmap(w,h, Pixmap.Format.RGBA8888)
 
   var data:FloatBuffer = BufferUtils.newFloatBuffer( 4*w*h );
-  val quad = Model(Quad())
-  //var data: FloatTextureData = _
-  //if( w > 0 && h > 0 ) data = Buffers.newDirectFloatBuffer(w*h)
+  val quad = Plane()
+  quad.material = Material.basic
+  quad.material.textureMix = 1.f
+
+  var texture: FloatTexture = _
 
   def apply( i:Int ):RGBA = RGBA(data.get(4*i),data.get(4*i+1),data.get(4*i+2),data.get(4*i+3))
   def apply( x:Int, y:Int ):RGBA = this( w*y + x)
@@ -133,12 +133,20 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
   }
   
   def bind(){
-    synchronized{
-      if(resized){ textureId = Texture(w,h,data); resized = false }
-
-      Texture.bind(textureId)
-      Texture(textureId).getTextureData().consumeCompressedData(0) // ? check this
+    if(resized){
+      texture = new FloatTexture(w,h)
+      texture.data = data
+      texture.bind(0)
+      texture.update
+      texture.params
+      // textureId = Texture(w,h,data); 
+      resized = false 
     }
+
+    texture.bind(0)
+    texture.update
+    // Texture.bind(textureId)
+    // Texture(textureId).getTextureData().consumeCompressedData(0) // ? check this
   }
 
   override def draw(){

@@ -8,14 +8,14 @@ import maths._
 import io._
 
 object Main extends App with Animatable {
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   var field = new MField(100,100)
 
   val live = new Ruby("src/main/scala/examples/fieldViewer/fractal/mandlebrot.rb")
 
-  SimpleAppRun()
+  DesktopApp()
 
   override def draw() = {
     field.draw()

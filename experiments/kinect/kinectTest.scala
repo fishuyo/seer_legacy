@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.glutils._
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
 
   Scene.push(this)
 
@@ -28,7 +28,7 @@ object Main extends App with Animatable{
   pix.setColor(1.f,1.f,1.f,0)
   pix.fill()
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
     //Shader("res/shaders/sky.vert", "res/shaders/sky.frag")

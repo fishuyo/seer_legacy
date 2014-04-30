@@ -20,7 +20,7 @@ import org.opencv.imgproc._
 
 object Loop extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
   Scene.push(this)
 
@@ -44,7 +44,7 @@ object Loop extends App with Animatable{
 
   val live = new Ruby("kinectLoop.rb")
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
   	Texture(bigpix)

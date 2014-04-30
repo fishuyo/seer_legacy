@@ -15,8 +15,8 @@ class StringTest
 		Mouse.clear()
 		Mouse.use()
 		Mouse.bind("drag", lambda{|i|
-			x = (i[0] / SimpleAppRun.app.width) * 20.0
-			y = (1 - i[1] / SimpleAppRun.app.height) * 20.0
+			x = (i[0] / DesktopApp.app.width) * 20.0
+			y = (1 - i[1] / DesktopApp.app.height) * 20.0
 
 			Main.strings[0].pins[0].q.position.set(x,y,0)
 		})
@@ -125,7 +125,7 @@ class StringTest
 
 		# p = Main.strings().apply(0).pins().apply(0).position()
 		# p = Vec3(p.x(),p.y(),p.z()+50)
-		# // SimpleAppRun.app().camera().nav().pos().lerpTo(p, 0.05)
+		# // DesktopApp.app().camera().nav().pos().lerpTo(p, 0.05)
 	end
 end
 StringTest.new

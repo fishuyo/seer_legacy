@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
   
   var looper = new Looper
@@ -77,7 +77,7 @@ object Main extends App with Animatable{
   Shader.lightingMix=0.0f
   Shader.setBgColor(RGBA(1,1,1,1))
 
-  SimpleAppRun()  
+  DesktopApp.run()  
 
   override def init(){
     Audio.start

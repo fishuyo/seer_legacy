@@ -188,7 +188,7 @@ class Skel
 		# Main.node.scene.alpha(1.0)
 		# Scene.alpha(1.0)
 		# puts Main.node.scene.alpha
-    	# node.scene.alpha = math.abs(math.sin(SimpleAppRun.app.frameCount/100.f).toFloat)
+    	# node.scene.alpha = math.abs(math.sin(DesktopApp.app.frameCount/100.f).toFloat)
 
 		@dur = 5.0
 		if @t < @dur

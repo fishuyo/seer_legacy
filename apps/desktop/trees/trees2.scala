@@ -16,7 +16,7 @@ import collection.mutable.ListBuffer
 
 object Main extends SeerApp with AudioSource {
 
-  // SimpleAppRun.loadLibs()
+  // DesktopApp.loadLibs()
   // Scene.push(this)
   //Scene.push(Kinect)
   
@@ -42,7 +42,7 @@ object Main extends SeerApp with AudioSource {
   // Audio.push(this) 
 
   var live:Ruby = _
-  // SimpleAppRun() 
+  // DesktopApp() 
 
 
   override def init(){

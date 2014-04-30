@@ -8,9 +8,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.BufferUtils
 
 
-import scala.collection.mutable.ListBuffer
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.GL30
+import com.badlogic.gdx.Gdx.{gl20 => gl }
+
+// import org.lwjgl.opengl.GL11
+// import org.lwjgl.opengl.GL12
+// import org.lwjgl.opengl.GL43
 
 import java.nio.FloatBuffer
+import java.io.DataInputStream
+import java.io.FileInputStream
+
+import scala.collection.mutable.ListBuffer
 
 
 object Texture {
@@ -57,11 +67,64 @@ object Texture {
   // def getFloatBuffer(i:Int) = textures(i).getTextureData match { case td:FloatTextureDataExposed => td.getBuffer; case _ => null }
 }
 
-class FloatTexture(val w:Int,val h:Int) {
-	val data:FloatBuffer = BufferUtils.newFloatBuffer( 4*w*h )
-	val td = new DynamicFloatTexture(w,h,data)
-	val t = new GdxTexture( td )
+// class FloatTexture(val w:Int,val h:Int) {
+// 	val data:FloatBuffer = BufferUtils.newFloatBuffer( 4*w*h )
+// 	val td = new DynamicFloatTexture(w,h,data)
+// 	val t = new GdxTexture( td )
 
+// }
+
+class FloatTexture(var w:Int,var h:Int) {
+  var data = BufferUtils.newFloatBuffer( 4*w*h )
+  val handle = getGLHandle()
+  val target = GL20.GL_TEXTURE_2D
+  val iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
+  val format = GL20.GL_RGBA
+  val dtype = GL20.GL_FLOAT
+  // println(Gdx.graphics.supportsExtension("texture_float"))
+
+  val filterMin = GL20.GL_NEAREST
+  val filterMag = GL20.GL_NEAREST
+  val mWrapS = GL20.GL_CLAMP_TO_EDGE
+  val mWrapT = GL20.GL_CLAMP_TO_EDGE
+  val mWrapR = GL20.GL_CLAMP_TO_EDGE
+
+  // bind(0)
+  // update()
+  // params()
+
+  def getGLHandle() = {
+    val buf = BufferUtils.newIntBuffer(1)
+    Gdx.gl.glGenTextures(1,buf)
+    buf.get(0)
+  }
+
+  def bind(i:Int=0){
+    Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0+i)
+    Gdx.gl.glEnable(target)
+    Gdx.gl.glBindTexture(target, handle)    
+  }
+
+  def params(){
+    // Gdx.gl.glBindTexture(target, handle);
+    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_MAG_FILTER, filterMag)
+    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_MIN_FILTER, filterMin)
+    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_WRAP_S, mWrapS);
+    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_WRAP_T, mWrapT);
+    Gdx.gl.glTexParameterf(target, GL30.GL_TEXTURE_WRAP_R, mWrapR);
+    if (filterMin != GL20.GL_LINEAR && filterMin != GL20.GL_NEAREST) {
+      Gdx.gl.glTexParameteri(target, GL20.GL_GENERATE_MIPMAP, GL20.GL_TRUE); // automatic mipmap
+    }
+    // Gdx.gl.glBindTexture(target, 0);
+  }
+
+  def update(){
+    data.rewind
+    // Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
+    Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,data)
+    Gdx.gl.glGenerateMipmap(GL20.GL_TEXTURE_2D);
+    // println(Gdx.gl.glGetError())
+  }
 }
 
 

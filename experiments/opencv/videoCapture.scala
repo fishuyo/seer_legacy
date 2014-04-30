@@ -29,7 +29,7 @@ object Main extends App with Animatable{
 
   var bytes:Array[Byte] = null
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
 
   Scene.push(this)
 
@@ -42,7 +42,7 @@ object Main extends App with Animatable{
 
   var player:VideoPlayer = null
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)

@@ -10,7 +10,7 @@ import objects._
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   val live = new JS("fabric.js")
@@ -18,7 +18,7 @@ object Main extends App with Animatable{
   val fabric = new Fabric()
 
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def draw(){
     Shader.lightingMix = 0.f

@@ -20,6 +20,7 @@ object Settings {
       "NativeLibs4Java Repository" at "http://nativelibs4java.sourceforge.net/maven/",
       "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
       "Sonatypes OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
+      "Sonatypes OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/",
       "ScalaNLP Maven2" at "http://repo.scalanlp.org/repo",
       "maven.org" at "http://repo1.maven.org/maven2",
       "java portaudio" at "http://maven.renejeschke.de/snapshots",
@@ -48,6 +49,9 @@ object Settings {
   )
   lazy val jruby = Settings.common ++ Seq(
     libraryDependencies += "org.jruby" % "jruby" % "1.7.3"
+  )
+  lazy val luaj = Settings.common ++ Seq(
+    libraryDependencies += "org.luaj" % "luaj-jse" % "3.0-beta2"
   )
   lazy val twitter_eval = Settings.common ++ Seq(
     libraryDependencies += "com.twitter" %% "util-eval" % "6.12.1"
@@ -156,6 +160,11 @@ object SeerBuild extends Build {
     file("seer-dynamic/seer-jruby"),
     settings = Settings.common ++ Settings.jruby
   ) dependsOn seer_core
+  lazy val seer_luaj = Project (
+    "seer-luaj",
+    file("seer-dynamic/seer-luaj"),
+    settings = Settings.common ++ Settings.luaj
+  ) dependsOn seer_core
   lazy val seer_eval = Project (
     "seer-eval",
     file("seer-dynamic/seer-eval"),
@@ -212,7 +221,7 @@ object SeerBuild extends Build {
     "experiments",
     file("experiments"),
     settings = Settings.desktop ++ Settings.openni
-  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio, seer_kinect )
+  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio, seer_kinect, seer_luaj )
 
 
   // apps

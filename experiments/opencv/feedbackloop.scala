@@ -22,7 +22,7 @@
 
 // object Main extends App with Animatable{
 
-//   SimpleAppRun.loadLibs()
+//   DesktopApp.loadLibs()
 //   System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
 //   Scene.push(this)
 
@@ -54,7 +54,7 @@
 
 //   Audio.push(audioLoop)
 
-//   SimpleAppRun()  
+//   DesktopApp()  
 
 //   override def init(){
 //     capture = new VideoCapture(0)

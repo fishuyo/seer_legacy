@@ -81,6 +81,11 @@ object SceneGraph {
     roots.prepend(n)
   }
 
+  def removeNode(n:RenderNode){
+    //TODO cleanup inputs outputs
+    roots -= n
+  }
+
   def animate(dt:Float){
     roots.foreach( (n) => animateChildren(n,dt) )
   }

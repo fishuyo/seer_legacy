@@ -17,14 +17,14 @@ import scala.collection.mutable.ListBuffer
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   val live = new JS("emitter.js")
 
   val emitter = new MyEmitter(100)
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
     // Shader.load("basic", Gdx.files.internal("res/t.vert"), Gdx.files.internal("res/t.frag"))

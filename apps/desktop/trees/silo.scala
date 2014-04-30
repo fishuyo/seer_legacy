@@ -18,7 +18,7 @@ import collection.mutable.ListBuffer
 
 object Main extends SeerApp with AudioSource {
 
-  // SimpleAppRun.loadLibs()
+  // DesktopApp.loadLibs()
   // Scene.push(this)
   Audio.push(this)
   
@@ -35,7 +35,7 @@ object Main extends SeerApp with AudioSource {
 
   val live = new Ruby("apps/desktop/trees/silo.rb")
 
-  // SimpleAppRun() 
+  // DesktopApp() 
 
   override def init(){
     tree.init()

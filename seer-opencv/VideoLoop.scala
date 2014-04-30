@@ -36,7 +36,7 @@ class VideoLoop extends VideoSource {
 
   def play(){ playing = true; }
   def togglePlay() = playing = !playing
-  def stop(){ playing = false; recording = false}
+  def stop(){ playing = false; recording = false; stacking = false}
   def rewind(){ frame = 0.f }
   def record(){ recording = true; }
   def toggleRecord() = {
@@ -53,6 +53,8 @@ class VideoLoop extends VideoSource {
   def reverse() = reversing = !reversing
   def reverse(b:Boolean) = reversing = b
   def clear() = {
+    stop()
+    images.foreach( _.release )
   	images.clear()
   	frame = 0.f
   }

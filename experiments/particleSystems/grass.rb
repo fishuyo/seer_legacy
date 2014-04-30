@@ -31,8 +31,8 @@ class Grass
 		Mouse.clear()
 		Mouse.use()
 		Mouse.bind("drag", lambda{|i| 
-			x = (i[0] / SimpleAppRun.app.width) * 20.0
-			y = (1 - i[1] / SimpleAppRun.app.height) * 20.0
+			x = (i[0] / DesktopApp.app.width) * 20.0
+			y = (1 - i[1] / DesktopApp.app.height) * 20.0
 
 			# // Main.strings().apply(0).pins().apply(0).position().set(x,y,0)
 			

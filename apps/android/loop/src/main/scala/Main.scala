@@ -25,7 +25,7 @@ class Main extends AndroidApplication {
     config.depth = 0
     config.useGL20 = true
     val loopscene = new LoopScene
-    initialize(new SimpleAppListener, config)
+    initialize(new SeerAppListener, config)
   }
 
   override def getLogLevel(): Int = 0

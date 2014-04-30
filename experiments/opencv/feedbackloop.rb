@@ -182,8 +182,8 @@ OSC.bind("/9/y", lambda{|f|
 
 
 
-# SimpleAppRun.setDecorated(false)
-# SimpleAppRun.setBounds(0,0,1920,1200)
+# DesktopApp.setDecorated(false)
+# DesktopApp.setBounds(0,0,1920,1200)
 
 # for i in 0...Main.loop.images.length
 #  Highgui.imwrite("/Users/fishuyo/img/"+i.to_s+".png",Main.loop.images[i])

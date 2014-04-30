@@ -15,7 +15,7 @@ import scala.collection.mutable.ListBuffer
 
 object Main extends App with Animatable {
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   var sines = ListBuffer[Osc]()
@@ -32,7 +32,7 @@ object Main extends App with Animatable {
 
   val live = new Ruby("synth.rb")
 
-  SimpleAppRun()
+  DesktopApp()
 
   override def step(dt:Float){
 

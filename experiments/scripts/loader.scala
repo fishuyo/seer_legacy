@@ -10,9 +10,11 @@ object Loader extends SeerScript {
 	// val loader = new SeerScriptLoader("scripts/empty.scala")
 	// val loader = new SeerScriptLoader("scripts/texture.scala")
 	// val loader = new SeerScriptLoader("scripts/shader.scala")
-	val loader = new SeerScriptLoader("scripts/omni.scala")
+	// val loader = new SeerScriptLoader("scripts/omni.scala")
 	// val loader = new SeerScriptLoader("scripts/gl30test.scala")
 	// val loader = new SeerScriptLoader("scripts/puddle.scala")
+	// val loader = new SeerScriptLoader("scripts/field.scala")
+	val loader = new SeerScriptLoader("scripts/andreou.scala")
 
 // 
 	override def onUnload(){

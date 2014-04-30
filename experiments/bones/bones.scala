@@ -18,7 +18,7 @@
 
 // object Main extends App{
 
-//   SimpleAppRun.loadLibs()
+//   DesktopApp.loadLibs()
 
 //   Scene.push( ParticleCollector )
 //   var p = new Particle(Vec3(.01,0,.01),Vec3(1,0,1).normalize)
@@ -74,7 +74,7 @@
 
 //   //Trackpad.connect()
   
-//   SimpleAppRun()  
+//   DesktopApp()  
 
 // }
 

@@ -9,7 +9,7 @@ import maths._
 import io._
 
 object Main extends App with Animatable {
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   //val live = new Ruby("src/main/scala/examples/fieldViewer/live/live.rb")
@@ -18,7 +18,7 @@ object Main extends App with Animatable {
   var fieldViewer = new FieldViewer(60,60)
   Scene.push(fieldViewer)
 
-  SimpleAppRun()
+  DesktopApp()
 
   override def step(dt:Float) = {
     live.step(dt)

@@ -7,12 +7,14 @@ import io._
 import cv._
 import video._
 import util._
+import kinect._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils._
+import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 
 import org.opencv.core._
 import org.opencv.highgui._
@@ -22,150 +24,126 @@ import org.opencv.imgproc._
 
 object Script extends SeerScript {
 
-	try{ System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)}
-	catch{ case e:Exception => () }
-	
-  val capture = new VideoCapture(0)
+  OpenCV.loadLibrary()
+
   var loop = new VideoLoop
-  var dirty = false
+  var dirty = true
 
 	var bytes:Array[Byte] = null
 	var (w,ww,h,hh) = (0.0,0.0,0.0,0.0)
 
+  val capture = new VideoCapture(0)
   w = capture.get(Highgui.CV_CAP_PROP_FRAME_WIDTH)
   h = capture.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT)
+  
+  Kinect.connect
+  Kinect.startVideo
+  w = 640.toDouble
+  h = 480.toDouble
+
   ww = w
   hh = h
   println( s"starting capture w: $w $h")
 
   var subRect = new Rect(0,0,w.toInt,h.toInt)
 
+  var pix:Pixmap = null
+  var texture:GdxTexture = null
+  var loopNode:TextureNode = null
+
+  val quad = Plane()
+  quad.material = Material.basic
+
+  var scale = 1.
+  // resize(0,0,1280,720)
+
 	override def onLoad(){
 	}
 
 	override def draw(){
-	}
-
-	override def animate(dt:Float){
+    // quad.draw
 	}
 
 	override def onUnload(){
-		capture.close
+    // if( texture != null) texture.dispose
+    loop.clear
+		capture.release
+    ScreenNode.inputs.clear
+    SceneGraph.removeNode(loopNode)
 	}
-
-}
-Script
-
-
-object Main extends App with Animatable{
-
-  var pix:Pixmap = null
-  var loopNode:TextureNode = null
-
-  override def init(){
-
-    // resize(160,0,960,720)
-
-    pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
-    bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
-  	cube.scale.set(1.f, (h/w).toFloat, 1.f)
-
-    // player = new VideoPlayer("/Users/fishuyo/Desktop/o.mp4")
-    player = new VideoPlayer("/Users/fishuyo/projects/Documentation/feedback_puddle/1.mov")
-
-
-  	Texture(pix) 
-  	val id = Texture(player.pixmap) 
-
-  	loopNode = new TextureNode( Texture(0) )
-  	val playerNode = new TextureNode( Texture(id) )
-  	val compNode = new RenderNode
-    compNode.shader = "composite"
-    // compNode.clear = false
-    val quag = new Drawable {
-      val m = Plane.generateMesh() //Mesh(Primitive2D.quad)
-      m.texCoords.foreach( (t) => t.y = 1.f-t.y )
-      m.update
-      override def draw(){
-        // Shader("composite").setUniformf("u_blend0", 1.0f)
-        // Shader("composite").setUniformf("u_blend1", 1.0f)
-        // Shader("composite").setUniformMatrix("u_projectionViewMatrix", new Matrix4())
-        m.draw()
-      }
-    }
-    compNode.scene.push( quag )
-    loopNode.outputTo(compNode)
-    playerNode.outputTo(compNode)
-  	SceneGraph.addNode(compNode)
-
-    looper.loops(0).load("Desktop/introS.wav")
-  	looper.loops(1).load("Desktop/boop.wav")
-  	loop.setAlpha(1.f)
-  	live.init()
-  }
 
   def resizeC(x1:Float,y1:Float, x2:Float, y2:Float){
     implicit def f2i(f:Float) = f.toInt
     val c = clamper(0.f,1.f)_
     val (l,r) = (if(x1>x2) (c(x2),c(x1)) else (c(x1),c(x2)) )
     val (t,b) = (if(y1>y2) (c(y2),c(y1)) else (c(y1),c(y2)) )
-    println(s"resize: ${l*w} ${t*h} ${(r-l)*w} ${(b-t)*h}")
-    resize( l*w, t*h, (r-l)*w, (b-t)*h )
+    // println(s"resizeC: ${l*w} ${t*h} ${(r-l)*w} ${(b-t)*h}")
+    resize( l*w, t*h, (r-l)*ww, (b-t)*hh )
   }
   
   def resize(x:Int, y:Int, width:Int, height:Int){
-    w = width.toDouble
-    h = height.toDouble
-    subRect = new Rect(x,y,width,height)
+    var wid = width
+    var hit = height
+    if(x+wid > ww) wid = ww.toInt-x
+    if( wid % 2 == 1) wid -= 1
+
+    if(y+hit > hh) hit = hh.toInt-y
+    w = wid.toDouble
+    h = hit.toDouble
+    println(s"resize: ${x} ${y} ${wid} ${hit}")
     loop.clear()
     dirty = true
+    subRect = new Rect(x,y,wid,hit)
   }
 
   def resizeFull(){
     resize(0,0,ww.toInt,hh.toInt)
   }
 
-  override def draw(){
-
-    Shader.lightingMix = 0.f
-  	Shader.textureMix = 1.f
-  	// Texture.bind(0)
-  	// cube.draw()
-
-  }
-
   override def animate(dt:Float){
-
-  	player.animate(dt)
-  	Texture(1).draw(player.pixmap,0,0)
-
+    if( pix == null){
+      loopNode = new TextureNode( texture )
+      loopNode.outputTo(ScreenNode)
+      SceneGraph.addNode(loopNode)
+      ScreenNode.scene.clear
+      ScreenNode.scene.push(Plane().scale(-1,-1,1))
+    }
     if( dirty ){  // resize everything if using sub image
-      pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
-      bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
-      cube.scale.set(1.f, (h/w).toFloat, 1.f)
-      Texture.update(0, pix)
-      loopNode.texture = Texture(0) 
+      pix = new Pixmap((w*scale).toInt,(h*scale).toInt, Pixmap.Format.RGB888)
+      bytes = new Array[Byte]((h.toInt*scale*w.toInt*scale*3).toInt)
+      // quad.scale.set(1.f, (h/w).toFloat, 1.f)
+      if(texture != null) texture.dispose
+      texture = new GdxTexture(pix) 
+      loopNode.texture = texture 
+      dirty = false
     }
 
-  	val img = new Mat()
-  	val read = capture.read(img)  // read from camera
+    try{
 
-    if( !read ) return
+  	val cam = new Mat()
+  	val read = capture.read(cam)  // read from camera
+
+    if( !read ){ return }
+
+    var img = cam
+    img = Kinect.videoMat
 
     val subImg = new Mat(img, subRect )   // take sub image
 
     val rsmall = new Mat()
   	val small = new Mat()
 
-  	Imgproc.resize(subImg,small, new Size(), 0.5,0.5,0)   // scale down
-    Core.flip(small,rsmall,1)   // flip so mirrored
-    Imgproc.cvtColor(rsmall,small, Imgproc.COLOR_BGR2RGB)   // convert to rgb
+  	Imgproc.resize(subImg,small, new Size(), scale,scale,0)   // scale down
+    // Core.flip(small,rsmall,0)   // flip so mirrored
+    // Imgproc.cvtColor(small,rsmall, Imgproc.COLOR_BGR2RGB)   // convert to rgb
 
-    var sub = small
+    var sub = rsmall
 
   	var out = new Mat()
   	loop.videoIO( sub, out)  // pass frame to loop get next output
-    if( out.empty()) return
+    // if( out.empty()) return
+
+    out = small
 
     // copy MAT to pixmap
   	out.get(0,0,bytes)
@@ -174,18 +152,69 @@ object Main extends App with Animatable{
 		bb.rewind()
 
     // update texture from pixmap
-		Texture(0).draw(pix,0,0)
+		texture.draw(pix,0,0)
 
-    live.animate(dt)
-
-    img.release
+    cam.release
     subImg.release
     small.release
     rsmall.release
     out.release
+    } catch { case e:Exception => ()}
+
   }
 
 }
+
+Keyboard.clear()
+Keyboard.use()
+Keyboard.bind("r",()=>{ Script.loop.toggleRecord() })
+Keyboard.bind("c",()=>{ Script.loop.stop(); Script.loop.clear() })
+Keyboard.bind("x",()=>{ Script.loop.stack() })
+Keyboard.bind("t",()=>{ Script.loop.togglePlay() })
+Keyboard.bind("v",()=>{ Script.loop.reverse() })
+Keyboard.bind("z",()=>{ Script.loop.rewind() })
+Keyboard.bind("1",()=>{ Script.resizeFull();})
+
+var x = 0
+var y = 0
+var w = Script.w.toInt
+var h = Script.h.toInt
+Keyboard.bind("y",()=>{ x -= 10; Script.resize(x,y,w,h);})
+Keyboard.bind("u",()=>{ x += 10;  Script.resize(x,y,w,h);})
+Keyboard.bind("h",()=>{ w -= 10; Script.resize(x,y,w,h);})
+Keyboard.bind("j",()=>{ w += 10;  Script.resize(x,y,w,h);})
+Keyboard.bind("i",()=>{ y -= 10; Script.resize(x,y,w,h);})
+Keyboard.bind("k",()=>{ y += 10;  Script.resize(x,y,w,h);})
+Keyboard.bind("o",()=>{ h -= 10; Script.resize(x,y,w,h);})
+Keyboard.bind("l",()=>{ h += 10;  Script.resize(x,y,w,h);})
+
+Mouse.clear()
+Mouse.use()
+Mouse.bind("drag", (i)=>{
+  val x = i(0) / (1.0*Window.width)
+  val y = i(1) / (1.0*Window.height)
+  val speed = (400 - i(1)) / 100.0
+  val decay = (i(0) - 400) / 100.0
+
+  // # Main.loop.setSpeed(1.0) #speed)
+  // # Main.loop.setAlphaBeta(decay, speed)
+  Script.loop.setAlpha(decay)
+})
+
+// var l=0.0
+// var t=0.0
+// Mouse.bind("down", (i)=>{
+//   l = i(0) / (1.0*Window.width)
+//   t = i(1) / (1.0*Window.height)
+// })
+// Mouse.bind("up", (i)=>{
+//   val x = i(0) / (1.0*Window.width)
+//   val y = i(1) / (1.0*Window.height)
+//   Script.resizeC(l,t,x,y)
+// })
+
+
+Script
 
 
 

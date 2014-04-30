@@ -23,7 +23,7 @@ object Shader {
   var shader:Option[Shader] = None
   val loadedShaders = new HashMap[String,Shader]()
 
-  var defaultMaterial:Material = new BasicMaterial
+  var defaultMaterial:BasicMaterial = new BasicMaterial
 
   var bg = RGBA(0,0,0,1)
   var color = RGBA(1,1,1,1)

@@ -17,7 +17,7 @@ import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
   Inputs.addProcessor(video.ScreenCaptureKey)
 
@@ -28,7 +28,7 @@ object Main extends App with Animatable{
 
   val live = new Ruby("strings.rb")
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
     val compNode = new RenderNode

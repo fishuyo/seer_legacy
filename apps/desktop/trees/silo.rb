@@ -143,7 +143,7 @@ def animate(dt)
 
 	gpose = Pose.apply(Vec3.apply(0,-1.3,0),Quat.apply(0.42112392,-0.09659095, 0.18010217, -0.8836787))
 
-	frame = SimpleAppRun.app.frameCount % (6500)
+	frame = DesktopApp.app.frameCount % (6500)
 	#puts frame
 	# if frame <= dawnf
 	# 	Main.nmove.set(1.3, 1.22, 1.2)

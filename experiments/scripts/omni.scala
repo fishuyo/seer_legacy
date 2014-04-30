@@ -1903,7 +1903,7 @@ object Script extends SeerScript with OmniDrawable {
 	// omni.mStereo = 1
 	// omni.mMode = omni.StereoMode.ACTIVE
 
-	SimpleAppRun.app.logfps = true
+	// DesktopApp.app.logfps = true
 
 	val h = HSV(0,1,1)
 	val n = 4

@@ -22,7 +22,7 @@ import collection.mutable.ListBuffer
 
 object Main extends SeerApp with AudioSource {
 
-  // SimpleAppRun.loadLibs()
+  // DesktopApp.loadLibs()
   // Scene.push(this)
   //Scene.push(Kinect)
   
@@ -61,7 +61,7 @@ object Main extends SeerApp with AudioSource {
   var dw = 0.f
   var blurDist = 0.1f
 
-  // SimpleAppRun() 
+  // DesktopApp() 
 
   override def init(){
     ground = OBJ(pref + "res/landscapealien.obj") //new ObjLoader().loadObj(Gdx.files.internal("src/main/scala/drone/landscapealien.obj"))

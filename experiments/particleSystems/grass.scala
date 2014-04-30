@@ -19,7 +19,7 @@ import com.badlogic.gdx.Gdx
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   val blades = ListBuffer[Grass]()
@@ -33,7 +33,7 @@ object Main extends App with Animatable{
   var duration = 0.f
   var mag = 0.f
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def draw(){
     Shader.lightingMix = 1.0f

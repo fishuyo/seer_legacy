@@ -19,7 +19,7 @@ import com.badlogic.gdx.Gdx
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
   val ground = Plane.generateMesh(20,20,100,100,Quat.up) //Cube().scale(2.f,0.1f,7.f).translate(0,-0.2f,3.5f)
@@ -86,7 +86,7 @@ object Main extends App with Animatable{
 
   val live = new Ruby("skeleton.rb")
 
-  SimpleAppRun()  
+  DesktopApp.run()  
 
 
   override def init(){

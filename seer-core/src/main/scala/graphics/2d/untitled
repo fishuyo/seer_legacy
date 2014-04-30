@@ -225,7 +225,7 @@ def step(dt)
 	Main.model.get().scale.set(s)
 
 
-	frame = 1 #SimpleAppRun.app.frameCount % (600)
+	frame = 1 #DesktopApp.app.frameCount % (600)
 	#puts frame
 	if frame == 0
 		r = Randf.apply(-2.0,2.0,false)

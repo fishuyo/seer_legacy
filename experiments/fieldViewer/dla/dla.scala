@@ -8,12 +8,12 @@ import maths._
 
 
 object Main extends App {
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
 
   val fv = new DlaFV(300,300)
   Scene.push( fv );
 
-  SimpleAppRun();
+  DesktopApp();
 
 }
 

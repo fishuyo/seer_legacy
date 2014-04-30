@@ -19,7 +19,7 @@ import org.opencv.imgproc._
 
 object Main extends App with Animatable{
 
-  SimpleAppRun.loadLibs()
+  DesktopApp.loadLibs()
   Scene.push(this)
 
 	var capture: VideoCapture = _
@@ -35,7 +35,7 @@ object Main extends App with Animatable{
 
   var pix:Pixmap = null
 
-  SimpleAppRun()  
+  DesktopApp()  
 
   override def init(){
     System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
