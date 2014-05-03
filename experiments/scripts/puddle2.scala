@@ -24,26 +24,7 @@ import org.opencv.imgproc._
 import akka.actor._
 import akka.event.Logging
  
-class SActor extends Actor with akka.actor.ActorLogging {
-  override def preStart() = {
-    log.debug("Starting")
-  }
-  override def preRestart(reason: Throwable, message: Option[Any]) {
-    log.error(reason, "Restarting due to [{}] when processing [{}]",
-      reason.getMessage, message.getOrElse(""))
-  }
-
-  def receive = {
-    case "info" => log.info(sender.path.toString)
-    case "test" => log.info("Received test")
-    case x => log.warning("Received unknown message: {}", x)
-  }
-}
-
-val myactor = system.actorOf(Props(new SActor), name = "puddd")
-
-val remote = system.actorFor("akka://seer@127.0.0.1:60815/user/q")
-
+Shader.bg.set(1,0,0,1)
 
 object Script extends SeerScript {
 
@@ -51,18 +32,10 @@ object Script extends SeerScript {
 
   var loop = new VideoLoop
   var dirty = true
+  var update = false
 
 	var bytes:Array[Byte] = null
-	var (w,ww,h,hh) = (0.0,0.0,0.0,0.0)
-
-  val capture = new VideoCapture(0)
-  w = capture.get(Highgui.CV_CAP_PROP_FRAME_WIDTH)
-  h = capture.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT)
-  
-  // Kinect.connect
-  // Kinect.startVideo
-  // w = 640.toDouble
-  // h = 480.toDouble
+	var (w,ww,h,hh) = (500.0,0.0,500.0,0.0)
 
   ww = w
   hh = h
@@ -78,7 +51,6 @@ object Script extends SeerScript {
   quad.material = Material.basic
 
   var scale = 1.
-  resize(0,0,500,500)
   // resize(0,0,1280,720)
   // resize(100,120,480,340)
 
@@ -86,14 +58,12 @@ object Script extends SeerScript {
 	}
 
 	override def draw(){
-    // myactor ! "info"
     // quad.draw
 	}
 
 	override def onUnload(){
     // if( texture != null) texture.dispose
     loop.clear
-		capture.release
     ScreenNode.inputs.clear
     SceneGraph.removeNode(loopNode)
 	}
@@ -127,7 +97,6 @@ object Script extends SeerScript {
   }
 
   override def animate(dt:Float){
-    // println(myactor)
     if( pix == null){
       loopNode = new TextureNode( texture )
       loopNode.outputTo(ScreenNode)
@@ -145,54 +114,43 @@ object Script extends SeerScript {
       dirty = false
     }
 
-    try{
+    if(update){
+      val bb = pix.getPixels()
+      bb.put(bytes)
+      bb.rewind()
 
-  	val cam = new Mat()
-  	val read = capture.read(cam)  // read from camera
-
-    if( !read ){ return }
-
-    var img = cam
-    // img = Kinect.videoMat
-
-    val subImg = new Mat(img, subRect )   // take sub image
-
-    val rsmall = new Mat()
-  	val small = new Mat()
-
-  	Imgproc.resize(subImg,small, new Size(), scale,scale,0)   // scale down
-    // Core.flip(small,rsmall,0)   // flip so mirrored
-    Imgproc.cvtColor(small,rsmall, Imgproc.COLOR_BGR2RGB)   // convert to rgb
-
-    var sub = rsmall
-
-  	var out = new Mat()
-  	loop.videoIO( sub, out)  // pass frame to loop get next output
-    // if( out.empty()) return
-
-    out = rsmall
-
-    // copy MAT to pixmap
-  	out.get(0,0,bytes)
-		val bb = pix.getPixels()
-		bb.put(bytes)
-		bb.rewind()
-
-    remote ! bytes
-
-    // update texture from pixmap
-		texture.draw(pix,0,0)
-
-    cam.release
-    subImg.release
-    small.release
-    rsmall.release
-    out.release
-    } catch { case e:Exception => ()}
+      // update texture from pixmap
+      texture.draw(pix,0,0)
+    }
+  //   // copy MAT to pixmap
+  // 	out.get(0,0,bytes)
+		// 
 
   }
 
 }
+
+class SActor extends Actor with akka.actor.ActorLogging {
+  override def preStart() = {
+    log.debug("Starting")
+  }
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+      reason.getMessage, message.getOrElse(""))
+  }
+
+  def receive = {
+    case b:Array[Byte] =>
+      Script.bytes = b
+      Script.update = true
+
+    case "test" => log.info("Received test")
+    case x => log.warning("Received unknown message: {}", x)
+  }
+}
+
+val myactor = system.actorOf(Props(new SActor), name = "q")
+
 
 ScreenCaptureKey.use()
 Keyboard.clear()

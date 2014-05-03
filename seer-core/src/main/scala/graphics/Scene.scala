@@ -132,7 +132,7 @@ class RenderNode {
   var shader = "basic"
 
   def createBuffer(){
-    if(buffer.isEmpty) buffer = Some(FrameBuffer(viewport.w, viewport.h))
+    if(buffer.isEmpty) buffer = Some(FrameBuffer(viewport.w.toInt, viewport.h.toInt))
   }
 
   def bindBuffer(i:Int) = buffer.get.getColorBufferTexture().bind(i)
@@ -148,7 +148,7 @@ class RenderNode {
 
     if(buffer.isDefined){
       buffer.get.dispose
-      buffer = Some(FrameBuffer(vp.w,vp.h))
+      buffer = Some(FrameBuffer(vp.w.toInt,vp.h.toInt))
     }
   }
 

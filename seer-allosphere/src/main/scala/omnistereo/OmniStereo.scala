@@ -27,6 +27,9 @@ import java.nio.FloatBuffer
 import java.io.DataInputStream
 import java.io.FileInputStream
 
+import org.luaj.vm2._
+import org.luaj.vm2.lib.jse._
+
 
 /* AlloSystem OmniStereo port */
 
@@ -532,9 +535,11 @@ class Projection {
 
 	// load warp/blend from disk:
 	def readBlend(path:String){
-		mBlend = new GdxTexture(Gdx.files.absolute(path), Pixmap.Format.Intensity, false)
-
+		mBlend = new GdxTexture(Gdx.files.internal(path), Pixmap.Format.RGBA8888, true)
+		// mBlend.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.Linear)
+		mBlend.setFilter( GdxTexture.TextureFilter.Linear, GdxTexture.TextureFilter.Linear)
 	}
+
 	def readWarp(path:String){
 
 		try{
@@ -545,13 +550,23 @@ class Projection {
 
 			println(s"warp dim $w x $h\n")
 
-			t = new Array[Float](w*h)
-			u = new Array[Float](w*h)
-			v = new Array[Float](w*h)
+			// t = new Array[Float](w*h)
+			// u = new Array[Float](w*h)
+			// v = new Array[Float](w*h)
 
-			for( i <- (0 until w*h)) t(i) = readFloat(ds)
-			for( i <- (0 until w*h)) u(i) = readFloat(ds)
-			for( i <- (0 until w*h)) v(i) = readFloat(ds)
+			val bytes = new Array[Byte](w*h*4)
+			ds.read(bytes)
+			t = parseFloats(bytes).toArray
+			ds.read(bytes)
+			u = parseFloats(bytes).toArray
+			ds.read(bytes)
+			v = parseFloats(bytes).toArray
+
+			// for( i <- (0 until w*h)) t(i) = readFloat(ds)
+			// for( i <- (0 until w*h)) u(i) = readFloat(ds)
+			// for( i <- (0 until w*h)) v(i) = readFloat(ds)
+			
+			println(s"read $path\n")
 
 			// pWarp = new Pixmap(w,h,Pixmap.Format.RGBA8888)
 			mWarp = new FloatTexture(w,h) //new GdxTexture(pWarp, true)
@@ -560,12 +575,18 @@ class Projection {
 
 			ds.close()
 
-			println(s"read $path\n")
-
 		} catch {
 			case e: Exception => println("failed to open Projector configuration file " + path + "\n")
 		}
 
+	}
+	def parseFloats(a:Array[Byte]) = {
+		a.grouped(4).map(bytesToFloat(_))
+	}
+
+	def bytesToFloat(b:Seq[Byte]) = {
+		val i = ((b(3)&0xff)<< 24)+((b(2)&0xff)<< 16)+((b(1)&0xff)<< 8)+(b(0)&0xff)
+		java.lang.Float.intBitsToFloat(i)
 	}
 
 	def readInt(ds:DataInputStream) = {
@@ -631,8 +652,8 @@ class Projection {
 			val y1 = h-y-1
 			val idx = y1*w+x
 
-	    mWarp.data.position(4*idx)
-	    mWarp.data.put( Array(t(idx),u(idx),v(idx),1.f),0, 4)
+	    // mWarp.data.position(4*idx)
+	    mWarp.data.put( Array(t(idx),u(idx),v(idx),1.f)) //,0, 4)
 
 	    // pWarp.setColor(t(idx),u(idx),v(idx),1)
 	    // pWarp.drawPixel(x,y)
@@ -645,6 +666,7 @@ class Projection {
 		}
 
 		// mWarp.draw(pWarp,0,0)
+		mWarp.bind(0)
 	  mWarp.update
 		// mWarp.td.consumeCompressedData(0);
 	}
@@ -728,6 +750,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 
 	val mQuad = Plane.generateMesh()
 
+	implicit def f2i(f:Float) = f.toInt
 	
 	// @resolution should be a power of 2
 	def resolution(res:Int) = {
@@ -744,141 +767,54 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 	// configure the projections according to files
 	def configure(configpath:String, configname:String){
 
-		// configpath += "/calibration-current/";
+		var path = configpath + "/" + configname + ".lua"
 
-		// if (L.dofile(configpath + "/" + configname + ".lua", 0)) return *this;
+		val L = JsePlatform.standardGlobals();
+		try{ 
+			val chunk = L.loadfile(path);
+			chunk.call()
+		} catch { 
+			case e:Exception => println(s"configuration $path not found.")
+			return
+		}
 
-		// L.getglobal("projections");
-		// if (!lua_istable(L, -1)) {
-			// printf("config file %s has no projections\n", configpath.c_str());
-			// return *this;
-		// }
-		// int projections = L.top();
+		try{
+			val ps = L.get("projections")
+			if(ps.get("active").toboolean) mMode = ACTIVE
+			if(ps.get("fullscreen").toboolean) mFullScreen = true
+			mResolution = ps.get("resolution").toint
 
-		// set active stereo
-		// lua_getfield(L, projections, "active");
-		// if (lua_toboolean(L, -1)) {
-			// mMode = ACTIVE;
-		// }
-		// L.pop(); //active
+			mNumProjections = ps.length
 
-		// set fullscreen by default mode?
-		// lua_getfield(L, projections, "fullscreen");
-		// if (lua_toboolean(L, -1)) {
-		// 	mFullScreen = true;
-		// }
-		// L.pop(); // fullscreen
+			for(i <- 0 until mNumProjections){
+				mProjections(i) = new Projection
 
-		// set resolution?
-		// lua_getfield(L, projections, "resolution");
-		// if (lua_isnumber(L, -1)) {
-		// 	resolution(lua_tonumber(L, -1));
-		// }
-		// L.pop(); // resolution
+				println(s"configuring projector $i")
+				val p = ps.get(i+1)
+				val v = p.get("viewport")
+				mProjections(i).mViewport.l = v.get("l").tofloat
+				mProjections(i).mViewport.b = v.get("b").tofloat
+				mProjections(i).mViewport.w = v.get("w").tofloat
+				mProjections(i).mViewport.h = v.get("h").tofloat
 
-		// mNumProjections = lua_objlen(L, projections);
-		// printf("found %d viewports\n", mNumProjections);
+				val warpFile = configpath + "/" + p.get("warp").get("file").tostring
+				mProjections(i).readWarp(warpFile)
+				val blendFile = configpath + "/" + p.get("blend").get("file").tostring
+				mProjections(i).readBlend(blendFile)
+				val paramFile = configpath + "/" + p.get("params").get("file").tostring
+				// mProjections(i).readParameters(paramFile)
 
-		// for (unsigned i=0; i<mNumProjections; i++) {
-			// L.push(i+1);
-			// lua_gettable(L, projections);
-			// int projection = L.top();
-			//L.dump("config");
+				mProjections(i).position.x = p.get("position").get(1).tofloat
+				mProjections(i).position.y = p.get("position").get(2).tofloat
+				mProjections(i).position.z = p.get("position").get(3).tofloat
 
-			// lua_getfield(L, projection, "viewport");
-			// if (lua_istable(L, -1)) {
-				// int viewport = L.top();
-				// lua_getfield(L, viewport, "l");
-				// mProjections[i].viewport().l = L.to<float>(-1);
-				// L.pop();
+			}
 
-				// lua_getfield(L, viewport, "b");
-				// mProjections[i].viewport().b = L.to<float>(-1);
-				// L.pop();
+		} catch {
+			case e:Exception => println(s"error reading configuration $path"); e.printStackTrace
+			return
+		}
 
-				// lua_getfield(L, viewport, "w");
-				// mProjections[i].viewport().w = L.to<float>(-1);
-				// L.pop();
-
-				// lua_getfield(L, viewport, "h");
-				// mProjections[i].viewport().h = L.to<float>(-1);
-				// L.pop();
-
-			// }
-			// L.pop(); // viewport
-
-			// lua_getfield(L, projection, "warp");
-			// if (lua_istable(L, -1)) {
-				// int warp = L.top();
-
-				// lua_getfield(L, warp, "width");
-				// if (lua_isnumber(L, -1)) {
-					// mProjections[i].warpwidth = lua_tonumber(L, -1);
-				// }
-				// L.pop();
-
-				// lua_getfield(L, warp, "height");
-				// if (lua_isnumber(L, -1)) {
-					// mProjections[i].warpheight = lua_tonumber(L, -1);
-				// }
-				// L.pop();
-
-				// lua_getfield(L, warp, "file");
-				// if (lua_isstring(L, -1)) {
-					// load from file
-					// mProjections[i].readWarp(configpath + "/" + lua_tostring(L, -1));
-				// }
-				// L.pop();
-			// }
-			// L.pop(); // warp
-
-			// lua_getfield(L, projection, "blend");
-			// if (lua_istable(L, -1)) {
-				// int blend = L.top();
-				// lua_getfield(L, blend, "file");
-				// if (lua_isstring(L, -1)) {
-					// load from file
-					// mProjections[i].readBlend(configpath + "/" + lua_tostring(L, -1));
-				// } else {
-					// TODO: generate blend...
-				// }
-				// L.pop();
-			// }
-			// L.pop(); // blend
-
-			// lua_getfield(L, projection, "params");
-			// if (lua_istable(L, -1)) {
-				// int params = L.top();
-				// lua_getfield(L, params, "file");
-				// if (lua_isstring(L, -1)) {
-					// load from file
-					// mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1)); //, true);
-				// }
-				// L.pop();
-			// }
-			// L.pop(); // params
-
-			// lua_getfield(L, projection, "position");
-			// if (lua_istable(L, -1)) {
-				// // int position = L.top();
-				// lua_rawgeti(L, position, 1);
-				// mProjections[i].position.x = L.to<double>(-1);
-				// L.pop();
-				// lua_rawgeti(L, position, 2);
-				// mProjections[i].position.y = L.to<double>(-1);
-				// L.pop();
-				// lua_rawgeti(L, position, 3);
-				// mProjections[i].position.z = L.to<double>(-1);
-				// L.pop();
-			// }
-			// L.pop(); // position
-
-
-			// L.pop(); // projector
-		// }
-
-		// L.pop(); // the projections table
-		// return *this;
 	}
 
 	// configure generatively:
@@ -939,7 +875,6 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 
 
 	def drawStereo(f:DrawMethod)(lens:Lens, pose:Pose, vp:Viewport) {
-		implicit def f2i(f:Float) = f.toInt
 
 		val eye = lens.eyeSep;
 		mMode match {

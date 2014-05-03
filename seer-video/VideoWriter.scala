@@ -167,6 +167,8 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input.Keys
 object ScreenCaptureKey extends InputAdapter {
 
+  def use(){ Inputs.addProcessor(this) }
+
   override def keyDown(k:Int) = {
     
     k match {

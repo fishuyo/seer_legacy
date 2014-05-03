@@ -1,6 +1,13 @@
 
-// package com.fishuyo.seer
-// package dynamic
+package com.fishuyo.seer
+package dynamic
+
+import org.luaj.vm2._
+import org.luaj.vm2.lib.jse._
+
+object Luaj {
+	val t = 0
+}
 
 // package com.fishuyo.seer
 // package dynamic

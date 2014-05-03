@@ -6,6 +6,8 @@ import maths._
 import io._
 import util._
 
+import allosphere._
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 
@@ -15,127 +17,103 @@ import collection.mutable.Map
 
 object Script extends SeerScript {
 
-	val path = "../../MAT/andreou/data_2013-08-09/negative/3.txt"
+	val path1 = "../../MAT/andreou/data_2013-08-09/positive/1.txt"
+	val path2 = "../../MAT/andreou/data_2013-08-09/negative/3.txt"
 
 	// parse data
-	val (freq,positions,amps) = A.readData(path)
+	val pos1 = new DataSet(path1)
+	val neg3 = new DataSet(path2)
+	val diff = pos1 - neg3
+	pos1.shader = ""
+	neg3.shader = ""
+	diff.shader = ""
+	pos1.offset.set(0,1.4,0)
+	neg3.offset.set(0,0,0)
+	diff.offset.set(0,0.7,0)
 
-	// calculate bounds for frequency and amplitude values
-	val fmin = freq.min
-	val fmax = freq.max
-	val ampmin = amps.map(_.min).min
-	val ampmax = amps.map(_.max).max
-
-	// println( fmin )
-	// println( fmax )
-	// println( ampmin )
-	// println( ampmax )
-
-	val dshift = Vec3(0.001f,0.8f,0.05f)
-	val shift = Vec3(0.001f,0.8f,0.05f)
-
-	val meshes = ArrayBuffer[Mesh]()
-	val models = ArrayBuffer[Model]()
-
-	// generate mesh for each spectrum
-	amps.foreach((amp) => {
-		val m = Mesh()
-		m.primitive = LineStrip
-		
-		freq.zip(amp).foreach { 
-			case (f,a) =>
-				val x = map(f,fmin,fmax,-1.f,1.f)
-				val y = map(a,ampmin,ampmax,0.f,1.f)
-				m.vertices += Vec3(x,y,0)
-		}
-		meshes += m
-	})
-
-	// group by x coordinate
-	val xgroups = positions.zip(meshes).groupBy {
-		case (pos,mesh) => pos.x
-	}
-	val ygroups = positions.zip(meshes).groupBy {
-		case (pos,mesh) => pos.y
-	}
-	val data = positions.zip(meshes)
+	pos1.generateMeshes
+	neg3.generateMeshes
 
 	var moveCamera=false
 
 	override def draw(){
-		//reverse to draw back to front
-		models.reverse.foreach(_.draw)
+		//reverse to draw back to front		
+		// pos1.draw
+		// neg3.draw
+		// diff.draw
+		Omni.draw
 	}
 
 	override def animate(dt:Float){
-		models.clear
-			//var z = 0.f
-
-		data.foreach {
-			case (pos,mesh) =>
-				val mdl = Model(mesh).translate(pos.y*shift.y,0,pos.x*shift.x)
-				mdl.shader = "s1"
-				models += mdl
-		}
-
-		// xgroups.values.foreach( (grp) => {
-		// 	var z = 0.f
-
-		// 	grp.foreach( { 
-		// 		case (pos,mesh) =>
-		// 			val mdl = Model(mesh).translate(pos.x*shift.x,0,pos.y*shift.y)
-		// 			mdl.shader = "s1"
-		// 			models += mdl
-		// 			z -= shift.z
-		// 	})
-		// })
-
-		// ygroups.keys.toList.sorted.foreach( (key) => {
-		// 	val grp = ygroups(key)
-		// 	var z = 0.f
-
-		// 	grp.foreach( { 
-		// 		case (pos,mesh) =>
-		// 			val mdl = Model(mesh).translate(z,0,pos.y*shift.y).rotate(0,Pi/2,0)
-		// 			// val mdl = Model(mesh).translate(pos.x*shift.x,pos.y*shift.y,z)
-		// 			mdl.shader = "s1"
-		// 			models += mdl
-		// 			z -= shift.z
-		// 	})
-		// })
+		pos1.animate(dt)
+		neg3.animate(dt)
+		diff.animate(dt)
 
 		if(moveCamera){
-			Camera.nav.pos.lerpTo(newPos,0.1)
+			Camera.nav.pos.lerpTo(newPos,speed)
+			Camera.nav.quat.slerpTo(newQuat,speed)
 		}
-		if( (Camera.nav.pos - newPos).mag < 0.01f){
+		if( (Camera.nav.pos - newPos).mag < 0.05f){
 			moveCamera = false
 		}
 	}
 
+	var viewX = 0
+	var viewY = 0
+	var speed = 0.1
+	var newPos = Vec3(0,1,2)
+	var newQuat = Quat.forward
+
+	def updateCamera(){
+		if( D.mode == "x"){
+			viewX %= D.xs.size
+			if(viewX < 0) viewX = D.xs.size
+			newPos = Vec3(D.xshift.x,0,0) * D.xs(viewX) + Vec3(0.f,1,2)
+			newQuat = Quat.forward
+		} else{
+			viewY %= D.ys.size
+			if(viewY < 0) viewY = D.ys.size
+			newPos = Vec3(0,0,D.yshift.y) * D.ys(viewY) + Vec3(2.f,1,0)
+			newQuat = Quat.right
+		}
+		moveCamera = true
+	}
+
+	Keyboard.clear
+	Keyboard.use
+	Keyboard.bind("g", ()=>{ 
+		if(D.mode == "x") D.mode = "y"
+		else D.mode = "x"
+		viewX = 0
+		viewY = 0
+		speed = 0.05
+		updateCamera()
+	})
+
 	Touch.clear()
 	Touch.use()
-	var viewX = 0
-	var newPos = Vec3(0,0,2)
 	Touch.bind("fling", (button,v) => {
 		val thresh = 500
-		if(v(0) > thresh)viewX -= 1
-		else if(v(0) < -thresh) viewX += 1
+		if(v(0) > thresh){
+			viewX -= 1; viewY += 1
+		} else if(v(0) < -thresh){
+			viewX += 1; viewY -= 1
+		}
 		// elsif v(1) > thresh
 			// l = l-4
 		// elsif v(1) < -thresh
 			// l = l+4
 		// end
-		moveCamera = true
-		viewX %= xgroups.size
-		if(viewX < 0) viewX = 0
-		newPos = Vec3(shift.y,0,0) * xgroups.keys.toList.sorted.apply(viewX) + Vec3(0.f,1,2) //*viewX
+		speed = 0.1
+		updateCamera()
 	})
 
 	Trackpad.clear
 	Trackpad.connect
 	Trackpad.bind {
 		case (1,f) =>
-		case (3,f) => shift.z += f(3)*0.001f
+		case (3,f) => D.xshift.y += f(3)*0.00025f; if(D.xshift.y < 0.f) D.xshift.y = 0.f
+									D.yshift.x += f(3)*0.00005f; if(D.yshift.x < 0.f) D.yshift.x = 0.f
 		case _ => ()
 	}
 
@@ -146,9 +124,176 @@ Camera.nav.quat.set(1,0,0,0)
 Scene.alpha = .5
 SceneGraph.root.depth = false
 Run(()=>{ S.shaders("s1") = Shader.load("s1",S.vert,S.frag1)})
+Run(()=>{ S.shaders("r") = Shader.load("r",S.vert,S.r)})
+Run(()=>{ S.shaders("g") = Shader.load("g",S.vert,S.g)})
 Run(()=>{ Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE) })
 Run(()=>{ Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA) })
 
+
+object D {
+	var mode = "x"
+	var freq:List[Float] = null
+	var pos:List[Vec2] = null
+	var xs:List[Float] = null
+	var ys:List[Float] = null
+
+	var fmin = Float.MaxValue
+	var fmax = Float.MinValue
+	var ampmin = Float.MaxValue
+	var ampmax = Float.MinValue
+
+	val xshift = Vec3(0.05f,0.001f,0.05f)
+	val yshift = Vec3(0.001f,0.7f,0.05f)
+
+	def updateBounds(f1:Float,f2:Float,a1:Float,a2:Float){
+		fmin = math.min(fmin,f1)
+		fmax = math.max(fmax,f2)
+		ampmin = math.min(ampmin,a1)
+		ampmax = math.max(ampmax,a2)
+	}
+}
+
+class DataSet(val path:String) extends Animatable {
+
+	// parse data
+	val (freq,positions,amps) = Parser.readData(path)
+
+	// store freq and positions since they are the same for each data set
+	if(D.freq == null) D.freq = freq.toList
+	if(D.pos == null){
+		D.pos = positions.toList
+		D.xs = D.pos.map(_.x).removeDuplicates
+		D.ys = D.pos.map(_.y).removeDuplicates
+	}
+
+	// calculate bounds for frequency and amplitude values
+	val fmin = freq.min
+	val fmax = freq.max
+	val ampmin = amps.map(_.min).min
+	val ampmax = amps.map(_.max).max
+
+	// update bounds for all loaded data sets
+	D.updateBounds(fmin,fmax,ampmin,ampmax)
+
+	val offset = Vec3(0)
+
+	val meshes = ArrayBuffer[Mesh]()
+	val models = ArrayBuffer[Model]()
+
+	var shader = "s1"
+
+	def generateMeshes(){
+		// generate mesh for each spectrum
+		amps.foreach((amp) => {
+			val m = Mesh()
+			m.primitive = LineStrip
+			
+			freq.zip(amp).foreach { 
+				case (f,a) =>
+					val x = map(f,D.fmin,D.fmax,-1.f,1.f)
+					val y = map(a,D.ampmin,D.ampmax,0.f,1.f)
+					m.vertices += Vec3(x,y,0)
+			}
+			meshes += m
+		})
+	}
+
+	def -(b:DataSet) = new DiffSet(this,b)
+
+	override def draw(){
+		//reverse to draw back to front
+		models.reverse.foreach(_.draw)
+	}
+
+	override def animate(dt:Float){
+		if(meshes.isEmpty) return
+		models.clear
+			//var z = 0.f
+
+		positions.zip(meshes).foreach {
+			case (pos,mesh) =>
+				val mdl = Model(mesh)
+				if(D.mode == "x") mdl.translate(pos.x*D.xshift.x,0,pos.y*D.xshift.y).translate(offset)
+				else mdl.rotate(0,Pi/2,0).translate(pos.x*D.yshift.x,0,pos.y*D.yshift.y).translate(offset)
+				mdl.shader = shader
+				models += mdl
+		}
+	}
+}
+
+class DiffSet(a:DataSet,b:DataSet) extends Animatable {
+	val offset = Vec3(0)
+	val meshes = ArrayBuffer[Mesh]()
+	val models = ArrayBuffer[Model]()
+	var shader = "s1"
+
+	a.amps.zip(b.amps).foreach((amps) => {
+
+		val m = Mesh()
+		m.primitive = LineStrip
+
+		val diff = amps._1.zip(amps._2).map( (a) => a._1 - a._2)
+
+		a.freq.zip(diff).foreach { 
+			case (f,a) =>
+				val x = map(f,D.fmin,D.fmax,-1.f,1.f)
+				val y = map(a,D.ampmin,D.ampmax,0.f,1.f)
+				m.vertices += Vec3(x,y,0)
+		}
+		meshes += m
+	})
+
+	override def draw(){
+		//reverse to draw back to front
+		models.reverse.foreach(_.draw)
+	}
+
+	override def animate(dt:Float){
+		FPS.print
+		if(meshes.isEmpty) return
+		models.clear
+
+		a.positions.zip(meshes).foreach {
+			case (pos,mesh) =>
+				val mdl = Model(mesh)
+				if(D.mode == "x") mdl.translate(pos.x*D.xshift.x,0,pos.y*D.xshift.y).translate(offset)
+				else mdl.rotate(0,Pi/2,0).translate(pos.x*D.yshift.x,0,pos.y*D.yshift.y).translate(offset)
+				mdl.shader = shader
+				models += mdl
+		}
+	}
+}
+
+// data parser
+object Parser {
+	def readData(path:String): (Array[Float],ArrayBuffer[Vec2],ArrayBuffer[Array[Float]]) = {
+		try{
+			val ds = new DataInputStream( new FileInputStream(path))
+
+			// first line is tab seperated frequency values
+			val freq = ds.readLine.split('\t').filter(!_.isEmpty).map(_.toFloat)
+			
+			val positions = ArrayBuffer[Vec2]()
+			val amps = ArrayBuffer[Array[Float]]()
+
+			while( ds.available > 0){
+				// each additional line is position and amplitude values
+				val d = ds.readLine.split('\t').map(_.toFloat)
+				positions += Vec2(d(1),d(0)) // first to values xy position
+				amps += d.tail.tail // remaining values amplitude
+			}
+			(freq,positions,amps)
+
+		} catch {
+			case e: Exception => println("failed to open file " + path + "\n")
+			(null,null,null)
+		}
+
+	}
+
+}
+
+// shader code
 object S {
   val shaders = Map[String,Shader]()
   val vert = """
@@ -164,6 +309,25 @@ object S {
 
     void main() {
       gl_Position = u_projectionViewMatrix * a_position;
+      v_texCoord = a_texCoord0;
+      v_color = a_color;
+      v_pos = a_position.xyz;
+    }
+  """
+  val vOmni = """
+    attribute vec4 a_position;
+    attribute vec2 a_texCoord0;
+    attribute vec4 a_color;
+
+    uniform mat4 u_projectionViewMatrix;
+    uniform mat4 u_modelViewMatrix;
+
+    varying vec4 v_color;
+    varying vec2 v_texCoord;
+    varying vec3 v_pos;
+
+    void main() {
+      gl_Position = omni_render(u_modelViewMatrix * a_position);
       v_texCoord = a_texCoord0;
       v_color = a_color;
       v_pos = a_position.xyz;
@@ -209,41 +373,78 @@ object S {
 
     void main(){
     	 	float hue = 0.7 * (1.0-(v_pos.y));
-        gl_FragColor = hsv_to_rgb(hue,1.,1.,0.5); //vec4(1,1,1,0.1);
+        gl_FragColor = hsv_to_rgb(hue,1.,1.,0.75); //vec4(1,1,1,0.1);
+    }
+  """
+  val g = frag + """
+    void main(){
+    		float c = 0.7+v_pos.y;
+        gl_FragColor = vec4(0,1,0,0.25);
+    }
+  """
+  val r = frag + """
+    void main(){
+    		float c = 0.7+v_pos.y;
+        gl_FragColor = vec4(1,0,0,0.25);
     }
   """
 }
 
+object Omni extends Animatable with OmniDrawable {
 
-// case class D(var pos:Vec2, var amp:Array[Float])
+	val omni = new OmniStereo
+	var omniEnabled = true
 
-object A{
-	def readData(path:String): (Array[Float],ArrayBuffer[Vec2],ArrayBuffer[Array[Float]]) = {
-		try{
-			val ds = new DataInputStream( new FileInputStream(path))
+	val lens = new Lens()
+	lens.near = 0.01
+	lens.far = 40.0
+	lens.eyeSep = 0.03
 
-			// first line is tab seperated frequency values
-			val freq = ds.readLine.split('\t').filter(!_.isEmpty).map(_.toFloat)
-			
-			val positions = ArrayBuffer[Vec2]()
-			val amps = ArrayBuffer[Array[Float]]()
+	var omniShader:Shader = _
 
-			while( ds.available > 0){
-				// each additional line is position and amplitude values
-				val d = ds.readLine.split('\t').map(_.toFloat)
-				positions += Vec2(d(1),d(0)) // first to values xy position
-				amps += d.tail.tail // remaining values amplitude
-			}
-			(freq,positions,amps)
+  var mode = "omni"
 
-		} catch {
-			case e: Exception => println("failed to open file " + path + "\n")
-			(null,null,null)
+	// omni.mStereo = 1
+	// omni.mMode = omni.StereoMode.ACTIVE
+
+	override def init(){
+    if( omniShader == null){
+      omniShader = Shader.load("omni", OmniStereo.glsl + S.vOmni, S.frag1 )
+      omni.onCreate
+      // omni.configure("../seer-allosphere/calibration","gr02")
+    }		
+	}
+
+	override def draw(){
+		
+		if( omniShader == null){ init()}
+		val vp = Viewport(Window.width, Window.height)
+
+		// omni.drawWarp(vp)
+		// omni.drawDemo(lens,Camera.nav,vp)
+
+		// onDrawOmni()
+
+		// omni.drawSphereMap(t, lens, Camera.nav, vp)
+
+		if (omniEnabled) {
+			omni.onFrame(this, lens, Camera.nav, vp);
+		} else {
+			omni.onFrameFront(this, lens, Camera.nav, vp);
 		}
+	}
 
+	override def onDrawOmni(){
+		Shader("omni").begin
+		omni.uniforms(omniShader);
+
+		Script.pos1.draw
+		Script.neg3.draw
+		Script.diff.draw
+		
+		Shader("omni").end
 	}
 
 }
-
 
 Script

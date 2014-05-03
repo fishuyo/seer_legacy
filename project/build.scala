@@ -112,7 +112,7 @@ object SeerBuild extends Build {
     "seer-allosphere",
     file("seer-allosphere"),
     settings = Settings.common
-  ) dependsOn ( seer_core, seer_desktop )
+  ) dependsOn ( seer_core, seer_desktop, seer_luaj )
 
   lazy val seer_sensors = Project (
     "seer-sensors",

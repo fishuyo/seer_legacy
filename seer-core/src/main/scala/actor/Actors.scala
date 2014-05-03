@@ -55,9 +55,9 @@ object ActorManager {
       }
       remote {
         enabled-transports = ["akka.remote.netty.tcp"]
-        netty.tcp {
+        netty {
           hostname = "127.0.0.1"
-          port = 2552
+          port = 0
         }
      }
     }
