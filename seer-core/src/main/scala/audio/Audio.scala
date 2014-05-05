@@ -35,7 +35,6 @@ case class Execute(f:()=>Unit)
 
 
 trait AudioSource {
-  //def apply():Float = {0.f}
   def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){}
 }
 

@@ -263,7 +263,7 @@ def animate dt
 	$looper.setMode("sync")
 	Audio.playThru(false)
 	Audio.recordThru(true)
-	Camera.nav.pos.lerpTo($newPos, 0.15)
+	# Camera.nav.pos.lerpTo($newPos, 0.15)
 
 	pos = SceneGraph.root.camera.nav.pos + Vec3.apply(-0.45,0,-0.55) #$model.pose.pos
 	# pos.set(pos.x, pos.y, 0)

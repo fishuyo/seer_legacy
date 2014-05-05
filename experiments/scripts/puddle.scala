@@ -40,9 +40,9 @@ class SActor extends Actor with akka.actor.ActorLogging {
   }
 }
 
-val myactor = system.actorOf(Props(new SActor), name = "puddd")
+val myactor = system.actorOf(Props(new SActor), name = "pp")
 
-val remote = system.actorFor("akka://seer@127.0.0.1:60815/user/q")
+val remote = system.actorFor("akka://seer@192.168.0.101:59583/user/qq")
 
 
 object Script extends SeerScript {

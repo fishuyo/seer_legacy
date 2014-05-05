@@ -73,7 +73,7 @@ object Settings {
 
   lazy val openni = Settings.common ++ Seq(
     // javaOptions in run += "-Djava.library.path=.;./lib;/usr/local/lib/ni2;/usr/local/lib;"
-    javaOptions in run += "-Djava.library.path=/usr/local/lib/ni2:/Users/fishuyo/lib/nite2"
+    javaOptions in run += "-Djava.library.path=/usr/lib/java" //:/usr/local/lib/ni2:/Users/fishuyo/lib/nite2"
   )
 
   lazy val desktop = packageArchetype.java_application ++ Settings.common ++ Seq (
