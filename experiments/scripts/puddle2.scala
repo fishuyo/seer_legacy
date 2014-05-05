@@ -28,14 +28,14 @@ Shader.bg.set(1,0,0,1)
 
 object Script extends SeerScript {
 
-  OpenCV.loadLibrary()
+  // OpenCV.loadLibrary()
 
   var loop = new VideoLoop
   var dirty = true
   var update = false
 
 	var bytes:Array[Byte] = null
-	var (w,ww,h,hh) = (500.0,0.0,500.0,0.0)
+	var (w,ww,h,hh) = (100.0,0.0,100.0,0.0)
 
   ww = w
   hh = h
@@ -121,6 +121,8 @@ object Script extends SeerScript {
 
       // update texture from pixmap
       texture.draw(pix,0,0)
+      update = false
+      myactor ! "free"
     }
   //   // copy MAT to pixmap
   // 	out.get(0,0,bytes)
@@ -128,9 +130,13 @@ object Script extends SeerScript {
 
   }
 
+  val myactor = system.actorOf(Props(new SActor), name = "qq")
+
 }
 
 class SActor extends Actor with akka.actor.ActorLogging {
+  var busy = false
+
   override def preStart() = {
     log.debug("Starting")
   }
@@ -140,17 +146,17 @@ class SActor extends Actor with akka.actor.ActorLogging {
   }
 
   def receive = {
-    case b:Array[Byte] =>
-      Script.bytes = b
-      Script.update = true
-
-    case "test" => log.info("Received test")
-    case x => log.warning("Received unknown message: {}", x)
+    case "free" => busy = false
+    case msg if !busy =>
+      msg match{
+        case b:Array[Byte] =>
+          busy = true
+          Script.bytes = b
+          Script.update = true
+      }
+    case _ => ()
   }
 }
-
-val myactor = system.actorOf(Props(new SActor), name = "q")
-
 
 ScreenCaptureKey.use()
 Keyboard.clear()

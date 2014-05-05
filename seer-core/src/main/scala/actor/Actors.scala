@@ -54,11 +54,12 @@ object ActorManager {
         provider = "akka.remote.RemoteActorRefProvider"
       }
       remote {
-        enabled-transports = ["akka.remote.netty.tcp"]
+        enabled-transports = ["akka.remote.netty.udp"]
         netty {
-          hostname = "127.0.0.1"
           port = 0
         }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
      }
     }
   """)
