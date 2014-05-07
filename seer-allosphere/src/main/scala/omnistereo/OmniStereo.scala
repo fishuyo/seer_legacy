@@ -1180,6 +1180,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 				// Vec3d ux, uy, uz;
 				// pose.unitVectors(ux, uy, uz);
 				// mModelView = Matrix4.lookAt(-ux, -uy, uz, pos);
+				// MatrixStack.rotate(0,0,180.f.toRadians)
 
 				mNear = lens.near
 				mFar = lens.far

@@ -24,9 +24,9 @@ object Script extends SeerScript {
 	val pos1 = new DataSet(path1)
 	val neg3 = new DataSet(path2)
 	val diff = pos1 - neg3
-	pos1.shader = ""
-	neg3.shader = ""
-	diff.shader = ""
+	pos1.shader = "s1"
+	neg3.shader = "s1"
+	diff.shader = "s1"
 	pos1.offset.set(0,1.4,0)
 	neg3.offset.set(0,0,0)
 	diff.offset.set(0,0.7,0)
@@ -38,10 +38,10 @@ object Script extends SeerScript {
 
 	override def draw(){
 		//reverse to draw back to front		
-		// pos1.draw
-		// neg3.draw
-		// diff.draw
-		Omni.draw
+		pos1.draw
+		neg3.draw
+		diff.draw
+		// Omni.draw
 	}
 
 	override def animate(dt:Float){
@@ -390,61 +390,61 @@ object S {
   """
 }
 
-object Omni extends Animatable with OmniDrawable {
+// object Omni extends Animatable with OmniDrawable {
 
-	val omni = new OmniStereo
-	var omniEnabled = true
+// 	val omni = new OmniStereo
+// 	var omniEnabled = false
 
-	val lens = new Lens()
-	lens.near = 0.01
-	lens.far = 40.0
-	lens.eyeSep = 0.03
+// 	val lens = new Lens()
+// 	lens.near = 0.01
+// 	lens.far = 40.0
+// 	lens.eyeSep = 0.03
 
-	var omniShader:Shader = _
+// 	var omniShader:Shader = _
 
-  var mode = "omni"
+//   var mode = "omni"
 
-	// omni.mStereo = 1
-	// omni.mMode = omni.StereoMode.ACTIVE
+// 	// omni.mStereo = 1
+// 	// omni.mMode = omni.StereoMode.ACTIVE
 
-	override def init(){
-    if( omniShader == null){
-      omniShader = Shader.load("omni", OmniStereo.glsl + S.vOmni, S.frag1 )
-      omni.onCreate
-      // omni.configure("../seer-allosphere/calibration","gr02")
-    }		
-	}
+// 	override def init(){
+//     if( omniShader == null){
+//       omniShader = Shader.load("omni", OmniStereo.glsl + S.vOmni, S.frag1 )
+//       omni.onCreate
+//       // omni.configure("../seer-allosphere/calibration","gr02")
+//     }		
+// 	}
 
-	override def draw(){
+// 	override def draw(){
 		
-		if( omniShader == null){ init()}
-		val vp = Viewport(Window.width, Window.height)
+// 		if( omniShader == null){ init()}
+// 		val vp = Viewport(Window.width, Window.height)
 
-		// omni.drawWarp(vp)
-		omni.drawDemo(lens,Camera.nav,vp)
+// 		// omni.drawWarp(vp)
+// 		// omni.drawDemo(lens,Camera.nav,vp)
 
-		// onDrawOmni()
+// 		// onDrawOmni()
 
-		// omni.drawSphereMap(t, lens, Camera.nav, vp)
+// 		// omni.drawSphereMap(t, lens, Camera.nav, vp)
 
-		if (omniEnabled) {
-			// omni.onFrame(this, lens, Camera.nav, vp);
-		} else {
-			omni.onFrameFront(this, lens, Camera.nav, vp);
-		}
-	}
+// 		if (omniEnabled) {
+// 			omni.onFrame(this, lens, Camera.nav, vp);
+// 		} else {
+// 			omni.onFrameFront(this, lens, Camera.nav, vp);
+// 		}
+// 	}
 
-	override def onDrawOmni(){
-		Shader("omni").begin
-		omni.uniforms(omniShader);
+// 	override def onDrawOmni(){
+// 		Shader("omni").begin
+// 		omni.uniforms(omniShader);
 
-		Script.pos1.draw
-		Script.neg3.draw
-		Script.diff.draw
+// 		Script.pos1.draw
+// 		Script.neg3.draw
+// 		Script.diff.draw
 		
-		Shader("omni").end
-	}
+// 		Shader("omni").end
+// 	}
 
-}
+// }
 
 Script
