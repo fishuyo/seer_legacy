@@ -27,7 +27,7 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
 
   	val l = mesh.primitive match {
 	  	case Triangles => mesh.indices.grouped(3).map(_.combinations(2)).flatten
-	  	case Lines => mesh.indices.grouped(2)
+	  	case Lines => mesh.wireIndices.grouped(2)
 	  	case Points => List()
 	  	case _ => mesh.indices.grouped(2)
 	  }
@@ -86,7 +86,7 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
       }
 
       particles.foreach( (p) => {
-        // p.applyGravity()
+        p.applyGravity()
         p.applyDamping(damping)
         p.step() // timeStep
         p.collideGround(-1.f, 0.999999f) 

@@ -421,14 +421,14 @@ object Omni extends Animatable with OmniDrawable {
 		val vp = Viewport(Window.width, Window.height)
 
 		// omni.drawWarp(vp)
-		// omni.drawDemo(lens,Camera.nav,vp)
+		omni.drawDemo(lens,Camera.nav,vp)
 
 		// onDrawOmni()
 
 		// omni.drawSphereMap(t, lens, Camera.nav, vp)
 
 		if (omniEnabled) {
-			omni.onFrame(this, lens, Camera.nav, vp);
+			// omni.onFrame(this, lens, Camera.nav, vp);
 		} else {
 			omni.onFrameFront(this, lens, Camera.nav, vp);
 		}

@@ -114,15 +114,15 @@ class Tree() extends Animatable {
   }
 
   override def init(){
-    val t = Texture("res/bark/bark_20091031_07_256x512_seamless.jpg")
-    val t1 = Texture("res/bark/mond.png")
-    textureID = t
-    textureID1 = t1
+    // val t = Texture("res/bark/bark_20091031_07_256x512_seamless.jpg")
+    // val t1 = Texture("res/bark/mond.png")
+    // textureID = t
+    // textureID1 = t1
 
-    Texture(t).setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    Texture(t).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-    Texture(t1).setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    Texture(t1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    // Texture(t).setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    // Texture(t).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
+    // Texture(t1).setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    // Texture(t1).setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
   }
   override def draw(){
     if( size != root.size){

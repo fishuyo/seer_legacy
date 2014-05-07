@@ -9,8 +9,12 @@ import util._
 object Script extends SeerScript {
 	implicit def f2i(f:Float) = f.toInt
 
-  val fieldViewer = new FieldViewer(100,100)
+  val fv = new FieldViewer(100,100)
   // val fieldViewer = new ReactDiffuseFV
+
+  val mesh = Plane.generateMesh(10,10,50,50, Quat.up)
+  val model = Model(mesh).translate(0,-4,0)
+  model.material = Material.specular
 
 	Mouse.clear()
 	Mouse.use()
@@ -25,24 +29,35 @@ object Script extends SeerScript {
 	    val v = hit.get
 	    v.set( (v + Vec3(1,1,0)) * 0.5 ) 
 
-	    x = (v.x*fieldViewer.w)
-	    y = (v.y*fieldViewer.h)
+	    x = (v.x*fv.w)
+	    y = (v.y*fv.h)
 
-	    fieldViewer.field.set(x,y,1.0)
+	    fv.field.set(x,y,1.0)
 	    RD.chemA.set(x,y,1.0)
 	})
 
 	Keyboard.clear
 	Keyboard.use
-	Keyboard.bind("g", fieldViewer.toggleRunning )
-
+  Keyboard.bind("g", fv.toggleRunning )
+	Keyboard.bind("f", ()=>{
+    for( y <- ( 0 until 50 ); x <- ( 0 until 50 )){
+      val i = y*50+x
+      var a:Float = RD.chemA(x*2,y*2)
+      mesh.vertices(i).y = a
+      mesh.recalculateNormals
+      mesh.update
+    }
+  })
 
 	override def draw(){
-		fieldViewer.draw
+		fv.draw
+    model.draw
 	}
 
 	override def animate(dt:Float){
-		fieldViewer.animate(dt)
+		fv.animate(dt)
+
+    FPS.print
 	}
 
 }

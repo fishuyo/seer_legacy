@@ -24,25 +24,25 @@ import org.opencv.imgproc._
 import akka.actor._
 import akka.event.Logging
  
-class SActor extends Actor with akka.actor.ActorLogging {
-  override def preStart() = {
-    log.debug("Starting")
-  }
-  override def preRestart(reason: Throwable, message: Option[Any]) {
-    log.error(reason, "Restarting due to [{}] when processing [{}]",
-      reason.getMessage, message.getOrElse(""))
-  }
+// class SActor extends Actor with akka.actor.ActorLogging {
+//   override def preStart() = {
+//     log.debug("Starting")
+//   }
+//   override def preRestart(reason: Throwable, message: Option[Any]) {
+//     log.error(reason, "Restarting due to [{}] when processing [{}]",
+//       reason.getMessage, message.getOrElse(""))
+//   }
 
-  def receive = {
-    case "info" => log.info(sender.path.toString)
-    case "test" => log.info("Received test")
-    case x => log.warning("Received unknown message: {}", x)
-  }
-}
+//   def receive = {
+//     case "info" => log.info(sender.path.toString)
+//     case "test" => log.info("Received test")
+//     case x => log.warning("Received unknown message: {}", x)
+//   }
+// }
 
-val myactor = system.actorOf(Props(new SActor), name = "pp")
+// val myactor = system.actorOf(Props(new SActor), name = "pp")
 
-val remote = system.actorFor("akka://seer@192.168.0.101:59583/user/qq")
+val remote = system.actorFor("akka://seer@192.168.0.101:2552/user/puddle")
 
 
 object Script extends SeerScript {
@@ -78,9 +78,12 @@ object Script extends SeerScript {
   quad.material = Material.basic
 
   var scale = 1.
-  resize(0,0,500,500)
+  // resize(0,0,500,500)
   // resize(0,0,1280,720)
-  // resize(100,120,480,340)
+  // resize(100,120,480,340) //kinect
+  resize(520,330,660,490) // ceilingcam
+
+  remote ! ("resize",w.toInt,h.toInt)
 
 	override def onLoad(){
 	}

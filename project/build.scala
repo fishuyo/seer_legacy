@@ -156,6 +156,12 @@ object SeerBuild extends Build {
     settings = Settings.common ++ Settings.portaudio
   ) dependsOn seer_core
 
+  lazy val seer_vrpn = Project (
+    "seer-vrpn",
+    file("seer-vrpn"),
+    settings = Settings.common //++ Settings.vrpn
+  ) dependsOn seer_core
+
   lazy val seer_jruby = Project (
     "seer-jruby",
     file("seer-dynamic/seer-jruby"),
@@ -222,7 +228,7 @@ object SeerBuild extends Build {
     "experiments",
     file("experiments"),
     settings = Settings.desktop ++ Settings.openni
-  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio, seer_kinect, seer_luaj )
+  ) dependsOn( seer_desktop, seer_opencv, seer_allosphere, seer_portaudio, seer_kinect, seer_luaj, seer_vrpn )
 
 
   // apps

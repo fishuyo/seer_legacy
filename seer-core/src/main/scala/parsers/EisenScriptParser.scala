@@ -60,7 +60,7 @@ object EisenScriptParser extends StandardTokenParsers {
  	lexical.reserved += ("var","set","rule","md","maxdepth","w","weight",
  											"x","y","z","rx","ry","rz","s",
  											"hue","h","sat","brightness","b","value","v","alpha","a","color",
- 											"box","sphere","grid")
+ 											"box","sphere","grid","cylinder")
  
   // grammar starts here
   def program = stmt*
@@ -106,12 +106,13 @@ object EisenScriptParser extends StandardTokenParsers {
   										| "rz"~ident ^^ { case p~v => TransformV(p,v) }
   										| "s"~ident ^^ { case p~v => TransformV(p,v) } )
 
-  def primitive = ( rulecall | box | sphere | grid )
+  def primitive = ( rulecall | box | sphere | grid | cylinder )
 
   def rulecall = ident ^^ {case id => RuleCall(id)}
   def box = "box" ^^^ Draw(Cube().mesh)
   def grid = "grid" ^^^ Draw(Cube().mesh) //TODO wireframe
   def sphere = "sphere" ^^^ Draw(Sphere().mesh)
+  def cylinder = "cylinder" ^^^ Draw(Cylinder().mesh)
 
 
   def apply( script: String ) = {
@@ -155,6 +156,8 @@ class ModelInterpreter(val tree: List[Statement]) {
 	env = env + ("maxdepth"->"500")
 	env = env + ("maxobjects"->"2000")
 
+	var seed = Random.int().toLong
+
 	this(tree)
 
 	def apply(tree: List[Statement]):ModelInterpreter = {
@@ -196,7 +199,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 					rules(name)._2 += weight
 				} else rules = rules + (name -> (ListBuffer(rule),ListBuffer(weight)))
 
-				ruleDepth(name) = 0
+				// ruleDepth(name) = 0
 				this(rest)
 			}
 			case _ => ()
@@ -208,7 +211,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 
 	def applyRule(name:String, n:Model){
 		val rule = Random.decide(rules(name)._1, rules(name)._2)()
-		val depth = ruleDepth(name)
+		val depth = ruleDepth.getOrElse(name,0)
 		ruleDepth(name) = depth+1
 		// if( depth >= env("maxdepth").toInt ) return
 		// rule._2.foreach( applyAction(_).foreach(n.addChild(_)) )
@@ -306,6 +309,10 @@ class ModelInterpreter(val tree: List[Statement]) {
 	def set(s:String,v:Float) = gst = gst + (s->v)
 
 	def buildModel(m:Model=Model()) = {
+		Random.seed(seed)
+		ruleDepth.clear
+		primCount = 0
+
 		model = m
 		actionQueue = Queue[(Model,Action)]()
 		// initialActions.foreach( (a) => applyAction(a).foreach(model.addChild(_)) )

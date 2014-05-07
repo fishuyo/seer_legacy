@@ -32,12 +32,13 @@ object Plane extends Primitive {
       mesh.indices ++= List(i,i+1,i+nx)
       mesh.indices ++= List(i+1,i+nx+1,i+nx)
     }
+    
     for(y <-(0 until ny); x <-(0 until nx)){
       val i = y*nx + x
       if( x < nx-1 ) mesh.wireIndices ++= List(i,i+1)
       if( y < ny-1 ){
         mesh.wireIndices ++= List(i,i+nx)
-        if( x == nx-1) mesh.wireIndices ++= List(i+1,i+nx+1)
+        // if( x == nx-1) mesh.wireIndices ++= List(i+1,i+nx+1)
       }
     }
     // mesh.init

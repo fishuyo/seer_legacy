@@ -56,7 +56,7 @@ object ActorManager {
       remote {
         enabled-transports = ["akka.remote.netty.udp"]
         netty {
-          port = 0
+          port = 2552
         }
         compression-scheme = "zlib"
         zlib-compression-level = 1
