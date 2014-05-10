@@ -14,8 +14,8 @@ import collection.mutable.Map
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 
-Scene.alpha = .5
-SceneGraph.root.depth = false
+Scene.alpha = 1 //.5
+SceneGraph.root.depth = true //false
 
 object Script extends SeerScript {
 
@@ -56,8 +56,8 @@ object Script extends SeerScript {
 	model.material.color.set(1,0,0,1)
 
 	var dirty = true;
-	var alpha = 0.05;
-	var beta = 0.95;
+	var alpha = 0.2;
+	var beta = 0.8;
 	var t = 0.f
 
 	override def draw(){
@@ -68,9 +68,9 @@ object Script extends SeerScript {
     S.shaders("s1").uniforms("color") = RGB(0,0.6,0.6)
 
 		// Shader.setMatrices
-		Shader("s1").begin
+		// Shader("s1").begin
 		model.draw
-		Shader("s1").end
+		// Shader("s1").end
 
 	}
 

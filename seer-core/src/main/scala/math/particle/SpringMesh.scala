@@ -58,6 +58,11 @@ class SpringMesh(val mesh:Mesh, val stiff:Float) extends Animatable {
   	// pins += AbsoluteConstraint(particles(i), particles(i).position)
 	// }
 
+  def +=(p:Particle){
+    particles += p
+    mesh.vertices += p.position
+  }
+
   def applyForce( f: Vec3 ) = particles.foreach( _.applyForce(f) )
 
   def averageVelocity() = (particles.map(_.velocity).sum / particles.length).mag()

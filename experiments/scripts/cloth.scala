@@ -7,6 +7,8 @@ import io._
 import util._
 import particle._
 
+import parsers._
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 
@@ -15,6 +17,48 @@ SceneGraph.root.depth = false
 
 object Script extends SeerScript {
 	implicit def f2i(f:Float) = f.toInt
+
+var modelGenerator = EisenScriptParser("""
+		set maxdepth 40
+		set maxobjects 1000
+
+		var rotz = 10.0
+		var roty = 90.0
+
+		//{ h 0.1 sat 0.7 } spiral
+		4 * { ry 90 } spiral
+
+		// 8 * { ry 45 h 0.1 sat 0.89 } spiral
+		 
+		rule spiral w 10 {
+			{ y 0.9 rz rotz s 0.94 h 0.01 sat 0.9} spiral
+			{ s 0.25 1 0.25 } cylinder	
+		}
+		rule spiral w 10 {
+			{ y 0.9 ry roty rz rotz s 0.93 h 0.01 sat 0.9} spiral
+			{ s 0.25 1 0.25 } cylinder	
+		}
+		 
+		rule spiral w 1 {
+			spiral
+			{ ry 180 h .1} spiral
+		}
+		// rule spiral w 1 {
+			// { ry -90 h .1} spiral
+			// { ry 90  h -.1} spiral
+		// }
+
+	""")
+
+	var model = Model()
+	model.material = new SpecularMaterial
+	model.material.color.set(1,0,0,1)
+
+	var dirty = true;
+	var alpha = 0.2;
+	var beta = 0.8;
+	var t = 0.f
+
 
 	val mesh = Plane.generateMesh(8,2,80,40)
 	mesh.primitive = Lines
@@ -44,6 +88,8 @@ object Script extends SeerScript {
 		Shader("s1").begin
 		m.draw
 		cursor.draw
+		model.draw
+
 
 		Shader("s1").end
 
@@ -66,15 +112,27 @@ object Script extends SeerScript {
 		}
 		lpos = Mouse.xy()
 
+		if(dirty){
+			model = Model()
+			modelGenerator.buildModel(model)
+			dirty = false
+			model.scale(0.2).translate(0,5,0)
+		}
+
 		s.animate(dt)
 	}
 
+	var rotz = 10.0
+	var roty = 90.0
 	Trackpad.clear
 	Trackpad.connect
 	Trackpad.bind( (i,f)=>{
 		i match{
 			// case 1 => s.applyForce( Vec3(f(0)-.5f,f(1)-.5f,0)*10.f)
-			case 3 => Gravity.set(Vec3(f(0)-.5f,f(1)-.5f,0)*10.f)
+			case 4 => Gravity.set(Vec3(f(0)-.5f,f(1)-.5f,0)*10.f)
+			case 3 => roty += f(3); modelGenerator.set("roty",roty); dirty = true
+								rotz += f(2); modelGenerator.set("rotz",rotz); dirty = true
+
 			case _ => ()
 		}
 	})
