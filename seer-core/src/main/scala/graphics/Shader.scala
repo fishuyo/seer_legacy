@@ -13,9 +13,6 @@ import com.badlogic.gdx.files.FileHandle;
 
 import monido._
 
-abstract class Uniform 
-case class Matrix(m:Matrix4) extends Uniform
-
 object Shader {
 
   var load = true

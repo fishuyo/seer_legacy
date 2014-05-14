@@ -15,6 +15,8 @@ import java.io._
 import collection.mutable.ArrayBuffer
 import collection.mutable.Map
 
+Shader.bg.set(0.,0.,0.,1)
+
 object Script extends SeerScript {
 
 	val path1 = "../../MAT/andreou/data_2013-08-09/positive/1.txt"
@@ -27,20 +29,35 @@ object Script extends SeerScript {
 	pos1.shader = "s1"
 	neg3.shader = "s1"
 	diff.shader = "s1"
-	pos1.offset.set(0,1.4,0)
+	pos1.offset.set(0,1.6,0)
 	neg3.offset.set(0,0,0)
-	diff.offset.set(0,0.7,0)
+	diff.offset.set(0,0.8,0)
 
 	pos1.generateMeshes
 	neg3.generateMeshes
 
 	var moveCamera=false
 
+	// val coord = Mesh()
+	// coord.primitive = Lines
+	// coord.vertices += Vec3()
+	// coord.vertices += Vec3(1,0,0)
+	// coord.vertices += Vec3()
+	// coord.vertices += Vec3(0,0.5,0)
+	// coord.vertices += Vec3()
+	// coord.vertices += Vec3(0,0,0.25)
+	// val cM = Model(coord)
+	// cM.shader ="s1"
+
+	// println(D.ys)
+
 	override def draw(){
 		//reverse to draw back to front		
 		pos1.draw
-		neg3.draw
-		diff.draw
+		// neg3.draw
+		// diff.draw
+		
+		// cM.draw
 		// Omni.draw
 	}
 
@@ -48,6 +65,8 @@ object Script extends SeerScript {
 		pos1.animate(dt)
 		neg3.animate(dt)
 		diff.animate(dt)
+
+		cM.pose.pos.set(Camera.nav.pos+Camera.nav.uf()+Vec3(0,-0.5,0))
 
 		if(moveCamera){
 			Camera.nav.pos.lerpTo(newPos,speed)
@@ -95,15 +114,10 @@ object Script extends SeerScript {
 	Touch.bind("fling", (button,v) => {
 		val thresh = 500
 		if(v(0) > thresh){
-			viewX -= 1; viewY += 1
+			viewX -= 1; viewY -= 1
 		} else if(v(0) < -thresh){
-			viewX += 1; viewY -= 1
+			viewX += 1; viewY += 1
 		}
-		// elsif v(1) > thresh
-			// l = l-4
-		// elsif v(1) < -thresh
-			// l = l+4
-		// end
 		speed = 0.1
 		updateCamera()
 	})
@@ -113,7 +127,7 @@ object Script extends SeerScript {
 	Trackpad.bind {
 		case (1,f) =>
 		case (3,f) => D.xshift.y += f(3)*0.00025f; if(D.xshift.y < 0.f) D.xshift.y = 0.f
-									D.yshift.x += f(3)*0.00005f; if(D.yshift.x < 0.f) D.yshift.x = 0.f
+									D.yshift.x -= f(3)*0.00005f; if(D.yshift.x > 0.f) D.yshift.x = 0.f
 		case _ => ()
 	}
 
@@ -143,7 +157,7 @@ object D {
 	var ampmax = Float.MinValue
 
 	val xshift = Vec3(0.05f,0.001f,0.05f)
-	val yshift = Vec3(0.001f,0.7f,0.05f)
+	val yshift = Vec3(-0.001f,-0.7f,0.05f)
 
 	def updateBounds(f1:Float,f2:Float,a1:Float,a2:Float){
 		fmin = math.min(fmin,f1)
@@ -201,8 +215,7 @@ class DataSet(val path:String) extends Animatable {
 	def -(b:DataSet) = new DiffSet(this,b)
 
 	override def draw(){
-		//reverse to draw back to front
-		models.reverse.foreach(_.draw)
+		models.foreach(_.draw)
 	}
 
 	override def animate(dt:Float){
@@ -244,8 +257,7 @@ class DiffSet(a:DataSet,b:DataSet) extends Animatable {
 	})
 
 	override def draw(){
-		//reverse to draw back to front
-		models.reverse.foreach(_.draw)
+		models.foreach(_.draw)
 	}
 
 	override def animate(dt:Float){
@@ -279,7 +291,7 @@ object Parser {
 			while( ds.available > 0){
 				// each additional line is position and amplitude values
 				val d = ds.readLine.split('\t').map(_.toFloat)
-				positions += Vec2(d(1),d(0)) // first to values xy position
+				positions += Vec2(d(1),d(0)) // first two values xy position
 				amps += d.tail.tail // remaining values amplitude
 			}
 			(freq,positions,amps)
@@ -373,7 +385,7 @@ object S {
 
     void main(){
     	 	float hue = 0.7 * (1.0-(v_pos.y));
-        gl_FragColor = hsv_to_rgb(hue,1.,1.,0.75); //vec4(1,1,1,0.1);
+        gl_FragColor = hsv_to_rgb(hue,1.,1.,0.8); //vec4(1,1,1,0.1);
     }
   """
   val g = frag + """
