@@ -90,7 +90,7 @@ object SeerBuild extends Build {
     file("seer-modules/seer-portaudio")
   ) dependsOn seer_core
 
-  lazy val seer_vrpn = SeerProject (
+  lazy val seer_vrpn = SeerProject ( // TODO get vrpn dependency..
     "seer-vrpn",
     file("seer-modules/seer-vrpn")
   ) dependsOn seer_core
