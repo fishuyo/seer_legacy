@@ -36,10 +36,10 @@ object SeerLibs {
     // Extract jars into their respective lib folders.
     val coreDest = file("seer-core/lib")
     val deskDest = file("seer-desktop/lib")
-    val opencvDest = file("seer-opencv/lib")
-    val kinectDest = file("seer-sensors/seer-kinect/lib")
-    val leapDest = file("seer-sensors/seer-leap/lib")
-    val touchDest = file("seer-sensors/seer-multitouch/lib")
+    val opencvDest = file("seer-modules/seer-opencv/lib")
+    val kinectDest = file("seer-modules/seer-kinect/lib")
+    val leapDest = file("seer-modules/seer-leap/lib")
+    val touchDest = file("seer-modules/seer-multitouch/lib")
     val nativeDest = file("lib")
     val nativeFilter =  new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("libLeap.dylib") | 
                         new ExactFilter("libLeapJava.dylib") | new ExactFilter("libopencv_java245.dylib")
@@ -71,10 +71,10 @@ object SeerLibs {
     import java.net.URL
     
     // Declare names
-    // val baseUrl = "http://libgdx.badlogicgames.com/releases"
-    // val gdxName = "libgdx-0.9.9"
-    val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
-    val gdxName = "libgdx-nightly-latest"
+    val baseUrl = "http://libgdx.badlogicgames.com/releases"
+    val gdxName = "libgdx-1.0.0"
+    // val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
+    // val gdxName = "libgdx-nightly-latest"
 
     // Fetch the file.
     s.log.info("Pulling %s" format(gdxName))
