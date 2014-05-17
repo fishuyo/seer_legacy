@@ -137,6 +137,19 @@ class RenderNode {
 
   def bindBuffer(i:Int) = buffer.get.getColorBufferTexture().bind(i)
 
+  def bindTarget(){
+    if( buffer.isDefined ){
+      buffer.get.begin()
+
+      if( clear ) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+      else Gdx.gl.glClear( GL20.GL_DEPTH_BUFFER_BIT)
+
+      nodes.foreach(_.render()) //hacky
+    }
+  }
+  
+  def unbindTarget() = if( buffer.isDefined ) buffer.get.end()
+
   def resize(vp:Viewport){
     viewport = vp
     if(camera.viewportHeight == 1.f){
@@ -167,15 +180,7 @@ class RenderNode {
   }
 
   def render(){
-    if( buffer.isDefined ){
-      buffer.get.begin()
-
-      if( clear ) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-      else Gdx.gl.glClear( GL20.GL_DEPTH_BUFFER_BIT)
-
-      nodes.foreach(_.render()) //hacky
-      
-    }
+    bindTarget()
 
     try{
       Shader(shader).begin() 
@@ -214,7 +219,7 @@ class RenderNode {
       // println ("\n" + e.printStackTrace + "\n")
     }
 
-    if( buffer.isDefined ) buffer.get.end()
+    unbindTarget()
   }
 }
 
