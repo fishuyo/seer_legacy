@@ -5,8 +5,4 @@ audio visual interactivity programming and things
 
 -------
 
-To build:
-
-  * sbt download-libs
-  * sbt run
-
+get started using [seer-template-project](https://github.com/fishuyo/seer-template-project)
