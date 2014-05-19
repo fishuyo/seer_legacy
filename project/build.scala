@@ -118,7 +118,7 @@ object SeerBuild extends Build {
     "examples",
     file("examples"),
     settings = BuildSettings.app
-  ) dependsOn( seer_desktop, seer_opencv )
+  ) dependsOn( seer_desktop, seer_opencv, seer_jruby, seer_multitouch )
 
   // lazy val experiments_fieldViewer = Project (
   //   "experiments-fieldViewer",
@@ -170,7 +170,7 @@ object SeerBuild extends Build {
     "trees",
     file("apps/desktop/trees"),
     settings = BuildSettings.app
-  ) dependsOn( seer_desktop, seer_kinect )
+  ) dependsOn( seer_desktop, seer_kinect, seer_jruby, seer_multitouch )
 
   // // android apps
   // lazy val loop_android = Project (

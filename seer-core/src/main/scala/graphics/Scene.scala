@@ -33,6 +33,7 @@ class Scene {
   //val lights = new ListBuffer[GLLight]
 
   def push( o: Drawable) = drawable += o
+  def remove( o: Drawable) = drawable -= o
   def push( o: Animatable) = { animatable += o;  drawable += o }
   def remove( o: Animatable) = { animatable -= o;  drawable -= o }
   def clear() = { drawable.clear; animatable.clear }
