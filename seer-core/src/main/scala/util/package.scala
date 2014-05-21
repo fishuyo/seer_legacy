@@ -42,4 +42,11 @@ package object util{
 	@inline def lerp(v1:Float, v2:Float, t:Float): Float = {
 	  v1*(1.f-t)+v2*t
 	}
+
+	@inline def wrap(v:Float,l:Float,h:Float):Float = {
+		if( v >= h) v - h + l
+		else if( v < l) v + h - l
+		else v 
+	}	
+
 }

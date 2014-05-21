@@ -61,6 +61,12 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   def lerp( v:Vec3, d:Float ) = this + (v-this)*d
   def lerpTo( v:Vec3, d:Float) = this.set(this.lerp(v,d))
 
+  def wrap(l:Vec3,h:Vec3) = {
+    x = util.wrap(x,l.x,h.x)
+    y = util.wrap(y,l.y,h.y)
+    z = util.wrap(z,l.z,h.z)
+  }
+
   def xy = Vec2(x,y)
   def xz = Vec2(x,z)
   def yz = Vec2(y,z)
