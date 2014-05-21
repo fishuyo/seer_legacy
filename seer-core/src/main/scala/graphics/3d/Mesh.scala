@@ -142,6 +142,29 @@ class Mesh extends Drawable {
 		}
 	}
 
+
+	def normalize() = {
+    var min = Vec3( java.lang.Double.MAX_VALUE )
+    var max = Vec3( java.lang.Double.MIN_VALUE )
+    vertices.foreach( {
+      case Vec3( x,y,z ) => {
+        min = Vec3( math.min( min.x, x ), math.min( min.y, y ), math.min( min.z, z ))
+        max = Vec3( math.max( max.x, x ), math.max( max.y, y ), math.max( max.z, z ))
+      }
+    })
+
+    val half = Vec3(.5)
+    val diff = max - min
+    val maxDiff = math.max( math.max( diff.x, diff.y ), diff.z)
+    for (i <- 0 until vertices.length ) {
+      vertices(i) -= min
+      vertices(i) *= 1.0f / maxDiff
+      vertices(i) -= half
+    }
+    println( min + " " + max )
+    this
+  }
+
 	def recalculateNormals(){
 		// make sure normals same size as vertices
 		if( normals.length < vertices.length){

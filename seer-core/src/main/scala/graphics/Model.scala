@@ -33,7 +33,7 @@ object Model {
     model
   }
 
-  def loadOBJ(s:String) = OBJ(s)
+  def loadOBJ(s:String) = Obj(s)
 }
 
 class Model extends Drawable with geometry.Pickable {

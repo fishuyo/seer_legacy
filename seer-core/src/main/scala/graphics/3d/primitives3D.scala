@@ -279,14 +279,14 @@ class Cylinder extends Model {
 }
 
 
-object OBJ {
-  def apply(file:String) = Model(load(file))
+// object OBJ {
+//   def apply(file:String) = Model(load(file))
 
-  def load(file:String) = {
-    val model = new ObjLoader().loadObj(Gdx.files.internal(file))
-    Mesh(model.meshes.get(0))
-  }
-}
+//   def load(file:String) = {
+//     val model = new ObjLoader().loadObj(Gdx.files.internal(file))
+//     Mesh(model.meshes.get(0))
+//   }
+// }
 
 
 
