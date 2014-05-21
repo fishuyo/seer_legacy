@@ -76,7 +76,7 @@ object Texture {
 
 class FloatTexture(var w:Int,var h:Int) {
   var data = BufferUtils.newFloatBuffer( 4*w*h )
-  val handle = getGLHandle()
+  var handle = getGLHandle()
   val target = GL20.GL_TEXTURE_2D
   val iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
   val format = GL20.GL_RGBA
@@ -124,6 +124,17 @@ class FloatTexture(var w:Int,var h:Int) {
     Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,data)
     Gdx.gl.glGenerateMipmap(GL20.GL_TEXTURE_2D);
     // println(Gdx.gl.glGetError())
+  }
+
+  def dispose(){
+    if (handle != 0) {
+      val buffer = BufferUtils.newIntBuffer(1)
+      buffer.put(0, handle);
+      buffer.position(0);
+      buffer.limit(1);
+      Gdx.gl.glDeleteTextures(1, buffer);
+      handle = 0;
+    }
   }
 }
 
