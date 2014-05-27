@@ -173,7 +173,7 @@ class Mesh extends Drawable {
 		}
 
 		// if indices present
-		if( indices.length > 0 && primitive == Triangles ){
+		if( indices.length > 0 && indices.length % 3 == 0 ){ //primitive == Triangles ){
 
 			val count = new Array[Float](vertices.length)
 			// for each face (3 indices)

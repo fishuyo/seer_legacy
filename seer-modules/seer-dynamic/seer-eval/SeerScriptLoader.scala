@@ -15,7 +15,7 @@ import com.twitter.util.Eval
  
 	
 
-class SeerScriptLoader(val scriptPath:String) extends scala.Dynamic {
+class SeerScriptLoader(val scriptPath:String) {
 
   var loaded = false
 
@@ -65,12 +65,7 @@ class SeerScriptLoader(val scriptPath:String) extends scala.Dynamic {
       loaded = false
     }
   }
-         
-  def applyDynamic(name: String)(args: Any*){
-    if( !loaded ) return
-    println(name)
-  }
-                   
+                       
 }
 
 class SeerScript extends scala.Dynamic with Animatable with AudioSource {

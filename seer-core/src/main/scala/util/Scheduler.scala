@@ -13,6 +13,28 @@ import system.dispatcher
 import collection.mutable.ListBuffer
 
 
+class Schedulable extends Cancellable with Animatable{
+	var cancelled = false
+	var duration = 0 millis
+	var t = 0 millis
+	var percent = 0.0
+	var speed = 1.0
+
+	Scene.push(this)
+
+	def updateDuration(d:FiniteDuration){
+		if(d == 0.seconds) return
+		val tt = d*percent
+		if(tt.isFinite){
+			duration = d
+			t = tt.asInstanceOf[FiniteDuration]
+		}
+	}
+
+	override def isCancelled = cancelled
+	override def cancel(){ Scene.remove(this); cancelled = true}
+}
+
 object Schedule {
 	implicit def int2fd(i:Int):FiniteDuration = i.milliseconds
 	implicit def d2f(d:Double) = d.toFloat
@@ -32,48 +54,52 @@ object Schedule {
 	}
 
 	def over(len:FiniteDuration)(f:(Float)=>Unit) = {
-		val e = new Cancellable{
-			var cancelled = false
-
-			val a = new Animatable {
-				val deadline = len.fromNow
-				var t = 0.millis
-				override def animate(dt:Float){
-					t += (dt.toDouble).seconds
-					if(deadline.isOverdue){
-						Scene.remove(this)
-						cancelled = true
-						f(1.f)
-					} else f(t/len)
+		val e = new Schedulable {
+			duration = len
+			override def animate(dt:Float){
+				t += (speed * dt.toDouble).seconds
+				if(t > duration){
+					cancel()
+					f(1.f)
+				} else {
+					percent = t/duration
+					f(percent)
 				}
 			}
-			Scene.push(a)
-
-			override def isCancelled = cancelled
-			override def cancel(){ Scene.remove(a); cancelled = true}
 		}
+		// val e = new Cancellable{
+		// 	var cancelled = false
+
+		// 	val a = new Animatable {
+		// 		val deadline = len.fromNow
+		// 		var t = 0.millis
+		// 		override def animate(dt:Float){
+		// 			t += (dt.toDouble).seconds
+		// 			if(deadline.isOverdue){
+		// 				Scene.remove(this)
+		// 				cancelled = true
+		// 				f(1.f)
+		// 			} else f(t/len)
+		// 		}
+		// 	}
+		// 	Scene.push(a)
+
+		// 	override def isCancelled = cancelled
+		// 	override def cancel(){ Scene.remove(a); cancelled = true}
+		// }
 		events += e
 		e
 	}
 
 	def cycle(len:FiniteDuration)(f:(Float)=>Unit) = {
-		val e = new Cancellable{ 
-			val a = new Animatable {
-				var deadline = len.fromNow
-				var t = 0.millis
-				override def animate(dt:Float){
-					t += (dt.toDouble).seconds
-					if(deadline.isOverdue){
-						deadline = len.fromNow
-						t -= len 
-					}
-					f(t/len)
-				}
+		val e = new Schedulable {
+			duration = len
+			override def animate(dt:Float){
+				t += (speed * dt.toDouble).seconds
+				if(t > duration) t -= duration
+				percent = t/duration
+				f(percent)
 			}
-			Scene.push(a)
-			var cancelled = false
-			override def isCancelled = cancelled
-			override def cancel(){ Scene.remove(a); cancelled = true}
 		}
 		events += e
 		e

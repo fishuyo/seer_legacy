@@ -120,8 +120,8 @@ object Shader {
       s.uniforms("u_normalMatrix") = MatrixStack.normalMatrix()
       s.uniforms("u_cameraPosition") = camera.nav.pos
       // s.uniforms("u_color") = color
-      // s.uniforms("u_alpha") = alpha
-      // s.uniforms("u_fade") = fade
+      s.uniforms("u_alpha") = alpha
+      s.uniforms("u_fade") = fade
       setLightUniforms()
     } catch { case e:Exception => ()} //println(e)}
     s.setUniforms() 
