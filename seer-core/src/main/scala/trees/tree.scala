@@ -49,6 +49,23 @@ class Tree() extends Animatable {
   val sAngle = RandVec3( Vec3(0,0,0), Vec3(0,0,0), true)
   val bAngle = RandVec3( Vec3(0,10.f.toRadians,0), Vec3(0,10.f.toRadians,0), true)
 
+  def update(mz:Float,rx:Float,ry:Float,rz:Float){
+    bAngle.y.setMinMax( 0.05, ry,false )
+    // ##bAngle.y.set(mx)
+    sRatio.setMinMax( 0.05, mz, false )
+    // ## sRatio.set( mz )
+    bRatio.setMinMax( 0.05, mz, false )
+    // ##bRatio.set( my )
+    sAngle.x.setMinMax( 0.05, rx, false )
+    bAngle.x.setMinMax( 0.05, rx, false )
+    // ##sAngle.x.set( rx )
+    sAngle.z.setMinMax( 0.05, rz, false )
+    bAngle.z.setMinMax( 0.05, rz, false )
+    // ##sAngle.z.set( rz )
+    // ##branch(depth)
+    refresh()
+  }
+
   def set(r:Randf, s:Float=1.f) = (v:Seq[Float]) => {r.set(v(0)*s); dirty=true}
   def setMin( r:Randf, s:Float=1.f) = (v:Float) => {r.min = v*s; dirty=true}
   def setMax( r:Randf, s:Float=1.f) = (v:Float) => {r.max = v*s; dirty=true}

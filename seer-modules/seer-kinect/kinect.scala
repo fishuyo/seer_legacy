@@ -105,30 +105,43 @@ object Kinect extends Animatable {
 		override def onFrameReceived(mode:FrameMode, frame:ByteBuffer, timestamp:Int) {
 			// println( "depth wy: " + mode.getWidth + " " + mode.getHeight + " " + mode.format )
 
-			for( i<-(0 until 480*640)){
+		  val histogram = Util.calcHist(frame);
+      frame.rewind();
+      var pos = 0;
+      while(frame.remaining() > 0) {
+        val depth = frame.getShort().toInt & 0xFFFF;
+        val pixel = histogram(depth).toShort;
+        col(pos) = 0xFF000000 | (pixel << 16) | (pixel << 8);
+				depthData(pos) = (pixel).toByte
+				flo(pos) = depth / 255.f //histogram(depth)/255.f
+        pos += 1
+      }
 
-				val lb = (frame.get(2*i) & 0xFF).toShort
-				val gb = (frame.get(2*i+1) & 0xFF).toShort
-				val raw:Int = (gb) << 8 | lb
-				var depth:Float = gamma(raw) 
-				//var depth:Float = raw / 2048.f
+			// for( i<-(0 until 480*640)){
 
-				case class Color(r:Int,g:Int,b:Int)
-				var color = gb match {
-					case 0 => Color(255,255-lb,255-lb)
-					case 1 => Color(255,lb,0)
-					case 2 => Color(255-lb,255,0)
-					case 3 => Color(0,255,lb)
-					case 4 => Color(0,255-lb,255)
-					case 5 => Color(0,0,255-lb)
-					case _ => Color(0,0,0)
-				}
-				val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
-				col(i) = c
+			// 	val lb = (frame.get(2*i) & 0xFF).toShort
+			// 	val gb = (frame.get(2*i+1) & 0xFF).toShort
+			// 	val raw:Int = (gb) << 8 | lb
+			// 	var depth:Float = gamma(raw) 
+			// 	//var depth:Float = raw / 2048.f
 
-				depthData(i) = (depth*255.f).toByte
-				flo(i) = depth
-			}
+			// 	case class Color(r:Int,g:Int,b:Int)
+			// 	var color = gb match {
+			// 		case 0 => Color(255,255-lb,255-lb)
+			// 		case 1 => Color(255,lb,0)
+			// 		case 2 => Color(255-lb,255,0)
+			// 		case 3 => Color(0,255,lb)
+			// 		case 4 => Color(0,255-lb,255)
+			// 		case 5 => Color(0,0,255-lb)
+			// 		case _ => Color(0,0,0)
+			// 	}
+			// 	val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
+			// 	col(i) = c
+
+			// 	depthData(i) = (depth*255.f).toByte
+			// 	flo(i) = depth
+			// }
+
 			//println ( flo.max )
 
 			// put kinect gamma corrected depthData into 8UC1 Mat
@@ -153,8 +166,9 @@ object Kinect extends Animatable {
 				detectPix.drawPixel(x,y)
 
 				// val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255.f
-				// videoPix.setColor(v,v,v,1.f)
-				depthPix.setColor(col(640*y+x))
+				val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255.f
+				depthPix.setColor(v,v,v,1.f)
+				// depthPix.setColor(col(640*y+x))
 				depthPix.drawPixel(x,y)
 
 			}
@@ -240,5 +254,36 @@ object Kinect extends Animatable {
     }
 
     out.close
+  }
+}
+
+object Util{
+
+	var histogram = new Array[Float](100000)
+  def calcHist(depthBuffer:ByteBuffer) = {
+    
+    // reset
+    for (i <- 0 until histogram.length) histogram(i) = 0;
+
+    var (min,max) = (999999999, -99999999)
+    var points = 0;
+    while(depthBuffer.remaining() > 0) {
+      val depth = depthBuffer.getShort() & 0xFFFF;
+      if(depth > max) max = depth
+      if(depth < min) min = depth
+      if (depth != 0) {
+        histogram(depth) += 1
+        points += 1
+      }
+    }
+    println( max + " " + min)
+
+    for (i <- 1 until histogram.length) histogram(i) += histogram(i - 1)
+
+    if (points > 0) {
+    	for (i <- 1 until histogram.length)
+    		histogram(i) = (256 * (1.0f - (histogram(i) / (1.f*points))));
+    }
+    histogram
   }
 }

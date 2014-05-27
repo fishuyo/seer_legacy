@@ -85,9 +85,12 @@ class FloatTexture(var w:Int,var h:Int) {
 
   val filterMin = GL20.GL_NEAREST
   val filterMag = GL20.GL_NEAREST
-  val mWrapS = GL20.GL_CLAMP_TO_EDGE
-  val mWrapT = GL20.GL_CLAMP_TO_EDGE
-  val mWrapR = GL20.GL_CLAMP_TO_EDGE
+  // val mWrapS = GL20.GL_CLAMP_TO_EDGE
+  // val mWrapT = GL20.GL_CLAMP_TO_EDGE
+  // val mWrapR = GL20.GL_CLAMP_TO_EDGE
+  val mWrapS = GL20.GL_REPEAT
+  val mWrapT = GL20.GL_REPEAT
+  val mWrapR = GL20.GL_REPEAT
 
   // bind(0)
   // update()
