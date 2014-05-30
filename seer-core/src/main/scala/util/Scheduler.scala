@@ -32,7 +32,7 @@ class Schedulable extends Cancellable with Animatable{
 	}
 
 	override def isCancelled = cancelled
-	override def cancel(){ Scene.remove(this); cancelled = true}
+	override def cancel() = { Scene.remove(this); cancelled = true; true}
 }
 
 object Schedule {
