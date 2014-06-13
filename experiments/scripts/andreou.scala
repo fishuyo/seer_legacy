@@ -122,18 +122,18 @@ object Script extends SeerScript {
 		updateCamera()
 	})
 
-	Trackpad.clear
-	Trackpad.connect
-	Trackpad.bind {
-		case (1,f) =>
-		case (3,f) => D.xshift.y += f(3)*0.00025f; if(D.xshift.y < 0.f) D.xshift.y = 0.f
-									D.yshift.x -= f(3)*0.00005f; if(D.yshift.x > 0.f) D.yshift.x = 0.f
-		case _ => ()
-	}
+	// Trackpad.clear
+	// Trackpad.connect
+	// Trackpad.bind {
+	// 	case (1,f) =>
+	// 	case (3,f) => D.xshift.y += f(3)*0.00025f; if(D.xshift.y < 0.f) D.xshift.y = 0.f
+	// 								D.yshift.x -= f(3)*0.00005f; if(D.yshift.x > 0.f) D.yshift.x = 0.f
+	// 	case _ => ()
+	// }
 
 }
 
-Camera.nav.pos.set(0,1,2)
+Camera.nav.pos.set(0,0,0)
 Camera.nav.quat.set(1,0,0,0)
 Scene.alpha = .5
 SceneGraph.root.depth = false
@@ -421,10 +421,12 @@ object Omni extends Animatable with OmniDrawable {
 
 	override def init(){
     if( omniShader == null){
+    	// mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
+			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
       omniShader = Shader.load("omni", OmniShader.glsl + S.vOmni, S.frag1 )
       omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
       omni.onCreate
-      
+
     }		
 	}
 

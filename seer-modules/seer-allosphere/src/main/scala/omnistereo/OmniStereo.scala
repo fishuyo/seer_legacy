@@ -178,9 +178,9 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 				val paramFile = configpath + "/" + p.get("params").get("file").tostring
 				// mProjections(i).readParameters(paramFile)
 
-				mProjections(i).position.x = p.get("position").get(1).tofloat
-				mProjections(i).position.y = p.get("position").get(2).tofloat
-				mProjections(i).position.z = p.get("position").get(3).tofloat
+				// mProjections(i).position.x = p.get("position").get(1).tofloat
+				// mProjections(i).position.y = p.get("position").get(2).tofloat
+				// mProjections(i).position.z = p.get("position").get(3).tofloat
 
 			}
 
