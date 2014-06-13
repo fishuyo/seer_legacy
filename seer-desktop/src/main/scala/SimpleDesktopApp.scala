@@ -116,6 +116,10 @@ object DesktopApp {
     }
   }
 
+  def setFullscreen(){
+    Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
+  }
+
   def toggleFullscreen(){
     app.pause()
     if( usingCanvas ){
