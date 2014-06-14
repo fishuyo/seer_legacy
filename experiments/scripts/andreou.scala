@@ -424,7 +424,8 @@ object Omni extends Animatable with OmniDrawable {
     	// mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
 			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
       omniShader = Shader.load("omni", OmniShader.glsl + S.vOmni, S.frag1 )
-      omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
+      // omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
+      omni.configure("../../../calibration-current",java.net.InetAddress.getLocalHost().getHostName())
       omni.onCreate
 
     }		
@@ -435,7 +436,7 @@ object Omni extends Animatable with OmniDrawable {
 		if( omniShader == null){ init()}
 		val vp = Viewport(Window.width, Window.height)
 
-		// omni.drawWarp(vp)
+		omni.drawWarp(vp)
 		// omni.drawDemo(lens,Camera.nav,vp)
 
 		// onDrawOmni()
@@ -443,7 +444,7 @@ object Omni extends Animatable with OmniDrawable {
 		// omni.drawSphereMap(t, lens, Camera.nav, vp)
 
 		// if (omniEnabled) {
-			omni.onFrame(this, lens, Camera.nav, vp);
+			// omni.onFrame(this, lens, Camera.nav, vp);
 		// } else {
 			// omni.onFrameFront(this, lens, Camera.nav, vp);
 		// }
