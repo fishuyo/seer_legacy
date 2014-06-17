@@ -118,6 +118,7 @@ object DesktopApp {
 
   def setFullscreen(){
     Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
+    fullscreen = true
   }
 
   def toggleFullscreen(){

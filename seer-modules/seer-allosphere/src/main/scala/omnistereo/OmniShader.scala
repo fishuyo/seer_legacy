@@ -85,7 +85,9 @@ object OmniShader {
 			vec3 v = normalize(texture2D(pixelMap, T).rgb);
 
 			// index into cubemap:
-			vec3 rgb = textureCube(cubeMap, v).rgb * texture2D(alphaMap, T).rgb;
+			vec2 TT = T;
+			TT.y = 1.0 - T.y;
+			vec3 rgb = textureCube(cubeMap, v).rgb * texture2D(alphaMap, TT).rgb;
 
 			gl_FragColor = vec4(rgb, 1.);
 		}
@@ -146,7 +148,9 @@ object OmniShader {
 			vec3 v = texture2D(pixelMap, T).rgb;
 			v = normalize(v);
 			v = mod(v * 8., 1.);
-			v *= texture2D(alphaMap, T).rgb;
+			vec2 TT = T;
+			TT.y = 1.0 - T.y;
+			v *= texture2D(alphaMap, TT).rgb;
 			gl_FragColor = vec4(v, 1.);
 		}
 	"""
@@ -320,7 +324,9 @@ object OmniShader {
 				//color *= fog;
 			}
 
-			color *= texture2D(alphaMap, T).rgb;
+			vec2 TT = T;
+			TT.y = 1.0 - T.y;
+			color *= texture2D(alphaMap, TT).rgb;
 
 			gl_FragColor = vec4(color, 1);
 		}

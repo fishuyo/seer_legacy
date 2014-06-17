@@ -134,11 +134,12 @@ class Projection {
 		bb.rewind()
 		// mBlend.draw(pBlend,0,0)
 
-		mBlend = new GdxTexture(pBlend)
+		mBlend = new GdxTexture(pBlend, true)
 
 		// mBlend = new GdxTexture(Gdx.files.internal(path), Pixmap.Format.RGBA8888, true)
-		// mBlend.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.Linear)
-		mBlend.setFilter( GdxTexture.TextureFilter.Linear, GdxTexture.TextureFilter.Linear)
+		mBlend.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.Linear)
+		// mBlend.setFilter( GdxTexture.TextureFilter.MipMap, GdxTexture.TextureFilter.MipMap)
+		// mBlend.setFilter( GdxTexture.TextureFilter.Linear, GdxTexture.TextureFilter.Linear)
 	}
 
 	def readWarp(path:String){
@@ -195,6 +196,11 @@ class Projection {
 
 			// pWarp = new Pixmap(w,h,Pixmap.Format.RGBA8888)
 			mWarp = new FloatTexture(w,h) //new GdxTexture(pWarp, true)
+			mWarp.filterMin = GL20.GL_LINEAR_MIPMAP_LINEAR
+			mWarp.filterMag = GL20.GL_LINEAR
+			mWarp.mWrapS = GL20.GL_CLAMP_TO_EDGE
+			mWarp.mWrapT = GL20.GL_CLAMP_TO_EDGE
+			mWarp.mWrapR = GL20.GL_CLAMP_TO_EDGE
 
 			updatedWarp()
 
@@ -278,6 +284,7 @@ class Projection {
 		}
 
 		mWarp.bind(0)
+		mWarp.params
 	  mWarp.update
 	}
 

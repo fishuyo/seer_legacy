@@ -83,14 +83,14 @@ class FloatTexture(var w:Int,var h:Int) {
   val dtype = GL20.GL_FLOAT
   // println(Gdx.graphics.supportsExtension("texture_float"))
 
-  val filterMin = GL20.GL_NEAREST
-  val filterMag = GL20.GL_NEAREST
+  var filterMin = GL20.GL_NEAREST
+  var filterMag = GL20.GL_NEAREST
   // val mWrapS = GL20.GL_CLAMP_TO_EDGE
   // val mWrapT = GL20.GL_CLAMP_TO_EDGE
   // val mWrapR = GL20.GL_CLAMP_TO_EDGE
-  val mWrapS = GL20.GL_REPEAT
-  val mWrapT = GL20.GL_REPEAT
-  val mWrapR = GL20.GL_REPEAT
+  var mWrapS = GL20.GL_REPEAT
+  var mWrapT = GL20.GL_REPEAT
+  var mWrapR = GL20.GL_REPEAT
 
   // bind(0)
   // update()

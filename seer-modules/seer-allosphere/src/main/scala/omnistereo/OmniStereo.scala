@@ -113,7 +113,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 
 	var mTex = Array(0,0)
 
-	val mQuad = Plane.generateMesh()
+	val mQuad = Plane() //.generateMesh()
 
 	implicit def f2i(f:Float) = f.toInt
 
@@ -155,7 +155,11 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 		try{
 			val ps = L.get("projections")
 			if(ps.get("active").toboolean) mMode = ACTIVE
-			if(ps.get("fullscreen").toboolean) mFullScreen = true
+			if(ps.get("fullscreen").toboolean){ 
+				mFullScreen = true
+				com.fishuyo.seer.DesktopApp.setFullscreen
+			}
+			
 			mResolution = ps.get("resolution").toint
 
 			mNumProjections = ps.length

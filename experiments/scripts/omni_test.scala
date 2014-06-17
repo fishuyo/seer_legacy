@@ -6,6 +6,9 @@ import maths._
 import io._
 import util._
 
+import actor._
+import akka.actor.Props
+
 import allosphere._
 
 import com.badlogic.gdx.Gdx
@@ -15,24 +18,42 @@ import java.io._
 import collection.mutable.ArrayBuffer
 import collection.mutable.Map
 
+import de.sciss.osc.Message
 
 
 object Script extends SeerScript {
 
-	override def draw(){
+	val sim = false
+	if(sim) OSC.connect("192.168.0.255", 8008)
 
+	// val actor = system.actorOf(Props(new Node), name = "node")
+
+
+	override def preUnload(){
+		recv.clear()
+		recv.disconnect()
+
+	}
+	override def draw(){
 		Omni.draw
 	}
 
 	override def animate(dt:Float){
-
-
+		if(sim){
+			val pos = Camera.nav.pos
+			OSC.send("/camera/pos", pos.x, pos.y, pos.z)
+		}	
 	}
 
-	
-
-	
-
+  val recv = new OSCRecv
+  recv.listen(8008)
+  recv.bindp {
+    case Message("/camera/pos", x:Float, y:Float, z:Float) => 
+    	Camera.nav.pos.set(x,y,z)
+   	case Message("/camera/quat", w:Float, x:Float, y:Float, z:Float) => 
+    	Camera.nav.quat.set(w,x,y,z)
+    case _ => ()
+  }
 }
 
 Camera.nav.pos.set(0,0,0)
@@ -144,7 +165,7 @@ object S {
 }
 
 object Omni extends Animatable with OmniDrawable {
-
+	
 	val omni = new OmniStereo
 	var omniEnabled = true
 
@@ -177,7 +198,7 @@ object Omni extends Animatable with OmniDrawable {
 		if( omniShader == null){ init()}
 		val vp = Viewport(Window.width, Window.height)
 
-		omni.drawWarp(vp)
+		// omni.drawWarp(vp)
 		// omni.drawDemo(lens,Camera.nav,vp)
 
 		// onDrawOmni()
@@ -185,7 +206,7 @@ object Omni extends Animatable with OmniDrawable {
 		// omni.drawSphereMap(t, lens, Camera.nav, vp)
 
 		// if (omniEnabled) {
-			// omni.onFrame(this, lens, Camera.nav, vp);
+			omni.onFrame(this, lens, Camera.nav, vp);
 		// } else {
 			// omni.onFrameFront(this, lens, Camera.nav, vp);
 		// }
@@ -195,9 +216,10 @@ object Omni extends Animatable with OmniDrawable {
 		Shader("omni").begin
 		omni.uniforms(omniShader);
 
-		val c = Cube()
-		c.scale(10.f)
+		val c = Cube().translate(1,1,0)
+		val c2 = Cube()
 		c.draw
+		c2.draw
 		// Script.pos1.draw
 		// Script.neg3.draw
 		// Script.diff.draw
@@ -206,5 +228,37 @@ object Omni extends Animatable with OmniDrawable {
 	}
 
 }
+
+
+// import akka.cluster.Cluster
+// import akka.cluster.ClusterEvent._
+// import akka.actor.ActorLogging
+// import akka.actor.Actor
+ 
+// class Node extends Actor with ActorLogging {
+ 
+//   val cluster = Cluster(system)
+ 
+//   // subscribe to cluster changes, re-subscribe when restart 
+//   override def preStart(): Unit = {
+//     //#subscribe
+//     cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
+//       classOf[MemberEvent], classOf[UnreachableMember])
+//     //#subscribe
+//   }
+//   override def postStop(): Unit = cluster.unsubscribe(self)
+ 
+//   def receive = {
+//     case MemberUp(member) =>
+//       log.info("Member is Up: {}", member.address)
+//     case UnreachableMember(member) =>
+//       log.info("Member detected as unreachable: {}", member)
+//     case MemberRemoved(member, previousStatus) =>
+//       log.info("Member is Removed: {} after {}",
+//         member.address, previousStatus)
+//     case _: MemberEvent => // ignore
+//   }
+// }
+
 
 Script
