@@ -6,12 +6,6 @@ import maths._
 import io._
 import util._
 
-import akka.cluster.Cluster
-import akka.cluster.ClusterEvent._
-import akka.actor.ActorLogging
-import akka.actor.Actor
-import akka.actor.Props
-
 import allosphere._
 import allosphere.actor._
 
@@ -24,12 +18,32 @@ import collection.mutable.Map
 
 import de.sciss.osc.Message
 
+import akka.cluster.Cluster
+import akka.cluster.ClusterEvent._
+import akka.actor._
+import akka.contrib.pattern.DistributedPubSubExtension
+import akka.contrib.pattern.DistributedPubSubMediator
+
 
 object Script extends SeerScript {
 
-	val sim = false
+	var frame = 0
+	var sim = true
 
-	val actor = system.actorOf(Props(new Node), name = "node")
+	var publisher:ActorRef = _
+	var subscriber:ActorRef = _
+	ClusterConfig.hostname match {
+		case "gr01" => publisher = system.actorOf(Props[Simulator], name = "simulator")
+		case "Thunder.local" =>
+			publisher = system.actorOf(Props[Simulator], name = "simulator")
+			subscriber = system.actorOf(Props[Renderer], name = "renderer")
+		case _ => sim = false; subscriber = system.actorOf(Props[Renderer], name = "renderer")
+	}
+
+	if(sim) println( "I am the Simulator!")
+	else println( "I am a Renderer!")
+
+	// val actor = system.actorOf(Props(new Node), name = "node")
 
 	override def preUnload(){
 	}
@@ -38,9 +52,40 @@ object Script extends SeerScript {
 	}
 
 	override def animate(dt:Float){
+		frame += 1
+		if(sim) publisher ! s"frame: $frame"
 	}
 
 
+}
+
+class Renderer extends Actor with ActorLogging {
+  import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
+  val mediator = DistributedPubSubExtension(system).mediator
+  // subscribe to the topic named "state"
+  mediator ! Subscribe("state", self)
+ 
+  def receive = {
+    case SubscribeAck(Subscribe("state", None, `self`)) ⇒
+      context become ready
+  }
+ 
+  def ready: Actor.Receive = {
+    case s: String =>
+      log.info("Got {}", s)
+  }
+}
+
+class Simulator extends Actor {
+  import DistributedPubSubMediator.Publish
+  // activate the extension
+  val mediator = DistributedPubSubExtension(system).mediator
+ 
+  def receive = {
+    case in: String ⇒
+      val out = in.toUpperCase
+      mediator ! Publish("state", out)
+  }
 }
 
 class Node extends Actor with ActorLogging {
