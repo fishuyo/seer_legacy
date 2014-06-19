@@ -23,7 +23,7 @@ import de.sciss.osc.Message
 
 object Script extends SeerScript {
 
-	val sim = true
+	val sim = false
 	if(sim) OSC.connect("192.168.0.255", 8008)
 
 	// val actor = system.actorOf(Props(new Node), name = "node")
@@ -41,7 +41,8 @@ object Script extends SeerScript {
 	override def animate(dt:Float){
 		if(sim){
 			val pos = Camera.nav.pos
-			OSC.send("/camera/pos", pos.x, pos.y, pos.z)
+			try{OSC.send("/camera/pos", pos.x, pos.y, pos.z)}
+			catch{ case e:Exception => println(e)}
 		}	
 	}
 
@@ -194,7 +195,7 @@ object Omni extends Animatable with OmniDrawable {
 
       omni.mStereo = 0
 			omni.mMode = StereoMode.MONO
-			
+
     }		
 	}
 

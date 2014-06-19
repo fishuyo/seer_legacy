@@ -190,6 +190,9 @@ object Omni extends Animatable with OmniDrawable {
       // omni.configure("../../../calibration-current",java.net.InetAddress.getLocalHost().getHostName())
       omni.onCreate
 
+      omni.mStereo = 0
+      omni.mMode = StereoMode.MONO
+
     }		
 	}
 
