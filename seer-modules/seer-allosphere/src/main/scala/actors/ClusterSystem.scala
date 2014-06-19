@@ -33,9 +33,10 @@ object ClusterConfig {
       
       cluster {
         seed-nodes = [
-          #"akka.udp://seer@127.0.0.1:2552"
-          #"akka.udp://seer@192.168.0.73:2552" #gr02
-          "akka.udp://seer@192.168.3.104:2552" 
+          #"akka.udp://sphere@127.0.0.1:2552"
+          #"akka.udp://sphere@192.168.0.73:2552" #gr02
+          #"akka.udp://sphere@192.168.3.104:2552" 
+          "akka.udp://sphere@Thunder.local:2552" 
         ]
 
         auto-down-unreachable-after = 10s
