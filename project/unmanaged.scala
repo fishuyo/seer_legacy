@@ -40,6 +40,7 @@ object SeerLibs {
     val kinectDest = file("seer-modules/seer-kinect/lib")
     val leapDest = file("seer-modules/seer-leap/lib")
     val touchDest = file("seer-modules/seer-multitouch/lib")
+    val vrpnDest = file("seer-modules/seer-vrpn/lib")
     val nativeDest = file("lib")
     val nativeFilter =  new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("libLeap.dylib") | 
                         new ExactFilter("libLeapJava.dylib") | new ExactFilter("libopencv_java245.dylib")
@@ -51,6 +52,7 @@ object SeerLibs {
     val kinectFilter = new ExactFilter("freenect-0.0.1.jar")
     val leapFilter = new ExactFilter("LeapJava.jar")
     val touchFilter = new ExactFilter("GlulogicMT.jar")
+    val vrpnFilter = new ExactFilter("vrpn.jar")
     
     IO.unzip(zipFile, coreDest, coreFilter)
     IO.unzip(zipFile, deskDest, deskFilter)
@@ -58,6 +60,7 @@ object SeerLibs {
     IO.unzip(zipFile, kinectDest, kinectFilter)
     IO.unzip(zipFile, leapDest, leapFilter)
     IO.unzip(zipFile, touchDest, touchFilter)
+    IO.unzip(zipFile, vrpnDest, vrpnFilter)
     IO.unzip(zipFile, nativeDest, nativeFilter)
 
     // Destroy the file.
