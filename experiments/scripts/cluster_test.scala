@@ -6,10 +6,11 @@ import maths._
 import io._
 import util._
 
-import actor._
+
 import akka.actor.Props
 
 import allosphere._
+import allosphere.actors._
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
@@ -23,17 +24,16 @@ import de.sciss.osc.Message
 
 object Script extends SeerScript {
 
-	val sim = true
+	val sim = false
 	if(sim) OSC.connect("192.168.0.255", 8008)
 
-	// val actor = system.actorOf(Props(new Node), name = "node")
-
+	val actor = system.actorOf(Props(new Node), name = "node")
 
 	override def preUnload(){
 		recv.clear()
 		recv.disconnect()
-
 	}
+
 	override def draw(){
 		Omni.draw
 	}
@@ -46,7 +46,7 @@ object Script extends SeerScript {
 	}
 
   val recv = new OSCRecv
-  recv.listen(8008)
+  // recv.listen(8008)
   recv.bindp {
     case Message("/camera/pos", x:Float, y:Float, z:Float) => 
     	Camera.nav.pos.set(x,y,z)
@@ -174,27 +174,22 @@ object Omni extends Animatable with OmniDrawable {
 	lens.far = 40.0
 	lens.eyeSep = 0.03
 
-
-	val spheres = for(i <- 0 until 50) yield Sphere()
-	spheres.foreach( _.translate( Random.vec3() ))
-
 	var omniShader:Shader = _
 
   var mode = "omni"
 
+	// omni.mStereo = 1
+	// omni.mMode = omni.StereoMode.ACTIVE
 
 	override def init(){
     if( omniShader == null){
     	// mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
 			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
       omniShader = Shader.load("omni", OmniShader.glsl + S.vOmni, S.frag1 )
-      // omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
-      omni.configure("../../../calibration-current",java.net.InetAddress.getLocalHost().getHostName())
+      omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
+      // omni.configure("../../../calibration-current",java.net.InetAddress.getLocalHost().getHostName())
       omni.onCreate
 
-      omni.mStereo = 0
-			omni.mMode = StereoMode.MONO
-			
     }		
 	}
 
@@ -221,9 +216,9 @@ object Omni extends Animatable with OmniDrawable {
 		Shader("omni").begin
 		omni.uniforms(omniShader);
 
-		// val c = Cube().translate(1,1,0)
+		val c = Cube().translate(1,1,0)
 		val c2 = Cube()
-		// c.draw
+		c.draw
 		c2.draw
 		
 		Shader("omni").end
@@ -232,35 +227,35 @@ object Omni extends Animatable with OmniDrawable {
 }
 
 
-// import akka.cluster.Cluster
-// import akka.cluster.ClusterEvent._
-// import akka.actor.ActorLogging
-// import akka.actor.Actor
+import akka.cluster.Cluster
+import akka.cluster.ClusterEvent._
+import akka.actor.ActorLogging
+import akka.actor.Actor
  
-// class Node extends Actor with ActorLogging {
+class Node extends Actor with ActorLogging {
  
-//   val cluster = Cluster(system)
+  val cluster = Cluster(system)
  
-//   // subscribe to cluster changes, re-subscribe when restart 
-//   override def preStart(): Unit = {
-//     //#subscribe
-//     cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
-//       classOf[MemberEvent], classOf[UnreachableMember])
-//     //#subscribe
-//   }
-//   override def postStop(): Unit = cluster.unsubscribe(self)
+  // subscribe to cluster changes, re-subscribe when restart 
+  override def preStart(): Unit = {
+    //#subscribe
+    cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
+      classOf[MemberEvent], classOf[UnreachableMember])
+    //#subscribe
+  }
+  override def postStop(): Unit = cluster.unsubscribe(self)
  
-//   def receive = {
-//     case MemberUp(member) =>
-//       log.info("Member is Up: {}", member.address)
-//     case UnreachableMember(member) =>
-//       log.info("Member detected as unreachable: {}", member)
-//     case MemberRemoved(member, previousStatus) =>
-//       log.info("Member is Removed: {} after {}",
-//         member.address, previousStatus)
-//     case _: MemberEvent => // ignore
-//   }
-// }
+  def receive = {
+    case MemberUp(member) =>
+      log.info("Member is Up: {}", member.address)
+    case UnreachableMember(member) =>
+      log.info("Member detected as unreachable: {}", member)
+    case MemberRemoved(member, previousStatus) =>
+      log.info("Member is Removed: {} after {}",
+        member.address, previousStatus)
+    case _: MemberEvent => // ignore
+  }
+}
 
 
 Script

@@ -8,6 +8,6 @@ import com.typesafe.config.ConfigFactory
 package object actor {
 
   implicit val system = ActorSystem("seer", ConfigFactory.load(ActorManager.config))
-
+  
 }
 
