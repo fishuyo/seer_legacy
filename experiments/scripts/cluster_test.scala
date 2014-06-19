@@ -10,7 +10,7 @@ import util._
 import akka.actor.Props
 
 import allosphere._
-import allosphere.actors._
+import allosphere.actor._
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20

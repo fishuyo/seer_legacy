@@ -1,6 +1,7 @@
 
 package com.fishuyo.seer
 package allosphere
+package actor
 
 import akka.actor._
 import akka.actor.Props
