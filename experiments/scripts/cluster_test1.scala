@@ -33,11 +33,11 @@ object Script extends SeerScript {
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	ClusterConfig.hostname match {
-		case "gr01" => publisher = system.actorOf(Props[Simulator], name = "simulator")
+		case "gr01" => publisher = system.actorOf(Props( new Simulator), name = "simulator")
 		case "Thunder.local" =>
-			publisher = system.actorOf(Props[Simulator], name = "simulator")
-			subscriber = system.actorOf(Props[Renderer], name = "renderer")
-		case _ => sim = false; subscriber = system.actorOf(Props[Renderer], name = "renderer")
+			publisher = system.actorOf(Props(new Simulator), name = "simulator")
+			subscriber = system.actorOf(Props( new Renderer), name = "renderer")
+		case _ => sim = false; subscriber = system.actorOf(Props( new Renderer), name = "renderer")
 	}
 
 	if(sim) println( "I am the Simulator!")
