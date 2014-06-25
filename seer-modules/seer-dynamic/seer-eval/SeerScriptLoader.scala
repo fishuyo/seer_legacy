@@ -68,6 +68,49 @@ class SeerScriptLoader(val scriptPath:String) {
                        
 }
 
+class SeerScriptTextLoader {
+
+  var loaded = false
+  var script:SeerScript = null
+
+  def load(code:String) = {
+    try{
+      script = Eval[SeerScript](code)
+      loaded = true
+      Scene.push(script)
+      Audio.push(script)
+      script.onLoad()
+    } catch { 
+      case e:Exception => loaded = false; println(e)
+    } 
+  }
+  
+  def reload(code:String) = {
+    try{
+      if(script != null) script.preUnload()
+      val newscript = Eval[SeerScript](code)
+      unload
+      script = newscript
+      loaded = true
+      Scene.push(script)
+      Audio.push(script)
+    } catch { 
+      case e:Exception => loaded = false; println(e)
+    }
+  }
+
+  def unload(){
+    if(script != null){
+      Scene.remove(script)
+      Audio.sources -= script
+      script.onUnload()
+      script = null
+      loaded = false
+    }
+  }
+                       
+}
+
 class SeerScript extends scala.Dynamic with Animatable with AudioSource {
 
 	def selectDynamic(name:String){println(s"$name select")}

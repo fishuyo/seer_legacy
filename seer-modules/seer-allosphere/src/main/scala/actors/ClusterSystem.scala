@@ -16,6 +16,8 @@ object ClusterConfig {
   val hostname = java.net.InetAddress.getLocalHost().getHostName()
   val config = ConfigFactory.parseString(s"""
     akka {
+      log-dead-letters = 0
+      
       actor {
         #provider = "akka.remote.RemoteActorRefProvider"
         provider = "akka.cluster.ClusterActorRefProvider"
