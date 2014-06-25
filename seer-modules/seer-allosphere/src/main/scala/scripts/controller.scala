@@ -1,6 +1,6 @@
 
 
-import com.fishuyo.seer
+import com.fishuyo.seer._
 import allosphere._
 import dynamic._
 

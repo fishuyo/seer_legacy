@@ -57,7 +57,8 @@ object SeerBuild extends Build {
   // modules
   lazy val seer_allosphere = SeerProject (
     id = "seer-allosphere",
-    base = file("seer-modules/seer-allosphere")
+    base = file("seer-modules/seer-allosphere"),
+    settings = BuildSettings.app
   ) dependsOn ( seer_desktop, seer_luaj, seer_eval )
 
   lazy val seer_kinect = SeerProject (

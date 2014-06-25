@@ -31,8 +31,8 @@ import monido._
 
 object LiveClusterController extends SeerApp {
 
-	val loader = new SeerScriptLoader("seer-modules/seer-allosphere/src/main/scala/scripts/controller.scala")
-	val monitor = FileMonido("seer-modules/seer-allosphere/src/main/scala/scripts/cluster_node.scala"){
+	val loader = new SeerScriptLoader("src/main/scala/scripts/controller.scala")
+	val monitor = FileMonido("src/main/scala/scripts/cluster_node.scala"){
     case ModifiedOrCreated(f) => 
       val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
       publisher ! code
