@@ -1,7 +1,7 @@
 
 package com.fishuyo.seer
 package allosphere
-package liveclusterloader 
+package livecluster
 
 import graphics._
 import dynamic._
@@ -27,7 +27,7 @@ import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
 
 
-object LiveClusterLoader extends SeerApp {
+object Node extends SeerApp {
 
 	var sim = false
 	val loader = new SeerScriptTextLoader
@@ -67,8 +67,7 @@ class Simulator extends Actor {
  
   def receive = {
     case in: String =>
-      val out = in.toUpperCase
-      mediator ! Publish("script", out)
+      mediator ! Publish("script", in)
   }
 }
 

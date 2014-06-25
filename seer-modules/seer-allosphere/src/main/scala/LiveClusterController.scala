@@ -1,7 +1,7 @@
 
 package com.fishuyo.seer
 package allosphere
-package liveclusterloader 
+package livecluster
 
 import graphics._
 import dynamic._
@@ -29,9 +29,10 @@ import akka.contrib.pattern.DistributedPubSubMediator
 
 import monido._
 
-object LiveClusterController extends SeerApp {
+object Controller extends SeerApp {
 
 	val loader = new SeerScriptLoader("src/main/scala/scripts/controller.scala")
+
 	val monitor = FileMonido("src/main/scala/scripts/cluster_node.scala"){
     case ModifiedOrCreated(f) => 
       val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
@@ -42,7 +43,7 @@ object LiveClusterController extends SeerApp {
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	ClusterConfig.hostname match {
-		case _ => publisher = system.actorOf(Props( new Simulator), name = "publisher")
+		case _ => publisher = system.actorOf(Props( new Publisher()), name = "publisher")
 		// case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
 	}
 
@@ -51,31 +52,31 @@ object LiveClusterController extends SeerApp {
 class Publisher extends Actor with ActorLogging {
   import DistributedPubSubMediator.Publish
 
-  val cluster = Cluster(system)
+  // val cluster = Cluster(system)
 
   // activate the extension
   val mediator = DistributedPubSubExtension(system).mediator
  
   // subscribe to cluster changes, re-subscribe when restart 
-  override def preStart(): Unit = {
-    cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
-      classOf[MemberEvent], classOf[UnreachableMember])
-  }
-  override def postStop(): Unit = cluster.unsubscribe(self)
+  // override def preStart(): Unit = {
+  //   cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
+  //     classOf[MemberEvent], classOf[UnreachableMember])
+  // }
+  // override def postStop(): Unit = cluster.unsubscribe(self)
   
   def receive = {
     case in: String =>
       println("Publishing script..")
       mediator ! Publish("script", in)
 
-    case MemberUp(member) =>
-      log.info("Member is Up: {}", member.address)
-    case UnreachableMember(member) =>
-      log.info("Member detected as unreachable: {}", member)
-    case MemberRemoved(member, previousStatus) =>
-      log.info("Member is Removed: {} after {}",
-        member.address, previousStatus)
-    case _: MemberEvent => // ignore
+    // case MemberUp(member) =>
+    //   log.info("Member is Up: {}", member.address)
+    // case UnreachableMember(member) =>
+    //   log.info("Member detected as unreachable: {}", member)
+    // case MemberRemoved(member, previousStatus) =>
+    //   log.info("Member is Removed: {} after {}",
+    //     member.address, previousStatus)
+    // case _: MemberEvent => // ignore
   }
 }
 
