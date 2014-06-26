@@ -65,6 +65,61 @@ object ClusterConfig {
 
   """)
 
+  val test_config1 = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+
+      actor {
+        provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "$hostname"
+          port = 2552
+        }
+      }
+      
+      cluster {
+        seed-nodes = [
+          "akka.tcp://sphere@boom.local:2552"
+          "akka.tcp://sphere@Thunder.local:2552"
+        ]
+
+        auto-down-unreachable-after = 10s
+      }
+    }
+    akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  """)
+  // val test_config2 = ConfigFactory.parseString(s"""
+  //   akka {
+  //     log-dead-letters = off
+
+  //     actor {
+  //       provider = "akka.cluster.ClusterActorRefProvider"
+  //     }
+  //     remote {
+  //       log-remote-lifecycle-events = off
+  //       enabled-transports = ["akka.remote.netty.tcp"]
+  //       netty.tcp {
+  //         hostname = "$hostname"
+  //         port = 2552
+  //       }
+  //     }
+      
+  //     cluster {
+  //       seed-nodes = [
+  //         "akka.tcp://sphere@127.0.0.1:2552"
+  //         "akka.tcp://sphere@127.0.0.1:2553"
+  //       ]
+
+  //       auto-down-unreachable-after = 10s
+  //     }
+  //   }
+  //   akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  // """)
+
   // load the normal config stack (system props, then application.conf, then reference.conf)
   val regularConfig = ConfigFactory.load();
   // override regular stack with config

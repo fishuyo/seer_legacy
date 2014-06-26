@@ -77,8 +77,8 @@ class SeerScriptTextLoader {
     try{
       script = Eval[SeerScript](code)
       loaded = true
-      Scene.push(script)
-      Audio.push(script)
+      // Scene.push(script)
+      // Audio.push(script)
       script.onLoad()
     } catch { 
       case e:Exception => loaded = false; println(e)
@@ -92,8 +92,8 @@ class SeerScriptTextLoader {
       unload
       script = newscript
       loaded = true
-      Scene.push(script)
-      Audio.push(script)
+      // Scene.push(script)
+      // Audio.push(script)
     } catch { 
       case e:Exception => loaded = false; println(e)
     }
@@ -101,8 +101,8 @@ class SeerScriptTextLoader {
 
   def unload(){
     if(script != null){
-      Scene.remove(script)
-      Audio.sources -= script
+      // Scene.remove(script)
+      // Audio.sources -= script
       script.onUnload()
       script = null
       loaded = false

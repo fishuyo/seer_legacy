@@ -26,6 +26,8 @@ import akka.cluster.ClusterEvent._
 import akka.actor._
 import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
+import com.typesafe.config.ConfigFactory
+
 
 import monido._
 
@@ -40,11 +42,13 @@ object Controller extends SeerApp {
     case _ => None
   }
 
+  val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
+
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	ClusterConfig.hostname match {
-		case _ => publisher = system.actorOf(Props( new Publisher()), name = "publisher")
-		// case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
+		case _ => publisher = systemm.actorOf(Props( new Publisher()), name = "publisher")
+		// case _ => subscriber = systemm.actorOf(Props( new Loader()), name = "loader")
 	}
 
 }
@@ -52,10 +56,10 @@ object Controller extends SeerApp {
 class Publisher extends Actor with ActorLogging {
   import DistributedPubSubMediator.Publish
 
-  // val cluster = Cluster(system)
+  // val cluster = Cluster(systemm)
 
   // activate the extension
-  val mediator = DistributedPubSubExtension(system).mediator
+  val mediator = DistributedPubSubExtension(Node.systemm).mediator
  
   // subscribe to cluster changes, re-subscribe when restart 
   // override def preStart(): Unit = {

@@ -1,222 +1,176 @@
-// package com.fishuyo.seer
-// package allosphere
 
-// import io._
-// import audio._
-// import graphics._
-// // import audio.PortAudio
+package com.fishuyo.seer 
+package allosphere
 
-// import com.badlogic.gdx.utils.GdxNativesLoader
-// import com.badlogic.gdx.utils.SharedLibraryLoader
-// import com.badlogic.gdx.backends.lwjgl._
-// import com.badlogic.gdx.Gdx
-// import com.badlogic.gdx.graphics.GL20
-// import com.badlogic.gdx.graphics.PerspectiveCamera
-// import com.badlogic.gdx.InputAdapter
-// import com.badlogic.gdx.Input.Keys
-
-// import org.lwjgl.opengl.Display
-// import org.lwjgl.opengl.AWTGLCanvas
-
-// import java.awt._
-// import java.awt.event._
-
-// object DesktopApp {
-
-//   var displayMode:Option[Long] = _
-
-//   var fullscreen = false
-//   var nativesLoaded = false
-
-//   loadLibs() // load gdx before simple app listener
-
-//   val app = new SeerAppListener()
-
-//   Inputs.addProcessor(FullscreenKey)
-
-//   // for use to get fullscreen effect accross multiple monitors
-//   var usingCanvas = false
-//   var bounds = new Rectangle
-//   var frame:Frame = null
-//   var canvas:Canvas = null
-
-//   // HACK: adds dir to load library path
-//   def unsafeAddDir(dir: String) = try {
-//     val field = classOf[ClassLoader].getDeclaredField("usr_paths")
-//     field.setAccessible(true)
-//     val paths = field.get(null).asInstanceOf[Array[String]]
-//     if(!(paths contains dir)) {
-//       field.set(null, paths :+ dir)
-//       System.setProperty("java.library.path",
-//        System.getProperty("java.library.path") +
-//        java.io.File.pathSeparator +
-//        dir)
-//     }
-//   } catch {
-//     case _: IllegalAccessException =>
-//       error("Insufficient permissions; can't modify private variables.")
-//     case _: NoSuchFieldException =>
-//       error("JVM implementation incompatible with path hack")
-//   }
-
-//   // load gdx libs and other common natives
-//   def loadLibs(){
-//     if (nativesLoaded) return
-//     println("loading native libraries..")
-//     try {
-//       GdxNativesLoader.load()
-//       unsafeAddDir("lib")
-//       unsafeAddDir("../lib")
-//       unsafeAddDir("../../lib")
-//       unsafeAddDir("../../../lib")
-//       //System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME)
-//       //new SharedLibraryLoader("lib/GlulogicMT.jar").load("GlulogicMT")
-//     } catch { case e:Exception => println(e) } 
-//     nativesLoaded = true
-//   }
-
-//   // create and run the lwjgl application
-//   def apply(useCanvas:Boolean = false) = {
-    
-//     loadLibs()
-
-//     val cfg = new LwjglApplicationConfiguration()
-//     cfg.title = "seer"
-//     cfg.useGL30 = true
-//     cfg.width = Window.w0
-//     cfg.height = Window.h0
-
-//     usingCanvas = useCanvas
-
-//     if( usingCanvas ){
-//       frame = new Frame
-//       frame.setLayout(new BorderLayout())
-//       canvas = new Canvas
-//       // canvas = new AWTGLCanvas
-
-//       frame.add(canvas, BorderLayout.CENTER)
-//       frame.setSize(cfg.width, cfg.height)
-//       frame.setTitle(cfg.title)
-//       frame.addWindowListener(new WindowAdapter(){
-//         override def windowClosing(we:WindowEvent){
-//           Gdx.app.exit()
-//         }
-//       });
-//       canvas.setBackground(Color.black)
-//       frame.show()
-//       new LwjglApplication( app, cfg, canvas )
-
-//     }else{ 
-
-//       new LwjglApplication( app, cfg )
-//     }
-//     // PortAudio.initialize()
-//     // PortAudio.start()
-
-//   }
-
-//   def toggleFullscreen(){
-//     app.pause()
-//     if( usingCanvas ){
-
-//       if( fullscreen ){
-
-//         val w = bounds.getWidth().toInt
-//         val h = bounds.getHeight().toInt
-//         // Display.setParent(null)
-
-//         // frame.dispose
-//         frame.removeNotify()
-//         frame.setUndecorated(false)
-//         frame.addNotify()
-//         // frame.add(canvas)
-//         frame.setBounds( bounds )
-//         canvas.setBounds( bounds )
-//         // frame.pack; frame.setVisible(true)
-
-//         // Display.setParent(canvas)
-
-//         //app.resize( bounds.getWidth().toInt, bounds.getHeight().toInt )
-
-//         // Gdx.graphics.setDisplayMode( SimpleAppSize.width, SimpleAppSize.height, false)
-//         Gdx.gl.glViewport(0, 0, w, h)
-//         app.resize(w,h)
-
-//       }else{
-//         var r = new Rectangle
-//         GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().foreach( _.getConfigurations().foreach( (g) => r = r.union( g.getBounds() ) ))
-//         println( s"fullscreen: $r")
-
-//         bounds = frame.getBounds
-//         val w = r.getWidth.toInt
-//         val h = r.getHeight.toInt
-
-//         // Display.setParent(null)
-
-//         // frame.dispose
-//         frame.removeNotify()
-//         frame.setUndecorated(true)
-//         frame.addNotify()
-//         // frame.add(canvas)
-//         frame.setBounds( r.getBounds() )
-//         canvas.setBounds( r.getBounds() )
-//         // frame.pack; frame.setVisible(true)
-//         // Display.setParent(canvas)
-
-//         //app.resize( r.getWidth().toInt, r.getHeight().toInt )
-//         // f.setSize(result.getWidth(), result.getHeight());
-//         // Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
-
-//         Gdx.gl.glViewport(0, 0, w, h)
-//         app.resize(w,h)
-//       }
-
-//     }else{
-
-//       if( fullscreen ){
-//         Gdx.graphics.setDisplayMode( Window.w0, Window.h0, false)
-//       }else{
-//         Gdx.graphics.setDisplayMode( Gdx.graphics.getDesktopDisplayMode() )
-//       }
-//     }
-
-//     fullscreen = !fullscreen
-//     app.resume()
-//   }
-
-//   def setDecorated(b:Boolean){
-//     if( usingCanvas ){
-//       frame.removeNotify()
-//       frame.setUndecorated(!b)
-//       frame.addNotify()
-//     }
-//   }
-//   def setBounds(x:Int,y:Int,w:Int,h:Int){
-//     frame.setBounds(x,y,w,h)
-//     canvas.setBounds(x,y,w,h)
-//     Gdx.gl.glViewport(0, 0, w, h)
-//     app.resize(w,h)
-//   }
-// }
+import graphics._
+import dynamic._
+import maths._
+import io._
+import util._
 
 
-// object FullscreenKey extends InputAdapter {
+class OmniApp extends App with Animatable with OmniDrawable {
 
-//   override def keyDown(k:Int) = {
-    
-//     k match {
-//       case Keys.ESCAPE => DesktopApp.toggleFullscreen
-//       case Keys.F1 => 
-//         if( PortAudio.sources.length > 0) PortAudio.toggleRecording()
-//         else Audio.toggleRecording()
-//       case _ => false
-//     }
-//     false
-//   }
-// }
+  DesktopApp.loadLibs()
+  Scene.push(this)
+  DesktopApp.run()
+  // Repl.imports += this.getClass.getName.replace("$","")
+  // Repl.start()
 
-// class OmniApp extends App with Animatable {
-//   DesktopApp.loadLibs()
-//   Scene.push(this)
-//   DesktopApp()
-// }
+	var omni:OmniStereo = _
+	var omniEnabled = true
+
+	val lens = new Lens()
+	lens.near = 0.01
+	lens.far = 40.0
+	lens.eyeSep = 0.03
+
+	var omniShader:Shader = _
+
+  var mode = "omni"
+
+  Camera.nav.pos.set(0,0,0)
+	Camera.nav.quat.set(1,0,0,0)
+
+	override def init(){
+    if( omniShader == null){
+    	omni = new OmniStereo
+    	// mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
+			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
+      omniShader = Shader.load("omni", OmniShader.glsl + S.vOmni, S.frag1 )
+      // omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
+      omni.configure("../../../calibration-current", Hostname())
+      omni.onCreate
+
+      omni.mStereo = 0
+			omni.mMode = StereoMode.MONO
+
+    }		
+	}
+
+	override def draw(){
+		
+		if( omniShader == null){ init()}
+		val vp = Viewport(Window.width, Window.height)
+
+		mode match {
+			case "warp" => omni.drawWarp(vp)
+			case "demo" => omni.drawDemo(lens, Camera.nav, vp)
+			case _ =>
+				if (omniEnabled) {
+					omni.onFrame(this, lens, Camera.nav, vp)
+				} else {
+				  omni.onFrameFront(this, lens, Camera.nav, vp)
+				}
+		}
+	}
+
+	override def onDrawOmni(){
+		Shader("omni").begin
+		omni.uniforms(omniShader);
+
+		// val c = Cube().translate(1,1,0)
+		val c2 = Cube()
+		// c.draw
+		c2.draw
+		
+		Shader("omni").end
+	}
+
+}
+
+object S {
+  val shaders = Map[String,Shader]()
+  val vert = """
+    attribute vec4 a_position;
+    attribute vec2 a_texCoord0;
+    attribute vec4 a_color;
+
+    uniform mat4 u_projectionViewMatrix;
+
+    varying vec4 v_color;
+    varying vec2 v_texCoord;
+    varying vec3 v_pos;
+
+    void main() {
+      gl_Position = u_projectionViewMatrix * a_position;
+      v_texCoord = a_texCoord0;
+      v_color = a_color;
+      v_pos = a_position.xyz;
+    }
+  """
+  val vOmni = """
+    attribute vec4 a_position;
+    attribute vec2 a_texCoord0;
+    attribute vec4 a_color;
+
+    uniform mat4 u_projectionViewMatrix;
+    uniform mat4 u_modelViewMatrix;
+
+    varying vec4 v_color;
+    varying vec2 v_texCoord;
+    varying vec3 v_pos;
+
+    void main() {
+      gl_Position = omni_render(u_modelViewMatrix * a_position);
+      v_texCoord = a_texCoord0;
+      v_color = a_color;
+      v_pos = a_position.xyz;
+    }
+  """
+  val frag = """
+    #ifdef GL_ES
+        precision mediump float;
+    #endif
+
+    varying vec4 v_color;
+    varying vec3 v_pos;
+    varying vec2 v_texCoord;
+  """
+  val frag1 = frag + """
+
+	  vec4 hsv_to_rgb(float h, float s, float v, float a) {
+	        float c = v * s;
+	        h = mod((h * 6.0), 6.0);
+	        float x = c * (1.0 - abs(mod(h, 2.0) - 1.0));
+	        vec4 color;
+
+	        if (0.0 <= h && h < 1.0) {
+	                color = vec4(c, x, 0.0, a);
+	        } else if (1.0 <= h && h < 2.0) {
+	                color = vec4(x, c, 0.0, a);
+	        } else if (2.0 <= h && h < 3.0) {
+	                color = vec4(0.0, c, x, a);
+	        } else if (3.0 <= h && h < 4.0) {
+	                color = vec4(0.0, x, c, a);
+	        } else if (4.0 <= h && h < 5.0) {
+	                color = vec4(x, 0.0, c, a);
+	        } else if (5.0 <= h && h < 6.0) {
+	                color = vec4(c, 0.0, x, a);
+	        } else {
+	                color = vec4(0.0, 0.0, 0.0, a);
+	        }
+
+	        color.rgb += v - c;
+
+	        return color;
+		}
+
+    void main(){
+    	 	float hue = 0.7 * (1.0-(v_pos.y));
+        gl_FragColor = hsv_to_rgb(hue,1.,1.,0.8); //vec4(1,1,1,0.1);
+    }
+  """
+  val g = frag + """
+    void main(){
+    		float c = 0.7+v_pos.y;
+        gl_FragColor = vec4(0,1,0,0.25);
+    }
+  """
+  val r = frag + """
+    void main(){
+    		float c = 0.7+v_pos.y;
+        gl_FragColor = vec4(1,0,0,0.25);
+    }
+  """
+}

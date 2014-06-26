@@ -8,7 +8,7 @@ import graphics._
 object Script extends SeerScript{
 
 	override def draw(){
-		Sphere().draw
+		Cube().draw
 	}
 }
 
