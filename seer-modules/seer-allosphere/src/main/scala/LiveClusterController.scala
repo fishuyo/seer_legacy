@@ -59,7 +59,7 @@ class Publisher extends Actor with ActorLogging {
   // val cluster = Cluster(systemm)
 
   // activate the extension
-  val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  val mediator = DistributedPubSubExtension(Controller.systemm).mediator
  
   // subscribe to cluster changes, re-subscribe when restart 
   // override def preStart(): Unit = {
