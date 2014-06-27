@@ -34,13 +34,13 @@ object Node extends OmniApp {
 	var sim = false
 	val loader = new SeerScriptTextLoader
 
-  val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
+  // val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
 
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	ClusterConfig.hostname match {
-		// case "gr01" => publisher = systemm.actorOf(Props( new Simulator), name = "sLoader")
-		case _ => subscriber = systemm.actorOf(Props( new Loader()), name = "loader")
+		// case "gr01" => publisher = system.actorOf(Props( new Simulator), name = "sLoader")
+		case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
 	}
 
 	if(sim) println( "I am the Simulator!")
@@ -81,7 +81,7 @@ object Node extends OmniApp {
 
 class Loader extends Actor with ActorLogging {
   import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
-  val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
   // subscribe to the topic named "state"
   mediator ! Subscribe("script", self)
  
@@ -99,7 +99,7 @@ class Loader extends Actor with ActorLogging {
 class Simulator extends Actor {
   import DistributedPubSubMediator.Publish
   // activate the extension
-  val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
  
   def receive = {
     case in: String =>

@@ -29,8 +29,8 @@ object ClusterConfig {
           hostname = "$hostname"
           port = 2552
         }
-        #compression-scheme = "zlib"
-        #zlib-compression-level = 1
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
       }
       
       cluster {
@@ -79,6 +79,9 @@ object ClusterConfig {
           hostname = "$hostname"
           port = 2552
         }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+
       }
       
       cluster {
@@ -108,6 +111,9 @@ object ClusterConfig {
           hostname = "$hostname"
           port = 2552
         }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+
       }
       
       cluster {

@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 
 package object actor {
 
-  // implicit val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
+  implicit val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
   
 }
 

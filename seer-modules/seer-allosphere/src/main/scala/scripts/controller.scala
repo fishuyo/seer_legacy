@@ -5,6 +5,8 @@ import allosphere._
 import dynamic._
 import graphics._
 import io._
+import maths._
+import spatial._
 
 
 import akka.cluster.Cluster
@@ -27,6 +29,7 @@ object Script extends SeerScript{
 
 	override def animate(dt:Float){
 		actor ! Mouse.y().toFloat
+		actor ! Camera.nav.pos
 	}
 
 	Mouse.clear
@@ -57,8 +60,8 @@ class Publisher extends Actor {
   val mediator = DistributedPubSubExtension(livecluster.Controller.systemm).mediator
  
   def receive = {
-    case f:Float =>
-      mediator ! Publish("io", f)
+    case f:Float => mediator ! Publish("io", f)
+    case pos:Vec3 => mediator ! Publish("io", Array(pos.x,pos.y,pos.z) )
   }
 }
 

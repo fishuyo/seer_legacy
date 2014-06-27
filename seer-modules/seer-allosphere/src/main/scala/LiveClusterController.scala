@@ -42,13 +42,13 @@ object Controller extends SeerApp {
     case _ => None
   }
 
-  val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
+  // val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
 
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	ClusterConfig.hostname match {
-		case _ => publisher = systemm.actorOf(Props( new Publisher()), name = "publisher")
-		// case _ => subscriber = systemm.actorOf(Props( new Loader()), name = "loader")
+		case _ => publisher = system.actorOf(Props( new Publisher()), name = "publisher")
+		// case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
 	}
 
 }
@@ -56,10 +56,10 @@ object Controller extends SeerApp {
 class Publisher extends Actor with ActorLogging {
   import DistributedPubSubMediator.Publish
 
-  // val cluster = Cluster(systemm)
+  // val cluster = Cluster(system)
 
   // activate the extension
-  val mediator = DistributedPubSubExtension(Controller.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
  
   // subscribe to cluster changes, re-subscribe when restart 
   // override def preStart(): Unit = {
