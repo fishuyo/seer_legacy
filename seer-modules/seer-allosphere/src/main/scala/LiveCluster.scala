@@ -92,7 +92,7 @@ class Loader extends Actor with ActorLogging {
  
   def ready: Actor.Receive = {
     case s: String =>
-      Node.loader.load(s)
+      Node.loader.reload(s)
   }
 }
 
