@@ -39,7 +39,7 @@ class OmniApp extends App with Animatable with OmniDrawable {
 			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
       omniShader = Shader.load("omni", OmniShader.glsl + S.vOmni, S.frag1 )
       // omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
-      omni.configure("../../../calibration-current", Hostname())
+      omni.configure("../../../../calibration-current", Hostname())
       omni.onCreate
 
       omni.mStereo = 0

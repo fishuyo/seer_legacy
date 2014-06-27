@@ -39,7 +39,7 @@ object Node extends OmniApp {
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	ClusterConfig.hostname match {
-		// case "gr01" => publisher = system.actorOf(Props( new Simulator), name = "sLoader")
+		case "gr01" => publisher = system.actorOf(Props( new Simulator), name = "sLoader")
 		case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
 	}
 
@@ -96,15 +96,6 @@ class Loader extends Actor with ActorLogging {
   }
 }
 
-class Simulator extends Actor {
-  import DistributedPubSubMediator.Publish
-  // activate the extension
-  val mediator = DistributedPubSubExtension(system).mediator
- 
-  def receive = {
-    case in: String =>
-      mediator ! Publish("script", in)
-  }
-}
+
 
 

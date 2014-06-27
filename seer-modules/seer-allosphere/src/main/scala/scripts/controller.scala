@@ -2,6 +2,7 @@
 
 import com.fishuyo.seer._
 import allosphere._
+import allosphere.actor._
 import dynamic._
 import graphics._
 import io._
@@ -18,7 +19,8 @@ import com.typesafe.config.ConfigFactory
 
 object Script extends SeerScript{
 
-	val actor = livecluster.Controller.systemm.actorOf(Props( new Publisher()), name = "controller_script")
+	// val actor = livecluster.Controller.systemm.actorOf(Props( new Publisher()), name = "controller_script")
+	val actor = system.actorOf(Props( new Publisher()), name = "controller_script")
 
 	override def preUnload(){
 		actor ! Kill
@@ -57,7 +59,8 @@ object Script extends SeerScript{
 class Publisher extends Actor {
   import DistributedPubSubMediator.Publish
   // activate the extension
-  val mediator = DistributedPubSubExtension(livecluster.Controller.systemm).mediator
+  // val mediator = DistributedPubSubExtension(livecluster.Controller.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
  
   def receive = {
     case f:Float => mediator ! Publish("io", f)

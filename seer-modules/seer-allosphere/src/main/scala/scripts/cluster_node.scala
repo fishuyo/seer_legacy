@@ -1,5 +1,6 @@
 import com.fishuyo.seer._
 import allosphere._
+import allosphere.actor._
 import graphics._
 import dynamic._
 import maths._
@@ -26,13 +27,16 @@ object ClusterScript extends SeerScript{
 
   var t = 0.f
   var scale = 1.f
-	val actor = Node.systemm.actorOf(Props( new Listener()), name = "node_script5")
+	// val actor = Node.systemm.actorOf(Props( new Listener()), name = "node_script5")
+	val actor = system.actorOf(Props( new Listener()), name = "node_script")
 
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
 	Hostname() match {
-		case "Thunder.local" => publisher = Node.systemm.actorOf(Props( new Simulator()), name = "simulator5")
-		case _ => sim = false; subscriber = Node.systemm.actorOf(Props( new Renderer), name = "renderer5")
+		// case "Thunder.local" => publisher = Node.systemm.actorOf(Props( new Simulator()), name = "simulator5")
+		// case _ => sim = false; subscriber = Node.systemm.actorOf(Props( new Renderer), name = "renderer5")
+		case "Thunder.local" => publisher = system.actorOf(Props( new Simulator()), name = "simulator")
+		case _ => sim = false; subscriber = system.actorOf(Props( new Renderer), name = "renderer")
 	}
 
 	if(sim) println( "I am the Simulator!")
@@ -51,7 +55,7 @@ object ClusterScript extends SeerScript{
 	}
   override def draw(){
   	Script.draw()
-    // cubes.foreach(_.draw)
+    cubes.foreach(_.draw)
   }
   override def animate(dt:Float){
   	if(!inited) init()
@@ -60,7 +64,7 @@ object ClusterScript extends SeerScript{
   		Script.animate(dt)
   		t += dt
   		scale = math.sin(t)
-  		publisher ! Script.mesh
+  		publisher ! Mouse.y() //Script.mesh
   	}
   	cubes.foreach(_.scale.set(scale))
 
@@ -200,7 +204,8 @@ object Script extends SeerScript {
 
 class Renderer extends Actor with ActorLogging {
   import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
-  val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  // val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
   // subscribe to the topic named "state"
   mediator ! Subscribe("state", self)
  
@@ -221,7 +226,8 @@ class Renderer extends Actor with ActorLogging {
 class Simulator extends Actor {
   import DistributedPubSubMediator.Publish
   // activate the extension
-  val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  // val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
  
   def receive = {
     case f:Float =>
@@ -238,7 +244,8 @@ class Simulator extends Actor {
 
 class Listener extends Actor {
   import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
-  val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  // val mediator = DistributedPubSubExtension(Node.systemm).mediator
+  val mediator = DistributedPubSubExtension(system).mediator
   // subscribe to the topic named "state"
   mediator ! Subscribe("io", self)
  
@@ -249,7 +256,7 @@ class Listener extends Actor {
  
   def ready: Actor.Receive = {
     case f:Float =>
-      // ClusterScript.scale = f
+      ClusterScript.scale = f
     case pos:Array[Float] => Camera.nav.pos.set(pos(0),pos(1),pos(2))
   }
 }
