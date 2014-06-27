@@ -23,8 +23,9 @@ import ClusterSystem._
 object Main extends App {
 
 	var sim = false
-	val buf = new Array[Byte](1024)
+	val buf = new Array[Int](1024*1024)
 	var frame = 0
+	var lframe = 0
 	var bytes = 0
 
 	var pub:ActorRef = _
@@ -36,12 +37,15 @@ object Main extends App {
 
 	while(true){
 		if(sim){
+			buf(0) = frame
 			pub ! buf
-		}
+			frame += 1
+		} else sub ! "ready"
 		Thread.sleep(33)
-		frame += 1
+		lframe += 1
 
-		if(frame % 30 == 0) printStats()	
+
+		if(lframe % 30 == 0) printStats()	
 	}
 
 	def printStats(){
@@ -58,7 +62,7 @@ class Pub extends Actor {
   val mediator = DistributedPubSubExtension(system).mediator
  
   def receive = {
-    case state: Array[Byte] =>
+    case state: Array[Int] =>
       mediator ! Publish("state", state)
   }
 }
@@ -75,8 +79,15 @@ class Sub extends Actor {
   }
  
   def ready: Actor.Receive = {
-    case state: Array[Byte] =>
+    case state: Array[Int] =>
+    	context become busy
       Main.bytes += state.length
+      Main.frame = state(0)
+  }
+
+  def busy: Actor.Receive = {
+  	case "ready" => context become ready
+  	case _ => print(".")
   }
 }
 
