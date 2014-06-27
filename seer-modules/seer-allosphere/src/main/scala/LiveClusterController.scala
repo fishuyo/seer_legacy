@@ -31,6 +31,11 @@ import com.typesafe.config.ConfigFactory
 
 import monido._
 
+object ClusterSystemm {
+  val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
+}
+import ClusterSystemm._
+
 object Controller extends SeerApp {
 
 	val loader = new SeerScriptLoader("src/main/scala/scripts/controller.scala")
@@ -42,11 +47,9 @@ object Controller extends SeerApp {
     case _ => None
   }
 
-  // val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
-
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
-	ClusterConfig.hostname match {
+	Hostname() match {
 		case _ => publisher = system.actorOf(Props( new Publisher()), name = "publisher")
 		// case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
 	}

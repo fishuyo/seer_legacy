@@ -112,7 +112,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "$hostname"
+          hostname = "$Hostname()"
           port = 2552
         }
         compression-scheme = "zlib"

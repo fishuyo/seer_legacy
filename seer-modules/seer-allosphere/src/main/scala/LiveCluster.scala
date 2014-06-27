@@ -27,19 +27,20 @@ import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
 
-
+object ClusterSystem {
+  val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
+}
+import ClusterSystem._
 
 object Node extends OmniApp {
 
 	var sim = false
 	val loader = new SeerScriptTextLoader
 
-  // val systemm = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test_config1))
-
 	var publisher:ActorRef = _
 	var subscriber:ActorRef = _
-	ClusterConfig.hostname match {
-		case "gr01" => publisher = system.actorOf(Props( new Simulator), name = "sLoader")
+	Hostname() match {
+		// case "gr01" => publisher = system.actorOf(Props( new Simulator), name = "sLoader")
 		case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
 	}
 
