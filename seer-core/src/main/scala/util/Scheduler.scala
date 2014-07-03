@@ -96,9 +96,9 @@ object Schedule {
 			duration = len
 			override def animate(dt:Float){
 				t += (speed * dt.toDouble).seconds
-				if(t > duration) t -= duration
 				percent = t/duration
 				f(percent)
+				if(t > duration) t -= duration
 			}
 		}
 		events += e
