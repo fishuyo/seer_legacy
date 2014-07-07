@@ -189,6 +189,23 @@ class Mesh extends Drawable {
 
 		  normals.zip(count).foreach{ case (n,c) => n /= c }
 
+	  } else if( vertices.length > 0 && vertices.length % 3 == 0 ){
+
+			val count = new Array[Float](vertices.length)
+			// for each face (3 indices)
+			var indx = 0
+	  	val l = vertices.grouped(3)
+		  l.foreach( (vs) => {
+		  	val n = (vs(1)-vs(0) cross vs(2)-vs(0)).normalize
+		  	for( i <- 0 until 3){
+		  		normals(indx) += n 
+		  		count(indx) += 1 
+		  		indx += 1
+		  	}
+		  })
+
+		  normals.zip(count).foreach{ case (n,c) => n /= c }
+
 	  } else {
 	  	println("calc normals not implemented")
 
