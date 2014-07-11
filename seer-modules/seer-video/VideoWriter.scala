@@ -4,6 +4,7 @@ package video
 
 import graphics._
 import io._
+import util._
 
 import java.awt.image.BufferedImage
 
@@ -35,7 +36,7 @@ class VideoWriter(val path:String, val w:Int, val h:Int, val scale:Float=1.f, va
   var name = path
   if( name == ""){
     Gdx.files.external("SeerData/video").file().mkdirs()
-    name = "SeerData/video/out-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".mp4" 
+    name = "SeerData/video/out-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + "-" + Random.int() + ".mp4" 
   }
   var file = Gdx.files.external(name).file().getPath()
   
@@ -110,7 +111,10 @@ object ScreenCapture extends Animatable {
     else start
   }
   def start(){
-    if( writer != null && writer.closing ){
+    if( recording ){
+      println("already recording..")
+      return
+    } else if(writer != null && writer.closing){
       println("still closing..")
       return
     }
@@ -122,14 +126,14 @@ object ScreenCapture extends Animatable {
     }
     writer = new VideoWriter("", w, h, scale, 15 )
     // bi = new BufferedImage(w,h, BufferedImage.TYPE_3BYTE_BGR)
-    Video.writer ! Open(writer)
+    // Video.writer ! Open(writer)
     recording = true
     println("Screen capture started.")
     Scene.push(this)
   }
 
   def stop(){
-    if( writer != null && writer.closing ){
+    if( !recording || (writer != null && writer.closing) ){
       println("still closing..")
       return
     }
@@ -137,7 +141,7 @@ object ScreenCapture extends Animatable {
     // writer.close()
     writer.closing = true
     recording = false
-    Video.writer ! Close
+    Video.writer ! Close(writer)
     println("Screen capture stopped.")
   }
 
@@ -152,7 +156,7 @@ object ScreenCapture extends Animatable {
       // val buffer = IBuffer.make(null, pix.getPixels, 0, w*h*4)
       val picture = IVideoPicture.make(buffer,IPixelFormat.Type.RGBA,w,h)
 
-      Video.writer ! Frame(picture)
+      Video.writer ! Frame(writer,picture)
       // writer.addFrame(picture)
 
       dtAccum -= timeStep
@@ -192,9 +196,10 @@ import akka.actor.Props
 import akka.event.Logging
 import akka.actor.ActorSystem
 
-case class Frame(frame:IVideoPicture)
+case class Frame(writer:VideoWriter, frame:IVideoPicture)
+case class Bytes(writer:VideoWriter, bytes:Array[Byte],w:Int,h:Int)
 case class Open(writer:VideoWriter)
-case class Close
+case class Close(writer:VideoWriter)
 
 object Video {
 
@@ -205,15 +210,19 @@ object Video {
 
 class VideoWriterActor extends Actor {
 
-  var writer:Option[VideoWriter] = None
+  // var writer:Option[VideoWriter] = None
 
   // override def preStart(){
   // }
 
   def receive = {
-    case Open(w:VideoWriter) => if( writer == None) writer = Some(w) else println("still writing")
-    case Frame(frame:IVideoPicture) => writer.foreach( _.addFrame(frame) )
-    case Close => writer.foreach( _.close ); writer = None
+    // case Open(w:VideoWriter) => if( writer == None) writer = Some(w) else println("still writing")
+    case Frame(writer:VideoWriter, frame:IVideoPicture) => writer.addFrame(frame)
+    case Bytes(writer:VideoWriter, bytes:Array[Byte],w:Int,h:Int) => 
+      val buffer = IBuffer.make(null, bytes, 0, bytes.length)
+      val picture = IVideoPicture.make(buffer,IPixelFormat.Type.RGBA,w,h)
+      writer.addFrame(picture)
+    case Close(writer:VideoWriter) => writer.close
   }
 
 }
