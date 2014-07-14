@@ -75,7 +75,7 @@ object SeerLibs {
     
     // Declare names
     val baseUrl = "http://libgdx.badlogicgames.com/releases"
-    val gdxName = "libgdx-1.0.0"
+    val gdxName = "libgdx-1.2.0"
     // val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
     // val gdxName = "libgdx-nightly-latest"
 

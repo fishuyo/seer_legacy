@@ -4,10 +4,10 @@ then
   echo ""
 else
   echo "Downloading sbt-launch.jar..."
-  wget "http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch//0.12.3/sbt-launch.jar" > /dev/null 2>&1
+  wget "http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.5/sbt-launch.jar" > /dev/null 2>&1
   if [ $? != 0 ]
   then
-    curl -O "http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch//0.12.3/sbt-launch.jar"
+    curl -O "http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.5/sbt-launch.jar"
     if [ $? != 0 ]
     then
       echo "Failed to get sbt-launch.jar, please install wget or curl"
