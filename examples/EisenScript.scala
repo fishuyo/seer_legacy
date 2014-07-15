@@ -8,6 +8,8 @@ import io._
 import dynamic._
 import parsers._
 
+import com.badlogic.gdx.graphics.profiling.GLProfiler
+
 /**
 	* This example sets up a generative recursive model specified via eisenscript
 	* 
@@ -49,11 +51,17 @@ object Main extends SeerApp {
 
 	override def init(){
 		live = new Ruby("EisenScript.rb")
+		GLProfiler.enable()
 	}
 
 	override def draw(){
 		model.draw()
 		live.draw()
+
+		println("draw calls: " + GLProfiler.drawCalls )
+		println("shader switches: " + GLProfiler.shaderSwitches )
+
+		GLProfiler.reset()
 	}
 
 	// animate called once per frame
