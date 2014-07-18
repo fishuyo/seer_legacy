@@ -63,7 +63,7 @@ object SeerBuild extends Build {
 
 
   // examples
-  lazy val examples = Project (
+  lazy val examples = SeerProject (
     "examples",
     file("examples"),
     settings = BuildSettings.app

@@ -13,6 +13,29 @@ import collection.mutable.ListBuffer
 
 object ClusterConfig {
 
+  val test = ConfigFactory.parseString(s"""
+    akka {
+      #log-dead-letters = off
+
+      actor {
+        provider = "akka.remote.RemoteActorRefProvider"
+        #provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.udp"]
+        netty.udp {
+          hostname = "${Hostname()}"
+          port = 2552
+        }
+        #compression-scheme = "zlib"
+        #zlib-compression-level = 1
+      }
+      
+    }
+
+  """)
+
   val config = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
@@ -134,12 +157,12 @@ object ClusterConfig {
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
 
-  // load the normal config stack (system props, then application.conf, then reference.conf)
-  val regularConfig = ConfigFactory.load();
-  // override regular stack with config
-  val combined = config.withFallback(regularConfig);
-  // put the result in between the overrides (system props) and defaults again
-  val complete = ConfigFactory.load(combined);
+  // // load the normal config stack (system props, then application.conf, then reference.conf)
+  // val regularConfig = ConfigFactory.load();
+  // // override regular stack with config
+  // val combined = config.withFallback(regularConfig);
+  // // put the result in between the overrides (system props) and defaults again
+  // val complete = ConfigFactory.load(combined);
 
 }
 

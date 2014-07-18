@@ -3,15 +3,6 @@ package com.fishuyo.seer
 
 package object graphics {
 
-	trait Drawable {
-		def init(){}
-		def draw(){}
-	}
-
-	trait Animatable extends Drawable {
-		def animate(dt: Float){}
-	}
-
 	val Points = 0
 	val Lines = 1
 	val LineLoop = 2
