@@ -50,10 +50,16 @@ object SeerBuild extends Build {
     base = file("seer-core")
   )
 
-  lazy val seer_desktop = SeerProject (
-    id = "seer-desktop",
-    base = file("seer-desktop")
-  ) dependsOn ( seer_core, seer_repl, seer_script )
+  lazy val seer_gdx = SeerProject (
+    id = "seer-gdx",
+    base = file("seer-gdx")
+  ) dependsOn seer_core
+
+  lazy val seer_gdx_desktop_app = SeerProject (
+    id = "seer-gdx-desktop-app",
+    base = file("seer-gdx/seer-gdx-desktop-app")
+  ) dependsOn (seer_gdx, seer_repl, seer_script)
+
 
 
   // examples
@@ -61,7 +67,7 @@ object SeerBuild extends Build {
     "examples",
     file("examples"),
     settings = BuildSettings.app
-  ) dependsOn( seer_desktop, seer_jruby )
+  ) dependsOn( seer_gdx_desktop_app, seer_jruby, seer_portaudio  )
 
 }
 

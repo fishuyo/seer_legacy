@@ -4,7 +4,7 @@ package com.fishuyo.seer
 package examples.graphics.obj
 
 import graphics._
-import maths._
+import spatial._
 import dynamic._
 
 object Main extends SeerApp { 

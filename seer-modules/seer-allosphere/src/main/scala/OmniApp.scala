@@ -4,7 +4,7 @@ package allosphere
 
 import graphics._
 import dynamic._
-import maths._
+import spatial._
 import io._
 import util._
 

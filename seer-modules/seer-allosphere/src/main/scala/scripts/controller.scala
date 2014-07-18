@@ -6,7 +6,7 @@ import allosphere.actor._
 import dynamic._
 import graphics._
 import io._
-import maths._
+import spatial._
 import spatial._
 
 

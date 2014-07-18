@@ -5,7 +5,8 @@ import Keys._
 object SeerModulesBuild extends Build {
 
 	import SeerBuild.seer_core
-	import SeerBuild.seer_desktop
+  import SeerBuild.seer_gdx
+  import SeerBuild.seer_gdx_desktop_app
 
 
 	// interaction
@@ -63,7 +64,7 @@ object SeerModulesBuild extends Build {
   lazy val seer_script = SeerProject (
     "seer-eval",
     file("seer-modules/seer-dynamic/seer-eval")
-  ) dependsOn seer_core
+  ) dependsOn( seer_core )
 
   lazy val seer_repl = SeerProject (
     "seer-repl",
@@ -76,6 +77,6 @@ object SeerModulesBuild extends Build {
     id = "seer-allosphere",
     base = file("seer-modules/seer-allosphere"),
     settings = BuildSettings.app
-  ) dependsOn ( seer_desktop, seer_luaj, seer_script )
+  ) dependsOn ( seer_gdx_desktop_app, seer_luaj, seer_script )
 }
 

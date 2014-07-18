@@ -21,7 +21,7 @@ object Repl {
   val actor = system.actorOf(Props( new ReplActor ), name = "repl")
   
   var imports = ListBuffer("com.fishuyo.seer", "com.fishuyo.seer._", "com.fishuyo.seer.graphics._",
-                    "com.fishuyo.seer.maths._", "com.fishuyo.seer.io._", "com.fishuyo.seer.util._" 
+                    "com.fishuyo.seer.spatial._", "com.fishuyo.seer.io._", "com.fishuyo.seer.util._" 
                 )
 
   def repl = new SeerILoop(imports) {

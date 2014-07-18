@@ -2,7 +2,7 @@
 package com.fishuyo.seer
 package io
 
-import maths._
+import spatial._
 import spatial._
 
 import collection.mutable.ListBuffer

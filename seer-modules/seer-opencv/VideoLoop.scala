@@ -4,7 +4,7 @@ package cv
 
 import graphics._
 import io._
-import maths._
+import spatial._
 import dynamic._
 import cv._
 import video._
