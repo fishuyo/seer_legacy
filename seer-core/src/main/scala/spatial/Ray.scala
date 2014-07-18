@@ -1,9 +1,6 @@
 package com.fishuyo.seer
 package spatial
 
-import maths.Vec3
-import maths.Quat
-
 object Ray{
 	def apply(o:Vec3,d:Vec3) = new Ray(o,d)
 }

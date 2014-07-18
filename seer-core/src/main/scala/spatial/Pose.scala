@@ -8,10 +8,6 @@
 package com.fishuyo.seer
 package spatial
 
-import maths._
-
-import com.badlogic.gdx.math.Matrix4
-
 object Pose {
 	def apply():Pose = apply(Vec3(),Quat())
 	def apply(p:Pose):Pose = apply(Vec3(p.pos),Quat(p.quat))
@@ -48,12 +44,12 @@ class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ){
   /** return linear interpolated Pose from this to p by amount d*/
   def lerp(p:Pose, d:Float) = new Pose( pos.lerp(p.pos, d), quat.slerp(p.quat, d) )
 
-  def toMatrix() = {
-  	val m = quat.toMatrix
-  	m.`val`(12) = pos.x
-  	m.`val`(13) = pos.y
-  	m.`val`(14) = pos.z
-  	m
-  }
+  // def toMatrix() = {
+  // 	val m = quat.toMatrix
+  // 	m.`val`(12) = pos.x
+  // 	m.`val`(13) = pos.y
+  // 	m.`val`(14) = pos.z
+  // 	m
+  // }
 }
 

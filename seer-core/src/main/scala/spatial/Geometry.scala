@@ -2,8 +2,6 @@ package com.fishuyo.seer
 package spatial
 package geometry
 
-import maths.Vec3
-
 
 trait Pickable {
   def intersect(r:Ray):Option[Hit] = None

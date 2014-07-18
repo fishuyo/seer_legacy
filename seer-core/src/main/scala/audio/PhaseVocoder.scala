@@ -2,12 +2,12 @@
 package com.fishuyo.seer
 package audio
 
-import maths._
+import spatial._
 import graphics._
 import util._
 
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.{Texture => GdxTexture}
+// import com.badlogic.gdx.graphics.Pixmap
+// import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 
 import edu.emory.mathcs.jtransforms.fft._
 
@@ -303,47 +303,47 @@ class PhaseVocoder extends AudioSource {
   }
 }
 
-class Spectrogram extends Drawable {
+// class Spectrogram extends Drawable {
 
-	var numWin = 0
-	var numBins = 0
+// 	var numWin = 0
+// 	var numBins = 0
 
-	var pix:Pixmap = null
-	var texture:GdxTexture = null
+// 	var pix:Pixmap = null
+// 	var texture:GdxTexture = null
 
-	var tID = 0
-	val model = Plane()
-	model.scale.set(0.25)
-	model.material = new BasicMaterial()
-	model.material.textureMix = 1.f
+// 	var tID = 0
+// 	val model = Plane()
+// 	model.scale.set(0.25)
+// 	model.material = new BasicMaterial()
+// 	model.material.textureMix = 1.f
 
-	def setData(data:Array[Array[Float]], complex:Boolean=false){
-		numWin = data.length
-		numBins = data(0).length / 2
+// 	def setData(data:Array[Array[Float]], complex:Boolean=false){
+// 		numWin = data.length
+// 		numBins = data(0).length / 2
 
-		pix = new Pixmap(numWin,numBins, Pixmap.Format.RGBA8888)
-		pix.setColor(1,1,1,1)
-		// pix.fill()
-		for( x <- (0 until numWin); y <- (0 until numBins)){
-			val (re,im) = (data(x)(2*y),data(x)(2*y+1)) // re/im or mag/phase
-			val mag = (if(complex) math.sqrt(re*re+im*im) else re)
-			val c = math.max(1.0 - mag,0.f)
-			// val c = clamp(1.f-(10*math.log10(mag)),0.f,1.f)
-			// val f = math.min((im / 22050.f * numBins),numBins-1)
-			pix.setColor(c,c,c,c)
-			if(complex) pix.drawPixel(x,y) //f.toInt)
-			else pix.drawPixel(x,y) //f.toInt)
-		}
+// 		pix = new Pixmap(numWin,numBins, Pixmap.Format.RGBA8888)
+// 		pix.setColor(1,1,1,1)
+// 		// pix.fill()
+// 		for( x <- (0 until numWin); y <- (0 until numBins)){
+// 			val (re,im) = (data(x)(2*y),data(x)(2*y+1)) // re/im or mag/phase
+// 			val mag = (if(complex) math.sqrt(re*re+im*im) else re)
+// 			val c = math.max(1.0 - mag,0.f)
+// 			// val c = clamp(1.f-(10*math.log10(mag)),0.f,1.f)
+// 			// val f = math.min((im / 22050.f * numBins),numBins-1)
+// 			pix.setColor(c,c,c,c)
+// 			if(complex) pix.drawPixel(x,y) //f.toInt)
+// 			else pix.drawPixel(x,y) //f.toInt)
+// 		}
 
-		texture = new GdxTexture(pix)
-		texture.setFilter( GdxTexture.TextureFilter.Linear, GdxTexture.TextureFilter.Linear)
-		model.material.texture = Some(texture)
-	}
+// 		texture = new GdxTexture(pix)
+// 		texture.setFilter( GdxTexture.TextureFilter.Linear, GdxTexture.TextureFilter.Linear)
+// 		model.material.texture = Some(texture)
+// 	}
 
-  override def init(){
-  }
-	override def draw(){
-		model.draw()
-	}
+//   override def init(){
+//   }
+// 	override def draw(){
+// 		model.draw()
+// 	}
 
-}
+// }

@@ -9,10 +9,6 @@
 package com.fishuyo.seer
 package spatial
 
-import maths._
-
-import com.badlogic.gdx.math.Matrix4
-
 object Nav{
 	def apply() = new Nav()
 }

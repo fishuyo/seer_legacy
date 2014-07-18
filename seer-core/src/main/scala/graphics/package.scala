@@ -1,17 +1,24 @@
 
 package com.fishuyo.seer
+
 package object graphics {
 
+	trait Drawable {
+		def init(){}
+		def draw(){}
+	}
 
-	import com.badlogic.gdx.graphics.GL20
+	trait Animatable extends Drawable {
+		def animate(dt: Float){}
+	}
 
-	val Points = GL20.GL_POINTS
-	val Lines = GL20.GL_LINES
-	val LineLoop = GL20.GL_LINE_LOOP
-  val LineStrip = GL20.GL_LINE_STRIP
-  val Triangles = GL20.GL_TRIANGLES
-  val TriangleStrip = GL20.GL_TRIANGLE_STRIP
-  val TriangleFan = GL20.GL_TRIANGLE_FAN
+	val Points = 0
+	val Lines = 1
+	val LineLoop = 2
+  val LineStrip = 3
+  val Triangles = 4
+  val TriangleStrip = 5
+  val TriangleFan = 6
 
 	implicit def RGBA2Float(c:RGBA) = c.toGray
 	implicit def RGB2RGBA(c:RGB) = RGBA(c.r,c.g,c.b,1)

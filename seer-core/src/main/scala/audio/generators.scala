@@ -2,7 +2,7 @@
 package com.fishuyo.seer
 package audio.gen
 
-import util._
+import types._
 
 class Osc(var freq: Generator[Float], var amp: Generator[Float]) extends Generator[Float] with com.fishuyo.seer.audio.AudioSource {
   var phase = freq.foldLeft(0.f)((p,g) => (p + g() / 44100.f) % 1 )

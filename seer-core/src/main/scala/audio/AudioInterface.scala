@@ -2,20 +2,19 @@
 package com.fishuyo.seer
 package audio
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.audio.AudioDevice
-import com.badlogic.gdx.audio.AudioRecorder
-
-import akka.actor._
-import akka.actor.Props
-import com.typesafe.config.ConfigFactory
-// import akka.event.Logging
-// import akka.actor.ActorSystem
-
 import collection.mutable.ListBuffer
 
 import de.sciss.synth.io._
 
+
+object Audio {
+  var interface:Option[AudioInterface] = None
+  def apply() = interface.getOrElse(new NullAudioInterface())
+}
+
+class NullAudioInterface extends AudioInterface {
+  println("Using null audio interface!")
+}
 
 trait AudioInterface {
   var bufferSize = 2048
@@ -25,6 +24,7 @@ trait AudioInterface {
   var channelsOut = 2
 
   var gain = 1.f
+
   var playThru = false
   var recordThru = true
   var recording = false
@@ -36,11 +36,14 @@ trait AudioInterface {
   // add audio source
   def push(s:AudioSource) = sources += s
 
+  // do any initialization
+  def init = Audio.interface = Some(this)
+  
   // start audio
-  def start{}
+  def start {}
 
   // stop audio
-  def stop{}
+  def stop {}
 
   // set master gain
   def gain(g:Float){}
@@ -52,24 +55,24 @@ trait AudioInterface {
   def recordThru(b:Boolean){}
 
 
-  def toggleRecording() = {
-    if( !recording ){
-      try{
-        val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
-        var path = "SeerData/audio/recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
-        // if( name != "") path = name
-        Gdx.files.external("SeerData/audio").file().mkdirs()
-        var file = Gdx.files.external(path).file()
-        outFile = AudioFile.openWrite(file, outSpec)
-        recording = true
-        println("recording started..")
-      } catch { case e:Exception => println(e) }
-    } else {
-      recording = false
-      outFile.close
-      println("recording stopped.")
-    }
-  }
+  // def toggleRecording() = {
+  //   if( !recording ){
+  //     try{
+  //       val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
+  //       var path = "SeerData/audio/recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
+  //       // if( name != "") path = name
+  //       Gdx.files.external("SeerData/audio").file().mkdirs()
+  //       var file = Gdx.files.external(path).file()
+  //       outFile = AudioFile.openWrite(file, outSpec)
+  //       recording = true
+  //       println("recording started..")
+  //     } catch { case e:Exception => println(e) }
+  //   } else {
+  //     recording = false
+  //     outFile.close
+  //     println("recording stopped.")
+  //   }
+  // }
 }
 
 

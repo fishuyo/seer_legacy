@@ -2,7 +2,6 @@
 package com.fishuyo.seer
 package spatial
 
-import maths._
 
 object AABB {
   def apply( a:Vec3, b:Vec3 ) = new AABB(a,b)

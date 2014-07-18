@@ -2,11 +2,8 @@
 package com.fishuyo.seer
 package spatial
 
-import maths._
 
 import scala.collection.mutable.ListBuffer
-//import scala.tools.nsc.interpreter.ILoop._
-//import scala.tools.nsc.interpreter.NamedParam
 
 object Octant {
   val o = Array[Vec3]( Vec3(-1,-1,-1), Vec3(1,-1,-1), Vec3(-1,1,-1), Vec3(1,1,-1), Vec3(-1,-1,1),Vec3(1,-1,1),Vec3(-1,1,1),Vec3(1,1,1) )

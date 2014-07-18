@@ -2,7 +2,8 @@
 package com.fishuyo.seer
 package util
 
-import maths.Vec3
+import types.Generator
+import spatial.Vec3
 
 
 object Random {
