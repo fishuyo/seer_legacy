@@ -21,14 +21,14 @@ trait GLThis {
   def gl30 = Gdx.gl30
 }
 
-trait Drawable extends GLThis {
-  def init(){}
-  def draw(){}
-}
+// trait Drawable extends GLThis {
+//   def init(){}
+//   def draw(){}
+// }
 
-trait Animatable extends Drawable {
-  def animate( dt: Float){}
-}
+// trait Animatable extends Drawable {
+//   def animate( dt: Float){}
+// }
 
 
 

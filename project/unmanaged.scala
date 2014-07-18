@@ -35,7 +35,7 @@ object SeerLibs {
 
     // Extract jars into their respective lib folders.
     val coreDest = file("seer-core/lib")
-    val deskDest = file("seer-desktop/lib")
+    // val deskDest = file("seer-desktop/lib")
     val opencvDest = file("seer-modules/seer-opencv/lib")
     val kinectDest = file("seer-modules/seer-kinect/lib")
     val leapDest = file("seer-modules/seer-leap/lib")
@@ -46,8 +46,8 @@ object SeerLibs {
                         new ExactFilter("libLeapJava.dylib") | new ExactFilter("libopencv_java245.dylib")
                       
                 
-    val coreFilter =  new ExactFilter("monido-core_2.10-0.1.2.jar") | new ExactFilter("gdx.jar")
-    val deskFilter =  new ExactFilter("gdx-natives.jar") | new ExactFilter("gdx-backend-lwjgl.jar") | new ExactFilter("gdx-backend-lwjgl-natives.jar")
+    val coreFilter =  new ExactFilter("monido-core_2.10-0.1.2.jar") //| new ExactFilter("gdx.jar")
+    //val deskFilter =  new ExactFilter("gdx-natives.jar") | new ExactFilter("gdx-backend-lwjgl.jar") | new ExactFilter("gdx-backend-lwjgl-natives.jar")
     val opencvFilter = new ExactFilter("opencv-245.jar")
     val kinectFilter = new ExactFilter("freenect-0.0.1.jar")
     val leapFilter = new ExactFilter("LeapJava.jar")
@@ -55,7 +55,7 @@ object SeerLibs {
     val vrpnFilter = new ExactFilter("vrpn.jar")
     
     IO.unzip(zipFile, coreDest, coreFilter)
-    IO.unzip(zipFile, deskDest, deskFilter)
+    //IO.unzip(zipFile, deskDest, deskFilter)
     IO.unzip(zipFile, opencvDest, opencvFilter)
     IO.unzip(zipFile, kinectDest, kinectFilter)
     IO.unzip(zipFile, leapDest, leapFilter)
@@ -90,25 +90,25 @@ object SeerLibs {
     s.log.info("Extracting..")
 
     // Extract jars into their respective lib folders.
-    val commonDest = file("seer-core/lib")
+    val commonDest = file("seer-gdx/lib")
     val commonFilter = new ExactFilter("gdx.jar")
     IO.unzip(zipFile, commonDest, commonFilter)
 
-    val desktopDest = file("seer-desktop/lib")
+    val desktopDest = file("seer-gdx/seer-gdx-desktop-app/lib")
     val desktopFilter = new ExactFilter("gdx-natives.jar") |
     new ExactFilter("gdx-backend-lwjgl.jar") |
-    new ExactFilter("gdx-backend-lwjgl-natives.jar") |
-    new ExactFilter("gdx-tools.jar")
+    new ExactFilter("gdx-backend-lwjgl-natives.jar") //|
+    // new ExactFilter("gdx-tools.jar")
     IO.unzip(zipFile, desktopDest, desktopFilter)
 
-    val androidDest = file("apps/android/loop/src/main/libs")
-    val androidFilter = new ExactFilter("gdx-backend-android.jar") |
-    new ExactFilter("armeabi/libgdx.so") |
-    new ExactFilter("armeabi/libandroidgl20.so") |
-    new ExactFilter("armeabi-v7a/libgdx.so") |
-    new ExactFilter("armeabi-v7a/libandroidgl20.so") |
-    commonFilter
-    IO.unzip(zipFile, androidDest, androidFilter)
+    // val androidDest = file("apps/android/loop/src/main/libs")
+    // val androidFilter = new ExactFilter("gdx-backend-android.jar") |
+    // new ExactFilter("armeabi/libgdx.so") |
+    // new ExactFilter("armeabi/libandroidgl20.so") |
+    // new ExactFilter("armeabi-v7a/libgdx.so") |
+    // new ExactFilter("armeabi-v7a/libandroidgl20.so") |
+    // commonFilter
+    // IO.unzip(zipFile, androidDest, androidFilter)
     //check this copy?
     //IO.copyFile( (androidDest+"gdx-backend-android.jar").asFile , "android/lib/".asFile )
 
