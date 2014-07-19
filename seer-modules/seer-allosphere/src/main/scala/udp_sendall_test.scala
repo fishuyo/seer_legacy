@@ -22,6 +22,8 @@ import java.net.InetSocketAddress
 class Simulator extends Actor with ActorLogging {
  
  	val renderers = ClusterConfig.renderers(UdpAllTest.system)
+  val renderer = system.actorFor("akka.udp://state@gr02-10g:2553/user/renderer")
+
 
   override def preStart() = {
     log.debug("Starting")
@@ -32,7 +34,7 @@ class Simulator extends Actor with ActorLogging {
   }
 
   def receive = {
-    case msg => renderers.foreach( _ ! msg)
+    case msg => renderer ! msg //renderers.foreach( _ ! msg)
   }
  
 }
