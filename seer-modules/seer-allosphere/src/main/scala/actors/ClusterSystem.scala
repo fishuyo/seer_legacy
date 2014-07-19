@@ -13,7 +13,7 @@ import collection.mutable.ListBuffer
 
 object ClusterConfig {
 
-  val test = ConfigFactory.parseString(s"""
+  val udp_test = ConfigFactory.parseString(s"""
     akka {
       #log-dead-letters = off
 
@@ -25,6 +25,29 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.udp"]
         netty.udp {
+          hostname = "${Hostname()}"
+          port = 2552
+        }
+        #compression-scheme = "zlib"
+        #zlib-compression-level = 1
+      }
+      
+    }
+
+  """)
+
+  val zmq_test = ConfigFactory.parseString(s"""
+    akka {
+      #log-dead-letters = off
+
+      actor {
+        provider = "akka.remote.RemoteActorRefProvider"
+        #provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
           hostname = "${Hostname()}"
           port = 2552
         }
@@ -124,6 +147,27 @@ object ClusterConfig {
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
 
+  val udp10g = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+
+      actor {
+        provider = "akka.remote.RemoteActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.udp"]
+        netty.udp {
+          maximum-frame-size = 100 MiB
+          hostname = "${Hostname()+"-10g"}"
+          port = 2553
+        }
+        #compression-scheme = "zlib"
+        #zlib-compression-level = 1
+      }
+    }
+  """)
+
   val test_config1 = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
@@ -156,6 +200,24 @@ object ClusterConfig {
     }
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
+
+  def renderers(implicit system:ActorSystem) = {
+    List(
+      system.actorSelection("akka.udp://state@gr02-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr03-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr04-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr05-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr06-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr07-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr08-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr09-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr10-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr11-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr12-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr13-10g:2553/user/renderer"),
+      system.actorSelection("akka.udp://state@gr14-10g:2553/user/renderer")
+    )
+  }
 
   // // load the normal config stack (system props, then application.conf, then reference.conf)
   // val regularConfig = ConfigFactory.load();

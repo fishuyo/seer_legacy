@@ -19,7 +19,7 @@ import akka.io._
 import java.net.InetSocketAddress
 
 object UdpSystem {
-  implicit val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test))
+  implicit val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.udp_test))
   // val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config10g))
 }
 import UdpSystem._
@@ -48,7 +48,7 @@ object UdpTest extends App {
 	var bytes = 0
 
 
-	val sender = system.actorOf(Props(new SimpleSender(new InetSocketAddress("192.168.3.255",9000))), name = "send")
+	val sender = system.actorOf(Props(new SimpleSender(new InetSocketAddress("192.168.0.255",9000))), name = "send")
 
 	while(true){
 		if(sim){
