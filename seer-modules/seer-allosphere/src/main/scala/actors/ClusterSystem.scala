@@ -149,7 +149,7 @@ object ClusterConfig {
 
   val udp10g = ConfigFactory.parseString(s"""
     akka {
-      log-dead-letters = off
+      #log-dead-letters = off
 
       actor {
         provider = "akka.remote.RemoteActorRefProvider"

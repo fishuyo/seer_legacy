@@ -17,7 +17,7 @@ import akka.util.ByteString
 
 
 object ClusterSystem {
-  val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test))
+  val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.zmq_test))
   // val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config10g))
 }
 import ClusterSystem._

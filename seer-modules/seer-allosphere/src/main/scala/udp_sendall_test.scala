@@ -21,8 +21,16 @@ import java.net.InetSocketAddress
 
 class Simulator extends Actor with ActorLogging {
  
- 	val renderers = ClusterSystem.renderers(UdpAllTest.system)
- 	
+ 	val renderers = ClusterConfig.renderers(UdpAllTest.system)
+
+  override def preStart() = {
+    log.debug("Starting")
+  }
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+      reason.getMessage, message.getOrElse(""))
+  }
+
   def receive = {
     case msg => renderers.foreach( _ ! msg)
   }
@@ -31,11 +39,19 @@ class Simulator extends Actor with ActorLogging {
 
 class Renderer extends Actor with ActorLogging {
  
+  override def preStart() = {
+    log.debug("Starting")
+  }
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "Restarting due to [{}] when processing [{}]",
+      reason.getMessage, message.getOrElse(""))
+  }
+
   def receive = {
     case bytes:Array[Int] => 
     	UdpAllTest.bytes += bytes.length*4
-      UdpAllTest.frame = state(0)
-    case _ => ()
+      UdpAllTest.frame = bytes(0)
+    case _ => println("no match.")
   }
  
 }
@@ -65,7 +81,7 @@ object UdpAllTest extends App {
 
 	while(true){
 		if(sim){
-			buf(0) = frame.toByte
+			buf(0) = frame
 			publisher ! buf 
 			frame += 1
 		} 
