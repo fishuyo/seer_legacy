@@ -2,7 +2,7 @@
 package com.fishuyo.seer
 package cv
 
-import maths.Vec3
+import spatial.Vec3
 
 import org.opencv.core._
 import org.opencv.imgproc.Imgproc

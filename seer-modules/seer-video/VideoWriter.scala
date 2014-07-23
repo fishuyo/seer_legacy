@@ -179,8 +179,8 @@ object ScreenCaptureKey extends InputAdapter {
       case Keys.F2 => 
         ScreenCapture.toggleRecord
       case Keys.F3 => 
-        audio.Audio.toggleRecording()
-        ScreenCapture.toggleRecord
+        // audio.Audio.toggleRecording()
+        // ScreenCapture.toggleRecord
       case _ => false
     }
     false
