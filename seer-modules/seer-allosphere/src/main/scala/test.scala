@@ -13,13 +13,6 @@ import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
 
 
-object ClusterSystem {
-  val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
-  // val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config10g))
-}
-import ClusterSystem._
-
-
 object Main extends App {
 
 	var sim = false

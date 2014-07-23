@@ -3,7 +3,7 @@ package com.fishuyo.seer
 package allosphere
 package zeromq
 
-import allosphere.actor._
+import allosphere.actor.ClusterConfig
 
 // import akka.cluster.Cluster
 // import akka.cluster.ClusterEvent._
