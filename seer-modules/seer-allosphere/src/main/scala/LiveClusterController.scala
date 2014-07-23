@@ -11,71 +11,52 @@ import util._
 
 import allosphere.actor._
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
 
 import java.io._
-import collection.mutable.ArrayBuffer
-import collection.mutable.Map
 import scala.io.Source
 
-import de.sciss.osc.Message
 
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.actor._
 import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
-import com.typesafe.config.ConfigFactory
-
 
 import monido._
 
-object ClusterSystemm {
-  val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
-}
-import ClusterSystemm._
 
 object Controller extends SeerApp {
 
-	val loader = new SeerScriptLoader("src/main/scala/scripts/controller.scala")
+	val loader = new SeerScriptLoader("scripts/controller.scala")
 
-	val monitor = FileMonido("src/main/scala/scripts/cluster_node.scala"){
+  val monitor1 = FileMonido("scripts/simulator.scala"){
     case ModifiedOrCreated(f) => 
       val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
-      publisher ! code
+      publisher ! ("simulator", code)
+    case _ => None
+  }
+  val monitor2 = FileMonido("scripts/renderer.scala"){
+    case ModifiedOrCreated(f) => 
+      val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
+      publisher ! ("renderer", code)
     case _ => None
   }
 
-	var publisher:ActorRef = _
-	var subscriber:ActorRef = _
-	Hostname() match {
-		case _ => publisher = system.actorOf(Props( new Publisher()), name = "publisher")
-		// case _ => subscriber = system.actorOf(Props( new Loader()), name = "loader")
-	}
+	var publisher = system.actorOf(Props( new SimPublisher()), name = "simpublisher")
 
 }
 
-class Publisher extends Actor with ActorLogging {
+class SimPublisher extends Actor with ActorLogging {
   import DistributedPubSubMediator.Publish
-
-  // val cluster = Cluster(system)
 
   // activate the extension
   val mediator = DistributedPubSubExtension(system).mediator
  
-  // subscribe to cluster changes, re-subscribe when restart 
-  // override def preStart(): Unit = {
-  //   cluster.subscribe(self, initialStateMode = InitialStateAsEvents,
-  //     classOf[MemberEvent], classOf[UnreachableMember])
-  // }
-  // override def postStop(): Unit = cluster.unsubscribe(self)
-  
   def receive = {
-    case in: String =>
-      println("Publishing script..")
-      mediator ! Publish("script", in)
-
+    case (name:String, script:String) =>
+      println(s"Publishing script to $name..")
+      mediator ! Publish(name, script)
+    case _ => ()
     // case MemberUp(member) =>
     //   log.info("Member is Up: {}", member.address)
     // case UnreachableMember(member) =>

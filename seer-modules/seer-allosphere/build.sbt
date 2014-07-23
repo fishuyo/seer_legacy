@@ -1,5 +1,5 @@
 
-excludeFilter in unmanagedSources := "controller.scala" || "cluster_node.scala"
+//excludeFilter in unmanagedSources := "controller.scala" || "simulator.scala" || ""
 
 
 libraryDependencies ++= Seq(

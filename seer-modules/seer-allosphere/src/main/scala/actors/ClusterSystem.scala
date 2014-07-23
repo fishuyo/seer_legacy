@@ -115,8 +115,8 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "${Hostname()+".10g"}"
-          port = 2552
+          hostname = "${Hostname()+"-10g"}"
+          port = 2553
         }
         compression-scheme = "zlib"
         zlib-compression-level = 1
@@ -124,20 +124,20 @@ object ClusterConfig {
       
       cluster {
         seed-nodes = [
-          "akka.tcp://sphere@gr01.10g:2552" #gr01
-          "akka.tcp://sphere@gr02.10g:2552" #gr02
-          "akka.tcp://sphere@gr03.10g:2552" #gr03
-          "akka.tcp://sphere@gr04.10g:2552" #gr04
-          "akka.tcp://sphere@gr05.10g:2552" #gr05
-          "akka.tcp://sphere@gr06.10g:2552" #gr06
-          "akka.tcp://sphere@gr07.10g:2552" #gr07
-          "akka.tcp://sphere@gr08.10g:2552" #gr08
-          "akka.tcp://sphere@gr09.10g:2552" #gr09
-          "akka.tcp://sphere@gr10.10g:2552" #gr10
-          "akka.tcp://sphere@gr11.10g:2552" #gr11
-          "akka.tcp://sphere@gr12.10g:2552" #gr12
-          "akka.tcp://sphere@gr13.10g:2552" #gr13
-          "akka.tcp://sphere@gr14.10g:2552" #gr14
+          "akka.tcp://sphere@gr01-10g:2552" #gr01
+          "akka.tcp://sphere@gr02-10g:2552" #gr02
+          "akka.tcp://sphere@gr03-10g:2552" #gr03
+          "akka.tcp://sphere@gr04-10g:2552" #gr04
+          "akka.tcp://sphere@gr05-10g:2552" #gr05
+          "akka.tcp://sphere@gr06-10g:2552" #gr06
+          "akka.tcp://sphere@gr07-10g:2552" #gr07
+          "akka.tcp://sphere@gr08-10g:2552" #gr08
+          "akka.tcp://sphere@gr09-10g:2552" #gr09
+          "akka.tcp://sphere@gr10-10g:2552" #gr10
+          "akka.tcp://sphere@gr11-10g:2552" #gr11
+          "akka.tcp://sphere@gr12-10g:2552" #gr12
+          "akka.tcp://sphere@gr13-10g:2552" #gr13
+          "akka.tcp://sphere@gr14-10g:2552" #gr14
         ]
 
         auto-down-unreachable-after = 10s
