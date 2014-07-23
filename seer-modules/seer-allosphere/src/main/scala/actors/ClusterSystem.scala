@@ -184,15 +184,42 @@ object ClusterConfig {
         }
         compression-scheme = "zlib"
         zlib-compression-level = 1
-
       }
       
       cluster {
         seed-nodes = [
-          #"akka.tcp://sphere@127.0.0.1:2552"
-          #"akka.tcp://sphere@127.0.0.1:2553"
-          "akka.tcp://sphere@boom.local:2552"
           "akka.tcp://sphere@Thunder.local:2552"
+          "akka.tcp://sphere@Wind.local:2552"
+        ]
+
+        auto-down-unreachable-after = 10s
+      }
+    }
+    akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  """)
+
+  val test_config2 = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+
+      actor {
+        provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "$Hostname()"
+          port = 2553
+        }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+      }
+      
+      cluster {
+        seed-nodes = [
+          "akka.tcp://sphere@Thunder.local:2553"
+          "akka.tcp://sphere@Wind.local:2553"
         ]
 
         auto-down-unreachable-after = 10s
