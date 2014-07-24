@@ -115,6 +115,8 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 
 	val mQuad = Plane() //.generateMesh()
 
+	val renderFace = Array(true,true,true,true,true,true)
+
 	implicit def f2i(f:Float) = f.toInt
 
 
@@ -478,20 +480,22 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 		for (i <-(0 until (mStereo+1))) {
 			mEyeParallax = eyeSep * (i-0.5);
 			for (face <- (0 until 6)) {
-				mFace = face
+				if(renderFace(face)){
+					mFace = face
 
-				GL11.glDrawBuffer(GL20.GL_COLOR_ATTACHMENT0 + mFace);
-				gl.glFramebufferTexture2D(
-					GL20.GL_FRAMEBUFFER,
-					GL20.GL_COLOR_ATTACHMENT0 + mFace,
-					GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
-					mTex(i), 0);
+					GL11.glDrawBuffer(GL20.GL_COLOR_ATTACHMENT0 + mFace);
+					gl.glFramebufferTexture2D(
+						GL20.GL_FRAMEBUFFER,
+						GL20.GL_COLOR_ATTACHMENT0 + mFace,
+						GL20.GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
+						mTex(i), 0);
 
-				gl.glClearColor(mClearColor.r,mClearColor.g,mClearColor.b,mClearColor.a);
-				gl.glEnable(GL20.GL_DEPTH_TEST)
-				gl.glDepthMask(true);
-				gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-				drawable.onDrawOmni();
+					gl.glClearColor(mClearColor.r,mClearColor.g,mClearColor.b,mClearColor.a);
+					gl.glEnable(GL20.GL_DEPTH_TEST)
+					gl.glDepthMask(true);
+					gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+					drawable.onDrawOmni();
+				}
 			}
 		}
 

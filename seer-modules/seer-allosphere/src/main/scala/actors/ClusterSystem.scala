@@ -11,6 +11,21 @@ import com.typesafe.config.ConfigFactory
 
 import collection.mutable.ListBuffer
 
+
+object ClusterSystem {
+  implicit lazy val system = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.config))
+  implicit lazy val system10g = ActorSystem("sphere10g", ConfigFactory.load(ClusterConfig.config10g))
+
+
+  implicit lazy val test1 = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test1))
+  implicit lazy val test1_10g = ActorSystem("sphere10g", ConfigFactory.load(ClusterConfig.test1_10g))
+  implicit lazy val test2 = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test2))
+  implicit lazy val test2_10g = ActorSystem("sphere10g", ConfigFactory.load(ClusterConfig.test2_10g))
+  implicit lazy val test3 = ActorSystem("sphere", ConfigFactory.load(ClusterConfig.test3))
+  implicit lazy val test3_10g = ActorSystem("sphere10g", ConfigFactory.load(ClusterConfig.test3_10g))
+}
+
+
 object ClusterConfig {
 
   var hostname = Hostname() //"localhost"
@@ -126,20 +141,20 @@ object ClusterConfig {
       
       cluster {
         seed-nodes = [
-          "akka.tcp://sphere@gr01-10g:2552" #gr01
-          "akka.tcp://sphere@gr02-10g:2552" #gr02
-          "akka.tcp://sphere@gr03-10g:2552" #gr03
-          "akka.tcp://sphere@gr04-10g:2552" #gr04
-          "akka.tcp://sphere@gr05-10g:2552" #gr05
-          "akka.tcp://sphere@gr06-10g:2552" #gr06
-          "akka.tcp://sphere@gr07-10g:2552" #gr07
-          "akka.tcp://sphere@gr08-10g:2552" #gr08
-          "akka.tcp://sphere@gr09-10g:2552" #gr09
-          "akka.tcp://sphere@gr10-10g:2552" #gr10
-          "akka.tcp://sphere@gr11-10g:2552" #gr11
-          "akka.tcp://sphere@gr12-10g:2552" #gr12
-          "akka.tcp://sphere@gr13-10g:2552" #gr13
-          "akka.tcp://sphere@gr14-10g:2552" #gr14
+          "akka.tcp://sphere10g@gr01-10g:2552" #gr01
+          "akka.tcp://sphere10g@gr02-10g:2552" #gr02
+          "akka.tcp://sphere10g@gr03-10g:2552" #gr03
+          "akka.tcp://sphere10g@gr04-10g:2552" #gr04
+          "akka.tcp://sphere10g@gr05-10g:2552" #gr05
+          "akka.tcp://sphere10g@gr06-10g:2552" #gr06
+          "akka.tcp://sphere10g@gr07-10g:2552" #gr07
+          "akka.tcp://sphere10g@gr08-10g:2552" #gr08
+          "akka.tcp://sphere10g@gr09-10g:2552" #gr09
+          "akka.tcp://sphere10g@gr10-10g:2552" #gr10
+          "akka.tcp://sphere10g@gr11-10g:2552" #gr11
+          "akka.tcp://sphere10g@gr12-10g:2552" #gr12
+          "akka.tcp://sphere10g@gr13-10g:2552" #gr13
+          "akka.tcp://sphere10g@gr14-10g:2552" #gr14
         ]
 
         auto-down-unreachable-after = 10s
@@ -170,10 +185,9 @@ object ClusterConfig {
     }
   """)
 
-  lazy val test_config1 = ConfigFactory.parseString(s"""
+  lazy val test1 = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
-
       actor {
         provider = "akka.cluster.ClusterActorRefProvider"
       }
@@ -181,29 +195,24 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "$hostname"
+          hostname = "localhost"
           port = 2552
         }
         compression-scheme = "zlib"
         zlib-compression-level = 1
       }
-      
       cluster {
         seed-nodes = [
-          "akka.tcp://sphere@Thunder.local:2552"
-          "akka.tcp://sphere@Wind.local:2552"
+          "akka.tcp://sphere@localhost:2552"
         ]
-
         auto-down-unreachable-after = 10s
       }
     }
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
-
-  lazy val test_config2 = ConfigFactory.parseString(s"""
+  lazy val test2 = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
-
       actor {
         provider = "akka.cluster.ClusterActorRefProvider"
       }
@@ -211,24 +220,128 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "$hostname"
-          port = 2553
+          hostname = "localhost"
+          port = 2554
         }
         compression-scheme = "zlib"
         zlib-compression-level = 1
       }
-      
       cluster {
         seed-nodes = [
-          "akka.tcp://sphere@Thunder.local:2553"
-          "akka.tcp://sphere@Wind.local:2553"
+          "akka.tcp://sphere@localhost:2552"
         ]
-
         auto-down-unreachable-after = 10s
       }
     }
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
+  lazy val test3 = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+      actor {
+        provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "localhost"
+          port = 2556
+        }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+      }
+      cluster {
+        seed-nodes = [
+          "akka.tcp://sphere@localhost:2552"
+        ]
+        auto-down-unreachable-after = 10s
+      }
+    }
+    akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  """)
+
+  lazy val test1_10g = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+      actor {
+        provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "localhost"
+          port = 2553
+        }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+      }
+      cluster {
+        seed-nodes = [
+          "akka.tcp://sphere10g@localhost:2553"
+          "akka.tcp://sphere10g@localhost:2555"
+        ]
+        auto-down-unreachable-after = 10s
+      }
+    }
+    akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  """)
+  
+  lazy val test2_10g = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+      actor {
+        provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "localhost"
+          port = 2555
+        }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+      }
+      cluster {
+        seed-nodes = [
+          "akka.tcp://sphere10g@localhost:2553"
+          "akka.tcp://sphere10g@localhost:2555"
+        ]
+        auto-down-unreachable-after = 10s
+      }
+    }
+    akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  """)
+  
+  lazy val test3_10g = ConfigFactory.parseString(s"""
+    akka {
+      log-dead-letters = off
+      actor {
+        provider = "akka.cluster.ClusterActorRefProvider"
+      }
+      remote {
+        log-remote-lifecycle-events = off
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "localhost"
+          port = 2557
+        }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+      }
+      cluster {
+        seed-nodes = [
+          "akka.tcp://sphere10g@localhost:2553"
+          "akka.tcp://sphere10g@localhost:2555"
+        ]
+        auto-down-unreachable-after = 10s
+      }
+    }
+    akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
+  """)
+
 
   def renderers(implicit system:ActorSystem) = {
     List(

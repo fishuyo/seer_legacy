@@ -12,6 +12,7 @@ import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
 
+import ClusterSystem.system
 
 object Main extends App {
 

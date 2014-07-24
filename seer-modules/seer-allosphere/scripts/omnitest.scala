@@ -2,86 +2,147 @@
 import com.fishuyo.seer._
 
 import allosphere._
-import allosphere.actor._
 
 import graphics._
 import dynamic._
 import spatial._
 import io._
+import particle._
+import util._
+
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
+
+import de.sciss.osc.Message
 
 import collection.mutable.ArrayBuffer
 
-import akka.actor._
-import akka.contrib.pattern.DistributedPubSubExtension
-import akka.contrib.pattern.DistributedPubSubMediator
+import allosphere.OmniTest
 
-import ClusterSystem.{ system, system10g }
-// import ClusterSystem.{ test2_10g => system10g }
+Scene.alpha = .3
+SceneGraph.root.depth = false
 
-import allosphere.livecluster.Node
+Mouse.clear
+Mouse.use
 
+implicit def f2i(f:Float) = f.toInt
 
-object RendererScript extends SeerScript {
+object Script extends SeerScript {
 	
 
-  Node.mode = "omni"
+  OmniTest.mode = "omni"
 
   val c = Cube()
-  val n = 1
-  val cubes = for(z <- -n to n; y <- -n to n; x <- -n to n) yield {
+  val nc = 1
+  val cubes = for(z <- -nc to nc; y <- -nc to nc; x <- -nc to nc) yield {
     val c = Cube().translate(Vec3(x,y,z)*3.f)
     c.material = Material.specular
     c.material.color = RGB(1,0,1)
     c
   }
 
+ 	val n = 40
+  val mesh = Plane.generateMesh(10,10,n,n,Quat.up)
+  mesh.primitive = Lines
+  val model = Model(mesh)
+  model.material = Material.specular
+  model.material.color = RGB(0,0.5,0.7)
+  // mesh.vertices.foreach{ case v => v.set(v.x,v.y+Random.float(-1,1).apply()*0.05*(v.x).abs,v.z) }
+  mesh.vertices.foreach{ case v => v.set(v.x,v.y+math.sin(v.x*v.z)*0.1,v.z) }
+  val fabricVertices0 = mesh.vertices.clone
+
+  val fabric = new SpringMesh(mesh,1.f)
+  fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
+  fabric.pins += AbsoluteConstraint(fabric.particles(n), fabric.particles(n).position)
+  // fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
+  fabric.pins += AbsoluteConstraint(fabric.particles.last, fabric.particles.last.position)
+  Gravity.set(0,0,0)
+
+  mesh.primitive = Triangles
+
   var t = 0.f
   var scale = 1.f
 
-	val stateListener = system10g.actorOf(Props( new StateListener()), name = "statelistener")
+	val cursor = Sphere().scale(0.05)
+	var lpos = Vec2()
+	var vel = Vec2()
 
 	override def preUnload(){
-		stateListener ! PoisonPill
+		recv.clear()
+    recv.disconnect()
 	}
 
 	var inited = false
 	override def init(){
-    Node.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
+    OmniTest.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
+    // OmniTest.omni.configure("/Users/fishuyo/calib", "gr02")
+    // OmniTest.omni.onCreate
+
+    OmniTest.omni.mStereo = 1
+		OmniTest.omni.mMode = StereoMode.ACTIVE
+		// OmniTest.omni.renderFace(0) = true
+		// OmniTest.omni.renderFace(1) = true
+		// OmniTest.omni.renderFace(2) = true
+		// OmniTest.omni.renderFace(3) = true
+		// OmniTest.omni.renderFace(4) = true
+		// OmniTest.omni.renderFace(5) = true
+		
 		inited = true
 	}
 
   override def draw(){
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+
+
+  	model.draw
     cubes.foreach(_.draw)
   }
 
   override def animate(dt:Float){
   	if(!inited) init()
 
+  	OmniTest.lens.eyeSep = Mouse.y() * 0.5
+
+  	if( Mouse.status() == "drag"){
+			vel = (Mouse.xy() - lpos)/dt
+			// println(vel)
+			// s.applyForce( Vec3(vel.x,vel.y,0)*10.f)
+			val r = Camera.ray(Mouse.x()*Window.width, (1.f-Mouse.y()) * Window.height)
+			fabric.particles.foreach( (p) => {
+				val t = r.intersectSphere(p.position, 0.25f)
+				if(t.isDefined){
+					// val p = r(t.get)
+					p.applyForce(Vec3(vel.x,vel.y,0)*150.f)
+					cursor.pose.pos.set(r(t.get))
+				}
+			})
+		}
+		lpos = Mouse.xy()
+
+
+
+  	fabric.animate(dt)
   	cubes.foreach(_.scale.set(scale))
   }
-}
 
 
-class StateListener extends Actor with ActorLogging {
-  import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
+	val recv = new OSCRecv
+  recv.listen(12001)
+  recv.bindp {
+    case Message("/mx", x:Float) => Camera.nav.vel.x = -x
+    case Message("/my", x:Float) => Camera.nav.vel.y = x
+    case Message("/mz", x:Float) => Camera.nav.vel.z = x
+    case Message("/tx", x:Float) => Camera.nav.angVel.x = x * -.02
+    case Message("/ty", x:Float) => Camera.nav.angVel.y = x * .02
+    case Message("/tz", x:Float) => Camera.nav.angVel.z = x * -.02
+    case Message("/home") => Camera.nav.moveToOrigin
+    case Message("/halt") => Camera.nav.stop
 
-  val mediator = DistributedPubSubExtension(system10g).mediator
-  mediator ! Subscribe("state", self)
- 
-  def receive = {
-    case SubscribeAck(Subscribe("state", None, `self`)) ⇒
-      context become ready
+    case _ => ()
   }
- 
-  def ready: Actor.Receive = {
-    case f:Float =>
-      RendererScript.scale = f
-    case a:Array[Float] =>
-      Camera.nav.pos.set(a(0),a(1),a(2))
-      Camera.nav.quat.set(a(3),a(4),a(5),a(6))
-  }
-}
 
+}
 
 object S {
  val basic = (
@@ -198,6 +259,5 @@ object S {
  }
 
 
-
-RendererScript
+Script
 

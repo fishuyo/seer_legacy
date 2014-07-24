@@ -24,6 +24,8 @@ import akka.contrib.pattern.DistributedPubSubMediator
 
 import monido._
 
+import ClusterSystem.system
+// import ClusterSystem.{ test3 => system }
 
 object Controller extends SeerApp {
 

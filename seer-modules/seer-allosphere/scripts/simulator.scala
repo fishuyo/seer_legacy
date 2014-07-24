@@ -19,6 +19,10 @@ import akka.actor._
 import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
 
+import ClusterSystem.{ system, system10g }
+// import ClusterSystem.{ test1 => system, test1_10g => system10g }
+
+
 object SimulatorScript extends SeerScript{
 	
   var t = 0.f

@@ -16,7 +16,8 @@ import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
 
-
+import ClusterSystem.system
+// import ClusterSystem.{ test3 => system }
 
 object ControllerScript extends SeerScript{
 

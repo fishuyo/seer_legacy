@@ -2,6 +2,7 @@
 package com.fishuyo.seer
 package allosphere
 package livecluster
+package test
 
 import graphics._
 import dynamic._
@@ -28,9 +29,9 @@ import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
 
 import ClusterSystem.{ system, system10g }
-// import ClusterSystem.{ test2 => system, test2_10g => system10g }
+// import ClusterSystem.{ test1 => system, test1_10g => system10g }
 
-object Node extends OmniApp {
+object Sim extends OmniApp {
 
 	var sim = false
   var render = true
@@ -39,15 +40,15 @@ object Node extends OmniApp {
   var scriptListener:ActorRef = _
 	var clusterPublisher:ActorRef = _
 
-	Hostname() match {
-		case "gr01" => 
+	// Hostname() match {
+		// case "gr01" => 
       sim = true
-      render = false
+      render = true
       scriptListener = system.actorOf(Props( new SimLoader() ), name = "simLoader")
       clusterPublisher = system.actorOf(Props( new NodePublisher() ), name = "nodePublisher")
-		case _ =>
-      scriptListener = system10g.actorOf(Props( new NodeLoader()), name = "loader")
-	}
+		// case _ =>
+      // scriptListener = system10g.actorOf(Props( new NodeLoader()), name = "loader")
+	// }
 
 	if(sim) println( "I am the Simulator!")
 	else println( "I am a Renderer!")
@@ -92,14 +93,17 @@ class SimLoader extends Actor with ActorLogging {
   mediator ! Subscribe("simulator", self)
 
   def receive = {
-    case SubscribeAck(Subscribe("simulator", None, `self`)) ⇒
+    case SubscribeAck(Subscribe("simulator", None, `self`)) =>
+    	println("got ack :)")
       context become ready
+    case _ => println("not ACK!")
   }
  
   def ready: Actor.Receive = {
     case script: String =>
-      println("Loading script..")
-      Node.loader.reload(script)
+    	println("Loading script..")
+      Sim.loader.reload(script)
+    case m => println(s"GOT BAD: $m")
   }
 }
 
@@ -124,23 +128,22 @@ class NodePublisher extends Actor with ActorLogging {
 }
 
 
-class NodeLoader extends Actor with ActorLogging {
-  import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
+// class NodeLoader extends Actor with ActorLogging {
+//   import DistributedPubSubMediator.{ Subscribe, SubscribeAck }
 
-  val mediator = DistributedPubSubExtension(system10g).mediator
-  mediator ! Subscribe("renderer", self)
+//   val mediator = DistributedPubSubExtension(system10g).mediator
+//   mediator ! Subscribe("renderer", self)
  
-  def receive = {
-    case SubscribeAck(Subscribe("renderer", None, `self`)) ⇒
-      context become ready
-  }
+//   def receive = {
+//     case SubscribeAck(Subscribe("renderer", None, `self`)) ⇒
+//       context become ready
+//   }
  
-  def ready: Actor.Receive = {
-    case script: String =>
-      println("Loading script..")
-      Node.loader.reload(script)
-  }
-}
+//   def ready: Actor.Receive = {
+//     case script: String =>
+//       Node.loader.reload(script)
+//   }
+// }
 
 
 
