@@ -13,7 +13,9 @@ import collection.mutable.ListBuffer
 
 object ClusterConfig {
 
-  val udp_test = ConfigFactory.parseString(s"""
+  var hostname = Hostname() //"localhost"
+
+  lazy val udp_test = ConfigFactory.parseString(s"""
     akka {
       #log-dead-letters = off
 
@@ -25,7 +27,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.udp"]
         netty.udp {
-          hostname = "${Hostname()}"
+          hostname = "${hostname}"
           port = 2552
         }
         #compression-scheme = "zlib"
@@ -36,7 +38,7 @@ object ClusterConfig {
 
   """)
 
-  val zmq_test = ConfigFactory.parseString(s"""
+  lazy val zmq_test = ConfigFactory.parseString(s"""
     akka {
       #log-dead-letters = off
 
@@ -48,7 +50,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "${Hostname()}"
+          hostname = "${hostname}"
           port = 2552
         }
         #compression-scheme = "zlib"
@@ -59,7 +61,7 @@ object ClusterConfig {
 
   """)
 
-  val config = ConfigFactory.parseString(s"""
+  lazy val config = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
 
@@ -71,7 +73,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "${Hostname()}"
+          hostname = "${hostname}"
           port = 2552
         }
         compression-scheme = "zlib"
@@ -103,7 +105,7 @@ object ClusterConfig {
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
 
-  val config10g = ConfigFactory.parseString(s"""
+  lazy val config10g = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
 
@@ -115,7 +117,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "${Hostname()+"-10g"}"
+          hostname = "${hostname+"-10g"}"
           port = 2553
         }
         compression-scheme = "zlib"
@@ -147,7 +149,7 @@ object ClusterConfig {
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
 
-  val udp10g = ConfigFactory.parseString(s"""
+  lazy val udp10g = ConfigFactory.parseString(s"""
     akka {
       #log-dead-letters = off
 
@@ -159,7 +161,7 @@ object ClusterConfig {
         enabled-transports = ["akka.remote.netty.udp"]
         netty.udp {
           maximum-frame-size = 100 MiB
-          hostname = "${Hostname()+"-10g"}"
+          hostname = "${hostname+"-10g"}"
           port = 2553
         }
         #compression-scheme = "zlib"
@@ -168,7 +170,7 @@ object ClusterConfig {
     }
   """)
 
-  val test_config1 = ConfigFactory.parseString(s"""
+  lazy val test_config1 = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
 
@@ -179,7 +181,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "$Hostname()"
+          hostname = "$hostname"
           port = 2552
         }
         compression-scheme = "zlib"
@@ -198,7 +200,7 @@ object ClusterConfig {
     akka.extensions = ["akka.contrib.pattern.DistributedPubSubExtension"]
   """)
 
-  val test_config2 = ConfigFactory.parseString(s"""
+  lazy val test_config2 = ConfigFactory.parseString(s"""
     akka {
       log-dead-letters = off
 
@@ -209,7 +211,7 @@ object ClusterConfig {
         log-remote-lifecycle-events = off
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
-          hostname = "$Hostname()"
+          hostname = "$hostname"
           port = 2553
         }
         compression-scheme = "zlib"
