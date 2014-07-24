@@ -9,7 +9,3 @@ package object io{
 	// def React
 
 }
-
-object Hostname{
-	def apply() = java.net.InetAddress.getLocalHost().getHostName()
-}
