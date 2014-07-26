@@ -10,6 +10,7 @@ object SetDisplayStereo {
 			val pfs = pf.withStereo(true)
 			// val attrs = new ContextAttribs(3, 2).withForwardCompatible(false).withProfileCore(true);
 			d.setPixelFormat(pfs, null ) //attrs)
+			println("SetDisplayStereo hackd.")
 		} catch { case e:Exception => println("SetDisplayStereo hack failed.") }
 	}
 }
