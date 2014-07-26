@@ -8,8 +8,12 @@ import graphics._
 import dynamic._
 import spatial._
 import io._
+import particle._
 
 import collection.mutable.ArrayBuffer
+
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 
 import akka.actor._
 import akka.contrib.pattern.DistributedPubSubExtension
@@ -20,6 +24,8 @@ import ClusterSystem.{ system, system10g }
 
 import allosphere.livecluster.Node
 
+Scene.alpha = .3
+SceneGraph.root.depth = false
 
 object RendererScript extends SeerScript {
 	
@@ -27,13 +33,35 @@ object RendererScript extends SeerScript {
   Node.mode = "omni"
 
   val c = Cube()
-  val n = 1
-  val cubes = for(z <- -n to n; y <- -n to n; x <- -n to n) yield {
-    val c = Cube().translate(Vec3(x,y,z)*3.f)
+  val nc = 3
+  val cubes = for(z <- -nc to nc; y <- -nc to nc; x <- -nc to nc) yield {
+    val c = Cube().translate(Vec3(x,y,z)*3.f).scale(0.01)
     c.material = Material.specular
     c.material.color = RGB(1,0,1)
     c
   }
+
+  val n = 40
+  val mesh = Plane.generateMesh(10,10,n,n,Quat.up)
+  mesh.primitive = Lines
+  val model = Model(mesh)
+  model.material = Material.specular
+  model.material.color = RGB(0,0.5,0.7)
+  // mesh.vertices.foreach{ case v => v.set(v.x,v.y+Random.float(-1,1).apply()*0.05*(v.x).abs,v.z) }
+  mesh.vertices.foreach{ case v => v.set(v.x,v.y+math.sin(v.x*v.z)*0.1,v.z) }
+  val fabricVertices0 = mesh.vertices.clone
+
+  val fabric = new SpringMesh(mesh,1.f)
+  fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
+  fabric.pins += AbsoluteConstraint(fabric.particles(n), fabric.particles(n).position)
+  // fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
+  fabric.pins += AbsoluteConstraint(fabric.particles.last, fabric.particles.last.position)
+  Gravity.set(0,0,0)
+  mesh.primitive = Triangles
+
+  var vertices = Array[Float]()
+
+  val cursor = Sphere().scale(0.05)
 
   var t = 0.f
   var scale = 1.f
@@ -47,17 +75,44 @@ object RendererScript extends SeerScript {
 	var inited = false
 	override def init(){
     Node.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
+
+    Node.omni.mStereo = 1
+    Node.omni.mMode = StereoMode.ACTIVE
+    Node.lens.eyeSep = 0.05
+    // Node.omni.renderFace(0) = true
+    // Node.omni.renderFace(1) = true
+    // Node.omni.renderFace(2) = true
+    // Node.omni.renderFace(3) = true
+    // Node.omni.renderFace(4) = true
+    // Node.omni.renderFace(5) = true
+
 		inited = true
 	}
 
   override def draw(){
+
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+
+    model.draw
     cubes.foreach(_.draw)
   }
 
   override def animate(dt:Float){
   	if(!inited) init()
 
-  	cubes.foreach(_.scale.set(scale))
+    Node.lens.eyeSep = 0.05 //math.sin(t)
+
+    if(vertices.length > 0){
+    //   mesh.clear
+    //   mesh.vertices ++= vertices
+    //   mesh.recalculateNormals
+    //   mesh.update
+      mesh.gdxMesh.get.setVertices(vertices)
+    }
+
+
+  	cubes.foreach(_.scale.set(math.sin(t)*0.5))
   }
 }
 
@@ -75,10 +130,12 @@ class StateListener extends Actor with ActorLogging {
  
   def ready: Actor.Receive = {
     case f:Float =>
-      RendererScript.scale = f
-    case a:Array[Float] =>
+      RendererScript.t = f
+    case a:Array[Float] if a.length == 7 =>
       Camera.nav.pos.set(a(0),a(1),a(2))
       Camera.nav.quat.set(a(3),a(4),a(5),a(6))
+    case a:Array[Float] =>
+      RendererScript.vertices = a //a.grouped(3).map((g)=>Vec3(g(0),g(1),g(2))).toArray
   }
 }
 
@@ -115,6 +172,7 @@ object S {
         } else {
           v_color = a_color;
         }
+        v_color = u_color;
 
         vec4 pos = u_modelViewMatrix * vec4(a_position,1);
         v_pos = vec3(pos) / pos.w;
@@ -163,6 +221,7 @@ object S {
         }else{
           colorMixed = v_color;
         }
+        // colorMixed = vec4(1,0,1,1);
 
         vec4 final_color = colorMixed * u_lightAmbient;
 
@@ -190,7 +249,7 @@ object S {
         gl_FragColor *= (1.0 - u_fade);
         gl_FragColor.a *= u_alpha;
 
-        // gl_FragColor = vec4(1,0,1,1); //(1.0 - u_fade);
+        // gl_FragColor = vec4(1,0,0,1); //(1.0 - u_fade);
 
       }
     """

@@ -141,20 +141,20 @@ object ClusterConfig {
       
       cluster {
         seed-nodes = [
-          "akka.tcp://sphere10g@gr01-10g:2552" #gr01
-          "akka.tcp://sphere10g@gr02-10g:2552" #gr02
-          "akka.tcp://sphere10g@gr03-10g:2552" #gr03
-          "akka.tcp://sphere10g@gr04-10g:2552" #gr04
-          "akka.tcp://sphere10g@gr05-10g:2552" #gr05
-          "akka.tcp://sphere10g@gr06-10g:2552" #gr06
-          "akka.tcp://sphere10g@gr07-10g:2552" #gr07
-          "akka.tcp://sphere10g@gr08-10g:2552" #gr08
-          "akka.tcp://sphere10g@gr09-10g:2552" #gr09
-          "akka.tcp://sphere10g@gr10-10g:2552" #gr10
-          "akka.tcp://sphere10g@gr11-10g:2552" #gr11
-          "akka.tcp://sphere10g@gr12-10g:2552" #gr12
-          "akka.tcp://sphere10g@gr13-10g:2552" #gr13
-          "akka.tcp://sphere10g@gr14-10g:2552" #gr14
+          "akka.tcp://sphere10g@gr01-10g:2553" #gr01
+          "akka.tcp://sphere10g@gr02-10g:2553" #gr02
+          "akka.tcp://sphere10g@gr03-10g:2553" #gr03
+          "akka.tcp://sphere10g@gr04-10g:2553" #gr04
+          "akka.tcp://sphere10g@gr05-10g:2553" #gr05
+          "akka.tcp://sphere10g@gr06-10g:2553" #gr06
+          "akka.tcp://sphere10g@gr07-10g:2553" #gr07
+          "akka.tcp://sphere10g@gr08-10g:2553" #gr08
+          "akka.tcp://sphere10g@gr09-10g:2553" #gr09
+          "akka.tcp://sphere10g@gr10-10g:2553" #gr10
+          "akka.tcp://sphere10g@gr11-10g:2553" #gr11
+          "akka.tcp://sphere10g@gr12-10g:2553" #gr12
+          "akka.tcp://sphere10g@gr13-10g:2553" #gr13
+          "akka.tcp://sphere10g@gr14-10g:2553" #gr14
         ]
 
         auto-down-unreachable-after = 10s

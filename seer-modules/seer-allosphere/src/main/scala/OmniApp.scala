@@ -34,6 +34,8 @@ class OmniApp extends App with Animatable with OmniDrawable {
 
 	override def init(){
     if( omniShader == null){
+      org.lwjgl.opengl.SetDisplayStereo()
+
     	omni = new OmniStereo
     	// mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
 			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
