@@ -6,7 +6,7 @@ import spatial._
 
 
 trait KinematicState {
-	var mass = 1.f
+	var _mass = 1.f
 	var invMass = 1.f
 
 	var position = Vec3()
@@ -14,6 +14,9 @@ trait KinematicState {
 	var velocity = Vec3()
 	var acceleration = Vec3()
 	// var jerk = Vec3()
+
+	def mass = _mass
+	def mass_=(f:Float){ _mass = f; invMass = 1.f / f }
 
 	def applyForce( f: Vec3 ) = acceleration = acceleration + (f * invMass)
   def applyGravity() = acceleration = acceleration + Gravity
@@ -31,8 +34,11 @@ trait KinematicState {
 
 trait RotationalState {
 
-	var inertia = 1.f 
+	var _inertia = 1.f 
 	var invInertia = 1.f 
+
+	def inertia = _inertia
+	def inertia_=(f:Float){ _inertia = f; invInertia = 1.f / f }
 
   // var euler = Vec3(0)
   // var lEuler = Vec3(0)
@@ -49,6 +55,7 @@ trait RotationalState {
   var dSpin = Quat()
 
   def applyTorque( f: Vec3 ) = { torque = torque + f; dSpin = Quat().fromEuler(f*invInertia) * dSpin }
+  def applyTorque( q: Quat ) = { dSpin = q * dSpin }
   def applyAngularDamping( damp: Float ) = { torque = torque - angularVelocity * (damp); dSpin = spin.inverse.slerp(Quat(),1.f-damp) * dSpin }	
 
 }

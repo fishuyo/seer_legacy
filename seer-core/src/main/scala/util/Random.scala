@@ -4,6 +4,7 @@ package util
 
 import types.Generator
 import spatial.Vec3
+import spatial.Quat
 
 
 object Random {
@@ -38,6 +39,10 @@ object Random {
 		for(x <- float(lo.x,hi.x);
 				y <- float(lo.y,hi.y);
 				z <- float(lo.z,hi.z)) yield Vec3(x,y,z)
+	}
+
+	def quat = new Generator[Quat]{
+		def apply() = Quat(float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1,1)()).normalize
 	}
 
 	def oneOf[T](xs: T*) = for(i <- int(0,xs.length)) yield xs(i)

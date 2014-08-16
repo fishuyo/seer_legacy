@@ -67,7 +67,7 @@ object SeerBuild extends Build {
     "examples",
     file("examples"),
     settings = BuildSettings.app
-  ) dependsOn( seer_gdx_desktop_app, seer_jruby, seer_portaudio  )
+  ) dependsOn( seer_gdx_desktop_app, seer_jruby, seer_portaudio, seer_multitouch )
 
 }
 
