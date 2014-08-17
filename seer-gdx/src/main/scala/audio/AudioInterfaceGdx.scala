@@ -37,7 +37,8 @@ object GdxAudio extends AudioInterface {
   
   // create ActorSystem
   // val system = ActorSystem("Audio", myConfig.getConfig("audio"))
-  val actor = system.actorOf(Props( new GdxAudioActor(sampleRate, bufferSize, 2)).withDispatcher("audio-dispatcher"), name = "audio-main")
+  val actor = system.actorOf(Props( new GdxAudioActor(sampleRate, bufferSize, 2)), name = "audio-main")
+  // val actor = system.actorOf(Props( new GdxAudioActor(sampleRate, bufferSize, 2)).withDispatcher("audio-dispatcher"), name = "audio-main")
 
   // ewww hack gross temporary while switching to akka actors
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))

@@ -48,6 +48,7 @@ object ActorManager {
   //       }
   //     }
   // """)
+
   val config = ConfigFactory.parseString("""
     akka {
       actor {
