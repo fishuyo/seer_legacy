@@ -28,7 +28,7 @@ Scene.alpha = .3
 SceneGraph.root.depth = false
 
 object RendererScript extends SeerScript {
-	
+  
 
   Node.mode = "omni"
 
@@ -66,14 +66,14 @@ object RendererScript extends SeerScript {
   var t = 0.f
   var scale = 1.f
 
-	val stateListener = system10g.actorOf(Props( new StateListener()), name = "statelistener")
+  val stateListener = system10g.actorOf(Props( new StateListener()), name = "statelistener")
 
-	override def preUnload(){
-		stateListener ! PoisonPill
-	}
+  override def preUnload(){
+    stateListener ! PoisonPill
+  }
 
-	var inited = false
-	override def init(){
+  var inited = false
+  override def init(){
     Node.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
 
     Node.omni.mStereo = 1
@@ -86,8 +86,8 @@ object RendererScript extends SeerScript {
     // Node.omni.renderFace(4) = true
     // Node.omni.renderFace(5) = true
 
-		inited = true
-	}
+    inited = true
+  }
 
   override def draw(){
 
@@ -99,9 +99,9 @@ object RendererScript extends SeerScript {
   }
 
   override def animate(dt:Float){
-  	if(!inited) init()
+    if(!inited) init()
 
-    Node.lens.eyeSep = 0.05 //math.sin(t)
+    Node.lens.eyeSep = 0.1 //math.sin(t)
 
     if(vertices.length > 0){
     //   mesh.clear
@@ -112,7 +112,7 @@ object RendererScript extends SeerScript {
     }
 
 
-  	cubes.foreach(_.scale.set(math.sin(t)*0.5))
+    cubes.foreach(_.scale.set(math.sin(t)*0.5))
   }
 }
 

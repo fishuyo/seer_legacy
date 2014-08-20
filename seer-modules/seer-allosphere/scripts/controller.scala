@@ -19,7 +19,10 @@ import com.typesafe.config.ConfigFactory
 import ClusterSystem.system
 // import ClusterSystem.{ test3 => system }
 
+
 implicit def f2i(f:Float) = f.toInt
+
+Camera.nav.pos.set(0,0,0)
 
 object ControllerScript extends SeerScript{
 
