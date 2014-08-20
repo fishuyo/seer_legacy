@@ -20,7 +20,7 @@ class Schedulable extends Cancellable with Animatable{
 	var percent = 0.0
 	var speed = 1.0
 
-	// Scene.push(this)
+	Scene.push(this)
 
 	def updateDuration(d:FiniteDuration){
 		if(d == 0.seconds) return
@@ -32,7 +32,7 @@ class Schedulable extends Cancellable with Animatable{
 	}
 
 	override def isCancelled = cancelled
-	override def cancel() = { /*Scene.remove(this);*/ cancelled = true; true}
+	override def cancel() = { Scene.remove(this); cancelled = true; true}
 }
 
 object Schedule {
