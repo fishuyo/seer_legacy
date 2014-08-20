@@ -1,9 +1,8 @@
-Seer
+seer
 ========
 
 audio visual interactivity programming and things
 
 -------
 
-more later..
-
+get started using [seer-template-project](https://github.com/fishuyo/seer-template-project)
