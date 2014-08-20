@@ -1,19 +1,20 @@
 
 
 package com.fishuyo.seer
-package examples.graphics.obj
+package examples.graphics
 
 import graphics._
-import spatial._
-import dynamic._
 
-object Main extends SeerApp { 
+object LoadObj extends SeerApp { 
 
 	var model:Model = _
 
 	override def init(){
 		// load bunny
-		model = Model.loadOBJ("res/obj/bunny.obj")
+		model = Model.loadOBJ("../res/obj/bun.obj")
+
+		// generate normals from vertices (if no normals supplied)
+		model.mesh.recalculateNormals()
 
 		// modify material
 		model.material = new SpecularMaterial

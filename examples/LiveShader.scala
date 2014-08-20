@@ -1,26 +1,25 @@
 
 package com.fishuyo.seer
-package examples.graphics.liveshader
+package examples.graphics
 
 import graphics._
+import spatial._
 import io._
-import dynamic._
 
 /**
-	* This example sets up a render node to render a custom shader which
-	* is loaded and editable through a ruby script.
+	* This example sets up a render node to render a custom shader
+	* which is reloaded on modification.
 	* 
-	* Saving the ruby script causes it to be evaluated in turn reloading the shader code
+	* See "./shaders/live.vert" and "./shaders/live.frag"
+	* 
 	*/
-object Main extends SeerApp {
-
-	var live:Ruby = null
+object LiveShader extends SeerApp {
 
 	// Render node encapsulates a scene, camera, and shader
 	val node = new RenderNode 
 
-	// set to use shader with name liveShader which we will load dynamically from our ruby script
-	node.shader = "liveShader"
+	// set to use shader with name liveShader which we will load below
+	node.shader = "live"
 
 	// add a screen filling quad to the scene		
 	node.scene.push( Plane() )
@@ -28,20 +27,37 @@ object Main extends SeerApp {
 	// add render node to the Scene graph to have it be rendered
 	SceneGraph.addNode(node) 
 
-	// another way is to load shader code from files and call monitor to automatically reload on save
-	// val shader = Shader.load("liveShader", File("liveShader.vert"),File("liveShader.frag"))
-	// shader.monitor
+	// shader variable
+	var shader:Shader = _
 
+	// to use as uniforms
+	var t = 0.f 
+	var zoom = 1.f 
+	var mouse = Vec2()
 
-	// init method called once from the underlying render thread on startup
 	override def init(){
-		// evaluate and monitor a ruby script
-		live = new Ruby("LiveShader.rb")
+		shader = Shader.load("live", File("shaders/live.vert"),File("shaders/live.frag"))
+		shader.monitor
 	}
 
-	// animate called once per frame
+	// since the RenderNode has been added to the Scene Graph
+	// we don't need to draw anything here
+	override def draw(){}
+
 	override def animate(dt:Float){
-		// call our ruby scripts animate method
-		live.animate(dt)
+		t += dt
+		shader.uniforms("time") = t
+		shader.uniforms("zoom") = zoom
+		shader.uniforms("mouse") = mouse
 	}
+
+	// OSX trackpad control
+	Trackpad.connect()
+	Trackpad.bind( (i,f) => { 
+			if(i == 1){
+				mouse += Vec2(f(2),f(3)) * 0.05 * math.pow(zoom,8)
+			} else if(i == 2){
+				zoom += f(3) * -0.001
+			}
+	})
 }
