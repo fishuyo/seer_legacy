@@ -122,8 +122,8 @@ class SeerAppListener extends ApplicationListener {
     println("Dispose called.")
     // audio.stop
     Thread.sleep(100)
+    Gdx.app.exit
     // audio.main ! "dispose"
-    //Kinect.disconnect()
   }
 
 }

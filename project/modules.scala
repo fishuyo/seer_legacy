@@ -30,6 +30,10 @@ object SeerModulesBuild extends Build {
     file("seer-modules/seer-vrpn")
   ) dependsOn seer_core
 
+  lazy val seer_openni = SeerProject(
+    "seer-openni",
+    file("seer-modules/seer-openni")
+  ) dependsOn seer_gdx
 
   // image video computer vision
   lazy val seer_opencv = SeerProject (
