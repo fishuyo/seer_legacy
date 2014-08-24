@@ -9,9 +9,20 @@ object LoadObj extends SeerApp {
 
 	var model:Model = _
 
+	def downloadFile(url:String, file:String){
+		import sys.process._
+		import java.net.URL
+		import java.io.File
+		new URL(url) #> new File(file) !!
+	}
+
 	override def init(){
+
+		// download bunny
+		downloadFile("http://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj", "bunny.obj")
+
 		// load bunny
-		model = Model.loadOBJ("../res/obj/bun.obj")
+		model = Model.loadOBJ("bunny.obj")
 
 		// generate normals from vertices (if no normals supplied)
 		model.mesh.recalculateNormals()
