@@ -278,7 +278,11 @@ class PhaseVocoder extends AudioSource {
 		// }
 	}
 
-  override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+  override def audioIO( io:AudioIOBuffer ){ 
+  	// in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+		val in = io.inputSamples(0)
+		val out = io.outputSamples
+		val numSamples = io.bufferSize
 
   	if( spectrumData == null ) return
   	val o = resynth(nextWindow)

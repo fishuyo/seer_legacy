@@ -14,24 +14,27 @@ import com.github.rjeschke.jpa._
 
 object PortAudio extends AudioInterface {
 
-  val in = new Array[Float](bufferSize)
+  val in = Array(new Array[Float](bufferSize))
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
   val outInterleaved = new Array[Float](bufferSize*channelsOut)
+
+  val ioBuffer = new AudioIOBuffer(channelsIn,channelsOut,bufferSize,in,out)
 
   var callback = new PaCallback {
   	def paCallback(paIn:PaBuffer, paOut:PaBuffer, nframes:Int){
 
-        paIn.getFloatBuffer.get(in)
+        paIn.getFloatBuffer.get(in(0))
 
         // zero output buffers
         for( c <- (0 until channelsOut))
           for( i <- (0 until bufferSize)) out(c)(i) = 0.f
 
         // call audio callbacks
-        sources.foreach( _.audioIO(in,out,channelsOut,bufferSize) )
+        ioBuffer.reset
+        sources.foreach{ case s=> s.audioIO( ioBuffer ); ioBuffer.reset } //in,out,channelsOut,bufferSize) )
 
         // if playThru set add input to output
-        if( playThru ) AudioPass.audioIO(in,out,channelsOut,bufferSize)
+        if( playThru ) AudioPass.audioIO( ioBuffer ) //in,out,channelsOut,bufferSize)
 
         // copy output buffers to interleaved
         for( i<-(0 until bufferSize)){
@@ -45,7 +48,7 @@ object PortAudio extends AudioInterface {
 
         if(recording){
           // if recordThru set and not already done add input to output
-          if( recordThru && !playThru ) AudioPass.audioIO(in,out,channelsOut,bufferSize)
+          if( recordThru && !playThru ) AudioPass.audioIO( ioBuffer ) //in,out,channelsOut,bufferSize)
 
           outFile.write(out,0,bufferSize)
         }
@@ -54,7 +57,9 @@ object PortAudio extends AudioInterface {
   }
 
   override def init(){
-  	JPA.initialize()
+  	try{ JPA.initialize() }
+    catch { case e:Exception => println(e) }
+    
   	JPA.setCallback( callback )
   	JPA.openDefaultStream(channelsIn, channelsOut, PaSampleFormat.paFloat32, sampleRate, bufferSize)
     super.init

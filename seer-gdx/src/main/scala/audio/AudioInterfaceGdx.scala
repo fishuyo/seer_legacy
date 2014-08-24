@@ -48,7 +48,7 @@ object GdxAudio extends AudioInterface {
   override def start = { actor ! Connect; actor ! Read; actor ! Process }
   override def stop = actor ! Disconnect
   
-  def toggleRecording() = actor ! Record("")
+  override def toggleRecording() = actor ! Record("")
 
   override def gain(f:Float) = actor ! Gain(f)
   override def playThru(b:Boolean) = actor ! PlayThru(b)
@@ -65,12 +65,14 @@ class GdxAudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channe
 
   var device:AudioDevice = null
   var record:AudioRecorder = null
-  val in = Array(new Array[Float](bufferSize), new Array[Float](bufferSize), new Array[Float](bufferSize))
+  val in = Array(new Array[Float](bufferSize)) //, new Array[Float](bufferSize), new Array[Float](bufferSize))
   var inRead = 0
   var inWrite = 0
   val ins = new Array[Short](bufferSize)
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
   val out_interleaved = new Array[Float](bufferSize*channels)
+
+  val ioBuffer = new AudioIOBuffer(1,channels,bufferSize,in,GdxAudio.out)
 
   var outFile:AudioFile = null
 
@@ -102,10 +104,11 @@ class GdxAudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channe
           for( i <- (0 until bufferSize)) out(c)(i) = 0.f
 
         // call audio callbacks
-        GdxAudio.sources.foreach( _.audioIO(in(inRead),out,channels,bufferSize) )
+        ioBuffer.reset
+        GdxAudio.sources.foreach{ case s => s.audioIO(ioBuffer); ioBuffer.reset } //in(inRead),out,channels,bufferSize) )
 
         // if playThru set add input to output
-        if( playThru ) AudioPass.audioIO(in(inRead),out,channels,bufferSize)
+        if( playThru ) AudioPass.audioIO( ioBuffer ) //in(inRead),out,channels,bufferSize)
 
         // copy output buffers to interleaved
         for( i<-(0 until bufferSize)){
@@ -119,7 +122,7 @@ class GdxAudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channe
 
         if(recording){
           // if recordThru set and not already done add input to output
-          if( recordThru && !playThru ) AudioPass.audioIO(in(inRead),out,channels,bufferSize)
+          if( recordThru && !playThru ) AudioPass.audioIO( ioBuffer ) //in(inRead),out,channels,bufferSize)
 
           outFile.write(out,0,bufferSize)
         }
@@ -132,7 +135,7 @@ class GdxAudioActor(val sampleRate:Int=44100, val bufferSize:Int=512, val channe
     case Read =>
       record.read(ins,0,bufferSize)
       var i=0
-      val b = in(inWrite)
+      val b = in(0) //inWrite)
       while( i < bufferSize ){
         b(i) = ins(i).toFloat / 32767.0f
         i += 1

@@ -55,7 +55,7 @@ trait AudioInterface {
   def recordThru(b:Boolean){}
 
 
-  // def toggleRecording() = {
+  def toggleRecording() = {}
   //   if( !recording ){
   //     try{
   //       val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)

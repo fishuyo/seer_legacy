@@ -6,11 +6,18 @@ class Gen extends AudioSource {
 	def apply() = gen()
 	var gen = ()=>{0.f}
 
-	override def audioIO(in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
-    for( i <- 0 until numSamples){
+	override def audioIO( io:AudioIOBuffer ){ 
+    // in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){
+    // val out = io.outputData
+    // for( i <- 0 until io.bufferSize){
+    //   val s = this()
+    //   out(0)(i) += s
+    //   out(1)(i) += s
+    // }
+    while(io()){
       val s = this()
-      out(0)(i) += s/2.f
-      out(1)(i) += s/2.f
+      io.outSum(0)(s)
+      io.outSum(1)(s)
     }
   }
 
@@ -25,16 +32,16 @@ class Gen extends AudioSource {
 
 class Osc(var frequency:Float = 440.f, var amp:Float = 1.f) extends Gen{
   var phase = 0.f
+  var dphase:Float = frequency / Audio().sampleRate
   override def apply() = {
-    phase += frequency / 44100.f
-    phase %= 1
+    phase += dphase
+    phase %= 1.f
     gen() * amp
   }
 
   def f() = {val that=this; new Gen(){ gen = ()=>{ that.frequency }} }
-  def f(f:Float) = frequency = f
+  def f(f:Float) = { frequency = f; dphase = frequency / Audio().sampleRate }
   def a(f:Float) = amp = f
-
 
 }
 

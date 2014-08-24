@@ -348,7 +348,13 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   var onSync = ()=>{}
 
   
-  override def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, count:Int ) = {
+  override def audioIO( io:AudioIOBuffer ){
+    // in:Array[Float], out:Array[Array[Float]], numOut:Int, count:Int ) = {
+    val in = io.inputSamples(0)
+    val out = io.outputSamples
+    val numOut = io.channelsOut
+    val count = io.bufferSize
+
     var lPos = 0.f
     val l = (1.f - pan )
     val r = pan
@@ -360,7 +366,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
       
     }else if(playing && numSamples > 0){ //playback and stack
       
-      if( vocoderActive ) vocoder.audioIO(in, out, numOut, count)
+      if( vocoderActive ) vocoder.audioIO(io) //in, out, numOut, count)
       else{
         lPos = b.rPos
         
