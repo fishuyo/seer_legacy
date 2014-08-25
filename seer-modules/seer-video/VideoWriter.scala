@@ -151,12 +151,13 @@ object ScreenCapture extends Animatable {
     dtAccum += dt
     if( dtAccum > timeStep ){
       val bytes = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixels(true)
-      val buffer = IBuffer.make(null, bytes, 0, bytes.length)
+      // val buffer = IBuffer.make(null, bytes, 0, bytes.length)
       // val pix = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixmap(0,0,w,h)
       // val buffer = IBuffer.make(null, pix.getPixels, 0, w*h*4)
-      val picture = IVideoPicture.make(buffer,IPixelFormat.Type.RGBA,w,h)
+      // val picture = IVideoPicture.make(buffer,IPixelFormat.Type.RGBA,w,h)
 
-      Video.writer ! Frame(writer,picture)
+      // Video.writer ! Frame(writer,picture)
+      Video.writer ! Bytes(writer,bytes,w,h)
       // writer.addFrame(picture)
 
       dtAccum -= timeStep
