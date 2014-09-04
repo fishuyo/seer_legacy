@@ -37,10 +37,11 @@ class VideoLoop extends VideoSource {
   def record(){ recording = true; }
   def toggleRecord() = {
     if(!recording){
-    	record()
+    	recording = true
+      playing = true
 		}else{
-			stop()
-      play()
+      recording = false
+      playing = true
 		}
 		recording
 	}
@@ -117,24 +118,26 @@ class VideoLoop extends VideoSource {
     val hh = (images(0).height * scale).toInt
 
     val bi = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR)
-    val buf = new Array[Byte](w*h*4)
 
     val writer = new VideoWriter(path, ww, hh, 1.f, 60, codec)
     for( i<-(0 until images.length)){
 
       val mat = images(i)
+      val buf = new Array[Byte](w*h*4)
       mat.get(0,0,buf)
-      for( x<-(0 until w); y<-(0 until h)){
-        val rgb = (buf(3*(x+y*w)) << 16) + (buf(3*(x+y*w)+1) << 8) + buf(3*(x+y*w)+2)
-        bi.setRGB(x,y,rgb)
-        // bi.setRGB(0,0,w,h,buf,0,w)
-      }
+      // for( x<-(0 until w); y<-(0 until h)){
+        // val rgb = (buf(3*(x+y*w)) << 16) + (buf(3*(x+y*w)+1) << 8) + buf(3*(x+y*w)+2)
+        // bi.setRGB(x,y,rgb)
+        //// bi.setRGB(0,0,w,h,buf,0,w)
+      // }
 
-      writer.addFrame(bi)
+      Video.writer ! Bytes(writer,buf,w,h)
+
+      // writer.addFrame(bi)
       // println("add frame")
     }
 
-    writer.close
+    Video.writer ! Close(writer)
   }
 
   def writeToPointCloud(path:String=""){
