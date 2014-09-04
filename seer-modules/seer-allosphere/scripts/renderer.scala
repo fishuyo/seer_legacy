@@ -24,7 +24,7 @@ import ClusterSystem.{ system, system10g }
 
 import allosphere.livecluster.Node
 
-Scene.alpha = .3
+Scene.alpha = .3f
 SceneGraph.root.depth = false
 
 object RendererScript extends SeerScript {
@@ -73,6 +73,8 @@ object RendererScript extends SeerScript {
   }
 
   var inited = false
+  var rs:Seq[Int] = _
+
   override def init(){
     Node.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
 
@@ -87,6 +89,8 @@ object RendererScript extends SeerScript {
     // Node.omni.renderFace(5) = true
 
     inited = true
+
+    rs = for( i <- 0 until 5) yield util.Random.int(0,5)()
   }
 
   override def draw(){
@@ -94,8 +98,61 @@ object RendererScript extends SeerScript {
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
     Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
 
+    // val s = Cube()
+    // s.scale(30.f,30.f,30.f)
+    // s.material = Material.basic
+    // s.material.color = RGB(0/255.f,191.f/255,255/255.f)
+    // s.translate(Camera.nav.pos)
+    // s.draw()
+
+
+    // val ps = for(i <- 0 until 50) yield {
+    //   val p = Plane()
+    //   p.rotate(Pi/2,0,0)
+    //   p.scale(1,10,10)
+    //   p.material = Material.basic
+    //   if( i % 2 == 0) p.material.color = RGB(0,1,0)
+    //   else p.material.color = RGB(1,0,0)
+    //   p.translate(i*2,0,0)
+    //   p
+    // }
+    // ps.foreach( _.draw )
+
+    // val cs = for(i <- 0 until 5) yield {
+    //   val p = Cube()
+    //   var l = List(p)
+    //   p.material = Material.specular
+    //   p.material.color = RGB(1,0,1)
+    //   p.translate(i*20.f,0.75f,5*math.sin(t))
+    //   p.scale(0.5,0.5,0.5)
+      
+    //   val r = rs(i)
+    //   for(j <- 0 until r){
+    //     val c = Cube()
+    //     c.material = Material.specular
+    //     c.material.color = RGB(1,0,1)
+
+    //     c.translate(i*20.f, 0.75 + r * 0.6, 5*math.sin(r*0.8*t))
+    //     c.scale(0.5,0.5,0.5)
+    //     l = c :: l
+    //   }
+    //   l
+    // }
+    // cs.flatten.foreach( _.draw )
+
+    // val p = Plane()
+    // p.material = Material.basic 
+    // p.material.color = RGB(0,0.6,0.2)
+    // p.translate(0,0,-1)
+    // p.rotate(Pi/2,0,0)
+    // p.scale(100,100,1)
+    // p.draw
+
+    // val p = Plane().draw
+    // p.rotate(Pi/2,0,0).scale(10.f)
+    // p.draw()
     model.draw
-    cubes.foreach(_.draw)
+    // cubes.foreach(_.draw)
   }
 
   override def animate(dt:Float){
@@ -112,7 +169,11 @@ object RendererScript extends SeerScript {
     }
 
 
-    cubes.foreach(_.scale.set(math.sin(t)*0.5))
+    cubes.foreach((c) => {
+      c.scale.set(math.sin(t)*0.5)
+      c.rotate(0.01,0.02,0)
+    })
+
   }
 }
 

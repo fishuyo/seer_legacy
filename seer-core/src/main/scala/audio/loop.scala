@@ -292,16 +292,18 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
 
   allocate(numSamples)
 
-  gen = ()=>{
+  def apply() = {
     if( playing && numSamples > 0){
       if( reversing ){
         b.r()
       }else{
         b()
       }
-    }
-    0.f
+    }else{ 0.f }
   }
+  // gen = ()=>{
+
+  // }
   
   def allocate( n:Int ){
     b.resize(n)
