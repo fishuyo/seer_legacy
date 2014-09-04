@@ -53,11 +53,13 @@ object LiveShader extends SeerApp {
 
 	// OSX trackpad control
 	Trackpad.connect()
-	Trackpad.bind( (i,f) => { 
-			if(i == 1){
-				mouse += Vec2(f(2),f(3)) * 0.05 * math.pow(zoom,8)
-			} else if(i == 2){
-				zoom += f(3) * -0.001
-			}
+	Trackpad.bind( (touch) => {
+		val i = touch.count
+		val vel = touch.vel
+		if(i == 1){
+			mouse += vel * 0.05 * math.pow(zoom,8)
+		} else if(i == 2){
+			zoom += vel.y * -0.001
+		}
 	})
 }

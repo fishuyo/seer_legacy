@@ -67,13 +67,19 @@ object SeerBuild extends Build {
     "examples",
     file("examples"),
     settings = BuildSettings.app
-  ) dependsOn( seer_gdx_desktop_app, seer_portaudio, seer_multitouch )
+  ) dependsOn( seer_gdx_desktop_app, seer_multitouch )
 
   lazy val examples_audio = SeerProject (
     "examples-audio",
     file("examples/audio"),
     settings = BuildSettings.app
   ) dependsOn( seer_gdx_desktop_app, seer_portaudio, seer_multitouch )
+
+  lazy val examples_bullet = SeerProject (
+    "examples-bullet",
+    file("examples/bullet"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_multitouch, seer_bullet )
 
 }
 

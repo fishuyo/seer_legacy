@@ -75,6 +75,12 @@ object SeerModulesBuild extends Build {
     file("seer-modules/seer-dynamic/seer-repl")
   ) dependsOn seer_core 
 
+  // physics
+  lazy val seer_bullet = SeerProject (
+    "seer-bullet",
+    file("seer-modules/seer-bullet")
+  ) dependsOn seer_gdx
+
 
   // allosphere related
   lazy val seer_allosphere = SeerProject (
