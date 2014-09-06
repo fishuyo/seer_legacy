@@ -8,7 +8,7 @@ import spatial.Vec3
 import scala.collection.mutable.ArrayBuffer
 
 
-class SpringMesh(val mesh:MeshLike, val stiff:Float) extends Animatable {
+class SpringMesh(val mesh:MeshLike, val stiff:Float, val tear:Float = 0.f) extends Animatable {
 
 	var timeStep = .015f
   var damping = 20.f 
@@ -35,7 +35,8 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float) extends Animatable {
 	  l.foreach( (xs) => {
 	  		val p = particles(xs(0))
 	  		val q = particles(xs(1))
-	  		springs += LinearSpringConstraint(p, q, (p.position-q.position).mag, stiff)		
+        val dist = (p.position-q.position).mag
+	  		springs += LinearSpringConstraint(p, q, dist, stiff, tear*dist)		
 	  })
 
   } else {
@@ -50,7 +51,8 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float) extends Animatable {
 	  		val p = Particle(xs(0))
 	  		val q = Particle(xs(1))
 	  		particles ++= p :: q :: List()
-	  		springs += LinearSpringConstraint(p, q, (p.position-q.position).mag, stiff)		
+        val dist = (p.position-q.position).mag
+	  		springs += LinearSpringConstraint(p, q, dist, stiff, tear*dist)		
 	  })
   }
 
