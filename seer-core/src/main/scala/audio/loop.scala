@@ -1,6 +1,8 @@
 package com.fishuyo.seer
 package audio
 
+import types._
+
 import de.sciss.synth.io._
 
 
@@ -51,10 +53,18 @@ class LoopBuffer( var maxSize:Int = 0) {
   }
   
   //write sample data, appended to buffer
-  def append( in:Array[Float], numSamples:Int ){
+  def append( in:Array[Float], numSamples:Int, offset:Int=0 ){
     if( maxSize == 0 ) return
     else if( curSize + numSamples >= maxSize ) resize(2*maxSize)
-    for( i <- (0 until numSamples)) samples(curSize+i) = in(i)
+
+    var i = offset
+    var cursor = 0
+    while( i < offset + numSamples){
+    // for( i <- (offset until (offset + numSamples))){
+      samples(curSize + cursor) = in(i)
+      cursor += 1
+      i += 1
+    }
     if( rMax == curSize ) rMax += numSamples;
     curSize += numSamples;
   }
@@ -155,18 +165,18 @@ class LoopBuffer( var maxSize:Int = 0) {
     }
   }
   
-  def addFrom( from:Array[Float], numSamples:Int, off:Float=0.f ){
+  def addFrom( from:Array[Float], numSamples:Int, off:Float=0.f, inOff:Int=0 ){
     
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMin
 
-    var read = 0
-    while( read < numSamples){
+    var read = inOff
+    while( read < numSamples + inOff){
       while( offset < rMax ){
         addSampleAt(offset, from(read) )
         offset += speed
         read += 1
-        if( read == numSamples ) return
+        if( read == numSamples + inOff ) return
       }
       offset = offset - rMax + rMin
     }
@@ -191,18 +201,18 @@ class LoopBuffer( var maxSize:Int = 0) {
     //   }
     // }
   }
-  def addFromR( from:Array[Float], numSamples:Int, off:Float ){
+  def addFromR( from:Array[Float], numSamples:Int, off:Float, inOff:Int=0 ){
 
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMax-1;
 
-    var read = 0
-    while( read < numSamples){
+    var read = inOff
+    while( read < numSamples + inOff){
       while( offset >= rMin ){
         addSampleAt(offset, from(read) )
         offset -= speed
         read += 1
-        if( read == numSamples ) return
+        if( read == numSamples + inOff ) return
       }
       offset = offset + rMax - rMin
     }
@@ -281,10 +291,16 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
 
   var (gain, pan, decay, rms) = (1.f,0.5f,0.5f,0.f)
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
+  var startStack, startRecord = false
+  var slPos = new RingBuffer[Float](10000)
+
   var recOut = false
-  var iobuffer = new Array[Float](2048)
+  var iobuffer = new Array[Float](Audio().bufferSize)
 
   var dirty = true
+
+  var latency = .06f
+  var offset = 0
 
   val vocoder = new PhaseVocoder
   var vocoderActive = false
@@ -316,9 +332,9 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
   def play(t:Int){ b.times=0; times = t; play() }
   def stop(){ playing = false; recording = false}
   def rewind(){ b.rPos = b.rMin }
-  def record(){ recording = true; playing = false; dirty = true }
+  def record(){ startRecord = true; recording = true; playing = false; dirty = true }
   def toggleRecord(){ if( recording ) play() else record() }
-  def stack() = { stacking = !stacking; dirty = true }
+  def stack() = { startStack = true; stacking = !stacking; dirty = true }
   def reverse() = reversing = !reversing
   def reverse(b:Boolean) = reversing = b
   def undo() = {}
@@ -364,21 +380,40 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     if(recording){ //fresh loop
       vocoderActive = false
       vocoderAnalyze = true
-      b.append( in, count )
-      
+
+      if(startRecord){
+        offset = (latency * Audio().sampleRate).toInt
+        startRecord = false
+      }
+
+      if(offset < count){
+        b.append( in, count-offset, offset )
+        offset = 0
+      } else offset -= count
+
     }else if(playing && numSamples > 0){ //playback and stack
       
       if( vocoderActive ) vocoder.audioIO(io) //in, out, numOut, count)
       else{
         lPos = b.rPos
         
+        if(startStack){
+          slPos.clear()
+          offset = (latency * Audio().sampleRate).toInt
+          startStack = false
+        }
+        if(stacking) slPos += lPos
+
         if(reversing){
           
           b.readR( iobuffer, count, gain )
           
           if(stacking){ 
-            b.applyGain( decay, count, b.rPos+1 )
-            b.addFromR( in, count, lPos )
+            if(offset < count){
+              b.applyGain( decay, count-offset, b.rPos+1) //??? rlPOs
+              b.addFromR( in, count-offset, slPos.next, offset )
+              offset = 0
+            } else offset -= count            
           }
           
         }else {
@@ -386,8 +421,12 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
           b.read( iobuffer, count, gain )
           
           if(stacking){
-              b.applyGain( decay, count, lPos)
-              b.addFrom( in, count, lPos )
+            if(offset < count){
+              val pos = slPos.next
+              b.applyGain( decay, count-offset, pos)
+              b.addFrom( in, count-offset, pos, offset )
+              offset = 0
+            } else { offset -= count }
           }     
         }
         

@@ -15,6 +15,7 @@ import com.github.rjeschke.jpa._
 object PortAudio extends AudioInterface {
 
   val in = Array(new Array[Float](bufferSize))
+
   val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
   val outInterleaved = new Array[Float](bufferSize*channelsOut)
 

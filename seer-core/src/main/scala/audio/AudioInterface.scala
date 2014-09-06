@@ -13,7 +13,7 @@ object Audio {
 }
 
 class NullAudioInterface extends AudioInterface {
-  println("Using null audio interface!")
+  println("No audio interface initialized.")
 }
 
 trait AudioInterface {
@@ -37,23 +37,22 @@ trait AudioInterface {
   def push(s:AudioSource) = sources += s
 
   // do any initialization
-  def init = Audio.interface = Some(this)
+  def init() = Audio.interface = Some(this)
   
   // start audio
-  def start {}
+  def start(){}
 
   // stop audio
-  def stop {}
+  def stop(){}
 
   // set master gain
-  def gain(g:Float){}
+  def gain(g:Float){ gain = g }
 
   // audio passed through automatically
-  def playThru(b:Boolean){}
+  def playThru(b:Boolean){ playThru = b}
 
   // when recording, record input directly
-  def recordThru(b:Boolean){}
-
+  def recordThru(b:Boolean){ recordThru = b}
 
   def toggleRecording() = {}
   //   if( !recording ){
