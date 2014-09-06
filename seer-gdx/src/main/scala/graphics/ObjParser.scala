@@ -59,7 +59,7 @@ object ObjParser extends JavaTokenParsers {
     val file = Source.fromFile( filename )
 
     def addFace(u:Int,v:Int,w:Int){
-    	val l = List(u,v,w).map( (i) => (i - 1).toShort )
+    	val l = List(u,v,w).map( (i) => (i - 1) )//.toShort )
     	mesh.indices ++= l
     	mesh.wireIndices ++= l.combinations(2).flatten
     }

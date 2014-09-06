@@ -63,8 +63,8 @@ class Mesh extends MeshLike {
 		}else vert = vertices.map(v => List(v.x,v.y,v.z)).flatten.toArray
 
 		gdxMesh.get.setVertices(vert)
-		if( primitive == Lines && wireIndices.length > 0) gdxMesh.get.setIndices(wireIndices.toArray)
-		else if(indices.length > 0) gdxMesh.get.setIndices(indices.toArray)
+		if( primitive == Lines && wireIndices.length > 0) gdxMesh.get.setIndices(wireIndices.map(_.toShort).toArray)
+		else if(indices.length > 0) gdxMesh.get.setIndices(indices.map(_.toShort).toArray)
 	}
 
 	/** draw the mesh */
@@ -96,7 +96,7 @@ class Mesh extends MeshLike {
 
 		if(numI > 0){
 			gdxMesh.get.getIndices(indxs)
-			indices ++= indxs
+			indices ++= indxs.map(_.toInt)
 		}
 
 		gdxMesh.get.getVertices(verts)

@@ -55,12 +55,12 @@ object Sphere extends Primitive {
       for ( long <- (0 until bands)){
         var first = (lat * (bands + 1)) + long
         var second = first + bands + 1
-        mesh.indices += first.toShort
-        mesh.indices += second.toShort
-        mesh.indices += (first + 1).toShort
-        mesh.indices += second.toShort
-        mesh.indices += (second + 1).toShort
-        mesh.indices += (first + 1).toShort
+        mesh.indices += first //.toShort
+        mesh.indices += second //.toShort
+        mesh.indices += (first + 1) //.toShort
+        mesh.indices += second //.toShort
+        mesh.indices += (second + 1) //.toShort
+        mesh.indices += (first + 1) //.toShort
       }
     }
     // mesh.init
@@ -77,7 +77,7 @@ object Cube extends Primitive {
   override def generateMesh():Mesh = generateMesh(new Mesh())
   def generateMesh( mesh:Mesh, l:Float=0.5f ):Mesh = {
 
-    mesh.indices ++= Array[Short](
+    mesh.indices ++= Array[Int](
       0,1,2, 1,2,3, //f
       4,5,6, 5,6,7, //b
       8,9,10, 9,10,11, //l
@@ -129,7 +129,7 @@ object Cube extends Primitive {
       mesh.texCoords += Vec2(0, 1)
     }
 
-    for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i).toShort
+    for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i) //.toShort
     
     
     // mesh.setIndices( Array[Short](
@@ -165,8 +165,8 @@ object Cube extends Primitive {
     //   }
     // }
     
-    // for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i).toShort
-    // for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i).toShort
+    // for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i) //.toShort
+    // for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i) //.toShort
 
     mesh
   }
@@ -334,13 +334,13 @@ object Cylinder extends Primitive {
 
     for( i<-(0 until vertCount)){
       if( i % 2 == 0){
-        mesh.wireIndices += i.toShort
-        mesh.wireIndices += ((i+1) % vertCount).toShort
+        mesh.wireIndices += i //.toShort
+        mesh.wireIndices += ((i+1) % vertCount) //.toShort
       }
-      mesh.wireIndices += ((i) % vertCount).toShort
-      mesh.wireIndices += ((i+2) % vertCount).toShort
+      mesh.wireIndices += ((i) % vertCount) //.toShort
+      mesh.wireIndices += ((i+2) % vertCount) //.toShort
     }
-    for( i<-(0 until indxCount)) mesh.indices += (i % vertCount).toShort
+    for( i<-(0 until indxCount)) mesh.indices += (i % vertCount) //.toShort
     
     // mesh.init
     mesh

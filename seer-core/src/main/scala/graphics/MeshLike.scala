@@ -14,8 +14,8 @@ trait MeshLike extends Drawable {
 	val normals = new ArrayBuffer[Vec3]
 	val texCoords = new ArrayBuffer[Vec2]
 	val colors = new ArrayBuffer[RGBA]
-	val indices = new ArrayBuffer[Short]
-	val wireIndices = new ArrayBuffer[Short]
+	val indices = new ArrayBuffer[Int]
+	val wireIndices = new ArrayBuffer[Int]
 
 	var primitive = Triangles
 
