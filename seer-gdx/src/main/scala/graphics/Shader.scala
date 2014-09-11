@@ -7,6 +7,7 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.files.FileHandle;
@@ -47,6 +48,20 @@ object Shader {
 
   // def texture_=(v:Float){ texture = v }
   // def lighting_=(v:Float){ lighting = v }
+
+  def alpha(f:Float) = {
+    if(f == 1.f) SceneGraph.root.depth = true
+    else SceneGraph.root.depth = false
+    Scene.alpha = f
+  }
+
+  def blend(mode:String){ mode.toUpperCase match {
+    case "ONE" => Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    case "ONEMINUSSRC" => Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+  }}
+
+  def lineWidth(f:Float) = Gdx.gl.glLineWidth(f)
+
 
   def setBlend(b:Boolean) = blend = b
 

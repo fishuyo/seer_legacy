@@ -3,6 +3,7 @@ package com.fishuyo.seer
 package examples.dynamic
 
 import dynamic._
+import audio._
 
 /**
 	* This example sets up a SeerScriptLoader which compiles
@@ -12,6 +13,9 @@ import dynamic._
 	* 
 	*/
 object LiveScript extends SeerApp {
+  GdxAudio.init
+  Audio().start
+  
   val live = new SeerScriptLoader("scripts/live.scala")
 
   override def draw(){}
