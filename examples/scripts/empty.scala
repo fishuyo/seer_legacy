@@ -9,7 +9,9 @@ import io._
 object Script extends SeerScript {
 
 
-  override def draw(){}
+  override def draw(){
+    Sphere().draw
+  }
 
   override def animate(dt:Float){}
 
@@ -17,7 +19,16 @@ object Script extends SeerScript {
 
   Trackpad.clear
   Trackpad.connect
-  Trackpad.bind((touch) => {})
+  Trackpad.bind((touch) => {
+    val p = touch.pos
+
+    touch.count match {
+      case 1 => println(s"${p.x} ${p.y}")
+      case 2 =>
+      case 3 =>
+      case _ => ()  
+    }
+  })
 }
 
 Script
