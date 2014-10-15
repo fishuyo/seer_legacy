@@ -16,12 +16,14 @@ trait Generator[T]{
 			value
 		}
 	}
+	
 	def flatMap[S](f: T => Generator[S]): Generator[S] = new Generator[S]{
 		def apply() = {
 			value = f(self.apply()).apply()
 			value
 		}
 	}
+
 	def filter(f:T => Boolean): Generator[T] = new Generator[T]{
 		def apply() = {
 			value = self.apply()

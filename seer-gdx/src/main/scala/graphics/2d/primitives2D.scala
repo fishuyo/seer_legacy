@@ -9,7 +9,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
-object Plane extends Primitive {
+object Plane extends PrimitiveGenerator {
   override def generateMesh():Mesh = generateMesh(2,2,2,2,Quat())
   def generateMesh(w:Float=2.f,h:Float=2.f,nx:Int=2,ny:Int=2,normal:Quat=Quat()):Mesh = generateMesh(new Mesh(),w,h,nx,ny,normal)
   def generateMesh(mesh:Mesh, w:Float,h:Float,nx:Int,ny:Int,normal:Quat):Mesh = {
@@ -46,7 +46,7 @@ object Plane extends Primitive {
   }
 }
 
-object Circle extends Primitive {
+object Circle extends PrimitiveGenerator {
   override def generateMesh():Mesh = generateMesh(1.f,30)
   def generateMesh(r:Float=1.f, nt:Int=30):Mesh = generateMesh(new Mesh(),r,nt)
   def generateMesh(mesh:Mesh, r:Float, nt:Int):Mesh = {

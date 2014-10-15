@@ -17,14 +17,14 @@ import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 import com.badlogic.gdx.graphics.g3d.loader._
 
-trait Primitive {
+trait PrimitiveGenerator {
   var mesh:Option[Mesh] = None
   def apply():Model = Model(mesh.getOrElse({mesh = Some(generateMesh()); mesh.get}))
   def generateMesh() = Mesh()
 }
 
 
-object Sphere extends Primitive {
+object Sphere extends PrimitiveGenerator {
   var radius = 1.f
   var bands = 30
 
@@ -72,7 +72,7 @@ class Sphere extends Model {
   mesh = Sphere.generateMesh()
 }
 
-object Cube extends Primitive {
+object Cube extends PrimitiveGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
   def generateMesh( mesh:Mesh, l:Float=0.5f ):Mesh = {
@@ -175,7 +175,7 @@ class Cube extends Model {
   mesh = Cube.generateMesh()
 }
 
-object Tetrahedron extends Primitive {
+object Tetrahedron extends PrimitiveGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
   def generateMesh( mesh:Mesh, l:Float = math.sqrt(1.f/3) ):Mesh = {
@@ -197,7 +197,7 @@ class Tetrahedron extends Model {
   mesh = Tetrahedron.generateMesh()
 }
 
-object Octahedron extends Primitive {
+object Octahedron extends PrimitiveGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
   def generateMesh( mesh:Mesh, l:Float = 1.f ):Mesh = {
@@ -223,7 +223,7 @@ class Octahedron extends Model {
   mesh = Octahedron.generateMesh()
 }
 
-object Dodecahedron extends Primitive {
+object Dodecahedron extends PrimitiveGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
   def generateMesh( mesh:Mesh ):Mesh = {
@@ -254,7 +254,7 @@ class Dodecahedron extends Model {
   mesh = Dodecahedron.generateMesh()
 }
 
-object Icosahedron extends Primitive {
+object Icosahedron extends PrimitiveGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
   def generateMesh( mesh:Mesh ):Mesh = {
@@ -303,7 +303,7 @@ class Icosahedron extends Model {
 }
 
 
-object Cylinder extends Primitive {
+object Cylinder extends PrimitiveGenerator {
   var radius1 = 1.f
   var radius2 = 1.f
   var rings = 2
