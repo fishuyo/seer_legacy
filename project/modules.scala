@@ -53,6 +53,11 @@ object SeerModulesBuild extends Build {
     file("seer-modules/seer-portaudio")
   ) dependsOn seer_core
 
+  lazy val seer_rtaudio = SeerProject (
+    "seer-rtaudio",
+    file("seer-modules/seer-rtaudio")
+  ) dependsOn seer_core
+
 
   // dynamic and livecoding related
   lazy val seer_jruby = SeerProject (
