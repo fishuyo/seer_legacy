@@ -6,7 +6,7 @@ object Hostname{
 	def apply() = {
 		val local = InetAddress.getLocalHost()
 		val name = local.getHostName()
-		println(s"Hostname: $name")
+		// println(s"Hostname: $name")
 		name
 	}
 }

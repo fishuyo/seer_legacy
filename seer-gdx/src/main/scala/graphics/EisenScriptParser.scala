@@ -2,7 +2,6 @@ package com.fishuyo.seer
 package parsers
 
 import spatial._
-import spatial._
 import graphics._
 import util._
 
