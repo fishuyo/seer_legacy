@@ -186,6 +186,15 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     return q.normalize();
   }
 
+  def pow(v:Float):Quat = {
+    val m = mag()
+    if( m == 0.f) return Quat()
+    val theta = math.acos(w / m)
+    val imag = Vec3(x,y,z) / (m * math.sin(theta))
+    imag *= math.sin(v*theta)
+    Quat(math.cos(v*theta), imag.x, imag.y, imag.z) * math.pow(m,v)
+  }
+
   override def toString() = "[" + w + " " + x + " " + y + " " + z + "]"
 }
 

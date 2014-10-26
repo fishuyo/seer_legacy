@@ -250,7 +250,7 @@ class TriangleMan(override val id:Int) extends Skeleton(id) {
   val linemodel = Model(linemesh)
   linemodel.shader = "bone"
 
-  val lineindices = Array[Short](13,11,11,6,6,12,12,14,11,0,0,2,2,9,6,5,11,5,0,5,5,1,5,10,1,10,1,3,3,7,10,8,8,4)
+  val lineindices = Array[Int](13,11,11,6,6,12,12,14,11,0,0,2,2,9,6,5,11,5,0,5,5,1,5,10,1,10,1,3,3,7,10,8,8,4)
 
 
   val model = Model(mesh)  
@@ -284,10 +284,10 @@ class TriangleMan(override val id:Int) extends Skeleton(id) {
   var phase = Map[String,Float]()
   jointModels.keys.foreach((k) => { phase(k) = 2*Pi*Random.float() })
   
-  var indices = for( i <- 0 until 30; j <- 0 until 3) yield Random.int(0,15)().toShort
+  var indices = for( i <- 0 until 30; j <- 0 until 3) yield Random.int(0,15)()
 
   def randomizeIndices(){
-    indices = for( i <- 0 until 30; j <- 0 until 3) yield Random.int(0,15)().toShort 
+    indices = for( i <- 0 until 30; j <- 0 until 3) yield Random.int(0,15)() 
   }
 
   override def draw(){

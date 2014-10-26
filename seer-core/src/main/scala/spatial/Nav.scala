@@ -38,9 +38,9 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 		stop
 	}
 
-	def lookAt( p: Vec3, amt:Float=1.f) = {
+	// def lookAt( p: Vec3, amt:Float=1.f) = {
 
-	}
+	// }
 	def goTo( p:Vec3, amt:Float=1.f) = {
 		val dir = (p - pos).normalize
 	}
