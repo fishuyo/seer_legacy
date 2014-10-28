@@ -13,8 +13,8 @@ import com.alderstone.multitouch.mac.touchpad.TouchpadObservable;
 import com.alderstone.multitouch.mac.touchpad.{Finger => TFinger};
 import com.alderstone.multitouch.mac.touchpad.FingerState;
 
-import com.badlogic.gdx.input.TGestureDetector
-import com.badlogic.gdx.math.Vector2
+// import com.badlogic.gdx.input.TGestureDetector
+// import com.badlogic.gdx.math.Vector2
 
 
 case class Finger(id:Int, pos:Vec2, vel:Vec2, size:Float, angle:Float)
