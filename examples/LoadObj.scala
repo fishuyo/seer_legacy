@@ -29,7 +29,7 @@ object LoadObj extends SeerApp {
 
 		// modify material
 		model.material = new SpecularMaterial
-		model.material.color = RGBA(0.f,.6f,.2f,1.f)
+		model.material.color = RGBA(0f,.6f,.2f,1f)
 	}
 
 	override def draw(){

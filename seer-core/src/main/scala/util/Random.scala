@@ -33,7 +33,7 @@ object Random {
 	}
 
 	val vec3 = new Generator[Vec3]{
-		def apply() = Vec3(float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1.f,1.f)())
+		def apply() = Vec3(float(-1f,1f)(),float(-1f,1f)(),float(-1f,1f)())
 	}
 	def vec3(lo:Vec3, hi:Vec3): Generator[Vec3] = {
 		for(x <- float(lo.x,hi.x);
@@ -42,7 +42,7 @@ object Random {
 	}
 
 	def quat = new Generator[Quat]{
-		def apply() = Quat(float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1.f,1.f)(),float(-1,1)()).normalize
+		def apply() = Quat(float(-1f,1f)(),float(-1f,1f)(),float(-1f,1f)(),float(-1,1)()).normalize
 	}
 
 	def oneOf[T](xs: T*) = for(i <- int(0,xs.length)) yield xs(i)
@@ -51,7 +51,7 @@ object Random {
 		def apply():T = {
 			val r = float()
 			val sum = weights.sum
-			var accum = 0.f
+			var accum = 0f
 			for( i <- ( 0 until weights.length)){
 				accum += weights(i) / sum
 				if( r < accum) return xs(i)

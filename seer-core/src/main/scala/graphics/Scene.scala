@@ -22,8 +22,8 @@ object Scene extends Scene
 class Scene {
   
   var active = true
-  var alpha = 1.f
-  var fade = 0.f
+  var alpha = 1f
+  var fade = 0f
   def alpha(v:Float){ alpha = v }
   def fade(v:Float){ fade = v }
 
@@ -153,7 +153,7 @@ class Scene {
 
 //   def resize(vp:Viewport){
 //     viewport = vp
-//     if(camera.viewportHeight == 1.f){
+//     if(camera.viewportHeight == 1f){
 //       camera.viewportWidth = vp.aspect
 //     }else{
 //       // camera.viewportWidth = vp.w
@@ -199,7 +199,7 @@ class Scene {
 //         Shader.alpha = scene.alpha
 //         Shader.fade = scene.fade
 
-//         if( scene.alpha < 1.f ){ //TODO depth ordering, conflicts with depth flag
+//         if( scene.alpha < 1f ){ //TODO depth ordering, conflicts with depth flag
 //           Shader.blend = true
 //           Gdx.gl.glEnable(GL20.GL_BLEND);
 //           Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
@@ -249,8 +249,8 @@ class Scene {
 //     //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
 //     // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
 //     // scene.draw2()
-//     // if( day.x == 1.f) Shader("secondPass").setUniformf("u_depth", 0.f)
-//     // else Shader("secondPass").setUniformf("u_depth", 1.f)
+//     // if( day.x == 1f) Shader("secondPass").setUniformf("u_depth", 0f)
+//     // else Shader("secondPass").setUniformf("u_depth", 1f)
 
 //     quad.render(Shader(), GL20.GL_TRIANGLES)
     

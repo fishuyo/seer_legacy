@@ -44,13 +44,13 @@ class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ){
   /** return linear interpolated Pose from this to p by amount d*/
   def lerp(p:Pose, d:Float) = new Pose( pos.lerp(p.pos, d), quat.slerp(p.quat, d) )
 
-  def lookAt(p:Vec3, amt:Float=1.f){
+  def lookAt(p:Vec3, amt:Float=1f){
     val target = (p - pos).normalize
     val rot = Quat().getRotationTo(uf(), target);
 
     // We must pre-multiply the Pose quaternion with our rotation since
     // it was computed in world space.
-    if(amt == 1.) quat = rot * quat
+    if(amt == 1f) quat = rot * quat
     else quat = rot.pow(amt) * quat
   }
   // def toMatrix() = {

@@ -98,7 +98,7 @@ class VideoPlayer(val filename:String) {
     if( !playing ) return
 
   	val framerate = videoCoder.getFrameRate().getDouble()
-  	val timeStep = 1.f/framerate
+  	val timeStep = 1f/framerate
     dtAccum += dt.toDouble
     if( dtAccum > timeStep ){
     	dtAccum -= timeStep

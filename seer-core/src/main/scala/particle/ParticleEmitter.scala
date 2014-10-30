@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 class ParticleEmitter(var maxParticles:Int) extends Animatable {
 
-	var ttl = 10.f
+	var ttl = 10f
 	var particles = ListBuffer[Particle]()
 
 	def addParticle(p:Particle) = particles += p

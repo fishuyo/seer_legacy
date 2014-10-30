@@ -19,7 +19,7 @@
 //   def apply( p: Vec3, w: Float, h: Float, d: Float, m:String="xy") = new Fabric(p,w,h,d,m)
 // }
 
-// class Fabric( var pos:Vec3=Vec3(0), var width:Float=1.f, var height:Float=1.f, var dist:Float=.05f, mode:String="xy") extends Animatable {
+// class Fabric( var pos:Vec3=Vec3(0), var width:Float=1f, var height:Float=1f, var dist:Float=.05f, mode:String="xy") extends Animatable {
 
 //   var stiff = 1.1f
 //   var particles = ListBuffer[Particle]()
@@ -34,7 +34,7 @@
 
 //   for( j <- ( 0 until ny ); i <- ( 0 until nx)){
 
-//     var x=0.f; var y=0.f;
+//     var x=0f; var y=0f;
 //     var p:Particle = null
 
 //     mode match {
@@ -81,7 +81,7 @@
 //       particles.foreach( (p) => {
 //       	if( field != null ) p.applyForce( field(p.position) ) 
 //         p.applyGravity()
-//         p.applyDamping(20.f)
+//         p.applyDamping(20f)
 //         p.step() // ts 
 //       })
 

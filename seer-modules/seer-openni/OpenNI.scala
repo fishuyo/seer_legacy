@@ -37,7 +37,7 @@ object OpenNI {
   import SkeletonJoint._
   
   val colors = RGB(1,0,0) :: RGB(0,1,0) :: RGB(0,0,1) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: RGB(1,1,1) :: List()
-  // val colors = RGB(1,1,1) :: RGB(0.7,0.,0.1) :: RGB(0.,.7,.5) :: RGB(.5,.5,.7) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: RGB(1,1,1) :: List()
+  // val colors = RGB(1,1,1) :: RGB(0.7,0.0,0.1) :: RGB(0.0,.7,.5) :: RGB(.5,.5,.7) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: RGB(1,1,1) :: List()
 
   val skeletons = HashMap[Int,TriangleMan]()
   for( i <- 1 to 4 ){ 
@@ -222,9 +222,9 @@ object OpenNI {
   def getJoint(user:Int, joint:String) = {
     val jpos = skeletonCap.getSkeletonJointPosition(user, s2j(joint))
     val p = jpos.getPosition
-    val x = -p.getX / 1000.f
-    val y = p.getY / 1000.f + 1.f
-    val z = -p.getZ / 1000.f
+    val x = -p.getX / 1000f
+    val y = p.getY / 1000f + 1f
+    val z = -p.getZ / 1000f
     val v = Vec3(x,y,z)
     skeletons(user).updateJoint(joint,v)
     (v, jpos.getConfidence )

@@ -25,11 +25,11 @@ trait ModelGenerator {
 
 
 object Sphere extends ModelGenerator {
-  var radius = 1.f
+  var radius = 1f
   var bands = 30
 
   override def generateMesh():Mesh = generateMesh(radius, bands)
-  def generateMesh(radius:Float=1.f, bands:Int=30):Mesh = generateMesh(new Mesh(), radius, bands)
+  def generateMesh(radius:Float=1f, bands:Int=30):Mesh = generateMesh(new Mesh(), radius, bands)
   def generateMesh( mesh:Mesh, radius:Float, bands:Int):Mesh = {
     mesh.primitive = Triangles
     for ( lat <- (0 to bands)){
@@ -44,7 +44,7 @@ object Sphere extends ModelGenerator {
         var x = cosPhi * sinTheta
         var y = cosTheta
         var z = sinPhi * sinTheta
-        var u = 1.f - (long.toFloat / bands)
+        var u = 1f - (long.toFloat / bands)
         var v = lat.toFloat / bands
         mesh.vertices += Vec3(x,y,z)*radius
         mesh.texCoords += Vec2(u,v)
@@ -178,7 +178,7 @@ class Cube extends Model {
 object Tetrahedron extends ModelGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
-  def generateMesh( mesh:Mesh, l:Float = math.sqrt(1.f/3) ):Mesh = {
+  def generateMesh( mesh:Mesh, l:Float = math.sqrt(1f/3) ):Mesh = {
     mesh.primitive = Triangles
     mesh.vertices += Vec3(l,l,l)
     mesh.vertices += Vec3(-l,l,-l)
@@ -200,7 +200,7 @@ class Tetrahedron extends Model {
 object Octahedron extends ModelGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
-  def generateMesh( mesh:Mesh, l:Float = 1.f ):Mesh = {
+  def generateMesh( mesh:Mesh, l:Float = 1f ):Mesh = {
     mesh.primitive = Triangles
     mesh.vertices += Vec3(l,0,0)
     mesh.vertices += Vec3(0,l,0)
@@ -304,13 +304,13 @@ class Icosahedron extends Model {
 
 
 object Cylinder extends ModelGenerator {
-  var radius1 = 1.f
-  var radius2 = 1.f
+  var radius1 = 1f
+  var radius2 = 1f
   var rings = 2
   var count = 30
 
   override def generateMesh():Mesh = generateMesh(new Mesh(),radius1,radius2,rings,count)
-  def generateMesh(r1:Float=1.f, r2:Float=1.f, rings:Int=2, vertCount:Int=30):Mesh = generateMesh(new Mesh(),r1,r2,rings,vertCount)
+  def generateMesh(r1:Float=1f, r2:Float=1f, rings:Int=2, vertCount:Int=30):Mesh = generateMesh(new Mesh(),r1,r2,rings,vertCount)
   def generateMesh(mesh:Mesh, r1:Float, r2:Float, rings:Int, vertCount:Int):Mesh = {
     mesh.primitive = TriangleStrip
     
@@ -322,12 +322,12 @@ object Cylinder extends ModelGenerator {
       val r = (if(j % 2 == 0) r1 else r2)
       val x = math.cos(theta).toFloat
       val y = math.sin(theta).toFloat
-      val u = (if(j % 2 == 0) 1.f else 0.f)
-      val v = j*1.f / vertCount
+      val u = (if(j % 2 == 0) 1f else 0f)
+      val v = j*1f / vertCount
 
-      mesh.normals += Vec3(x,y,(r1-r2)/2.f)
+      mesh.normals += Vec3(x,y,(r1-r2)/2f)
       mesh.texCoords += Vec2(u,v)
-      mesh.vertices += Vec3(r*x,r*y,(if(j % 2 == 0) 0.f else 1.f))
+      mesh.vertices += Vec3(r*x,r*y,(if(j % 2 == 0) 0f else 1f))
 
       theta += 2 * math.Pi / (vertCount)
     }
@@ -366,7 +366,7 @@ class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh
   var color = RGBA(1,1,1,.6f)
   override def draw(){
     Shader.setColor(color)
-    val s = scale / 2.f
+    val s = scale / 2f
 
     MatrixStack.push()
     MatrixStack.transform(pose,s)
@@ -380,7 +380,7 @@ class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh
 
 
 class Trace3D( var size:Int ) extends Drawable {
-  var thickness = 1.f
+  var thickness = 1f
   var smooth = false
   val mesh = Mesh()
   val model = Model(mesh)
@@ -411,7 +411,7 @@ class Trace3D( var size:Int ) extends Drawable {
   def setColors(c1:Vec3,c2:Vec3){
     for( i<-(0 until size)){
       val c = c2.lerp(c1, i/size.toFloat)
-      mesh.colors(i) = RGBA(c,1.f)
+      mesh.colors(i) = RGBA(c,1f)
     }
     dirty = true  
   }
@@ -427,7 +427,7 @@ class Trace3D( var size:Int ) extends Drawable {
     // if(smooth){
       // Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH)
     // }
-    val thick = map(vel.mag, 0.f,0.01f,0.f,6.f)
+    val thick = map(vel.mag, 0f,0.01f,0f,6f)
     Gdx.gl.glLineWidth(thickness)
     model.draw()
   }

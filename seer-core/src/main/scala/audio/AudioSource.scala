@@ -70,8 +70,8 @@ object AudioPassInputLatencyCorrection extends AudioSource {
       
       } else {
         offset -= 1
-        io.outSet(0)(0.f)
-        io.outSet(1)(0.f)
+        io.outSet(0)(0f)
+        io.outSet(1)(0f)
       }
     }
   }

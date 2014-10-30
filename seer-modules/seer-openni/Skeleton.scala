@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 
 
 object Bone {
-  def apply() = new Bone(Vec3(),Quat(),0.f)
+  def apply() = new Bone(Vec3(),Quat(),0f)
   def apply(p:Vec3,q:Quat,l:Float) = new Bone(p,q,l)
 }
 class Bone( var pos:Vec3, var quat:Quat, var length:Float)
@@ -94,7 +94,7 @@ class Skeleton(val id:Int) extends Animatable {
 class StickMan(override val id:Int) extends Skeleton(id) {
 
   val loadingModel = Cube().scale(0.1f).translate(0,0.5f,0)
-  val m = Cube().rotate(45.f.toRadians,0,45.f.toRadians)
+  val m = Cube().rotate(45f.toRadians,0,45f.toRadians)
   loadingModel.addPrimitive(m)
   m.material.color = color
   loadingModel.material.color = color

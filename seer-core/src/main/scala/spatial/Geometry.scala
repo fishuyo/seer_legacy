@@ -66,7 +66,7 @@ class Triangle( val vertices:(Vec3,Vec3,Vec3)) extends Geometry {
     if( dn == 0) return None
 
     val t = -(( ray.o - vertices._1 ) dot n ) / dn
-    if( t < 0.f) return None
+    if( t < 0f) return None
     val x = ray(t)
 
     if( (((vertices._2 - vertices._1) cross ( x - vertices._1 )) dot n) < 0 ||
@@ -92,7 +92,7 @@ class Quad( val vertices:(Vec3,Vec3,Vec3,Vec3)) extends Geometry {
     if( dn == 0) return None
 
     val t = -(( ray.o - vertices._1 ) dot n ) / dn
-    if( t < 0.f) return None
+    if( t < 0f) return None
     val x = ray(t)
 
     if( (((vertices._2 - vertices._1) cross ( x - vertices._1 )) dot n) < 0 ||

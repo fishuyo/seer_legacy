@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 pathToPackage () {
 (
   PACKAGE=$(echo "$1" | sed 's/[/]/./g')
-  PACKAGE="com.fishuyo.seer.$PACKAGE.Main"
+  PACKAGE="com.fishuyo.seer.$PACKAGE"
   echo $PACKAGE
 )
 }
@@ -314,7 +314,7 @@ declare -r app_mainclass="$(pathToPackage "$1")" #"$1" #"com.fishuyo.seer.exampl
 
 echo $lib_dir
 
-declare -r app_classpath="$lib_dir/examples_2.10-0.1.jar:$lib_dir/seer-core_2.10-0.1.jar:$lib_dir/seer-desktop_2.10-0.1.jar:$lib_dir/seer-multitouch_2.10-0.1.jar:$lib_dir/gdx-backend-lwjgl-natives.jar:$lib_dir/gdx-backend-lwjgl-natives.jar.ol.jar:$lib_dir/gdx-backend-lwjgl.jar:$lib_dir/gdx-backend-lwjgl.jar.ol.jar:$lib_dir/gdx-natives.jar:$lib_dir/gdx-natives.jar.ol.jar:$lib_dir/gdx.jar:$lib_dir/gdx.jar.lessold.jar:$lib_dir/jtransforms-2.4.jar:$lib_dir/monido-core_2.10-0.1.2.jar:$lib_dir/GlulogicMT.jar:$lib_dir/org.scala-lang.scala-library-2.10.2.jar:$lib_dir/com.typesafe.akka.akka-actor_2.10-2.1.4.jar:$lib_dir/com.typesafe.config-1.0.0.jar:$lib_dir/org.scala-lang.scala-actors-2.10.2.jar:$lib_dir/de.sciss.scalaosc_2.10-1.1.2.jar:$lib_dir/de.sciss.scalaaudiofile_2.10-1.2.0.jar:$lib_dir/org.jruby.jruby-1.7.3.jar:$lib_dir/net.java.dev.jna.jna-3.5.2.jar:$lib_dir/com.scalarx.scalarx_2.10-0.2.3.jar:$lib_dir/com.github.rjeschke.jpa-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-macos-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-linux32-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-linux64-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-win32-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-win64-0.1-SNAPSHOT.jar:$lib_dir/org.scala-lang.scala-compiler-2.10.2.jar:$lib_dir/org.scala-lang.scala-reflect-2.10.2.jar:$lib_dir/org.scala-lang.jline-2.10.2.jar:$lib_dir/org.fusesource.jansi.jansi-1.4.jar"
+declare -r app_classpath="$lib_dir/*" #examples_2.10-0.1.jar:$lib_dir/seer-core_2.10-0.1.jar:$lib_dir/seer-desktop_2.10-0.1.jar:$lib_dir/seer-multitouch_2.10-0.1.jar:$lib_dir/gdx-backend-lwjgl-natives.jar:$lib_dir/gdx-backend-lwjgl-natives.jar.ol.jar:$lib_dir/gdx-backend-lwjgl.jar:$lib_dir/gdx-backend-lwjgl.jar.ol.jar:$lib_dir/gdx-natives.jar:$lib_dir/gdx-natives.jar.ol.jar:$lib_dir/gdx.jar:$lib_dir/gdx.jar.lessold.jar:$lib_dir/jtransforms-2.4.jar:$lib_dir/monido-core_2.10-0.1.2.jar:$lib_dir/GlulogicMT.jar:$lib_dir/org.scala-lang.scala-library-2.10.2.jar:$lib_dir/com.typesafe.akka.akka-actor_2.10-2.1.4.jar:$lib_dir/com.typesafe.config-1.0.0.jar:$lib_dir/org.scala-lang.scala-actors-2.10.2.jar:$lib_dir/de.sciss.scalaosc_2.10-1.1.2.jar:$lib_dir/de.sciss.scalaaudiofile_2.10-1.2.0.jar:$lib_dir/org.jruby.jruby-1.7.3.jar:$lib_dir/net.java.dev.jna.jna-3.5.2.jar:$lib_dir/com.scalarx.scalarx_2.10-0.2.3.jar:$lib_dir/com.github.rjeschke.jpa-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-macos-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-linux32-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-linux64-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-win32-0.1-SNAPSHOT.jar:$lib_dir/com.github.rjeschke.jpa-win64-0.1-SNAPSHOT.jar:$lib_dir/org.scala-lang.scala-compiler-2.10.2.jar:$lib_dir/org.scala-lang.scala-reflect-2.10.2.jar:$lib_dir/org.scala-lang.jline-2.10.2.jar:$lib_dir/org.fusesource.jansi.jansi-1.4.jar"
 
 declare -r java_cmd=$(get_java_cmd)
 

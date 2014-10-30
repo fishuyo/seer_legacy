@@ -25,22 +25,22 @@ object Shader {
 
   var bg = RGBA(0,0,0,1)
   var color = RGBA(1,1,1,1)
-  var alpha = 1.f
-  var fade = 0.f
+  var alpha = 1f
+  var fade = 0f
   var visible = true
   var wireframe = false
   var linewidth = 1
 
   var blend = false
 
-  var lightingMix = 1.f
+  var lightingMix = 1f
   var lightPosition = Vec3(1,1,1)
   var lightAmbient = RGBA(.2f,.2f,.2f,1)
   var lightDiffuse = RGBA(.6f,.6f,.6f,1)
   var lightSpecular = RGBA(.4f,.4f,.4f,1)
-  var shininess = 1.f
+  var shininess = 1f
 
-  var textureMix = 0.f
+  var textureMix = 0f
 
   var camera:NavCamera = Camera
 
@@ -50,7 +50,7 @@ object Shader {
   // def lighting_=(v:Float){ lighting = v }
 
   def alpha(f:Float) = {
-    if(f == 1.f) SceneGraph.root.depth = true
+    if(f == 1f) SceneGraph.root.depth = true
     else SceneGraph.root.depth = false
     Scene.alpha = f
   }
@@ -83,8 +83,8 @@ object Shader {
     
     material match {
       case m:ShaderMaterial => setBasicMaterial(m);
-      case m:SpecularMaterial => setBasicMaterial(m); //lightingMix=1.f; shininess = m.shininess
-      case m:DiffuseMaterial => setBasicMaterial(m); //lightingMix=1.f; shininess = 0.f
+      case m:SpecularMaterial => setBasicMaterial(m); //lightingMix=1f; shininess = m.shininess
+      case m:DiffuseMaterial => setBasicMaterial(m); //lightingMix=1f; shininess = 0f
       case m:NoMaterial => setMaterial(defaultMaterial)
       case m:BasicMaterial => setBasicMaterial(m)
       case _ => () //setMaterial(defaultMaterial)

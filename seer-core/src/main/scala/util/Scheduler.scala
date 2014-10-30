@@ -60,7 +60,7 @@ object Schedule {
 				t += (speed * dt.toDouble).seconds
 				if(t > duration){
 					cancel()
-					f(1.f)
+					f(1f)
 				} else {
 					percent = t/duration
 					f(percent)
@@ -78,7 +78,7 @@ object Schedule {
 		// 			if(deadline.isOverdue){
 		// 				Scene.remove(this)
 		// 				cancelled = true
-		// 				f(1.f)
+		// 				f(1f)
 		// 			} else f(t/len)
 		// 		}
 		// 	}

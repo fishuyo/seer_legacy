@@ -8,14 +8,14 @@ import spatial.Vec3
 import scala.collection.mutable.ArrayBuffer
 
 
-class SpringMesh(val mesh:MeshLike, val stiff:Float, val tear:Float = 0.f) extends Animatable {
+class SpringMesh(val mesh:MeshLike, val stiff:Float, val tear:Float = 0f) extends Animatable {
 
 	var timeStep = .015f
-  var damping = 20.f 
+  var damping = 20f 
   var particles = ArrayBuffer[Particle]()
   var springs = ArrayBuffer[LinearSpringConstraint]()
   var pins = ArrayBuffer[AbsoluteConstraint]()
-  var xt = 0.f
+  var xt = 0f
 
   var updateNormals = true
 
@@ -96,7 +96,7 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float, val tear:Float = 0.f) exten
         p.applyGravity()
         p.applyDamping(damping)
         p.step() // timeStep
-        p.collideGround(-1.f, 0.999999f) 
+        p.collideGround(-1f, 0.999999f) 
       })
 
     }

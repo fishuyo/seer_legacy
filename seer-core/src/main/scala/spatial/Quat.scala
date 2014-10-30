@@ -17,12 +17,12 @@ object Quat {
   def apply(euler:Vec3) = new Quat(1,0,0,0).fromEuler(euler)
   def apply() = new Quat(1,0,0,0)
 
-  def up = this().fromEuler(-Pi/2.f,0.f,0.f)
-  def down = this().fromEuler(Pi/2.f,0.f,0.f)
-  def left = this().fromEuler(0.f,-Pi/2.f,0.f)
-  def right = this().fromEuler(0.f,Pi/2.f,0.f)
+  def up = this().fromEuler(-Pi/2f,0f,0f)
+  def down = this().fromEuler(Pi/2f,0f,0f)
+  def left = this().fromEuler(0f,-Pi/2f,0f)
+  def right = this().fromEuler(0f,Pi/2f,0f)
   def forward = this()
-  def back = this().fromEuler(0.f,Pi,0.f)
+  def back = this().fromEuler(0f,Pi,0f)
 }
 
 class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
@@ -106,7 +106,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
   // def toQuaternion() = new Quaternion(x,y,z,w)
 
   def slerp(q:Quat, d:Float): Quat = {
-    var (a,b) = (0.f,0.f)
+    var (a,b) = (0f,0f)
     var negb = false
     var dotprod = dot(q)
 
@@ -120,13 +120,13 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
 
     val ang = math.acos( dotprod )
     if( math.abs(ang) > Quat.eps ){
-      val sini = 1.f / math.sin(ang)
-      a = math.sin(ang * (1.-d))*sini
+      val sini = 1f / math.sin(ang)
+      a = math.sin(ang * (1.0 - d))*sini
       b = math.sin(ang*d)*sini
       if(negb) b = -b
     } else {
       a = d
-      b = 1.-d
+      b = 1.0 - d
     }
 
     val quat = Quat(a*w+b*q.w, a*x+b*q.x, a*y+b*q.y, a*z+b*q.z)
@@ -160,7 +160,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
     val q = Quat()
     
     val d = src dot dst
-    if (d >= 1.f) {
+    if (d >= 1f) {
       // vectors are the same
       return q;
     }
@@ -175,8 +175,8 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
       //axis.normalize();
       q.fromAxisAngle(math.Pi, axis);
     } else {
-      val s = math.sqrt((d+1.f)*2.f)
-      val invs = 1./s
+      val s = math.sqrt((d+1f)*2f)
+      val invs = 1.0/s
       val c = src cross dst
       q.x = c(0) * invs;
       q.y = c(1) * invs;
@@ -188,7 +188,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
 
   def pow(v:Float):Quat = {
     val m = mag()
-    if( m == 0.f) return Quat()
+    if( m == 0f) return Quat()
     val theta = math.acos(w / m)
     val imag = Vec3(x,y,z) / (m * math.sin(theta))
     imag *= math.sin(v*theta)

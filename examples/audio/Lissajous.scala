@@ -52,8 +52,8 @@ object Lissajous extends SeerApp with AudioSource {
 	io.Trackpad.bind((touch) => {
 		touch.count match{
 			case 1 =>
-				sin1.f = (440.f * (touch.pos.x-0.5))
-				sin2.f = (440.f * (touch.pos.y-0.5))
+				sin1f = (440f * (touch.pos.x-0.5))
+				sin2f = (440f * (touch.pos.y-0.5))
 			case _ => ()
 		}
 	})

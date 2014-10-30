@@ -47,11 +47,11 @@ class Var(var value:Float) extends Gen{
 
 class Osc(var f:Gen) extends Gen{
   var sr = Audio().sampleRate
-  var phase = 0.f
+  var phase = 0f
   // var dphase:Float = frequency / Audio().sampleRate
   def apply() = {
     phase += f() / sr
-    phase %= 1.f
+    phase %= 1f
     phase
   }
 
@@ -61,31 +61,31 @@ class Osc(var f:Gen) extends Gen{
 
 }
 
-class Sine(f:Float=440.f, var a:Float=1.f) extends Osc(f) {
+class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
   override def apply() = {
     super.apply()
     math.sin(phase * 2*math.Pi).toFloat * a
   }
 }
 
-class Tri(f:Float = 440.f, var a:Float = 1.f) extends Osc(f) {
+class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    (1.f - 4.f * math.abs((phase + 0.25f) % 1 - 0.5f)) * a
+    (1f - 4f * math.abs((phase + 0.25f) % 1 - 0.5f)) * a
   }
 }
 
-class Saw(f:Float = 440.f, var a:Float = 1.f) extends Osc(f) {
+class Saw(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    (((phase / 2.f + 0.25f) % 0.5f - 0.25f) * 4.f) * a
+    (((phase / 2f + 0.25f) % 0.5f - 0.25f) * 4f) * a
   }
 }
 
 
 // //class Val(var)
 
-// class KarplusStrong(f:Float=440.f, var blend:Float=.99f, var damping:Float=.5f) extends Osc(f,1.f){
+// class KarplusStrong(f:Float=440f, var blend:Float=.99f, var damping:Float=.5f) extends Osc(f,1f){
 //   /*val buf = Array[Float]()
 //   gen = ()=>{
 //     var valu = buf.shift();
@@ -102,11 +102,11 @@ class Saw(f:Float = 440.f, var a:Float = 1.f) extends Osc(f) {
 // }
 
 // object Scale {
-//   var root = 440.f
-//   var ratios = Array(1.f, 1.1f, 1.3f, 1.67f, 1.8f)
+//   var root = 440f
+//   var ratios = Array(1f, 1.1f, 1.3f, 1.67f, 1.8f)
 //   def note( idx: Int) : Float = {
 //     var i = idx % ratios.length
-//     var s = idx.toFloat / ratios.length + 1.f
+//     var s = idx.toFloat / ratios.length + 1f
 //     root * ratios(i)*s
 //   }
 // }

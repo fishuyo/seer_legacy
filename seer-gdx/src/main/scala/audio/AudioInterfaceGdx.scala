@@ -108,7 +108,7 @@ class GdxAudioActor extends Actor {
 
       // zero output buffers
       for( c <- (0 until channelsOut); i <- (0 until bufferSize))
-        out(c)(i) = 0.f
+        out(c)(i) = 0f
 
       // call audio callbacks
       ioBuffer.reset

@@ -88,7 +88,7 @@
 
 //     if (points > 0) {
 //     	for (i <- 1 until histogram.length)
-//     		histogram(i) = (256 * (1.0f - (histogram(i) / (1.f*points))));
+//     		histogram(i) = (256 * (1.0f - (histogram(i) / (1f*points))));
 //     }
 //     histogram
 //   }

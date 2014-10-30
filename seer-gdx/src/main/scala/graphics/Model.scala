@@ -107,7 +107,15 @@ class Model extends Drawable { // with geometry.Pickable {
     this
   }
 
-  override def draw(){
+  def updateWorldTransform(){
+    MatrixStack.push()
+    MatrixStack.transform(pose,scale)
+    worldTransform.set(MatrixStack.model)
+    children.foreach( _.updateWorldTransform() )
+    MatrixStack.pop()
+  }
+
+    override def draw(){
     MatrixStack.push()
 
     MatrixStack.transform(pose,scale)
@@ -134,6 +142,43 @@ class Model extends Drawable { // with geometry.Pickable {
     MatrixStack.pop()
   }
 
+  def makeLineMesh(r:Float, npoints:Int) = {
+    val m = Mesh()
+    m.primitive = LineStrip //TriangleStrip
+    this.foreach( (mdl) => {
+      val v = new Vector3()
+      mdl.worldTransform.getTranslation(v)
+      m.vertices += Vec3(v.x,v.y,v.z)
+    })
+    m
+  }
+
+  def makeMesh(mesh:Mesh, r:Float, npoints:Int):Mesh = {
+    var m = mesh
+    if(m == null) m = Mesh()
+    m.primitive = TriangleStrip
+    children.foreach( (child) => {
+      val v = new Vector3()
+      this.worldTransform.getTranslation(v)
+      val p = Vec3(v.x,v.y,v.z)
+      child.worldTransform.getTranslation(v)
+      val pc = Vec3(v.x,v.y,v.z)
+
+      for( i <- 0 to npoints){
+        val phase = i.toFloat / npoints * 2 * Pi
+        val x = r*math.cos(phase)
+        val y = r*math.sin(phase)
+        val off1 = pose.ur()*x*scale.x + pose.uu()*y*scale.y
+        val off2 = child.pose.ur()*x*child.scale.x + child.pose.uu()*y*child.scale.y
+        m.vertices += p + off1
+        m.normals += off1.normalized
+        m.vertices += pc + off2
+        m.normals += off2.normalized
+      }
+      child.makeMesh(m,r,npoints)
+    })
+    m
+  }
 
   // override def intersect(ray:Ray):Option[geometry.Hit] = {
     

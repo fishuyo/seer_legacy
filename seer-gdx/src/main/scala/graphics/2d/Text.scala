@@ -19,7 +19,7 @@ object Text {
 
 	var texture:GdxTexture = null
 	var font:BitmapFont = null
-	var smoothing = 1.f/16.f
+	var smoothing = 1f/16f
 	var sb:SpriteBatch = null
 
 	def setSmoothing(v:Float){ smoothing = v }

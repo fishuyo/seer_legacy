@@ -55,7 +55,7 @@ class BlobTracker {
 					blobs += blob
 
 					Imgproc.drawContours(mask, contours, i, new Scalar(255), -1);
-					// val i = blobs.indexWhere( (_.pos - blob.pos).magSq < 5.f )
+					// val i = blobs.indexWhere( (_.pos - blob.pos).magSq < 5f )
 					// if( i > -1){
 
 					// } else{
@@ -75,7 +75,7 @@ class BlobTracker {
 						val y3 = -sina*w - cosa*h + y
 						val x4 = -cosa*w - sina*h + x
 						val y4 = -sina*w + cosa*h + y
-						pix.setColor(0.f,1.f,0.f,1.f)
+						pix.setColor(0f,1f,0f,1f)
 						// pix.drawRectangle((x-w).toInt,(y-h).toInt,(2*w).toInt,(2*h).toInt)
 						pix.drawLine(x1.toInt,y1.toInt,x2.toInt,y2.toInt)
 						pix.drawLine(x2.toInt,y2.toInt,x3.toInt,y3.toInt)

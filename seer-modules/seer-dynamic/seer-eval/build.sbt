@@ -1,2 +1,2 @@
 
-libraryDependencies += "com.twitter" %% "util-eval" % "6.12.1"
+libraryDependencies += "com.twitter" % "util-eval_2.10" % "6.12.1"

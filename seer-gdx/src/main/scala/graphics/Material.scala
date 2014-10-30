@@ -47,8 +47,8 @@ class BasicMaterial extends Material {
 	var texture = None:Option[GdxTexture]
 	var normalMap = None:Option[GdxTexture]
 	var specularMap = None:Option[GdxTexture]
-	var textureMix = 0.f
-	var lightingMix = 0.f
+	var textureMix = 0f
+	var lightingMix = 0f
 	var shininess = 0
 
 	def loadTexture(path:String){
@@ -56,7 +56,7 @@ class BasicMaterial extends Material {
 	}
 	def loadTexture(t:GdxTexture){
 		texture = Some(t)
-		textureMix = 1.f
+		textureMix = 1f
 	}
 }
 
@@ -64,7 +64,7 @@ class NoMaterial extends BasicMaterial
 
 // class DiffuseMaterial extends BasicMaterial with Diffuse
 class DiffuseMaterial extends BasicMaterial{
-	lightingMix = 1.f
+	lightingMix = 1f
 }
 // class SpecularMaterial extends BasicMaterial with Specular
 

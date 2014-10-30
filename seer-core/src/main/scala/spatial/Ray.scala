@@ -43,7 +43,7 @@ class Ray( val o: Vec3, val d: Vec3 ){
     if( dn == 0) return None
 
     val t = -(( o - vertices._1 ) dot n ) / dn
-    if( t < 0.f) return None
+    if( t < 0f) return None
     val x = this(t)
 
     if( (((vertices._2 - vertices._1) cross ( x - vertices._1 )) dot n) < 0 ||
@@ -60,11 +60,11 @@ class Ray( val o: Vec3, val d: Vec3 ){
 
 //Intersection with Geometry
 
-// 1. Geometry.intersect( ray )
+// 1.0 Geometry.intersect( ray )
 
-// 2. intersect( Geometry, ray )
+// 2.0 intersect( Geometry, ray )
 
-// 3. ray.intersect( Geometry )
+// 3.0 ray.intersect( Geometry )
 
 
 // val ray = Camera.ray(x,y)

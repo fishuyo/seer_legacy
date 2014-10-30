@@ -23,7 +23,7 @@ trait AudioInterface {
   var channelsIn = 1
   var channelsOut = 2
 
-  var gain = 1.f
+  var gain = 1f
 
   var playThru = false
   var recordThru = true

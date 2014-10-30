@@ -3,7 +3,7 @@ package com.fishuyo.seer
 package spatial
 
 
-class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1.f)  extends AABB(c,halfsize) {
+class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1f)  extends AABB(c,halfsize) {
 
   var data = new Array[Vec3](n*n*n) 
   val dn = (2*halfsize)/n

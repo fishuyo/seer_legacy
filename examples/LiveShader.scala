@@ -31,8 +31,8 @@ object LiveShader extends SeerApp {
 	var shader:Shader = _
 
 	// to use as uniforms
-	var t = 0.f 
-	var zoom = 1.f 
+	var t = 0f 
+	var zoom = 1f 
 	var mouse = Vec2()
 
 	override def init(){

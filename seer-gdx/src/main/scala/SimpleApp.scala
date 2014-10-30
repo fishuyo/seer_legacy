@@ -20,7 +20,7 @@ object Window {
   def height = Gdx.graphics.getHeight()
   var w0 = 800
   var h0 = 800
-  var a0 = 1.f
+  var a0 = 1f
 }
 
 object FPS {
@@ -35,7 +35,7 @@ class SeerAppListener extends ApplicationListener {
   var aspect = Window.a0
 
   var scene = Scene
-  var camera = Camera //new PerspectiveCamera(67.f, SimpleAppSize.aspect, 1.f)
+  var camera = Camera //new PerspectiveCamera(67f, SimpleAppSize.aspect, 1f)
   var input = Inputs //new InputMultiplexer
   var navInput = new KeyboardNavInput(Camera.nav)
   // var audio = Audio
@@ -44,15 +44,16 @@ class SeerAppListener extends ApplicationListener {
   // val fps = new FPSLogger
   // var logfps = false
 
-  var dtAccum = 0.f
+  var dtAccum = 0f
   var paused = false
 
   def create(){
+    println("App create.")
 
     Gdx.input.setInputProcessor( input )
     input.addProcessor( navInput )
 
-    camera.nav.pos.z = 2.f
+    camera.nav.pos.z = 2f
 
     Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
     Shader.load("texture", DefaultShaders.texture._1, DefaultShaders.texture._2)
@@ -71,7 +72,7 @@ class SeerAppListener extends ApplicationListener {
     if(paused) return
     
     // if( logfps ) fps.log
-    val timeStep = 1.f/60.f
+    val timeStep = 1f/60f
     dtAccum += Gdx.graphics.getDeltaTime()
     while( dtAccum > timeStep ){
       SceneGraph.animate(timeStep)
@@ -104,22 +105,29 @@ class SeerAppListener extends ApplicationListener {
   }
 
   def resize(width: Int, height:Int){
+    println(s"App resize: $width $height")
+    Gdx.gl.glViewport(0, 0, width, height)
+
+
     SceneGraph.resize(Viewport(width,height))
     this.width = width
     this.height = height
-    aspect = width * 1.f / height
+    aspect = width * 1f / height
     // camera.viewportWidth = aspect
   }
   def pause(){
+    println("App pause.")
+
     //audio ! Stop
     // paused = true
   }
   def resume(){
+    println("App resume.")
     //audio ! Play
     // paused = false
   }
   def dispose(){
-    println("Dispose called.")
+    println("App dispose.")
     // audio.stop
     Thread.sleep(100)
     Gdx.app.exit

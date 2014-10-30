@@ -15,12 +15,12 @@ object Shapes extends SeerApp {
 	shapes.zipWithIndex.foreach { case (model,idx) =>
 
 		model.material = Material.specular
-		model.material.color = HSV(idx.toFloat/shapes.length, 1.f, 1.f)
+		model.material.color = HSV(idx.toFloat/shapes.length, 1f, 1f)
 
-		val r = 3.f
+		val r = 3f
 		val ang = 2*Pi / shapes.length * idx
 
-		model.translate( r * math.cos(ang), r * math.sin(ang), -4.f)
+		model.translate( r * math.cos(ang), r * math.sin(ang), -4f)
 	}
 
 	override def draw(){
@@ -30,7 +30,7 @@ object Shapes extends SeerApp {
 
 	override def animate(dt:Float){
 		// rotate each shape
-		shapes.foreach( _.rotate(1/3.f*dt, 1/3.f*dt, 0))
+		shapes.foreach( _.rotate(1/3f*dt, 1/3f*dt, 0))
 	}
 
 }

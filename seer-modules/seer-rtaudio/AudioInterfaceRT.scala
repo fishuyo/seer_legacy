@@ -32,7 +32,7 @@ object RtAudio extends AudioInterface {
 
     // zero output buffers
     for( c <- (0 until channelsOut))
-      java.util.Arrays.fill(out(c), 0.f)
+      java.util.Arrays.fill(out(c), 0f)
 
     // call audio callbacks
     ioBuffer.reset
@@ -65,7 +65,7 @@ object RtAudio extends AudioInterface {
 
   // def callback(outputBuffer:Array[Float], inputBuffer:Array[Float], nBufferFrames:Int, streamTime:Double, status:Int){
   // for(int i=0;i<nBufferFrames;i++){
-  // outputBuffer[i] = 0.f;
+  // outputBuffer[i] = 0f;
   // for(float period: oscillators)
   // outputBuffer[i] += mysin((i+counter)*period);
   // outputBuffer[i] /= oscillators.length;

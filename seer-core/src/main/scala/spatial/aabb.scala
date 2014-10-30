@@ -23,7 +23,7 @@ class AABB( var a:Vec3, var b:Vec3 ) {
     true
   }
   def intersectsSphere( c: Vec3, r: Float ):Boolean = {
-    var dx = 0.f; var dy = 0.f; var dz = 0.f; var d = 0.f;
+    var dx = 0f; var dy = 0f; var dz = 0f; var d = 0f;
     if( c.x < a.x ) dx = c.x - a.x
     else if( c.x > b.x ) dx = c.x - b.x
     if( c.y < a.y ) dy = c.y - a.y

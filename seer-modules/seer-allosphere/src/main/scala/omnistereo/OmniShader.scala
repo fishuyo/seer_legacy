@@ -52,7 +52,7 @@ object OmniShader {
 			// convert into screen-space:
 			// simplified perspective projection since fovy = 90 and aspect = 1
 			vertex.zw = vec2(
-				(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),
+				(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.0)/(omni_near-omni_far),
 				-vertex.z
 			);
 			return vertex;
@@ -69,7 +69,7 @@ object OmniShader {
 			// pass through the texture coordinate (normalized pixel):
 			// T = vec2(gl_MultiTexCoord0);
 			T = vec2(a_texCoord0);
-			gl_Position = vec4(T*2.-1., 0, 1);
+			gl_Position = vec4(T*2.-1.0, 0, 1);
 		}
 	"""
 
@@ -89,7 +89,7 @@ object OmniShader {
 			TT.y = 1.0 - T.y;
 			vec3 rgb = textureCube(cubeMap, v).rgb * texture2D(alphaMap, TT).rgb;
 
-			gl_FragColor = vec4(rgb, 1.);
+			gl_FragColor = vec4(rgb, 1.0);
 		}
 	"""
 
@@ -131,12 +131,12 @@ object OmniShader {
 			// derive new texture coordinates from polar direction:
 			float elevation = acos(-rd.y) * one_over_pi;
 			float azimuth = atan(-rd.x, -rd.z) * one_over_pi;
-			azimuth = (1. - azimuth)*0.5;	// scale from -1,1 to 1,0
+			azimuth = (1.0 - azimuth)*0.5;	// scale from -1,1 to 1,0
 			vec2 sphereT = vec2(azimuth, elevation);
 
 			// read maps:
 			vec3 rgb = texture2D(sphereMap, sphereT).rgb * texture2D(alphaMap, T).rgb;
-			gl_FragColor = vec4(rgb, 1.);
+			gl_FragColor = vec4(rgb, 1.0);
 		}
 	"""
 
@@ -147,11 +147,11 @@ object OmniShader {
 		void main (void){
 			vec3 v = texture2D(pixelMap, T).rgb;
 			v = normalize(v);
-			v = mod(v * 8., 1.);
+			v = mod(v * 8.0, 1.0);
 			vec2 TT = T;
 			TT.y = 1.0 - T.y;
 			v *= texture2D(alphaMap, TT).rgb;
-			gl_FragColor = vec4(v, 1.);
+			gl_FragColor = vec4(v, 1.0);
 		}
 	"""
 
@@ -200,7 +200,7 @@ object OmniShader {
 
 		// shadow ray:
 		float shadow( in vec3 ro, in vec3 rd, float mint, float maxt, float mindt, float k ) {
-			float res = 1.;
+			float res = 1.0;
 			for( float t=mint; t < maxt; ) {
 				float h = map(ro + rd*t);
 				// keep looking:
@@ -243,7 +243,7 @@ object OmniShader {
 			// initial eye-ray to find object intersection:
 			float mindt = 0.01;	// how close to a surface we can get
 			float mint = mindt;
-			float maxt = 50.;
+			float maxt = 50.0;
 			float t=mint;
 			float h = maxt;
 
@@ -280,11 +280,11 @@ object OmniShader {
 				vec3 ldir2 = normalize(light2 - p);
 
 				// abs for bidirectional surfaces
-				float ln1 = max(0.,dot(ldir1, normal));
-				float ln2 = max(0.,dot(ldir2, normal));
+				float ln1 = max(0.0,dot(ldir1, normal));
+				float ln2 = max(0.0,dot(ldir2, normal));
 
 				// shadow penumbra coefficient:
-				float k = 16.;
+				float k = 16.0;
 
 				// check for shadow:
 				float smint = 0.001;
@@ -303,24 +303,24 @@ object OmniShader {
 				/*
 				// Ambient Occlusion:
 				// sample 5 neighbors in direction of normal
-				float ao = 0.;
+				float ao = 0.0;
 				float dao = 0.001; // delta between AO samples
 				float aok = 2.0;
-				float weight = 1.;
+				float weight = 1.0;
 				for (int i=0; i<5; i++) {
 					float dist = float(i)*dao;
 					float factor = dist - map(p + normal*dist);
 					ao += weight * factor;
 					weight *= 0.6;	// decreasing importance
 				}
-				ao = 1. - aok * ao;
+				ao = 1.0 - aok * ao;
 				color *= ao;
 				*/
 
 
 				// fog:
 				float tnorm = t/maxt;
-				float fog = 1. - tnorm*tnorm;
+				float fog = 1.0 - tnorm*tnorm;
 				//color *= fog;
 			}
 

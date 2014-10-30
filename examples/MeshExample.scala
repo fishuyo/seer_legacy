@@ -8,7 +8,7 @@ import util.Random
 
 object MeshExample extends SeerApp {
 
-	var t = 0.f 
+	var t = 0f 
 
 	// make a new mesh and set render primitive to use GL_TRIANGLEs
 	val mesh = Mesh()
@@ -50,7 +50,7 @@ object MeshExample extends SeerApp {
 		// generate new random mesh ever 2.5 seconds
 		if( t > 2.5f){
 			generateMesh(mesh)
-			t = 0.f
+			t = 0f
 		}
 	}
 

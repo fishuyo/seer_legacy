@@ -28,7 +28,7 @@ var ray = Camera.ray(0,0)
 
 object SimulatorScript extends SeerScript{
   
-  var t = 0.f
+  var t = 0f
 
   val controllerStateListener:ActorRef = system.actorOf(Props( new ControllerListener()), name = "controllerlistener")
 
@@ -45,7 +45,7 @@ object SimulatorScript extends SeerScript{
   mesh.vertices.foreach{ case v => v.set(v.x,v.y+math.sin(v.x*v.z)*0.1,v.z) }
   val fabricVertices0 = mesh.vertices.clone
 
-  val fabric = new SpringMesh(mesh,1.f)
+  val fabric = new SpringMesh(mesh,1f)
   fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
   fabric.pins += AbsoluteConstraint(fabric.particles(n), fabric.particles(n).position)
   // fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
@@ -68,7 +68,7 @@ object SimulatorScript extends SeerScript{
       fabric.particles.foreach( (p) => {
         val hit = ray.intersectSphere(p.position, 0.25f)
         if(hit.isDefined){
-          p.applyForce(Vec3(vel.x,vel.y,0)*150.f)
+          p.applyForce(Vec3(vel.x,vel.y,0)*150f)
           // cursor.pose.pos.set(ray(hit.get))
         }
       })

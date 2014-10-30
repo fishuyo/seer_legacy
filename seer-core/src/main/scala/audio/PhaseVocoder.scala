@@ -14,9 +14,9 @@ import edu.emory.mathcs.jtransforms.fft._
 
 object FFT {
 	var length = 2048
-	var rect = Array.fill(length)(1.f)
-	var hann = Array.fill(length)(0.f)
-	for(i<-(0 until length)) hann(i) = 0.5f*(1.f-math.cos(2.0*math.Pi*i/(length-1.0)))
+	var rect = Array.fill(length)(1f)
+	var hann = Array.fill(length)(0f)
+	for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)))
 
 	var window = hann
 
@@ -25,9 +25,9 @@ object FFT {
 	def resize(size:Int){
 		length = size
 		fft = new FloatFFT_1D(length)
-		rect = Array.fill(length)(1.f)
-		hann = Array.fill(length)(0.f)
-		for(i<-(0 until length)) hann(i) = 0.5f*(1.f-math.cos(2.0*math.Pi*i/(length-1.0)))
+		rect = Array.fill(length)(1f)
+		hann = Array.fill(length)(0f)
+		for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)))
 
 	}
 
@@ -41,7 +41,7 @@ object FFT {
 class PhaseVocoder extends AudioSource {
 
 	var length = FFT.length
-	var hopFactor = 1.f/4.f
+	var hopFactor = 1f/4f
 	var hopSize = (length*hopFactor).toInt
 	var numWindows = 0
 	var spectrumData:Array[Array[Float]] = null
@@ -50,10 +50,10 @@ class PhaseVocoder extends AudioSource {
 	var phaseAccum = new Array[Float](length/2+1)
 
 	var (minWin, maxWin) = (0,0)
-	var nextWindow = 0.f
-	var timeShift = 1.f
-	var pitchShift = 1.f
-	var gain = 1.f
+	var nextWindow = 0f
+	var timeShift = 1f
+	var pitchShift = 1f
+	var gain = 1f
 
 	var update = false
 
@@ -80,7 +80,7 @@ class PhaseVocoder extends AudioSource {
 
 		// use sliding window over sample data
 		spectrumData = samples.sliding(length,hopSize).map( s => {
-			val windowed = s.padTo(length,0.f) zip FFT.window map { case (a,b) => a*b } // apply window
+			val windowed = s.padTo(length,0f) zip FFT.window map { case (a,b) => a*b } // apply window
 			// val shiftedWin = Array.concat( windowed.takeRight(length/2), windowed.take(length/2)) // shift window
 			FFT.forward(windowed) // do fft in place
 			prevPhase = new Array[Float](length/2+1) // new empty phase buffer
@@ -97,25 +97,25 @@ class PhaseVocoder extends AudioSource {
 	def convertMagPhase(win:Array[Float]):Array[Float] = {
 
 		// if(!convert) return win
-		var (phase, phaseDiff) = (0.f,0.f)
+		var (phase, phaseDiff) = (0f,0f)
 		var expPhaseDiff = 2.0*math.Pi*hopFactor
-		var freqPerBin = 44100.f / length
+		var freqPerBin = 44100f / length
 
 		val out = new Array[Float](length+2)
 
 		//BERNSEE METHOD
 		for(i <-(0 to length/2)){		//Go from 0 to N/2 because fftw places (N/2)+1 complex values in spectral array using r2c fft
 
-			var (re,im) = (0.f,0.f)
+			var (re,im) = (0f,0f)
 			if(i == 0){  
 				re = win(0)
-				im = 0.f
+				im = 0f
 			} else if( i < length/2){
 				re = win(2*i)
 				im = win(2*i+1)
 			} else {
 				re = win(1)
-				im = 0.f
+				im = 0f
 			}
 
 			//compute magnitude from real and imaginary components
@@ -153,9 +153,9 @@ class PhaseVocoder extends AudioSource {
 	def unconvertMagPhase(win:Array[Float]):Array[Float] = {
 
 		// if(!convert) return win
-		var (phase, phaseDiff) = (0.f,0.f)
+		var (phase, phaseDiff) = (0f,0f)
 		var expPhaseDiff = 2.0*math.Pi*hopFactor
-		var freqPerBin = 44100.f / length
+		var freqPerBin = 44100f / length
 
 		val out = new Array[Float](length)
 
@@ -319,7 +319,7 @@ class PhaseVocoder extends AudioSource {
 // 	val model = Plane()
 // 	model.scale.set(0.25)
 // 	model.material = new BasicMaterial()
-// 	model.material.textureMix = 1.f
+// 	model.material.textureMix = 1f
 
 // 	def setData(data:Array[Array[Float]], complex:Boolean=false){
 // 		numWin = data.length
@@ -331,9 +331,9 @@ class PhaseVocoder extends AudioSource {
 // 		for( x <- (0 until numWin); y <- (0 until numBins)){
 // 			val (re,im) = (data(x)(2*y),data(x)(2*y+1)) // re/im or mag/phase
 // 			val mag = (if(complex) math.sqrt(re*re+im*im) else re)
-// 			val c = math.max(1.0 - mag,0.f)
-// 			// val c = clamp(1.f-(10*math.log10(mag)),0.f,1.f)
-// 			// val f = math.min((im / 22050.f * numBins),numBins-1)
+// 			val c = math.max(1.0 - mag,0f)
+// 			// val c = clamp(1f-(10*math.log10(mag)),0f,1f)
+// 			// val f = math.min((im / 22050f * numBins),numBins-1)
 // 			pix.setColor(c,c,c,c)
 // 			if(complex) pix.drawPixel(x,y) //f.toInt)
 // 			else pix.drawPixel(x,y) //f.toInt)

@@ -14,10 +14,10 @@ import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 /* 
 * Plot stream of size data points scaled by range
 */
-class Plot2D( var size:Int, var range:Float=1.f) extends Drawable {
-  var color = Vec3(1.f)
+class Plot2D( var size:Int, var range:Float=1f) extends Drawable {
+  var color = Vec3(1f)
   var pose = Pose()
-  var scale = Vec3(1.f)
+  var scale = Vec3(1f)
   val mesh = new GdxMesh(false,size,0, VertexAttribute.Position)
   var data = Queue[Float]()
   data.enqueue(new Array[Float](size):_*)
@@ -30,7 +30,7 @@ class Plot2D( var size:Int, var range:Float=1.f) extends Drawable {
     for( i<-(0 until size)){
       vertices(3*i) = (i - size/2) / size.toFloat
       vertices(3*i+1) = data(i) / range
-      vertices(3*i+2) = 0.f
+      vertices(3*i+2) = 0f
     }
     dirty = true
   }
@@ -40,8 +40,8 @@ class Plot2D( var size:Int, var range:Float=1.f) extends Drawable {
       mesh.setVertices( vertices )
       dirty = false
     }
-    Shader.setColor(RGBA(color,1.f))
-    val s = scale / 2.f
+    Shader.setColor(RGBA(color,1f))
+    val s = scale / 2f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
     Shader.setMatrices()
@@ -82,8 +82,8 @@ class AudioDisplay(val size:Int) extends Drawable {
       val si2 = if( si >= right) left else si + 1
       val f = s-si
       vertices(3*i) = (i - size/2) / size.toFloat
-      vertices(3*i+1) = samples(si)*(1.f-f) + samples(si2)*f
-      vertices(3*i+2) = 0.f
+      vertices(3*i+1) = samples(si)*(1f-f) + samples(si2)*f
+      vertices(3*i+2) = 0f
     }
     primitive = GL20.GL_LINE_STRIP
     renderSize = size
@@ -100,14 +100,14 @@ class AudioDisplay(val size:Int) extends Drawable {
     //   val si2 = if( si >= right) left else si + 1
     //   val f = s-si
     //   vertices(3*i) = (i - size/2) / size.toFloat
-    //   vertices(3*i+1) = samples(si)*(1.f-f) + samples(si2)*f
-    //   vertices(3*i+2) = 0.f
+    //   vertices(3*i+1) = samples(si)*(1f-f) + samples(si2)*f
+    //   vertices(3*i+2) = 0f
     // }
 
     var sp = 0.0f
     var s1 = left
-    var max = -1.f
-    var min = 1.f
+    var max = -1f
+    var min = 1f
     for( i<-(0 until size)){
       val s = (i+1) / (size).toFloat * (right-left) + left
       val s2 = s.toInt
@@ -117,13 +117,13 @@ class AudioDisplay(val size:Int) extends Drawable {
         val off1 = sp - s1
         val off2 = s - s2
         try{
-        max = samples(s1)*(1.f-off1) + samples(s1+1) * off1
-        min = samples(s2)*(1.f-off2) + samples(s2+1) * off2
+        max = samples(s1)*(1f-off1) + samples(s1+1) * off1
+        min = samples(s2)*(1f-off2) + samples(s2+1) * off2
         } catch { case e:Exception => println(e) }
         offx = 1
       }else{
-        max = -1.f
-        min = 1.f
+        max = -1f
+        min = 1f
       
         for( j <- (s1 until s2)){
           val f = samples(j)
@@ -136,10 +136,10 @@ class AudioDisplay(val size:Int) extends Drawable {
 
       vertices(6*i) = (i - size/2) / size.toFloat
       vertices(6*i+1) = max
-      vertices(6*i+2) = 0.f
+      vertices(6*i+2) = 0f
       vertices(6*i+3) = (i + offx - size/2) / size.toFloat
       vertices(6*i+4) = min
-      vertices(6*i+5) = 0.f
+      vertices(6*i+5) = 0f
     }
     primitive = GL20.GL_LINES
     renderSize = size*2
@@ -166,9 +166,9 @@ class AudioDisplay(val size:Int) extends Drawable {
       cursorMesh.setVertices( cursorVert)
       cursorDirty = false
     }
-    Shader.textureMix = 0.f
+    Shader.textureMix = 0f
     Shader.setColor(color)
-    val s = scale / 2.f
+    val s = scale / 2f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
     Shader.setMatrices()

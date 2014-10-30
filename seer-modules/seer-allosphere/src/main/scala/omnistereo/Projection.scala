@@ -33,10 +33,10 @@ import javax.imageio.ImageIO
 /// Encapsulate the trio of fractional viewport, warp & blend maps:
 class Projection {
 	class Parameters {
-		var projnum = 0.f			// ID of the projector
-		var (width, height) = (0.f,0.f)	// width/height in pixels
+		var projnum = 0f			// ID of the projector
+		var (width, height) = (0f,0f)	// width/height in pixels
 		var (projector_position, screen_center, normal_unit, x_vec, y_vec) = (Vec3(),Vec3(),Vec3(),Vec3(),Vec3())
-		var (screen_radius, bridge_radius, unused0) = (0.f,0.f,0.f)
+		var (screen_radius, bridge_radius, unused0) = (0f,0f,0f)
 
 		def fromList(l:List[Float]){
 			projnum = l(0)
@@ -81,7 +81,7 @@ class Projection {
 
 	// derived:
 	var (x_unit, y_unit) = (Vec3(),Vec3())
-	var (x_pixel, y_pixel, x_offset, y_offset) = (0.f,0.f,0.f,0.f)
+	var (x_pixel, y_pixel, x_offset, y_offset) = (0f,0f,0f,0f)
 	var position = Vec3() //Vec3d
 
 	// TODO: remove this
@@ -279,7 +279,7 @@ class Projection {
 			val idx = y1*w+x
 
 	    // mWarp.data.position(4*idx)
-	    mWarp.data.put( Array(t(idx),u(idx),v(idx),1.f)) //,0, 4)
+	    mWarp.data.put( Array(t(idx),u(idx),v(idx),1f)) //,0, 4)
 
 		}
 

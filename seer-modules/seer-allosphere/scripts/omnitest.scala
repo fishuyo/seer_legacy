@@ -35,7 +35,7 @@ object Script extends SeerScript {
   val c = Cube()
   val nc = 1
   val cubes = for(z <- -nc to nc; y <- -nc to nc; x <- -nc to nc) yield {
-    val c = Cube().translate(Vec3(x,y,z)*3.f)
+    val c = Cube().translate(Vec3(x,y,z)*3f)
     c.material = Material.specular
     c.material.color = RGB(1,0,1)
     c
@@ -51,7 +51,7 @@ object Script extends SeerScript {
   mesh.vertices.foreach{ case v => v.set(v.x,v.y+math.sin(v.x*v.z)*0.1,v.z) }
   val fabricVertices0 = mesh.vertices.clone
 
-  val fabric = new SpringMesh(mesh,1.f)
+  val fabric = new SpringMesh(mesh,1f)
   fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
   fabric.pins += AbsoluteConstraint(fabric.particles(n), fabric.particles(n).position)
   // fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
@@ -60,8 +60,8 @@ object Script extends SeerScript {
 
   mesh.primitive = Triangles
 
-  var t = 0.f
-  var scale = 1.f
+  var t = 0f
+  var scale = 1f
 
 	val cursor = Sphere().scale(0.05)
 	var lpos = Vec2()
@@ -107,13 +107,13 @@ object Script extends SeerScript {
   	if( Mouse.status() == "drag"){
 			vel = (Mouse.xy() - lpos)/dt
 			// println(vel)
-			// s.applyForce( Vec3(vel.x,vel.y,0)*10.f)
-			val r = Camera.ray(Mouse.x()*Window.width, (1.f-Mouse.y()) * Window.height)
+			// s.applyForce( Vec3(vel.x,vel.y,0)*10f)
+			val r = Camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
 			fabric.particles.foreach( (p) => {
 				val t = r.intersectSphere(p.position, 0.25f)
 				if(t.isDefined){
 					// val p = r(t.get)
-					p.applyForce(Vec3(vel.x,vel.y,0)*150.f)
+					p.applyForce(Vec3(vel.x,vel.y,0)*150f)
 					cursor.pose.pos.set(r(t.get))
 				}
 			})

@@ -24,8 +24,8 @@ object AudioSourceExample extends SeerApp {
   	override def audioIO( io ){ 
   		if(doClick){
   			// set the first sample of each channel to 1.0
-  			io.outputSamples(0)(0) = 1.f
-  			io.outputSamples(1)(0) = 1.f
+  			io.outputSamples(0)(0) = 1f
+  			io.outputSamples(1)(0) = 1f
   			doClick = false
   			time1 = System.nanoTime
   		}
@@ -42,7 +42,7 @@ object AudioSourceExample extends SeerApp {
 	io.Keyboard.bind(" ", ()=>{ 
 		// println("click"); doClick = true 
 		time2 = System.nanoTime
-		val dt = (time2-time1) / 1000000.f 
+		val dt = (time2-time1) / 1000000f 
 		println(s"latency(ms): $dt")
 	})
 

@@ -160,7 +160,7 @@ object S {
 
     void main(){
     	 	float hue = 0.7 * (1.0-(v_pos.y));
-        gl_FragColor = hsv_to_rgb(hue,1.,1.,0.8); //vec4(1,1,1,0.1);
+        gl_FragColor = hsv_to_rgb(hue,1.0,1.0,0.8); //vec4(1,1,1,0.1);
     }
   """
   val g = frag + """

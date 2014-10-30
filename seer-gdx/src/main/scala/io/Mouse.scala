@@ -26,13 +26,13 @@ object Mouse extends InputAdapter {
 	callbacks += ("move" -> List())
 	callbacks += ("scroll" -> List())
 
-	val x = Var(0.f)
-	val y = Var(0.f)
+	val x = Var(0f)
+	val y = Var(0f)
 	val xy = Var(Vec2())
 
 	val id = Var(0)
 	val button = Var(0)
-	val scroll = Var(0.f)
+	val scroll = Var(0f)
 	val status = Var("up")
 
 	def non()() = {}
@@ -43,8 +43,8 @@ object Mouse extends InputAdapter {
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
 	def update(sx:Int, sy:Int, stat:String){
-		x() = sx * 1.f / Window.width
-		y() = 1.f - (sy * 1.f / Window.height)
+		x() = sx * 1f / Window.width
+		y() = 1f - (sy * 1f / Window.height)
 		xy() = Vec2(x(),y())
 		status() = stat
 	}
@@ -154,7 +154,7 @@ object Touch extends InputAdapter {
   }
  	override def touchDown( sx:Int, sy:Int, pointer:Int, button:Int) = {
   	down(pointer) = true
-  	pos(pointer) = Vec3(sx,sy,0.f)
+  	pos(pointer) = Vec3(sx,sy,0f)
 
     val indices = down.zipWithIndex.collect{ case (true,i) => i }
     val p = indices.map( pos(_) )
