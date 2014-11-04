@@ -6,7 +6,7 @@ resolvers in ThisBuild ++= Seq(
 
 libraryDependencies ++= Seq(
 	"com.typesafe.akka" %% "akka-actor" % "2.3.4", //"2.4-SNAPSHOT",
-	"org.scala-lang" % "scala-actors" % "2.11.2",
+	//"org.scala-lang" % "scala-actors" % "2.11.2",
 	//"de.sciss" %% "scalaosc" % "1.1.+",
 	"de.sciss" %% "scalaaudiofile" % "1.4.3+", //"1.4.+",
   "de.sciss" %% "scalaosc" % "1.1.+",

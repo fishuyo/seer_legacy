@@ -58,7 +58,7 @@ object SeerBuild extends Build {
   lazy val seer_gdx_desktop_app = SeerProject (
     id = "seer-gdx-desktop-app",
     base = file("seer-gdx/seer-gdx-desktop-app")
-  ) dependsOn (seer_gdx, seer_repl, seer_script)
+  ) dependsOn (seer_gdx, seer_script)
 
 
 

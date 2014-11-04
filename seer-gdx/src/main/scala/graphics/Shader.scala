@@ -2,6 +2,7 @@ package com.fishuyo.seer
 package graphics
 
 import spatial._
+import actor._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
@@ -12,7 +13,8 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.files.FileHandle;
 
-import monido._
+// import monido._
+
 
 object Shader {
 
@@ -277,14 +279,8 @@ class Shader {
     if( vertFile.isEmpty || fragFile.isEmpty ) return
     val that = this;
     try{
-      FileMonido( vertFile.get.path() ){
-        case ModifiedOrCreated(f) => that.reload
-        case _ => None
-      }
-      FileMonido( fragFile.get.path() ){
-        case ModifiedOrCreated(f) => that.reload
-        case _ => None
-      }
+      Monitor( vertFile.get.path() ){ (p) => that.reload }
+      Monitor( fragFile.get.path() ){ (p) => that.reload }
     } catch { case e:Exception => println(e) }
   } 
 }

@@ -163,13 +163,17 @@ class Model extends Drawable { // with geometry.Pickable {
       val p = Vec3(v.x,v.y,v.z)
       child.worldTransform.getTranslation(v)
       val pc = Vec3(v.x,v.y,v.z)
+      this.worldTransform.getScale(v)
+      val s = Vec3(v.x,v.y,v.z)
+      child.worldTransform.getScale(v)
+      val sc = Vec3(v.x,v.y,v.z)
 
       for( i <- 0 to npoints){
         val phase = i.toFloat / npoints * 2 * Pi
         val x = r*math.cos(phase)
         val y = r*math.sin(phase)
-        val off1 = pose.ur()*x*scale.x + pose.uu()*y*scale.y
-        val off2 = child.pose.ur()*x*child.scale.x + child.pose.uu()*y*child.scale.y
+        val off1 = pose.ur()*x*s.x + pose.uf()*y*s.y
+        val off2 = child.pose.ur()*x*sc.x + child.pose.uu()*y*sc.y
         m.vertices += p + off1
         m.normals += off1.normalized
         m.vertices += pc + off2
