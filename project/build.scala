@@ -31,7 +31,7 @@ object BuildSettings {
        Seq("-cp",cpString)
     },
     connectInput in run := true,
-    cancelable := true,
+    cancelable in Global := true,
     outputStrategy := Some(StdoutOutput)
   )
 }

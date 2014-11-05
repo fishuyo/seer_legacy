@@ -2,6 +2,12 @@
 
 package com.fishuyo.seer
 
+import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
+import java.io.ObjectOutputStream
+import java.io.ObjectInputStream
+
+
 package object util{
 
 	def clamper[@specialized(Int, Double) T : Ordering](low: T, high: T)(value:T): T = {
@@ -48,5 +54,22 @@ package object util{
 		else if( v < l) v + h - l
 		else v 
 	}	
+
+	/**
+   * This method makes a "deep clone" of any Java object it is given.
+   */
+  def deepClone(obj:Object){
+   try {
+     val baos = new ByteArrayOutputStream();
+     val oos = new ObjectOutputStream(baos);
+     oos.writeObject(obj);
+     val bais = new ByteArrayInputStream(baos.toByteArray());
+     val ois = new ObjectInputStream(bais);
+     return ois.readObject();
+   }catch{ case e:Exception =>
+     e.printStackTrace();
+     return null;
+   }
+  }
 
 }

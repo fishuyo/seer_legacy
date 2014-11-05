@@ -142,7 +142,7 @@ class Model extends Drawable { // with geometry.Pickable {
     MatrixStack.pop()
   }
 
-  def makeLineMesh(r:Float, npoints:Int) = {
+  def makeLineMesh() = {
     val m = Mesh()
     m.primitive = LineStrip //TriangleStrip
     this.foreach( (mdl) => {

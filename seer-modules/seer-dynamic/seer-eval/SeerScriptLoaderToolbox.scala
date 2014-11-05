@@ -60,6 +60,7 @@ class SeerScriptLoader(val scriptPath:String) {
       val source = Source.fromFile(file)
       val tree = toolbox.parse(source.mkString)
       val newscript = toolbox.eval(tree).asInstanceOf[SeerScript]
+      // newscript.copy(script)
       unload
       script = newscript
       loaded = true
@@ -125,11 +126,14 @@ class SeerScriptLoader(val scriptPath:String) {
                        
 // }
 
-class SeerScript extends scala.Dynamic with Animatable with AudioSource {
+// TODO serialization to maintain state across compilations?
 
-  def selectDynamic(name:String){println(s"$name select")}
-  def applyDynamic(name:String)(args:Any*){println(s"$name called")}
+class SeerScript extends Animatable with AudioSource {
+// class SeerScript extends scala.Dynamic with Animatable with AudioSource {
 
+  // def selectDynamic(name:String){println(s"$name select")}
+  // def applyDynamic(name:String)(args:Any*){println(s"$name called")}
+  // def copy[T](from:T){}
   def onLoad(){}
   def onUnload(){}
   def preUnload(){}
