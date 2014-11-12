@@ -23,9 +23,13 @@ import de.sciss.osc.Message
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.actor._
+import akka.pattern.ask
 import akka.contrib.pattern.DistributedPubSubExtension
 import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
+
+import concurrent.Await
+import concurrent.duration._
 
 import ClusterSystem.{ system, system10g }
 // import ClusterSystem.{ test2 => system, test2_10g => system10g }
@@ -34,7 +38,7 @@ object Node extends OmniApp {
 
 	var sim = false
   var render = true
-	val loader = new SeerScriptTextLoader
+	val loader = ScriptLoader()
 
   var scriptListener:ActorRef = _
 	var clusterPublisher:ActorRef = _
@@ -52,7 +56,7 @@ object Node extends OmniApp {
 	if(sim) println( "I am the Simulator!")
 	else println( "I am a Renderer!")
 
-  loader.load("""
+  loader ! ScriptLoader.RunCode("""
     import com.fishuyo.seer._
     import graphics._
     import dynamic._
@@ -68,18 +72,22 @@ object Node extends OmniApp {
     ClusterScript
   """)
 
+  implicit val timeout = akka.util.Timeout(4.seconds)
+  var script = Await.result(loader ? "script", 10 seconds).asInstanceOf[Option[SeerScript]]
+
+
   override def onDrawOmni(){
     if(!render) return
     Shader("omni").begin
     omni.uniforms(omniShader);
 
-    if(loader.script != null) loader.script.draw()
+    script.foreach( _.draw() )
     
     Shader("omni").end
   }
 
   override def animate(dt:Float){
-    if(loader.script != null) loader.script.animate(dt)
+    script.foreach( _.animate(dt) )
   }
 }
 
@@ -99,7 +107,7 @@ class SimLoader extends Actor with ActorLogging {
   def ready: Actor.Receive = {
     case script: String =>
       println("Loading script..")
-      Node.loader.reload(script)
+      Node.loader ! ScriptLoader.Reload(script)
   }
 }
 
@@ -138,7 +146,7 @@ class NodeLoader extends Actor with ActorLogging {
   def ready: Actor.Receive = {
     case script: String =>
       println("Loading script..")
-      Node.loader.reload(script)
+      Node.loader ! ScriptLoader.Reload(script)
   }
 }
 

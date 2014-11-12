@@ -3,16 +3,9 @@ package com.fishuyo.seer
 package allosphere
 
 import graphics._
-import dynamic._
 import spatial._
-import spatial._
-import io._
 import util._
 
-import com.badlogic.gdx.utils.BufferUtils
-import com.badlogic.gdx.math.Matrix4
-
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 import com.badlogic.gdx.graphics.GL20
