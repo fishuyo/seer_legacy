@@ -40,12 +40,12 @@ class Plot2D( var size:Int, var range:Float=1f) extends Drawable {
       mesh.setVertices( vertices )
       dirty = false
     }
-    Shader.setColor(RGBA(color,1f))
+    Renderer().setColor(RGBA(color,1f))
     val s = scale / 2f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
-    Shader.setMatrices()
-    mesh.render(Shader(), GL20.GL_LINE_STRIP)
+    Renderer().setMatrices()
+    mesh.render(Renderer().shader(), GL20.GL_LINE_STRIP)
     MatrixStack.pop()
   }
 
@@ -166,15 +166,15 @@ class AudioDisplay(val size:Int) extends Drawable {
       cursorMesh.setVertices( cursorVert)
       cursorDirty = false
     }
-    Shader.textureMix = 0f
-    Shader.setColor(color)
+    Renderer().textureMix = 0f
+    Renderer().setColor(color)
     val s = scale / 2f
     MatrixStack.push()
     MatrixStack.transform(pose,s)
-    Shader.setMatrices()
-    mesh.render(Shader(), primitive, 0, renderSize)
-    Shader.setColor(cursorColor)
-    cursorMesh.render(Shader(), GL20.GL_LINES)
+    Renderer().setMatrices()
+    mesh.render(Renderer().shader(), primitive, 0, renderSize)
+    Renderer().setColor(cursorColor)
+    cursorMesh.render(Renderer().shader(), GL20.GL_LINES)
     MatrixStack.pop()
   }
 

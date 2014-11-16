@@ -362,21 +362,21 @@ class Cylinder extends Model {
 
 
 
-class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh, val drawFunc:()=>Unit) extends Drawable {
-  var color = RGBA(1,1,1,.6f)
-  override def draw(){
-    Shader.setColor(color)
-    val s = scale / 2f
+// class GLPrimitive(var pose:Pose=Pose(), var scale:Vec3=Vec3(1), var mesh:GdxMesh, val drawFunc:()=>Unit) extends Drawable {
+//   var color = RGBA(1,1,1,.6f)
+//   override def draw(){
+//     Shader.setColor(color)
+//     val s = scale / 2f
 
-    MatrixStack.push()
-    MatrixStack.transform(pose,s)
+//     MatrixStack.push()
+//     MatrixStack.transform(pose,s)
 
-    Shader.setMatrices()
-    drawFunc()
+//     Shader.setMatrices()
+//     drawFunc()
     
-    MatrixStack.pop()
-  }
-}
+//     MatrixStack.pop()
+//   }
+// }
 
 
 class Trace3D( var size:Int ) extends Drawable {

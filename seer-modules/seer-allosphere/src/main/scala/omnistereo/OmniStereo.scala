@@ -320,21 +320,21 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 
 	def onCreate() {
 
-		mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
+		mCubeProgram = Shader.load(OmniShader.vGeneric, OmniShader.fCube)
 		mCubeProgram.uniforms("alphaMap") = 2
 		mCubeProgram.uniforms("pixelMap") = 1
 		mCubeProgram.uniforms("cubeMap") = 0
 
-		mSphereProgram = Shader.load("sphereProgram",OmniShader.vGeneric, OmniShader.fSphere)
+		mSphereProgram = Shader.load(OmniShader.vGeneric, OmniShader.fSphere)
 		mSphereProgram.uniforms("alphaMap") = 2
 		mSphereProgram.uniforms("pixelMap") = 1
 		mSphereProgram.uniforms("sphereMap") = 0
 
-		mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
+		mWarpProgram = Shader.load(OmniShader.vGeneric, OmniShader.fWarp)
 		mWarpProgram.uniforms("alphaMap") = 2
 		mWarpProgram.uniforms("pixelMap") = 1
 
-		mDemoProgram = Shader.load("demoProgram",OmniShader.vGeneric, OmniShader.fDemo)
+		mDemoProgram = Shader.load(OmniShader.vGeneric, OmniShader.fDemo)
 		mDemoProgram.uniforms("alphaMap") = 2
 		mDemoProgram.uniforms("pixelMap") = 1
 

@@ -175,6 +175,8 @@ class ScriptLoader extends Actor with ActorLogging {
     loaded = false
   }
 
+  def getScript() = Await.result(self ? "script", 3 seconds).asInstanceOf[Option[SeerScript]]
+
   override def preStart() = {
     log.debug("ScriptLoader Starting")
   }

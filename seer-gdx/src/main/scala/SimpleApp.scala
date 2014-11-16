@@ -55,15 +55,15 @@ class SeerAppListener extends ApplicationListener {
 
     camera.nav.pos.z = 2f
 
-    val basic = Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
+    val basic = Shader.load(DefaultShaders.basic._1, DefaultShaders.basic._2)
     // val basic = Shader.load("shaders/test")
     basic.monitor
     RenderGraph.root.shader = basic
 
     // Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
-    Shader.load("texture", DefaultShaders.texture._1, DefaultShaders.texture._2)
-    Shader.load("composite", DefaultShaders.composite._1, DefaultShaders.composite._2)
-    Shader.load("text", DefaultShaders.text._1, DefaultShaders.text._2)
+    // Shader.load("texture", DefaultShaders.texture._1, DefaultShaders.texture._2)
+    // Shader.load("composite", DefaultShaders.composite._1, DefaultShaders.composite._2)
+    // Shader.load("text", DefaultShaders.text._1, DefaultShaders.text._2)
 
     // Shader.load("firstPass", DefaultShaders.firstPass._1, DefaultShaders.firstPass._2)
     // Shader.load("secondPass", DefaultShaders.secondPass._1, DefaultShaders.secondPass._2)
@@ -85,18 +85,18 @@ class SeerAppListener extends ApplicationListener {
       frameCount +=1 
     }
     
-    Shader.update
+    // Shader.update
     
-    Gdx.gl.glClearColor(Shader.bg.r,Shader.bg.g,Shader.bg.b,Shader.bg.a)
-    Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    // Gdx.gl.glClearColor(Shader.bg.r,Shader.bg.g,Shader.bg.b,Shader.bg.a)
+    // Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+    // Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    if( Shader.blend ){ 
-      Gdx.gl.glEnable(GL20.GL_BLEND);
-      Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-    }else {
-      Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
-    }
+    // if( Shader.blend ){ 
+    //   Gdx.gl.glEnable(GL20.GL_BLEND);
+    //   Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+    // }else {
+    //   Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
+    // }
     //Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH);
 
     // Gdx.gl.glEnable(GL20.GL_CULL_FACE);

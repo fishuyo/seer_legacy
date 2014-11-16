@@ -64,11 +64,11 @@ object RenderGraph {
   }
 }
 
+
 /**
   * RenderNode is a node in the RenderGraph, which uses framebuffer targets
   * to send to outputs in the graph, and also binds them as textures for inputs
   */
-
 class RenderNode extends Renderer {
   var clear = true
   val inputs = new ListBuffer[RenderNode]
@@ -148,15 +148,15 @@ class RenderNode extends Renderer {
       Renderer() = this
 
       if(active){
-        Shader.alpha = scene.alpha
-        Shader.fade = scene.fade
+        // Shader.alpha = scene.alpha
+        // Shader.fade = scene.fade
 
         if( scene.alpha < 1f ){ //TODO depth ordering, conflicts with depth flag
-          Shader.blend = true
+          // Shader.blend = true
           Gdx.gl.glEnable(GL20.GL_BLEND);
           Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
         }else {
-          Shader.blend = false
+          // Shader.blend = false
           Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
           Gdx.gl.glDisable( GL20.GL_BLEND )
         }
@@ -169,7 +169,7 @@ class RenderNode extends Renderer {
       
       shader.end()
     } catch{ case e:Exception => println(e)
-      println ("\n" + e.printStackTrace + "\n")
+      // println ("\n" + e.printStackTrace + "\n")
     }
 
     unbindTarget()

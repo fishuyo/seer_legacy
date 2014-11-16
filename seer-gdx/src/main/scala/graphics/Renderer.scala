@@ -8,6 +8,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 // import com.badlogic.gdx.math.Matrix4
 
+/**
+  * Compainion object holding current renderer
+  */
 object Renderer {
   var renderer = new Renderer
   def apply() = renderer 
@@ -53,15 +56,15 @@ class Renderer {
       Renderer() = this
 
       if(active){
-        Shader.alpha = scene.alpha
-        Shader.fade = scene.fade
+        // Shader.alpha = scene.alpha
+        // Shader.fade = scene.fade
 
         if( scene.alpha < 1f ){ //TODO depth ordering, conflicts with depth flag
-          Shader.blend = true
+          // Shader.blend = true
           Gdx.gl.glEnable(GL20.GL_BLEND);
           Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
         }else {
-          Shader.blend = false
+          // Shader.blend = false
           Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
           Gdx.gl.glDisable( GL20.GL_BLEND )
         }

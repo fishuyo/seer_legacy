@@ -39,7 +39,7 @@ class OmniApp extends App with Animatable with OmniDrawable {
     	omni = new OmniStereo
     	// mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
 			// mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
-      omniShader = Shader.load("omni", OmniShader.glsl + S.vOmni, S.frag1 )
+      omniShader = Shader.load(OmniShader.glsl + S.vOmni, S.frag1 )
       // omni.configure("../seer-modules/seer-allosphere/calibration","gr02")
       omni.configure("../../../../calibration-current", Hostname())
       omni.onCreate
@@ -68,16 +68,16 @@ class OmniApp extends App with Animatable with OmniDrawable {
 	}
 
 	override def onDrawOmni(){
-		Shader("omni").begin
+    // Shader("omni").begin
+		omniShader.begin()
 		omni.uniforms(omniShader);
 
-		// val c = Cube().translate(1,1,0)
-		val c2 = Cube()
-		// c.draw
-		c2.draw
+		doOmniDraw()
 		
-		Shader("omni").end
+    omniShader.end()
 	}
+
+  def doOmniDraw(){}
 
 }
 

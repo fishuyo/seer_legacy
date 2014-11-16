@@ -1,13 +1,13 @@
 
 import com.fishuyo.seer._
 
-import allosphere._
+import com.fishuyo.seer.allosphere._
 
 import graphics._
 import dynamic._
 import spatial._
 import io._
-import particle._
+import com.fishuyo.seer.particle._
 import util._
 
 import com.badlogic.gdx.Gdx
@@ -17,10 +17,10 @@ import de.sciss.osc.Message
 
 import collection.mutable.ArrayBuffer
 
-import allosphere.OmniTest
+// import com.fishuyo.seer.allosphere.OmniTest
 
-Scene.alpha = .3
-SceneGraph.root.depth = false
+// Scene.alpha = .3
+// SceneGraph.root.depth = false
 
 Mouse.clear
 Mouse.use
@@ -30,7 +30,7 @@ implicit def f2i(f:Float) = f.toInt
 object Script extends SeerScript {
 	
 
-  OmniTest.mode = "omni"
+  // OmniTest.mode = "omni"
 
   val c = Cube()
   val nc = 1
@@ -67,19 +67,23 @@ object Script extends SeerScript {
 	var lpos = Vec2()
 	var vel = Vec2()
 
+  val node = RenderGraph.roots(0).asInstanceOf[OmniStereoRenderNode]
+
+
 	override def preUnload(){
-		recv.clear()
-    recv.disconnect()
+		// recv.clear()
+    // recv.disconnect()
 	}
 
 	var inited = false
 	override def init(){
-    OmniTest.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
+    node.shader = Shader.load(OmniShader.glsl + S.basic._1, S.basic._2 )
     // OmniTest.omni.configure("/Users/fishuyo/calib", "gr02")
     // OmniTest.omni.onCreate
 
-    OmniTest.omni.mStereo = 1
-		OmniTest.omni.mMode = StereoMode.ACTIVE
+    node.omni.mStereo = 1
+    // node.omni.mMode = StereoMode.ANAGLYPH
+		node.omni.mMode = StereoMode.ACTIVE
 		// OmniTest.omni.renderFace(0) = true
 		// OmniTest.omni.renderFace(1) = true
 		// OmniTest.omni.renderFace(2) = true
@@ -102,7 +106,7 @@ object Script extends SeerScript {
   override def animate(dt:Float){
   	if(!inited) init()
 
-  	OmniTest.lens.eyeSep = Mouse.y() * 0.5
+  	node.lens.eyeSep = Mouse.y() * 0.5
 
   	if( Mouse.status() == "drag"){
 			vel = (Mouse.xy() - lpos)/dt
@@ -127,20 +131,20 @@ object Script extends SeerScript {
   }
 
 
-	val recv = new OSCRecv
-  recv.listen(12001)
-  recv.bindp {
-    case Message("/mx", x:Float) => Camera.nav.vel.x = -x
-    case Message("/my", x:Float) => Camera.nav.vel.y = x
-    case Message("/mz", x:Float) => Camera.nav.vel.z = x
-    case Message("/tx", x:Float) => Camera.nav.angVel.x = x * -.02
-    case Message("/ty", x:Float) => Camera.nav.angVel.y = x * .02
-    case Message("/tz", x:Float) => Camera.nav.angVel.z = x * -.02
-    case Message("/home") => Camera.nav.moveToOrigin
-    case Message("/halt") => Camera.nav.stop
+	// val recv = new OSCRecv
+ //  recv.listen(12001)
+ //  recv.bindp {
+ //    case Message("/mx", x:Float) => Camera.nav.vel.x = -x
+ //    case Message("/my", x:Float) => Camera.nav.vel.y = x
+ //    case Message("/mz", x:Float) => Camera.nav.vel.z = x
+ //    case Message("/tx", x:Float) => Camera.nav.angVel.x = x * -.02
+ //    case Message("/ty", x:Float) => Camera.nav.angVel.y = x * .02
+ //    case Message("/tz", x:Float) => Camera.nav.angVel.z = x * -.02
+ //    case Message("/home") => Camera.nav.moveToOrigin
+ //    case Message("/halt") => Camera.nav.stop
 
-    case _ => ()
-  }
+ //    case _ => ()
+ //  }
 
 }
 
