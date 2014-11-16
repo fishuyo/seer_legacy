@@ -55,7 +55,12 @@ class SeerAppListener extends ApplicationListener {
 
     camera.nav.pos.z = 2f
 
-    Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
+    val basic = Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
+    // val basic = Shader.load("shaders/test")
+    basic.monitor
+    RenderGraph.root.shader = basic
+
+    // Shader.load("basic", DefaultShaders.basic._1, DefaultShaders.basic._2)
     Shader.load("texture", DefaultShaders.texture._1, DefaultShaders.texture._2)
     Shader.load("composite", DefaultShaders.composite._1, DefaultShaders.composite._2)
     Shader.load("text", DefaultShaders.text._1, DefaultShaders.text._2)
@@ -75,7 +80,7 @@ class SeerAppListener extends ApplicationListener {
     val timeStep = 1f/60f
     dtAccum += Gdx.graphics.getDeltaTime()
     while( dtAccum > timeStep ){
-      SceneGraph.animate(timeStep)
+      RenderGraph.animate(timeStep)
       dtAccum -= timeStep
       frameCount +=1 
     }
@@ -100,7 +105,7 @@ class SeerAppListener extends ApplicationListener {
     // Gdx.gl.glDepthFunc(GL20.GL_LESS);
     // Gdx.gl.glDepthMask(true);
 
-    SceneGraph.render() //renderNodes.foreach( _.render )
+    RenderGraph.render() //renderNodes.foreach( _.render )
 
   }
 
@@ -109,7 +114,7 @@ class SeerAppListener extends ApplicationListener {
     Gdx.gl.glViewport(0, 0, width, height)
 
 
-    SceneGraph.resize(Viewport(width,height))
+    RenderGraph.resize(Viewport(width,height))
     this.width = width
     this.height = height
     aspect = width * 1f / height

@@ -3,6 +3,7 @@ package graphics
 
 import spatial._
 import actor._
+import io._
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
@@ -52,8 +53,8 @@ object Shader {
   // def lighting_=(v:Float){ lighting = v }
 
   def alpha(f:Float) = {
-    if(f == 1f) SceneGraph.root.depth = true
-    else SceneGraph.root.depth = false
+    if(f == 1f) RenderGraph.root.depth = true
+    else RenderGraph.root.depth = false
     Scene.alpha = f
   }
 
@@ -184,6 +185,19 @@ object Shader {
     loadedShaders.foreach{ case(n,s) => s.update() } 
   }
 
+  def load(path:String) = {
+    val s = new Shader
+    s.vertFile = Some(File(path+".vert"))
+    s.fragFile = Some(File(path+".frag"))
+    s
+  }
+  def load(v:String, f:String) = {
+    val s = new Shader
+    s.vertCode = v
+    s.fragCode = f
+    s
+  }
+
 }
 
 class Shader {
@@ -203,6 +217,23 @@ class Shader {
   val uniforms = new HashMap[String,Any]()
   var currentUniforms = new HashMap[String,Any]()
 
+  def load(){
+    var s:ShaderProgram=null
+
+    if(vertFile.isDefined && fragFile.isDefined)
+      s = new ShaderProgram(vertFile.get, fragFile.get)
+    else
+      s = new ShaderProgram(vertCode, fragCode)
+
+    currentUniforms = new HashMap[String,Any]()
+
+    if( s.isCompiled() ){
+      program = Some(s)
+      loaded = true
+    }else{
+      println( s.getLog() )
+    }
+  }
   //load new shader program from file
   def load(n:String, v:FileHandle, f:FileHandle) = {
 
@@ -240,10 +271,13 @@ class Shader {
 
   def reload() = reloadFiles = true
 
-  def apply() = program.get
-  
-  def begin() = program.get.begin()
-  def end() = program.get.end()
+  def apply() = {
+    if(program.isEmpty || reloadFiles) load()
+    program.get
+  }
+
+  def begin() = this().begin()
+  def end() = this().end()
 
   def setUniforms(){
     if( program.isEmpty) return

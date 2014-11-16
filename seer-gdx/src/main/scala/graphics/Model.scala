@@ -115,29 +115,29 @@ class Model extends Drawable { // with geometry.Pickable {
     MatrixStack.pop()
   }
 
-    override def draw(){
+  override def draw(){
     MatrixStack.push()
 
     MatrixStack.transform(pose,scale)
     worldTransform.set(MatrixStack.model)
 
     // Shader.setColor(color)
-    val old = Shader.shader.get.name
-    if( shader != "" ){
-      Shader().end()
-      Shader(shader).begin()
-    }
-    Shader.setMaterial(material)
-    Shader.setMatrices()
+    // val old = Shader.shader.get.name
+    // if( shader != "" ){
+      // Shader().end()
+      // Shader(shader).begin()
+    // }
+    Renderer().setMaterial(material)
+    Renderer().setMatrices()
 
     mesh.draw()
     primitives.foreach( _.draw() )
     children.foreach( _.draw() )
 
-    if( shader != ""){
-      Shader().end()
-      Shader(old).begin()
-    }
+    // if( shader != ""){
+      // Shader().end()
+      // Shader(old).begin()
+    // }
 
     MatrixStack.pop()
   }

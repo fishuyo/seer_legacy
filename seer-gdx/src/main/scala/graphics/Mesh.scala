@@ -75,8 +75,8 @@ class Mesh extends MeshLike {
 		if( primitive == Lines && wireIndices.length > 0) count = math.min(wireIndices.length,maxIndices)
 		else if(indices.length > 0) count = math.min(indices.length,maxIndices)
 
-		if( hasColors ) Shader.shader.get.uniforms("u_hasColor") = 1
-    gdxMesh.get.render(Shader(), primitive, 0, count )
+		if( hasColors ) Renderer().shader.uniforms("u_hasColor") = 1
+    gdxMesh.get.render(Renderer().shader(), primitive, 0, count )
 	}
 
 	def dispose(){gdxMesh.foreach(_.dispose); gdxMesh = None}

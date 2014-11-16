@@ -7,24 +7,24 @@ package graphics
 
 object ShaderCode {
   val attributes = Map("all" -> """
-      attribute vec3 a_position;
-      attribute vec3 a_normal;
-      attribute vec4 a_color;
-      attribute vec2 a_texCoord0;
+    attribute vec3 a_position;
+    attribute vec3 a_normal;
+    attribute vec4 a_color;
+    attribute vec2 a_texCoord0;
   """)
 
   val matrixUniforms = Map("all" -> """
-      uniform mat4 u_projectionViewMatrix;
-      uniform mat4 u_modelViewMatrix;
-      uniform mat4 u_viewMatrix;
-      uniform mat4 u_modelMatrix;
-      uniform mat4 u_normalMatrix;
-      uniform vec4 u_cameraPosition;
+    uniform mat4 u_projectionViewMatrix;
+    uniform mat4 u_modelViewMatrix;
+    uniform mat4 u_viewMatrix;
+    uniform mat4 u_modelMatrix;
+    uniform mat4 u_normalMatrix;
+    //uniform vec4 u_cameraPosition;
   """)
 
   val lightUniforms = Map("simple" -> """
-      uniform vec4 u_color;
-      uniform vec3 u_lightPosition;
+    uniform vec4 u_color;
+    uniform vec3 u_lightPosition;
   """)
 
   val basicVarying = """
@@ -43,12 +43,8 @@ object DefaultShaders {
 
   val basic = (
     // Vertex Shader
+    attributes("all") +
     """
-      attribute vec3 a_position;
-      attribute vec3 a_normal;
-      attribute vec4 a_color;
-      attribute vec2 a_texCoord0;
-
       uniform int u_hasColor;
       uniform vec4 u_color;
       uniform mat4 u_projectionViewMatrix;

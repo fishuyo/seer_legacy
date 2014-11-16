@@ -19,16 +19,15 @@ object LiveShader extends SeerApp {
 	val node = new RenderNode 
 
 	// set to use shader with name liveShader which we will load below
-	node.shader = "live"
+	var shader = Shader.load("shaders/live")
+	shader.monitor()
+	node.shader = shader
 
 	// add a screen filling quad to the scene		
 	node.scene.push( Plane() )
 
 	// add render node to the Scene graph to have it be rendered
-	SceneGraph.addNode(node) 
-
-	// shader variable
-	var shader:Shader = _
+	RenderGraph.addNode(node) 
 
 	// to use as uniforms
 	var t = 0f 
@@ -36,8 +35,8 @@ object LiveShader extends SeerApp {
 	var mouse = Vec2()
 
 	override def init(){
-		shader = Shader.load("live", File("shaders/live.vert"),File("shaders/live.frag"))
-		shader.monitor
+		// shader = Shader.load("live", File("shaders/live.vert"),File("shaders/live.frag"))
+		// shader.monitor
 	}
 
 	// since the RenderNode has been added to the Scene Graph

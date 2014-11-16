@@ -14,59 +14,7 @@ import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 
 
 
-/**
-* Singleton scene object to contain list of scene drawables
-*/
-// object Scene extends Scene
-
-// class Scene {
-  
-//   var active = true
-//   var alpha = 1f
-//   var fade = 0f
-//   def alpha(v:Float){ alpha = v }
-//   def fade(v:Float){ fade = v }
-
-//   val drawable = new ListBuffer[Drawable]
-//   val animatable = new ListBuffer[Animatable]
-//   //val pickable = new ListBuffer[GLPickable]
-//   //val lights = new ListBuffer[GLLight]
-
-//   def push( o: Drawable) = drawable += o
-//   def remove( o: Drawable) = drawable -= o
-//   def push( o: Animatable) = { animatable += o;  drawable += o }
-//   def remove( o: Animatable) = { animatable -= o;  drawable -= o }
-//   def clear() = { drawable.clear; animatable.clear }
-  
-//   //def pushPickable( o: GLPickable) = pickable += o
-//   //def push( s: SoundSource) = { sounds += s; objects += s }
-
-//   def init() = drawable.foreach( _.init() )
-//   def animate( dt: Float ) = animatable.foreach( _.animate(dt) )
-//   //def onDraw( gl: GL2 ) = drawable.foreach( _.onDraw(gl) )
-//   def draw() = drawable.foreach( _.draw() )
-
-//   //def pick( r: Ray ) = pickable.foreach( _.pick(r) )
-  
-// }
-
-
-// object SceneManager {
-//   val scenes = new ListBuffer[Scene]
-//   val active = Scene :: List()
-
-//   def apply(i:Int) = scenes(i)
-
-
-
-//   // def init() = scenes.foreach( _.init() )
-//   def step( dt: Float ) = scenes.filter( _.active == true).foreach( _.step(dt) )
-//   def draw() = scenes.filter( _.active == true).foreach( _.draw() )
-
-// }
-
-
-object SceneGraph {
+object RenderGraph {
   var roots = ListBuffer[RenderNode]()
   var root:RenderNode = new BasicNode
   root.scene = Scene
@@ -116,21 +64,23 @@ object SceneGraph {
   }
 }
 
+/**
+  * RenderNode is a node in the RenderGraph, which uses framebuffer targets
+  * to send to outputs in the graph, and also binds them as textures for inputs
+  */
 
-class RenderNode {
-  var active = true
+class RenderNode extends Renderer {
   var clear = true
-  var depth = true
   val inputs = new ListBuffer[RenderNode]
   val outputs = new ListBuffer[RenderNode]
   val nodes = new ListBuffer[RenderNode]
 
   var viewport = new Viewport(0,0,800,800)
-  var scene = new Scene
-  var camera:NavCamera = new OrthographicCamera(2,2)
+  // var scene = new Scene
+  // var camera:NavCamera = new OrthographicCamera(2,2)
 
   var buffer:Option[FrameBuffer] = None
-  var shader = "basic"
+  // var shader = "basic"
 
   def createBuffer(){
     if(buffer.isEmpty) buffer = Some(FrameBuffer(viewport.w.toInt, viewport.h.toInt))
@@ -180,21 +130,23 @@ class RenderNode {
     camera.step(dt)
   }
 
-  def render(){
+  override def render(){
     bindTarget()
 
     try{
-      Shader(shader).begin() 
+      shader.begin() 
 
       inputs.zipWithIndex.foreach( (i) => {
         // i._1.buffer.get.getColorBufferTexture().bind(i._2) 
         i._1.bindBuffer(i._2) 
-        Shader.shader.get.uniforms("u_texture"+i._2) = i._2
+        shader.uniforms("u_texture"+i._2) = i._2
       })
 
       MatrixStack.clear()
-      Shader.setCamera(camera)
-      Shader.setMatrices()
+      setMatrices()
+
+      Renderer() = this
+
       if(active){
         Shader.alpha = scene.alpha
         Shader.fade = scene.fade
@@ -215,7 +167,7 @@ class RenderNode {
         scene.draw()
       }
       
-      Shader().end()
+      shader.end()
     } catch{ case e:Exception => println(e)
       println ("\n" + e.printStackTrace + "\n")
     }
@@ -226,35 +178,35 @@ class RenderNode {
 
 class BasicNode extends RenderNode
 
-object ScreenNode extends RenderNode {
-  // clear = false
-  scene.push(Plane.generateMesh())
-  shader = "texture"
-}
+// object ScreenNode extends RenderNode {
+//   // clear = false
+//   scene.push(Plane.generateMesh())
+//   shader = "texture"
+// }
 
-class TextureNode(var texture:GdxTexture) extends RenderNode{
-  override def bindBuffer(i:Int) = texture.bind(i)  
-  override def render(){}
-}
+// class TextureNode(var texture:GdxTexture) extends RenderNode{
+//   override def bindBuffer(i:Int) = texture.bind(i)  
+//   override def render(){}
+// }
 
-class OutlineNode extends RenderNode {
-  val quad = Primitive2D.quad
-  override def render(){
-    // inputs.foreach( _.buffer.get.getColorBufferTexture().bind(0) )
+// class OutlineNode extends RenderNode {
+//   val quad = Primitive2D.quad
+//   override def render(){
+//     // inputs.foreach( _.buffer.get.getColorBufferTexture().bind(0) )
 
-    SceneGraph.root.buffer.get.getColorBufferTexture().bind(0)
-    Shader("secondPass").begin()
-    Shader().setUniformi("u_texture0", 0);
-    Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
-    //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
-    // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
-    // scene.draw2()
-    // if( day.x == 1f) Shader("secondPass").setUniformf("u_depth", 0f)
-    // else Shader("secondPass").setUniformf("u_depth", 1f)
+//     SceneGraph.root.buffer.get.getColorBufferTexture().bind(0)
+//     Shader("secondPass").begin()
+//     Shader().setUniformi("u_texture0", 0);
+//     Shader().setUniformMatrix("u_projectionViewMatrix", new Matrix4())
+//     //Shader().setUniformMatrix("u_modelViewMatrix", new Matrix4())
+//     // Shader().setUniformMatrix("u_normalMatrix", modelViewMatrix.toNormalMatrix())
+//     // scene.draw2()
+//     // if( day.x == 1f) Shader("secondPass").setUniformf("u_depth", 0f)
+//     // else Shader("secondPass").setUniformf("u_depth", 1f)
 
-    quad.render(Shader(), GL20.GL_TRIANGLES)
+//     quad.render(Shader(), GL20.GL_TRIANGLES)
     
-    Shader().end();
-  }
-}
+//     Shader().end();
+//   }
+// }
 
