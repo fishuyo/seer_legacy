@@ -5,9 +5,13 @@ package examples.graphics
 
 import graphics._
 
+import particle.SpringMesh
+
 object LoadObj extends SeerApp { 
 
 	var model:Model = _
+	var spring:SpringMesh = _
+	var t = 0f
 
 	def downloadFile(url:String, file:String){
 		import sys.process._
@@ -18,7 +22,7 @@ object LoadObj extends SeerApp {
 
 	override def init(){
 
-		// download bunny
+		// download a bunny from the internets
 		downloadFile("http://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj", "bunny.obj")
 
 		// load bunny
@@ -29,10 +33,30 @@ object LoadObj extends SeerApp {
 
 		// modify material
 		model.material = new SpecularMaterial
-		model.material.color = RGBA(0f,.6f,.2f,1f)
+		model.material.color = RGBA(0f,.6f,.6f,1f)
+		// model.mesh.primitive = Lines
+
+		// create a spring simulation from mesh, set simulation gravity to zero
+		spring = new SpringMesh(model.mesh)
+		particle.Gravity.set(0,0,0)
 	}
 
 	override def draw(){
 		model.draw()
+	}
+
+	override def animate(dt:Float){
+		t += dt 
+
+		// simulate the spring mesh
+		// this automatically recalculates normals, and updates the mesh
+		spring.animate(dt)
+
+		// every second, snap a random vertex along its normal
+		if(t > 1f){
+			t = 0f
+			val i = util.Random.int(0, model.mesh.vertices.length)()
+			model.mesh.vertices(i) += model.mesh.normals(i) * (util.Random.float()*0.1f)
+		}
 	}
 }
