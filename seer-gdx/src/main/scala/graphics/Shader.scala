@@ -197,6 +197,12 @@ object Shader {
     s.fragCode = f
     s
   }
+  def load(code:(String,String)) = {
+    val s = new Shader
+    s.vertCode = code._1
+    s.fragCode = code._2
+    s
+  }
 
 }
 

@@ -4,7 +4,7 @@ package allosphere
 
 import graphics._
 
-class OmniStereoRenderNode extends RenderNode with OmniDrawable {
+class OmniStereoRenderer extends graphics.Renderer with OmniDrawable {
 
   org.lwjgl.opengl.SetDisplayStereo()
 
@@ -27,25 +27,32 @@ class OmniStereoRenderNode extends RenderNode with OmniDrawable {
   omni.mMode = StereoMode.MONO
 
   override def render(){
-    
     Renderer() = this
 
-    val vp = Viewport(Window.width, Window.height)
+    // val vp = Viewport(Window.width, Window.height)
 
     mode match {
-      case "warp" => omni.drawWarp(vp)
-      case "demo" => omni.drawDemo(lens, camera.nav, vp)
+      case "warp" => omni.drawWarp(viewport)
+      case "demo" => omni.drawDemo(lens, camera.nav, viewport)
       case _ =>
         if (omniEnabled) {
-          omni.onFrame(this, lens, camera.nav, vp)
+          omni.onFrame(this, lens, camera.nav, viewport)
         } else {
-          omni.onFrameFront(this, lens, camera.nav, vp)
+          omni.onFrameFront(this, lens, camera.nav, viewport)
         }
     }
   }
 
   override def onDrawOmni(){
     shader.begin()
+
+    MatrixStack.clear()
+    setMatrixUniforms()
+    setEnvironmentUniforms()
+    environment.setGLState()
+    setMaterialUniforms(material)
+    
+    shader.setUniforms() // set buffered uniforms in shader program
     omni.uniforms(shader);
 
     scene.draw()
@@ -53,6 +60,63 @@ class OmniStereoRenderNode extends RenderNode with OmniDrawable {
     shader.end()
   }
 
+}
+
+
+class OmniCapture extends graphics.Renderer with OmniDrawable {
+
+  val omni = new OmniStereo
+  shader = Shader.load(OmniShader.glsl + SS.vert, SS.frag )
+
+  val lens = new Lens()
+  lens.near = 0.01
+  lens.far = 40.0
+  lens.eyeSep = 0.03
+
+  omni.configure("../../../../calibration-current", Hostname())
+  omni.onCreate
+
+  omni.mStereo = 0
+  omni.mMode = StereoMode.MONO
+
+  override def render(){
+    Renderer() = this
+    omni.capture(this, lens, camera.nav)
+  }
+
+  override def onDrawOmni(){
+    shader.begin()
+
+    MatrixStack.clear()
+    setMatrixUniforms()
+    setEnvironmentUniforms()
+    environment.setGLState()
+    setMaterialUniforms(material)
+    
+    shader.setUniforms() // set buffered uniforms in shader program
+    omni.uniforms(shader);
+
+    scene.draw()
+    
+    shader.end()
+  }
+
+}
+
+// XXX don't know if having a framebuffer target will work with stereo..
+class OmniRender(val omni:OmniStereo) extends graphics.Renderer {
+
+  org.lwjgl.opengl.SetDisplayStereo()
+
+  val lens = new Lens()
+  lens.near = 0.01
+  lens.far = 40.0
+  lens.eyeSep = 0.03
+
+  override def render(){
+    // Renderer() = this
+    omni.draw(lens, camera.nav, viewport)
+  }
 }
 
 object SS {

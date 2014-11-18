@@ -67,8 +67,10 @@ object Script extends SeerScript {
 	var lpos = Vec2()
 	var vel = Vec2()
 
-  val node = RenderGraph.roots(0).asInstanceOf[OmniStereoRenderNode]
-
+  val renderer = OmniTest.renderer//Renderer().asInstanceOf[OmniStereoRenderer] //RenderGraph.roots(0).asInstanceOf[OmniStereoRenderNode]
+  renderer.environment.alpha = 0.1f
+  renderer.environment.blend = true
+  renderer.environment.depth = false
 
 	override def preUnload(){
 		// recv.clear()
@@ -77,13 +79,14 @@ object Script extends SeerScript {
 
 	var inited = false
 	override def init(){
-    node.shader = Shader.load(OmniShader.glsl + S.basic._1, S.basic._2 )
+    // renderer.shader = Shader.load(OmniShader.glsl + S.basic._1, S.basic._2 )
     // OmniTest.omni.configure("/Users/fishuyo/calib", "gr02")
     // OmniTest.omni.onCreate
 
-    node.omni.mStereo = 1
-    // node.omni.mMode = StereoMode.ANAGLYPH
-		node.omni.mMode = StereoMode.ACTIVE
+    renderer.omni.mStereo = 1
+    // renderer.omni.mMode = StereoMode.ANAGLYPH
+    renderer.omni.mMode = StereoMode.ACTIVE
+		// renderer.omni.mMode = StereoMode.SEQUENTIAL
 		// OmniTest.omni.renderFace(0) = true
 		// OmniTest.omni.renderFace(1) = true
 		// OmniTest.omni.renderFace(2) = true
@@ -95,9 +98,9 @@ object Script extends SeerScript {
 	}
 
   override def draw(){
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
-    Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-
+		// Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    // Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+    FPS.print
 
   	model.draw
     cubes.foreach(_.draw)
@@ -106,7 +109,7 @@ object Script extends SeerScript {
   override def animate(dt:Float){
   	if(!inited) init()
 
-  	node.lens.eyeSep = Mouse.y() * 0.5
+  	renderer.lens.eyeSep = Mouse.y() * 0.5
 
   	if( Mouse.status() == "drag"){
 			vel = (Mouse.xy() - lpos)/dt

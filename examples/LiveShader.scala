@@ -18,13 +18,13 @@ object LiveShader extends SeerApp {
 	// Render node encapsulates a scene, camera, and shader
 	val node = new RenderNode 
 
-	// set to use shader with name liveShader which we will load below
+	// load and automatically reload shader live.vert / live.frag
 	var shader = Shader.load("shaders/live")
 	shader.monitor()
-	node.shader = shader
+	node.renderer.shader = shader
 
 	// add a screen filling quad to the scene		
-	node.scene.push( Plane() )
+	node.renderer.scene.push( Plane() )
 
 	// add render node to the Scene graph to have it be rendered
 	RenderGraph.addNode(node) 

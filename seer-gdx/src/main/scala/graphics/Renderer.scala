@@ -22,138 +22,103 @@ object Renderer {
   */
 class Renderer {
 
-  var active = true
-  var depth = true
-
+  var viewport = Viewport(0,0,800,800)
   var camera:NavCamera = new OrthographicCamera(2,2)
   var scene = new Scene 
   var environment = new Environment
   var shader = new Shader
 
-  var defaultMaterial:BasicMaterial = new BasicMaterial
-  var visible = true
-  var wireframe = false
-  var linewidth = 1
-  var blend = false
-  var lightingMix = 1f
-  var lightPosition = Vec3(1,1,1)
-  var lightAmbient = RGBA(.2f,.2f,.2f,1)
-  var lightDiffuse = RGBA(.6f,.6f,.6f,1)
-  var lightSpecular = RGBA(.4f,.4f,.4f,1)
-  var shininess = 1f
-  var textureMix = 0f
-  var alpha = 1f
-  var fade = 0f
-
+  var active = true
+  var clear = true
+  var depth = true
+  
+  var material:BasicMaterial = new BasicMaterial
+  
   def render(){
+    if(!active) return
 
     try{
+      Renderer() = this
+
+      if(clear) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+      else Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT)
+      
       shader.begin() 
 
       MatrixStack.clear()
-      setMatrices()
+      setMatrixUniforms()
+      setEnvironmentUniforms()
+      environment.setGLState()
+      setMaterialUniforms(material)
+      
+      shader.setUniforms() // set buffered uniforms in shader program
 
-      Renderer() = this
-
-      if(active){
-        // Shader.alpha = scene.alpha
-        // Shader.fade = scene.fade
-
-        if( scene.alpha < 1f ){ //TODO depth ordering, conflicts with depth flag
-          // Shader.blend = true
-          Gdx.gl.glEnable(GL20.GL_BLEND);
-          Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-        }else {
-          // Shader.blend = false
-          Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
-          Gdx.gl.glDisable( GL20.GL_BLEND )
-        }
-
-        if(depth) Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
-        else Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-
-        scene.draw()
-      }
+      scene.draw()
       
       shader.end()
 
     } catch{ case e:Exception => println(e)
-      println ("\n" + e.printStackTrace + "\n")
+      // println ("\n" + e.printStackTrace + "\n")
     }
 
   }
 
-
-  def setLightUniforms(){
-    shader.uniforms("u_lightingMix") = lightingMix
-    shader.uniforms("u_textureMix") = textureMix
-    shader.uniforms("u_lightPosition") = lightPosition
-    shader.uniforms("u_lightAmbient") = lightAmbient
-    shader.uniforms("u_lightDiffuse") = lightDiffuse
-    shader.uniforms("u_lightSpecular") = lightSpecular
-    shader.uniforms("u_shininess") = shininess
+  def resize(vp:Viewport){
+    viewport = vp
+    if(camera.viewportHeight == 1f){
+      camera.viewportWidth = vp.aspect
+    }else{
+      // camera.viewportWidth = vp.w
+      // camera.viewportHeight = vp.h
+    }
   }
 
-  def setMatrices(){
-    try{
-      MatrixStack(camera)
+  def animate(dt:Float){
+    scene.animate(dt)
+    camera.step(dt)
+  }
 
-      shader.uniforms("u_projectionViewMatrix") = MatrixStack.projectionModelViewMatrix() 
-      shader.uniforms("u_modelViewMatrix") = MatrixStack.modelViewMatrix() 
-      shader.uniforms("u_viewMatrix") = MatrixStack.viewMatrix() 
-      shader.uniforms("u_modelMatrix") = MatrixStack.modelMatrix() 
-      shader.uniforms("u_normalMatrix") = MatrixStack.normalMatrix()
-      shader.uniforms("u_cameraPosition") = camera.nav.pos
-      // shader.uniforms("u_color") = color
-      shader.uniforms("u_alpha") = alpha
-      shader.uniforms("u_fade") = fade
-      setLightUniforms()
-    } catch { case e:Exception => ()} //println(e)}
-    shader.setUniforms() 
+  def setMatrixUniforms(){
+    MatrixStack(camera)
+    shader.uniforms("u_projectionViewMatrix") = MatrixStack.projectionModelViewMatrix() 
+    shader.uniforms("u_modelViewMatrix") = MatrixStack.modelViewMatrix() 
+    shader.uniforms("u_viewMatrix") = MatrixStack.viewMatrix() 
+    shader.uniforms("u_modelMatrix") = MatrixStack.modelMatrix() 
+    shader.uniforms("u_normalMatrix") = MatrixStack.normalMatrix()
+    shader.uniforms("u_cameraPosition") = camera.nav.pos
+  }
+
+  def setEnvironmentUniforms(){
+    val e = environment
+    shader.uniforms("u_lightPosition") = e.lightPosition
+    shader.uniforms("u_lightAmbient") = e.lightAmbient
+    shader.uniforms("u_lightDiffuse") = e.lightDiffuse
+    shader.uniforms("u_lightSpecular") = e.lightSpecular
+    shader.uniforms("u_alpha") = e.alpha
+
+
   }
   
-  def setColor(c:RGBA){
-    // if( shader.isEmpty ) return
-    // color = c
-    shader.uniforms("u_color") = c //olor
-    // this().setUniformf("u_color", color.r, color.g, color.b, color.a)
-  }
-  def setColor(v:Vec3, a:Float){ setColor( RGBA(v,a) ) }
-
-  // def setAlpha(f:Float) = {
-    // alpha = f
-    // this().setUniformf("u_alpha", alpha)
-  // }
-
-  def setMaterial(material:Material){
+  def setMaterialUniforms(mat:Material){
     
-    material match {
-      case m:ShaderMaterial => setBasicMaterial(m);
-      case m:SpecularMaterial => setBasicMaterial(m); //lightingMix=1f; shininess = m.shininess
-      case m:DiffuseMaterial => setBasicMaterial(m); //lightingMix=1f; shininess = 0f
-      case m:NoMaterial => setMaterial(defaultMaterial)
-      case m:BasicMaterial => setBasicMaterial(m)
+    mat match {
+      // case m:ShaderMaterial => setBasicMaterial(m);
+      // case m:SpecularMaterial => setBasicMaterial(m); //lightingMix=1f; shininess = m.shininess
+      // case m:DiffuseMaterial => setBasicMaterial(m); //lightingMix=1f; shininess = 0f
+      case m:NoMaterial => setMaterialUniforms(material)
+      case m:BasicMaterial =>
+        shader.uniforms("u_color") = m.color
+        shader.uniforms("u_lightingMix") = m.lightingMix
+        shader.uniforms("u_textureMix") = m.textureMix
+        shader.uniforms("u_shininess") = m.shininess
+        m.texture.foreach( (t) => {t.bind(0); shader.uniforms("u_texture0")=0 } )
+        if(m.transparent){
+          Gdx.gl.glEnable(GL20.GL_BLEND)
+          Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+        }
       case _ => () //setMaterial(defaultMaterial)
     }
   }
 
-  def setBasicMaterial(material:BasicMaterial){
-    setColor(material.color)
-    visible = material.visible
-    blend = material.transparent
-
-    wireframe = material.wireframe
-    linewidth = material.linewidth
-
-    val s = shader
-    material.texture.foreach( (t) => {t.bind(0); s.uniforms("u_texture0")=0 } )
-    textureMix = material.textureMix
-
-    // var normalMap = None:Option[Texture]
-    // var specularMap = None:Option[Texture]
-
-    lightingMix = material.lightingMix
-    shininess = material.shininess
-  }
 
 }

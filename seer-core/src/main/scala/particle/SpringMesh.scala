@@ -8,7 +8,7 @@ import spatial.Vec3
 import scala.collection.mutable.ArrayBuffer
 
 
-class SpringMesh(val mesh:MeshLike, val stiff:Float, val tear:Float = 0f) extends Animatable {
+class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) extends Animatable {
 
 	var timeStep = .015f
   var damping = 20f 

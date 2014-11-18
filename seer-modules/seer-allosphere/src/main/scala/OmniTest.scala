@@ -24,20 +24,33 @@ object OmniTest extends SeerApp { //extends OmniApp {
 	val loader = ScriptLoader("scripts/omnitest.scala")
   // val script = loader.script //getScript()
 
-  var node:OmniStereoRenderNode = _
+  var renderer:OmniCapture = _ //StereoRenderer = _
 
   override def init(){
-    node = new OmniStereoRenderNode
-    node.scene = Scene
-    node.camera = Camera
     RenderGraph.roots.clear
+    renderer = new OmniCapture //new OmniStereoRenderer
+    renderer.scene = Scene
+    renderer.camera = Camera
+    val node = new RenderNode(renderer)
     RenderGraph.roots += node
+
+    val node2 = new RenderNode(new OmniRender(renderer.omni))
+    node.outputTo(node2)
+
+    // val comp = new CompositeNode
+    // node2.outputTo(comp)
+    // RenderGraph.roots(0).outputTo(comp)
+    // comp.outputTo(ScreenNode)
+    
+    // val fb = new FeedbackNode(0.98, 0.2)
+    // node2.outputTo(fb)
+    // fb.outputTo(ScreenNode)
   }
 
   override def draw(){
     // Cube().draw
   }
-  
+
   // override def doOmniDraw(){
   //   // Shader("omni").begin
   //   // omni.uniforms(omniShader);

@@ -127,8 +127,9 @@ class Model extends Drawable { // with geometry.Pickable {
       // Shader().end()
       // Shader(shader).begin()
     // }
-    Renderer().setMaterial(material)
-    Renderer().setMatrices()
+    Renderer().setMaterialUniforms(material)
+    Renderer().setMatrixUniforms()
+    Renderer().shader.setUniforms()
 
     mesh.draw()
     primitives.foreach( _.draw() )
