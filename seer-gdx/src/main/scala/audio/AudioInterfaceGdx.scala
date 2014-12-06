@@ -37,7 +37,7 @@ object GdxAudio extends AudioInterface {
   // def push(o:AudioSource) = actor ! Source(o)
 
   override def init(){
-    actor = system.actorOf(Props( new GdxAudioActor()), name = "audio-main")
+    actor = System().actorOf(Props( new GdxAudioActor()), name = "audio-main")
     super.init()
   }
 
@@ -138,7 +138,7 @@ class GdxAudioActor extends Actor {
 
   def toggleRecord(path:String){
     if( !recording ){
-      writer = system.actorOf(Props( new AudioFileWriterActor()))
+      writer = System().actorOf(Props( new AudioFileWriterActor()))
       writer ! Open(path)
       AudioPassInputLatencyCorrection.resetLatency(0.03f)
       recording = true

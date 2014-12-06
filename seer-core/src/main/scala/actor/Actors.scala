@@ -10,6 +10,11 @@ import com.typesafe.config.ConfigFactory
 
 import collection.mutable.ListBuffer
 
+object System {
+  var system = ActorSystem("seer", ConfigFactory.load(ActorManager.regularConfig))
+  def apply() = system
+  def update(s:ActorSystem) = system = s
+}
 
 object ActorManager {
 

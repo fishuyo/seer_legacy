@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 
 package object actor {
 
-  implicit val system = ActorSystem("seer", ConfigFactory.load(ActorManager.regularConfig))
+  // implicit def system = System() //ActorSystem("seer", ConfigFactory.load(ActorManager.regularConfig))
   
 }
 

@@ -35,7 +35,7 @@ object ScriptLoader {
   case class Reload(code:String)
 
   val toolbox = currentMirror.mkToolBox() 
-  val manager = system.actorOf( Props[ScriptManager], name="ScriptManager" )
+  val manager = System().actorOf( Props[ScriptManager], name="ScriptManager" )
   
   implicit val timeout = Timeout(4 seconds)
 
@@ -115,7 +115,7 @@ class ScriptLoader extends Actor with ActorLogging {
       script = Some(runFile(path))
       load()
 
-    case RunCode(code) => runCode(code)
+    case RunCode(code) => script = Some(runCode(code)); load()
     case Reload(code) => reload(code)
     case "script" => sender ! script
 

@@ -9,6 +9,7 @@ import dynamic._
 import com.badlogic.gdx.utils.GdxNativesLoader
 import com.badlogic.gdx.utils.SharedLibraryLoader
 import com.badlogic.gdx.backends.lwjgl._
+import com.badlogic.gdx.backends.jglfw._
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.graphics.GL20
@@ -44,6 +45,7 @@ object DesktopApp {
   var bounds = new Rectangle
   var frame:JFrame = null
   var canvas:Canvas = null
+  var restoring = false
 
   var newCanvasSize:AtomicReference[Dimension] = new AtomicReference[Dimension]()
 
@@ -92,6 +94,7 @@ object DesktopApp {
     loadLibs()
 
     val cfg = new LwjglApplicationConfiguration()
+    // val cfg = new JglfwApplicationConfiguration()
     cfg.title = "seer"
     // cfg.useGL30 = true
     cfg.width = Window.w0
@@ -108,18 +111,24 @@ object DesktopApp {
       canvas.addComponentListener(new ComponentAdapter() {
         override def componentResized(e:ComponentEvent){ 
           newCanvasSize.set(canvas.getSize())
-          println(canvas.getSize())
+          // println(canvas.getSize())
         }
       });
      
       frame.addWindowFocusListener(new WindowAdapter() {
-        override def windowGainedFocus(e:WindowEvent)
-        { canvas.requestFocusInWindow(); }
+        override def windowGainedFocus(e:WindowEvent){
+          if(!restoring){
+            restoring = true
+            frame.setVisible(false)
+            frame.setVisible(true)
+            // canvas.requestFocusInWindow();
+          } else restoring = false
+        }
       });
        
       frame.add(canvas, BorderLayout.CENTER)
-      frame.setPreferredSize(new Dimension(1024, 786));
-      frame.setMinimumSize(new Dimension(800, 600));
+      frame.setPreferredSize(new Dimension(800, 800));
+      // frame.setMinimumSize(new Dimension(800, 600));
       frame.pack();
       frame.setVisible(true);
       // frame.setSize(cfg.width, cfg.height)
@@ -129,6 +138,16 @@ object DesktopApp {
           Gdx.app.exit()
         }
       });
+
+      try {
+        // val util = Class.forName("com.apple.eawt.FullScreenUtilities");
+        // val params = Array[Class](classOf[Window], typeOf[Boolean])
+        // val method = util.getMethod("setWindowCanFullScreen", params);
+        // method.invoke(util, window, true);
+        // com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(frame,false)
+        com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(frame,true)
+      } catch { case e:Exception => println(e) }
+
       // canvas.setBackground(Color.black)
       // frame.show()
       new LwjglApplication( app, cfg, canvas )
@@ -136,6 +155,7 @@ object DesktopApp {
     }else{ 
 
       new LwjglApplication( app, cfg )
+      // new JglfwApplication( app, cfg )
     }
   }
 

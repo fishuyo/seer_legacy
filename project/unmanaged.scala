@@ -97,7 +97,9 @@ object SeerLibs {
     val desktopDest = file("seer-gdx/seer-gdx-desktop-app/lib")
     val desktopFilter = new ExactFilter("gdx-natives.jar") |
     new ExactFilter("gdx-backend-lwjgl.jar") |
-    new ExactFilter("gdx-backend-lwjgl-natives.jar") //|
+    new ExactFilter("gdx-backend-lwjgl-natives.jar") |
+    new ExactFilter("gdx-backend-jglfw.jar") |
+    new ExactFilter("gdx-backend-jglfw-natives.jar") //|
     // new ExactFilter("gdx-tools.jar")
     IO.unzip(zipFile, desktopDest, desktopFilter)
 

@@ -14,7 +14,7 @@ import com.sun.nio.file._
 
 object Monitor {
 
-  val monitorActor = system.actorOf(MonitorActor(concurrency = 2))
+  val monitorActor = System().actorOf(MonitorActor(concurrency = 2))
 
   def apply(path:String)(f:Callback){
     //This will receive callbacks for just the one file
