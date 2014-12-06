@@ -130,10 +130,10 @@ class StickMan(override val id:Int) extends Skeleton(id) {
     b.scale.set(.015f,.015f,.15f) 
   })
 
-  def setShader(s:String){
-    jointModels.values.foreach(_.shader = s)
-    boneModels.foreach(_.shader = s)
-  }
+  // def setShader(s:String){
+  //   jointModels.values.foreach(_.shader = s)
+  //   boneModels.foreach(_.shader = s)
+  // }
 
   override def draw(){
     if(calibrating) loadingModel.draw()
@@ -202,10 +202,10 @@ class QuadMan(override val id:Int) extends Skeleton(id) {
     // b.scale.set(.5f) 
   })
 
-  def setShader(s:String){
-    jointModels.values.foreach(_.shader = s)
-    boneModels.foreach(_.shader = s)
-  }
+  // def setShader(s:String){
+  //   jointModels.values.foreach(_.shader = s)
+  //   boneModels.foreach(_.shader = s)
+  // }
 
   override def draw(){
     if(tracking){ 
@@ -306,10 +306,11 @@ class TriangleMan(override val id:Int) extends Skeleton(id) {
   def drawJoints(){
     if(tracking){
       jointModels.foreach{ case (k,m) => 
-        Shader("joint")
-        var sh = Shader.shader.get
-        sh.uniforms("phase") = phase(k)
-        sh.uniforms("color") = m.material.color
+        // XXX
+        // Shader("joint")
+        // var sh = Shader.shader.get
+        // sh.uniforms("phase") = phase(k)
+        // sh.uniforms("color") = m.material.color
         m.draw()
       }
     }
