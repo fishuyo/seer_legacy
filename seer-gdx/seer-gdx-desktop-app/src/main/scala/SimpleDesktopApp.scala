@@ -9,7 +9,7 @@ import dynamic._
 import com.badlogic.gdx.utils.GdxNativesLoader
 import com.badlogic.gdx.utils.SharedLibraryLoader
 import com.badlogic.gdx.backends.lwjgl._
-import com.badlogic.gdx.backends.jglfw._
+// import com.badlogic.gdx.backends.jglfw._
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.graphics.GL20
