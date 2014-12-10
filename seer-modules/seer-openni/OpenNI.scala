@@ -5,6 +5,7 @@ package openni
 import graphics._
 import spatial._
 import util._
+import actor._
 
 // import scala.collection.JavaConversions._
 // import scala.collection.mutable.ArrayBuffer
@@ -15,12 +16,17 @@ import scala.collection.mutable.ListBuffer
 import java.nio._
 
 import org.openni._
+import org.openni.SkeletonJoint._
+
 // import com.primesense.nite._
 
+import akka.actor._
+import akka.event.Logging
 
 object OpenNI {
 
   var connected = false
+  var depth, rgb, tracking = false
 	var context:Context = _
 
   var depthGen:DepthGenerator = _
@@ -32,73 +38,18 @@ object OpenNI {
 	var skeletonCap:SkeletonCapability = _
 	var poseDetectionCap:PoseDetectionCapability = _
 
-  val tracking = HashMap[Int,Boolean]()
-
-  import SkeletonJoint._
+  // val tracking = HashMap[Int,Boolean]()
   
   val colors = RGB(1,0,0) :: RGB(0,1,0) :: RGB(0,0,1) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: RGB(1,1,1) :: List()
-  // val colors = RGB(1,1,1) :: RGB(0.7,0.0,0.1) :: RGB(0.0,.7,.5) :: RGB(.5,.5,.7) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: RGB(1,1,1) :: List()
+  val skeletons = HashMap[Int,Skeleton]()
 
-  val skeletons = HashMap[Int,TriangleMan]()
-  for( i <- 1 to 4 ){ 
-    skeletons(i) = new TriangleMan(i)
-    skeletons(i).setColor(colors(i))
-  }
-  // val joints = HashMap[Int,HashMap[String,Vec3]]()
-  // val vel = HashMap[Int,HashMap[String,Vec3]]()
-  val s2j = HashMap[String,SkeletonJoint](
-    "head" -> HEAD,
-    "neck" -> NECK,
-    "torso" -> TORSO,
-    "waist" -> WAIST,
-    "lcollar" -> LEFT_COLLAR,
-    "lshoulder" -> LEFT_SHOULDER,
-    "lelbow" -> LEFT_ELBOW,
-    "lwrist" -> LEFT_WRIST,
-    "lhand" -> LEFT_HAND,
-    "lfingers" -> LEFT_FINGER_TIP,
-    "rcollar" -> RIGHT_COLLAR,
-    "rshoulder" -> RIGHT_SHOULDER,
-    "relbow" -> RIGHT_ELBOW,
-    "rwrist" -> RIGHT_WRIST,
-    "rhand" -> RIGHT_HAND,
-    "rfingers" -> RIGHT_FINGER_TIP,
-    "lhip" -> LEFT_HIP,
-    "lknee" -> LEFT_KNEE,
-    "lankle" -> LEFT_ANKLE,
-    "lfoot" -> LEFT_FOOT,
-    "rhip" -> RIGHT_HIP,
-    "rknee" -> RIGHT_KNEE,
-    "rankle" -> RIGHT_ANKLE,
-    "rfoot" -> RIGHT_FOOT
-  )
+  val actor = System().actorOf( Props[OpenNIActor], name="openni" )
 
 	def connect(){
     if(connected) return
 		try{
 			context = new Context
-	 		
-      depthGen = DepthGenerator.create(context)
-      depthMD = depthGen.getMetaData()
-
-      imageGen = ImageGenerator.create(context)
-			imageMD = imageGen.getMetaData()
-
-			val transform = new AlternativeViewpointCapability(depthGen)
-			// depthGen.GetAlternativeViewPointCap().SetViewPoint(imageGen);
-			transform.setViewpoint(imageGen)
-
-			userGen = UserGenerator.create(context)
-			skeletonCap = userGen.getSkeletonCapability()
-		  poseDetectionCap = userGen.getPoseDetectionCapability()
-
-			userGen.getNewUserEvent().addObserver(new NewUserObserver())
-			userGen.getLostUserEvent().addObserver(new LostUserObserver())
-		
-			skeletonCap.getCalibrationCompleteEvent().addObserver(new CalibrationObserver());
-
-			skeletonCap.setSkeletonProfile(SkeletonProfile.ALL);
-			context.startGeneratingAll()
+			// context.startGeneratingAll()
       connected = true
 		} catch { case e:Exception => println(e)}
 	}
@@ -107,11 +58,62 @@ object OpenNI {
 		// userGen.getNewUserEvent().deleteObservers
 		// userGen.getLostUserEvent().deleteObservers
 		// skeletonCap.getCalibrationCompleteEvent().deleteObservers
-		if(context != null) context.release
+		if(context != null){ 
+      context.stopGeneratingAll()
+      context.release
+      context = null
+    }
     connected = false
 	}
 
+  def initDepth(){
+    if(!connected) connect()
+    depthGen = DepthGenerator.create(context)
+    depthMD = depthGen.getMetaData()
+    depth = true
+  }
+  def initRGB(){
+    if(!connected) connect()
+    imageGen = ImageGenerator.create(context)
+    imageMD = imageGen.getMetaData()
+    rgb = true
+  }
+  def alignDepthToRGB(){
+    if(!(rgb && depth)) return
+    val transform = new AlternativeViewpointCapability(depthGen)
+    // depthGen.GetAlternativeViewPointCap().SetViewPoint(imageGen);
+    transform.setViewpoint(imageGen)
+  }
 
+  def initTracking(){
+    if(!connected) connect()
+    if(!depth) initDepth()
+    userGen = UserGenerator.create(context)
+    skeletonCap = userGen.getSkeletonCapability()
+    poseDetectionCap = userGen.getPoseDetectionCapability()
+
+    userGen.getNewUserEvent().addObserver(new NewUserObserver())
+    userGen.getLostUserEvent().addObserver(new LostUserObserver())
+    skeletonCap.getCalibrationCompleteEvent().addObserver(new CalibrationObserver());
+    skeletonCap.setSkeletonProfile(SkeletonProfile.ALL);
+    tracking = true
+  }
+
+  def initAll(){
+    initDepth()
+    initRGB()
+    initTracking()
+  }
+
+  def start() = if(connected){
+    context.startGeneratingAll()
+    actor ! "start"
+  }
+
+  def stop() = if(connected){ 
+    context.stopGeneratingAll()
+    actor ! "stop"
+  }
 
   val histogram = new Array[Float](10000)
   def calcHist(depth:ShortBuffer){
@@ -201,26 +203,28 @@ object OpenNI {
     } catch { case e:Exception => e.printStackTrace(); }
   }
 
+  def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
+
   def getJoints(user:Int){
     getJoint(user,"head")
     getJoint(user,"neck")
     getJoint(user,"torso")
-    getJoint(user,"lshoulder")
-    getJoint(user,"lelbow")
-    getJoint(user,"lhand")
-    getJoint(user,"rshoulder")
-    getJoint(user,"relbow")
-    getJoint(user,"rhand")
-    getJoint(user,"lhip")
-    getJoint(user,"lknee")
-    getJoint(user,"lfoot")
-    getJoint(user,"rhip")
-    getJoint(user,"rknee")
-    getJoint(user,"rfoot")
+    getJoint(user,"l_shoulder")
+    getJoint(user,"l_elbow")
+    getJoint(user,"l_hand")
+    getJoint(user,"r_shoulder")
+    getJoint(user,"r_elbow")
+    getJoint(user,"r_hand")
+    getJoint(user,"l_hip")
+    getJoint(user,"l_knee")
+    getJoint(user,"l_foot")
+    getJoint(user,"r_hip")
+    getJoint(user,"r_knee")
+    getJoint(user,"r_foot")
   }
 
   def getJoint(user:Int, joint:String) = {
-    val jpos = skeletonCap.getSkeletonJointPosition(user, s2j(joint))
+    val jpos = skeletonCap.getSkeletonJointPosition(user, String2Joint(joint))
     val p = jpos.getPosition
     val x = -p.getX / 1000f
     val y = p.getY / 1000f + 1f
@@ -232,6 +236,53 @@ object OpenNI {
 
 }
 
+class OpenNIActor extends Actor with ActorLogging {
+  var running = false
+  def receive = {
+    case "start" => running = true; self ! "update"
+    case "update" => if(running){ OpenNI.updateDepth(); self ! "update" }
+    case "stop" => running = false;
+    case _ => ()
+  }
+     
+  override def preStart() = {
+    log.debug("OpenNI actor Starting")
+  }
+  override def preRestart(reason: Throwable, message: Option[Any]) {
+    log.error(reason, "OpenNI actor Restarting due to [{}] when processing [{}]",
+      reason.getMessage, message.getOrElse(""))
+  }
+}
+
+object String2Joint {
+  def apply(s:String) = s match {
+    case "head" => HEAD
+    case "neck" => NECK
+    case "torso" => TORSO
+    case "waist" => WAIST
+    case "l_collar" => LEFT_COLLAR
+    case "l_shoulder" => LEFT_SHOULDER
+    case "l_elbow" => LEFT_ELBOW
+    case "l_wrist" => LEFT_WRIST
+    case "l_hand" => LEFT_HAND
+    case "l_fingers" => LEFT_FINGER_TIP
+    case "r_collar" => RIGHT_COLLAR
+    case "r_shoulder" => RIGHT_SHOULDER
+    case "r_elbow" => RIGHT_ELBOW
+    case "r_wrist" => RIGHT_WRIST
+    case "r_hand" => RIGHT_HAND
+    case "r_fingers" => RIGHT_FINGER_TIP
+    case "l_hip" => LEFT_HIP
+    case "l_knee" => LEFT_KNEE
+    case "l_ankle" => LEFT_ANKLE
+    case "l_foot" => LEFT_FOOT
+    case "r_hip" => RIGHT_HIP
+    case "r_knee" => RIGHT_KNEE
+    case "r_ankle" => RIGHT_ANKLE
+    case "r_foot" => RIGHT_FOOT
+    case _ => TORSO
+  }
+}
 
 
 class NewUserObserver extends IObserver[UserEventArgs]{
@@ -240,7 +291,7 @@ class NewUserObserver extends IObserver[UserEventArgs]{
     val id = args.getId
 		println("New user " + id + " pose: " + sk.needPoseForCalibration() );
 		sk.requestSkeletonCalibration(id, true);
-    OpenNI.skeletons.getOrElseUpdate(id, new TriangleMan(id)).calibrating = true
+    OpenNI.getSkeleton(id).calibrating = true
 	}
 }
 
@@ -248,9 +299,9 @@ class LostUserObserver extends IObserver[UserEventArgs]{
 	override def update( observable:IObservable[UserEventArgs], args:UserEventArgs){
     val id = args.getId
 		println("Lost user " + id);
-    OpenNI.tracking(id) = false
-    OpenNI.skeletons.getOrElseUpdate(id, new TriangleMan(id)).tracking = false
-    OpenNI.skeletons(id).calibrating = false
+    // OpenNI.tracking(id) = false
+    OpenNI.getSkeleton(id).tracking = false
+    OpenNI.getSkeleton(id).calibrating = false
 	}
 }
 
@@ -262,11 +313,11 @@ class CalibrationObserver extends IObserver[CalibrationProgressEventArgs]{
       val id = args.getUser
 			println("starting tracking "  + id);
 			OpenNI.skeletonCap.startTracking(id);
-      OpenNI.skeletons.getOrElseUpdate(id, new TriangleMan(id)).calibrating = false
-      OpenNI.skeletons(id).randomizeIndices
-      OpenNI.skeletons(id).tracking = true
+      OpenNI.getSkeleton(id).calibrating = false
+      // OpenNI.skeletons(id).randomizeIndices
+      OpenNI.getSkeleton(id).tracking = true
 
-      OpenNI.tracking(id) = true
+      // OpenNI.tracking(id) = true
 		} else if (args.getStatus() != CalibrationProgressStatus.MANUAL_ABORT){
 			OpenNI.skeletonCap.requestSkeletonCalibration(args.getUser(), true);
 		}
