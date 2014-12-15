@@ -17,6 +17,7 @@ object Random {
 	val int = new Generator[Int]{
 		def apply() = r.nextInt
 	}
+	def int(hi:Int): Generator[Int] = for(x <- int) yield math.abs(x) % hi
 	def int(lo:Int,hi:Int): Generator[Int] = for(x <- int) yield lo + math.abs(x) % (hi - lo)
 
 	val float = new Generator[Float]{

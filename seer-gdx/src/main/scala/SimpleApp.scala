@@ -44,7 +44,7 @@ class SeerAppListener extends ApplicationListener {
   // val fps = new FPSLogger
   // var logfps = false
 
-  var fixedTimeStep = true
+  var fixedTimeStep = false
   var timeStep = 1/60f
   var dtAccum = 0f
   var paused = false

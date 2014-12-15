@@ -12,6 +12,7 @@ import actor._
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 
 import java.nio._
 
@@ -25,8 +26,9 @@ import akka.event.Logging
 
 object OpenNI {
 
+  val (w,h) = (640, 480)
   var connected = false
-  var depth, rgb, tracking = false
+  var depth, rgb, tracking, pointCloud = false
 	var context:Context = _
 
   var depthGen:DepthGenerator = _
@@ -45,13 +47,15 @@ object OpenNI {
 
   val actor = System().actorOf( Props[OpenNIActor], name="openni" )
 
-	def connect(){
-    if(connected) return
+	def connect():Boolean = {
+    if(connected) return true
 		try{
 			context = new Context
 			// context.startGeneratingAll()
       connected = true
+      return true
 		} catch { case e:Exception => println(e)}
+    return false
 	}
 
 	def disconnect(){
@@ -67,13 +71,13 @@ object OpenNI {
 	}
 
   def initDepth(){
-    if(!connected) connect()
+    if(!connect()) return
     depthGen = DepthGenerator.create(context)
     depthMD = depthGen.getMetaData()
     depth = true
   }
   def initRGB(){
-    if(!connected) connect()
+    if(!connect()) return
     imageGen = ImageGenerator.create(context)
     imageMD = imageGen.getMetaData()
     rgb = true
@@ -86,7 +90,6 @@ object OpenNI {
   }
 
   def initTracking(){
-    if(!connected) connect()
     if(!depth) initDepth()
     userGen = UserGenerator.create(context)
     skeletonCap = userGen.getSkeletonCapability()
@@ -148,59 +151,118 @@ object OpenNI {
     }
   }
 
-  val imgbytes = Array.fill(640*480*4)(255.toByte)
-  val rgbbytes = Array.fill(640*480*4)(255.toByte)
-  val maskbytes = Array.fill(640*480)(0.toByte)
-  def updateDepth(){
+  val depthBytes = Array.fill(w*h*3)(255.toByte)
+  // val rgbbytes = Array.fill(w*h*4)(255.toByte)
+  val maskBytes = Array.fill(w*h)(0.toByte)
+
+  var depthBuffer:ShortBuffer = _ 
+  var sceneBuffer:ShortBuffer = _ 
+  var rgbBuffer:ByteBuffer = _ 
+
+  val meshBuffer = new Mesh() 
+  val pointMesh = new Mesh()
+  pointMesh.maxVertices = w*h
+  pointMesh.primitive = Points
+
+  val pointBuffer = ArrayBuffer[Point3D]()
+  var rem = 0
+
+  def update(){
+
   	if( context == null) return
     try {
       context.waitNoneUpdateAll();
 
-      val depthMD = depthGen.getMetaData();
-      val imageMD = imageGen.getMetaData();
-      val sceneMD = userGen.getUserPixels(0);
+      if(rgb){
+        val imageMD = imageGen.getMetaData();
+        rgbBuffer = imageMD.getData().createByteBuffer();
+      }
 
-      val scene = sceneMD.getData().createShortBuffer();
-      val image = imageMD.getData().createByteBuffer();
-      val depth = depthMD.getData().createShortBuffer();
-      calcHist(depth);
-      depth.rewind();
-        
-      while(depth.remaining() > 0){
-        val pos = depth.position();
-        val pixel = depth.get();
-        val user = scene.get();
-            
-        imgbytes(4*pos) = 0;
-        imgbytes(4*pos+1) = 0;
-        imgbytes(4*pos+2) = 0;
-        imgbytes(4*pos+3) = 0;
+      if(depth){
 
-        rgbbytes(4*pos) = image.get()
-    		rgbbytes(4*pos+1) = image.get()
-        rgbbytes(4*pos+2) = image.get()                  
-    		rgbbytes(4*pos+3) = 255.toByte 
+        val depthMD = depthGen.getMetaData();
+        val sceneMD = userGen.getUserPixels(0);
+        sceneBuffer = sceneMD.getData().createShortBuffer();
+        depthBuffer = depthMD.getData().createShortBuffer();
 
-    		maskbytes(pos) = if(user != 0) 1.toByte else 0               	
+        // if(depthImage){
+          calcHist(depthBuffer);
+          depthBuffer.rewind();
+        // }
+          
+        // meshBuffer.clear
+        pointBuffer.clear
 
-    		val drawBackground = false
-        if (drawBackground || pixel != 0){
-        	var c = user % (colors.length-1);
-        	if (user == 0)
-        	{
-        		c = colors.length-1;
-        	}
-        	if (pixel != 0)
-        	{
-        		val histValue = histogram(pixel);
-        		imgbytes(4*pos) = (colors(c).r * histValue*255).toByte 
-        		imgbytes(4*pos+1) = (colors(c).g * histValue*255).toByte
-            imgbytes(4*pos+2) = (colors(c).b * histValue*255).toByte
-        		imgbytes(4*pos+3) = 255.toByte
-        	}
+        while(depthBuffer.remaining() > 0){
+          val pos = depthBuffer.position();
+          val z = depthBuffer.get();
+          val user = sceneBuffer.get();
+              
+      		maskBytes(pos) = user.toByte //if(user != 0) 1.toByte else 0               	
+
+        	var c = RGB.white
+        	if (user > 0) c = RGB(0,1,0)
+        	if (z != 0){
+        		val histValue = histogram(z);
+        		depthBytes(3*pos) = (c.r * histValue*255).toByte 
+        		depthBytes(3*pos+1) = (c.g * histValue*255).toByte
+            depthBytes(3*pos+2) = (c.b * histValue*255).toByte
+        	} else{
+            depthBytes(3*pos) = 0.toByte 
+            depthBytes(3*pos+1) = 0.toByte
+            depthBytes(3*pos+2) = 0.toByte
+          }
+
+          if(pointCloud){
+            val y = pos / w
+            val x = pos % w
+            if (z != 0 && user > 0 && x%4==rem && y%4==rem){
+              pointBuffer += new Point3D(x, y, z)
+              // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
+              // meshBuffer.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
+            }
+          }
         }
+        if(pointCloud){
+          // pointMesh.clear 
+          // pointMesh.vertices ++= meshBuffer.vertices
+          // pointMesh.clear
+          val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
+          val vs = ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000 }
+          pointMesh.clear
+          pointMesh.vertices ++= vs
+          rem = (rem+2) % 4
+        }
+
       }
     } catch { case e:Exception => e.printStackTrace(); }
+  }
+
+  def updatePoints(){
+    if(!depth) return
+
+    depthBuffer.rewind();
+    sceneBuffer.rewind();
+
+    // pointMesh.clear
+    pointBuffer.clear
+
+    while(depthBuffer.remaining() > 0){
+      val pos = depthBuffer.position();
+      val z = depthBuffer.get();
+      val user = sceneBuffer.get();
+          
+      val y = pos / w
+      val x = pos % w
+      if (z != 0 && user > 0 && x%2==0 && y%2==0){
+        pointBuffer += new Point3D(x, y, z)
+        // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
+        // pointMesh.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
+      }
+    }
+    pointMesh.clear
+    val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
+    pointMesh.vertices ++= ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000 }
   }
 
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
@@ -224,11 +286,11 @@ object OpenNI {
   }
 
   def getJoint(user:Int, joint:String) = {
-    val jpos = skeletonCap.getSkeletonJointPosition(user, String2Joint(joint))
+    val jpos = skeletonCap.getSkeletonJointPosition(user, Joint(joint))
     val p = jpos.getPosition
-    val x = -p.getX / 1000f
-    val y = p.getY / 1000f + 1f
-    val z = -p.getZ / 1000f
+    val x = p.getX / 1000f
+    val y = p.getY / 1000f //+ 1f
+    val z = p.getZ / 1000f
     val v = Vec3(x,y,z)
     skeletons(user).updateJoint(joint,v)
     (v, jpos.getConfidence )
@@ -240,7 +302,7 @@ class OpenNIActor extends Actor with ActorLogging {
   var running = false
   def receive = {
     case "start" => running = true; self ! "update"
-    case "update" => if(running){ OpenNI.updateDepth(); self ! "update" }
+    case "update" => if(running){ OpenNI.update(); self ! "update" }
     case "stop" => running = false;
     case _ => ()
   }
@@ -251,36 +313,6 @@ class OpenNIActor extends Actor with ActorLogging {
   override def preRestart(reason: Throwable, message: Option[Any]) {
     log.error(reason, "OpenNI actor Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
-  }
-}
-
-object String2Joint {
-  def apply(s:String) = s match {
-    case "head" => HEAD
-    case "neck" => NECK
-    case "torso" => TORSO
-    case "waist" => WAIST
-    case "l_collar" => LEFT_COLLAR
-    case "l_shoulder" => LEFT_SHOULDER
-    case "l_elbow" => LEFT_ELBOW
-    case "l_wrist" => LEFT_WRIST
-    case "l_hand" => LEFT_HAND
-    case "l_fingers" => LEFT_FINGER_TIP
-    case "r_collar" => RIGHT_COLLAR
-    case "r_shoulder" => RIGHT_SHOULDER
-    case "r_elbow" => RIGHT_ELBOW
-    case "r_wrist" => RIGHT_WRIST
-    case "r_hand" => RIGHT_HAND
-    case "r_fingers" => RIGHT_FINGER_TIP
-    case "l_hip" => LEFT_HIP
-    case "l_knee" => LEFT_KNEE
-    case "l_ankle" => LEFT_ANKLE
-    case "l_foot" => LEFT_FOOT
-    case "r_hip" => RIGHT_HIP
-    case "r_knee" => RIGHT_KNEE
-    case "r_ankle" => RIGHT_ANKLE
-    case "r_foot" => RIGHT_FOOT
-    case _ => TORSO
   }
 }
 

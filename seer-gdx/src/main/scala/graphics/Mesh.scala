@@ -15,6 +15,13 @@ import com.badlogic.gdx.graphics.g3d.loader._
 
 object Mesh {
 	def apply() = new Mesh()
+	def apply(m:MeshLike) = {
+		val n = new Mesh()
+		n.vertices ++= m.vertices
+		n.normals ++= m.normals 
+		n.texCoords ++= m.texCoords 
+		n.colors ++= m.colors 
+	}
 	def apply(m:GdxMesh) = new Mesh(){ gdxMesh = Some(m); getVerticesFromGdxMesh() }
 }
 
