@@ -30,6 +30,9 @@ object Mouse extends InputAdapter {
 	val y = Var(0f)
 	val xy = Var(Vec2())
 
+  val dx = Var(0f)
+  val dy = Var(0f)
+
 	val id = Var(0)
 	val button = Var(0)
 	val scroll = Var(0f)
@@ -43,10 +46,14 @@ object Mouse extends InputAdapter {
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
 	def update(sx:Int, sy:Int, stat:String){
+    val lx = x()
+    val ly = y()
 		x() = sx * 1f / Window.width
 		y() = 1f - (sy * 1f / Window.height)
 		xy() = Vec2(x(),y())
 		status() = stat
+    dx() = x() - lx
+    dy() = y() - ly
 	}
   override def touchUp( sx:Int, sy:Int, pointer:Int, but:Int) = {
 		update(sx,sy,"up")

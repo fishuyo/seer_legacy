@@ -112,10 +112,16 @@ class LoopBuffer[A: ClassManifest](override val maxSize:Int) extends RingBuffer[
 	private var pos = 0
 
   def apply(): A = {
-    if (pos >= count_) pos = 0
+    if (pos >= read+count_) pos = 0
     val ret = array((read + pos) % maxSize)
+    // val ret = array((pos) % maxSize)
     pos += 1
     ret
+  }
+
+  def update(elem: A) {
+    array(write) = elem
+    write = (write + 1) % count_
   }
 
   override def take(n:Int) = {

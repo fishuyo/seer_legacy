@@ -2,8 +2,15 @@
 package com.fishuyo.seer
 package audio
 
+import types._
+
+/**
+  * Gen represents a floating point audio sample generator
+  */
 trait Gen extends AudioSource {
   self =>
+
+  var value = 0f
 
 	def apply():Float
 
@@ -23,28 +30,18 @@ trait Gen extends AudioSource {
     def apply() = f(self.apply()).apply()
   }
 
-  // def foldLeft[S](s:S)(f:(S,Generator[T]) => S):Generator[S] = new Generator[S]{
-  //   value = s
-  //   def apply() = {
-  //     value = f(value,self)
-  //     value
-  //   }
-  // }
+  def foldLeft(s:Float)(f:(Float,Gen) => Float):Gen = new Gen{
+    value = s
+    def apply() = {
+      value = f(value,self)
+      value
+    }
+  }
 }
 
-	// def *(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() * o() }} }
-	// def +(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() + o() }} }
-	// def -(o:Gen) = {val that=this; new Gen(){ gen = ()=>{ that() - o() }} }
-	// def unary_-(o:Gen) = new Gen(){ gen = ()=>{ -o() }}
-
- //  def ->(o:Osc) = {val that=this; new Gen(){ gen = ()=>{ o.f(that()); o() }} }
-  
-
-class Var(var value:Float) extends Gen{
-  def apply() = value
-}
-
-
+/**
+  * Osc represents a phase accumulating oscillator 
+  */
 class Osc(var f:Gen) extends Gen{
   var sr = Audio().sampleRate
   var phase = 0f
@@ -54,13 +51,11 @@ class Osc(var f:Gen) extends Gen{
     phase %= 1f
     phase
   }
-
-  // def f() = {val that=this; new Gen(){ gen = ()=>{ that.frequency }} }
-  // def f(f:Float) = { frequency = f; dphase = frequency / Audio().sampleRate }
-  // def a(f:Float) = amp = f
-
 }
 
+/**
+  * Inefficient sin wave oscillator
+  */
 class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
   override def apply() = {
     super.apply()
@@ -68,6 +63,9 @@ class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
   }
 }
 
+/**
+  * Triangle wave oscillator ^
+  */
 class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
@@ -75,12 +73,95 @@ class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   }
 }
 
+/**
+  * Saw /|/
+  */
 class Saw(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
     (((phase / 2f + 0.25f) % 0.5f - 0.25f) * 4f) * a
   }
 }
+
+class Square(f:Float = 100f, var a:Float = 1f) extends Osc(f) {
+  override def apply() = {
+    super.apply()
+    (math.round(phase) - 0.5f)*2*a
+  }
+}
+
+class Step(f:Float = 1f, var a:Float = 1f) extends Osc(f) {
+  override def apply() = {
+    super.apply()
+    (math.round(phase))*a
+  }
+}
+
+//
+class Var(v:Float) extends Gen {
+  value = v
+  def apply() = value
+}
+
+
+class PulseTrain(var width:Gen) extends Gen {
+  var i = 0
+  def apply() = {
+    if(i == 0) value = 1f
+    else value = 0f
+    val w = width().toInt
+    if(w > 0) i = (i+1) % w
+    value
+  }
+}
+
+
+
+class Impulse extends Gen {
+  value = 1f
+  def apply() = { val s=value; value=0f; s}
+}
+
+class Noise extends Gen {
+  def apply() = Random.float()
+}
+
+class Nyquist extends Gen {
+  value = 1f
+  def apply() = { value = -value; value }
+}
+
+class Add(var add:Float=1f) extends Gen{
+  value = -add
+  def apply() = { value += add; value}
+}
+
+class Line(var begin:Float=0f, var end:Float=1f, var len:Float=44100) extends Add((end-begin)/len)
+
+class Ramp(start:Float, end:Float, len:Int) extends Gen {
+  var add = (end-start) / len
+  value = start
+
+  def apply() = {
+    if(math.abs(value-end) >= math.abs(add)) value += add
+    else value = end
+    value
+  }
+}
+
+
+class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen {
+  val ring = new LoopBuffer[Float](maxDelay)
+
+  def apply(in:Float) = {
+    val d = delay().toInt
+    if(d > 0 && d <= maxDelay) ring.count_ = d
+    val s = in + ring() * c()
+    ring() = s //in + s * c()
+    s 
+  }
+  def apply = apply(0f)
+} 
 
 
 // //class Val(var)
