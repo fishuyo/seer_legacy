@@ -228,10 +228,10 @@ object OpenNI {
           // pointMesh.vertices ++= meshBuffer.vertices
           // pointMesh.clear
           val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
-          val vs = ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000 }
+          val vs = ps.map { case p => Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f }
           pointMesh.clear
           pointMesh.vertices ++= vs
-          rem = (rem+2) % 4
+          // rem = (rem+2) % 4
         }
 
       }
@@ -262,7 +262,7 @@ object OpenNI {
     }
     pointMesh.clear
     val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
-    pointMesh.vertices ++= ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000 }
+    pointMesh.vertices ++= ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000f }
   }
 
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
@@ -291,7 +291,7 @@ object OpenNI {
     val x = p.getX / 1000f
     val y = p.getY / 1000f //+ 1f
     val z = p.getZ / 1000f
-    val v = Vec3(x,y,z)
+    val v = Vec3(x,y,-z)
     skeletons(user).updateJoint(joint,v)
     (v, jpos.getConfidence )
   }

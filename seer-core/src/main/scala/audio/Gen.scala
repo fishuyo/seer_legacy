@@ -2,8 +2,6 @@
 package com.fishuyo.seer
 package audio
 
-import types._
-
 /**
   * Gen represents a floating point audio sample generator
   */
@@ -59,7 +57,8 @@ class Osc(var f:Gen) extends Gen{
 class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    math.sin(phase * 2*math.Pi).toFloat * a
+    value = math.sin(phase * 2*math.Pi).toFloat * a
+    value
   }
 }
 
@@ -69,7 +68,8 @@ class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
 class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    (1f - 4f * math.abs((phase + 0.25f) % 1 - 0.5f)) * a
+    value = (1f - 4f * math.abs((phase + 0.25f) % 1 - 0.5f)) * a
+    value
   }
 }
 
@@ -79,21 +79,24 @@ class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
 class Saw(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    (((phase / 2f + 0.25f) % 0.5f - 0.25f) * 4f) * a
+    value = (((phase / 2f + 0.25f) % 0.5f - 0.25f) * 4f) * a
+    value
   }
 }
 
 class Square(f:Float = 100f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    (math.round(phase) - 0.5f)*2*a
+    value = (math.round(phase) - 0.5f)*2*a
+    value
   }
 }
 
 class Step(f:Float = 1f, var a:Float = 1f) extends Osc(f) {
   override def apply() = {
     super.apply()
-    (math.round(phase))*a
+    value = (math.round(phase))*a
+    value
   }
 }
 
@@ -123,7 +126,7 @@ class Impulse extends Gen {
 }
 
 class Noise extends Gen {
-  def apply() = Random.float()
+  def apply() = util.Random.float()
 }
 
 class Nyquist extends Gen {
@@ -151,7 +154,7 @@ class Ramp(start:Float, end:Float, len:Int) extends Gen {
 
 
 class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen {
-  val ring = new LoopBuffer[Float](maxDelay)
+  val ring = new types.LoopBuffer[Float](maxDelay)
 
   def apply(in:Float) = {
     val d = delay().toInt
