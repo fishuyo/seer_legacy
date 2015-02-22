@@ -11,6 +11,21 @@ package object graphics {
   val TriangleStrip = 5
   val TriangleFan = 6
 
+  val Zero = 0;
+	val One = 1;
+	val SrcColor = 0x0300;
+	val OneMinuSrcColor = 0x0301;
+	val SrcAlpha = 0x0302;
+	val OneMinusSrcAlpha = 0x0303;
+	val DstAlpha = 0x0304;
+	val OneMinusDstAlpha = 0x0305;
+	val DstColor = 0x0306;
+	val OneMinuDstColor = 0x0307;
+	val SrcAlphaSaturate = 0x0308;
+	val Add = 0x8006;
+	val Subtract = 0x800A;
+	val ReverseSubtract = 0x800B;
+
 	implicit def RGBA2Float(c:RGBA) = c.toGray
 	implicit def RGB2RGBA(c:RGB) = RGBA(c.r,c.g,c.b,1)
 	implicit def RGBA2RGB(c:RGBA) = RGB(c.r,c.g,c.b)

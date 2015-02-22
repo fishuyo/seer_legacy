@@ -27,21 +27,25 @@ class Environment {
   var lightDiffuse = RGBA(.6f,.6f,.6f,1)
   var lightSpecular = RGBA(.4f,.4f,.4f,1)
 
-  var lights = ListBuffer[Light]()
+  // var lights = ListBuffer[Light]()
+  var srcBlend = GL20.GL_ONE
+  var dstBlend = GL20.GL_ONE
+
+  def blendFunc(src:Int, dst:Int){
+    srcBlend = src
+    dstBlend = dst
+  }
 
   def setGLState(){
     Gdx.gl.glClearColor(backgroundColor.r,backgroundColor.g,backgroundColor.b,backgroundColor.a)
     // Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-    Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE)
+
     Gdx.gl.glLineWidth(lineWidth)
 
-    if(blend){
-      Gdx.gl.glEnable(GL20.GL_BLEND)
-      Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-    }else {
-      Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
-      Gdx.gl.glDisable( GL20.GL_BLEND )
-    }
+    if(blend) Gdx.gl.glEnable(GL20.GL_BLEND)
+    else Gdx.gl.glDisable( GL20.GL_BLEND )
+    Gdx.gl.glBlendFunc(srcBlend, dstBlend)
+
 
     if(depth) Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )
     else Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
