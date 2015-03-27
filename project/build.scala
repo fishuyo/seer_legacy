@@ -69,6 +69,12 @@ object SeerBuild extends Build {
     settings = BuildSettings.app
   ) dependsOn( seer_gdx_desktop_app, seer_multitouch )
 
+  lazy val examples_graphics = SeerProject (
+    "examples-graphics",
+    file("examples/graphics"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_multitouch )
+
   lazy val examples_actor = SeerProject (
     "examples-actor",
     file("examples/actor"),
@@ -80,6 +86,24 @@ object SeerBuild extends Build {
     file("examples/audio"),
     settings = BuildSettings.app
   ) dependsOn( seer_gdx_desktop_app, seer_portaudio, seer_multitouch )
+
+  lazy val examples_particle = SeerProject (
+    "examples-particle",
+    file("examples/particle"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_multitouch )
+
+  lazy val examples_video = SeerProject (
+    "examples-video",
+    file("examples/video"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_video )
+
+  lazy val examples_opencv = SeerProject (
+    "examples-opencv",
+    file("examples/opencv"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_opencv )
 
   lazy val examples_bullet = SeerProject (
     "examples-bullet",

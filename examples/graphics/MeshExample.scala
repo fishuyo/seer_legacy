@@ -10,7 +10,7 @@ object MeshExample extends SeerApp {
 
 	var t = 0f 
 
-	// make a new mesh and set render primitive to use GL_TRIANGLEs
+	// make a new mesh and set render primitive to use GL_TRIANGLE
 	val mesh = Mesh()
 	mesh.primitive = Triangles
 

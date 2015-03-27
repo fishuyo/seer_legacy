@@ -37,7 +37,7 @@ class SeerAppListener extends ApplicationListener {
   var scene = Scene
   var camera = Camera //new PerspectiveCamera(67f, SimpleAppSize.aspect, 1f)
   var input = Inputs //new InputMultiplexer
-  var navInput = new KeyboardNavInput(Camera.nav)
+  // var navInput = new KeyboardNavInput(Camera.nav)
   // var audio = Audio
 
   var frameCount = 0
@@ -53,7 +53,7 @@ class SeerAppListener extends ApplicationListener {
     println("App create.")
 
     Gdx.input.setInputProcessor( input )
-    input.addProcessor( navInput )
+    // input.addProcessor( navInput )
 
     camera.nav.pos.z = 2f
 

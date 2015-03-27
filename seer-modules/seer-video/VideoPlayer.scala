@@ -139,7 +139,6 @@ class VideoBufferingActor(val player:VideoPlayer) extends Actor {
 
   def receive = {
   	case "decodeFrame" => {
-      if( queue.size < 60){
   		if( container.readNextPacket(packet) >= 0){
 
 	      if (packet.getStreamIndex() == videoStreamId){
@@ -176,8 +175,8 @@ class VideoBufferingActor(val player:VideoPlayer) extends Actor {
 	        }
 	      }
 	    } else { container.seekKeyFrame(videoStreamId,0,0)}
-      }
-	    if( queue.size > 60) Thread.sleep(10)
+      
+	    while( queue.size > 60) Thread.sleep(100)
 	    self ! "decodeFrame"
   	}
     case "close" => ()

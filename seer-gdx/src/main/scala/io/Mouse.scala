@@ -26,6 +26,8 @@ object Mouse extends InputAdapter {
 	callbacks += ("move" -> List())
 	callbacks += ("scroll" -> List())
 
+  use()
+
 	val x = Var(0f)
 	val y = Var(0f)
 	val xy = Var(Vec2())
@@ -40,8 +42,12 @@ object Mouse extends InputAdapter {
 
 	def non()() = {}
 
-	def clear() = { callbacks.keys.foreach(callbacks(_) = List()); Inputs.removeProcessor(this) }
-	def use() = Inputs.addProcessor(this)
+	def clear() = { callbacks.keys.foreach(callbacks(_) = List()) } // Inputs.removeProcessor(this) }
+  def use() = {
+    val ps = Inputs.getProcessors()
+    if(!ps.contains(this, true)) Inputs.addProcessor(this)
+  }
+	def remove() = Inputs.removeProcessor(this)
 
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
