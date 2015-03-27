@@ -27,7 +27,7 @@ class VideoLoop extends VideoSource {
   val images = new ListBuffer[Mat]()
   var frame = 0f
   var speed = 1f
-  var alpha = 0.1f
+  var alpha = 0.3f
   var beta = 1f-alpha
 
   def play(){ playing = true; }
