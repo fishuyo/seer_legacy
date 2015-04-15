@@ -93,6 +93,12 @@ object SeerBuild extends Build {
     settings = BuildSettings.app
   ) dependsOn( seer_gdx_desktop_app, seer_multitouch )
 
+  lazy val examples_trackpad = SeerProject (
+    "examples-trackpad",
+    file("examples/trackpad"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_multitouch )
+
   lazy val examples_video = SeerProject (
     "examples-video",
     file("examples/video"),

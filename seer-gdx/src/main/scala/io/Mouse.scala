@@ -34,6 +34,7 @@ object Mouse extends InputAdapter {
 
   val dx = Var(0f)
   val dy = Var(0f)
+  val vel = Var(Vec2())
 
 	val id = Var(0)
 	val button = Var(0)
@@ -60,6 +61,7 @@ object Mouse extends InputAdapter {
 		status() = stat
     dx() = x() - lx
     dy() = y() - ly
+    vel() = Vec2(dx(),dy())
 	}
   override def touchUp( sx:Int, sy:Int, pointer:Int, but:Int) = {
 		update(sx,sy,"up")
