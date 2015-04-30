@@ -5,7 +5,7 @@ package graphics
   * Shader code split into composable fragments
   */
 
-object ShaderCode {
+object ShaderSegments {
   val attributes = Map("all" -> """
     attribute vec3 a_position;
     attribute vec3 a_normal;
@@ -39,7 +39,7 @@ object ShaderCode {
 
 object DefaultShaders {
 
-  import ShaderCode._
+  import ShaderSegments._
 
   val basic = (
     // Vertex Shader
@@ -79,6 +79,13 @@ object DefaultShaders {
         v_lightDir = vec3(u_viewMatrix * vec4(u_lightPosition,0));
 
         v_texCoord = a_texCoord0;
+
+        vec3 flen = u_cameraPosition.xyz - pos.xyz;
+        float fog = dot(flen, flen); // * u_cameraPosition.w;
+        // v_fog = min(fog, 1.0);
+        float fogDensity = 0.04;
+        v_fog = 1.0-clamp(exp(-pow(fogDensity*length(flen), 2.0)), 0.0, 1.0);
+
         gl_Position = u_projectionViewMatrix * vec4(a_position,1); 
       }
     """,
@@ -105,6 +112,7 @@ object DefaultShaders {
       varying vec3 v_lightDir;
       varying vec4 v_color;
       varying vec3 v_pos;
+      varying float v_fog;
 
       void main() {
         
@@ -141,6 +149,8 @@ object DefaultShaders {
         gl_FragColor = mix(colorMixed, final_color, u_lightingMix);
         gl_FragColor *= (1.0 - u_fade);
         gl_FragColor.a *= u_alpha;
+
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0,0,0), v_fog);
       }
     """
   )

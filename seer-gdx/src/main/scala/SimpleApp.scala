@@ -55,6 +55,8 @@ class SeerAppListener extends ApplicationListener {
     Gdx.input.setInputProcessor( input )
     // input.addProcessor( navInput )
 
+    Keyboard.bindCamera()
+
     camera.nav.pos.z = 2f
 
     val basic = Shader.load(DefaultShaders.basic)

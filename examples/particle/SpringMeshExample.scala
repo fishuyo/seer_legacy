@@ -36,8 +36,10 @@ object SpringMeshExample extends SeerApp {
 		model.material.color = RGBA(0f,.6f,.6f,1f)
 		// model.mesh.primitive = Lines
 
-		// create a spring simulation from mesh, set simulation gravity to zero
-		spring = new SpringMesh(model.mesh)
+		// create a spring simulation from mesh, with maximum stiffness
+		spring = new SpringMesh(model.mesh, 1f)
+
+		//  set simulation gravity to zero
 		particle.Gravity.set(0,0,0)
 	}
 
