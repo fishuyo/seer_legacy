@@ -111,6 +111,12 @@ object SeerBuild extends Build {
     settings = BuildSettings.app
   ) dependsOn( seer_gdx_desktop_app, seer_opencv )
 
+  lazy val examples_openni = SeerProject (
+    "examples-openni",
+    file("examples/openni"),
+    settings = BuildSettings.app
+  ) dependsOn( seer_gdx_desktop_app, seer_opencv )
+
   lazy val examples_bullet = SeerProject (
     "examples-bullet",
     file("examples/bullet"),

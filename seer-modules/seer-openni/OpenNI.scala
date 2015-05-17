@@ -166,6 +166,7 @@ object OpenNI {
 
   val pointBuffer = ArrayBuffer[Point3D]()
   var rem = 0
+  var pointCloudDensity = 4
 
   def update(){
 
@@ -216,7 +217,7 @@ object OpenNI {
           if(pointCloud){
             val y = pos / w
             val x = pos % w
-            if (z != 0 && user > 0 && x%4==rem && y%4==rem){
+            if (z != 0 && user > 0 && x%pointCloudDensity==rem && y%pointCloudDensity==rem){
               pointBuffer += new Point3D(x, y, z)
               // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
               // meshBuffer.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
@@ -238,32 +239,32 @@ object OpenNI {
     } catch { case e:Exception => e.printStackTrace(); }
   }
 
-  def updatePoints(){
-    if(!depth) return
+  // def updatePoints(){
+  //   if(!depth) return
 
-    depthBuffer.rewind();
-    sceneBuffer.rewind();
+  //   depthBuffer.rewind();
+  //   sceneBuffer.rewind();
 
-    // pointMesh.clear
-    pointBuffer.clear
+  //   // pointMesh.clear
+  //   pointBuffer.clear
 
-    while(depthBuffer.remaining() > 0){
-      val pos = depthBuffer.position();
-      val z = depthBuffer.get();
-      val user = sceneBuffer.get();
+  //   while(depthBuffer.remaining() > 0){
+  //     val pos = depthBuffer.position();
+  //     val z = depthBuffer.get();
+  //     val user = sceneBuffer.get();
           
-      val y = pos / w
-      val x = pos % w
-      if (z != 0 && user > 0 && x%2==0 && y%2==0){
-        pointBuffer += new Point3D(x, y, z)
-        // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
-        // pointMesh.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
-      }
-    }
-    pointMesh.clear
-    val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
-    pointMesh.vertices ++= ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000f }
-  }
+  //     val y = pos / w
+  //     val x = pos % w
+  //     if (z != 0 && user > 0 && x%pointCloudDensity==0 && y%pointCloudDensity==0){
+  //       pointBuffer += new Point3D(x, y, z)
+  //       // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
+  //       // pointMesh.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
+  //     }
+  //   }
+  //   pointMesh.clear
+  //   val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
+  //   pointMesh.vertices ++= ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000f }
+  // }
 
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
 

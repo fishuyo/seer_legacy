@@ -53,7 +53,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   def cross( v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
-  def normalize() = this * (1.0f / mag() ) //fix this
+  def normalize() = { this *= (1.0f / mag()); this } 
   def normalized() = this * (1.0f / mag() )
 
   def zero() = {x=0;y=0;z=0}

@@ -104,4 +104,17 @@ class Octree[T]( val parent:Octree[T], c:Vec3, halfsize:Float) extends AABB(c,ha
     results
   }
 
+  def foreach(f:(Vec3,T) => Unit){
+    if( numChildren == 0 ){
+      values.foreach{ case (v,t) => f(v,t) }
+    }else if( numChildren > 0 ) {
+      for( i <- (0 until 8)){
+        if( children(i) != null ){
+          children(i).foreach(f)
+        }
+      }
+    }
+  }
+
+
 }
