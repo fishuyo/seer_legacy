@@ -6,7 +6,7 @@ object Vec3 {
 
   def apply() = new Vec3(0,0,0)
   def apply(v:Vec3) = new Vec3(v.x,v.y,v.z)
-  def apply( v: Float=0.f) = new Vec3( v, v, v)
+  def apply( v: Float=0f) = new Vec3( v, v, v)
   def apply( vv: Double) = { val v=vv.toFloat; new Vec3( v, v, v) }
   def apply( x: Float, y: Float, z: Float) = new Vec3(x,y,z)
   def apply( x: Double, y: Double, z: Double) =  new Vec3(x.toFloat,y.toFloat,z.toFloat) 
@@ -53,7 +53,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
   def cross( v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
-  def normalize() = this * (1.0f / mag() ) //fix this
+  def normalize() = { this *= (1.0f / mag()); this } 
   def normalized() = this * (1.0f / mag() )
 
   def zero() = {x=0;y=0;z=0}
@@ -81,7 +81,7 @@ object Vec2 {
 
   def apply() = new Vec2(0,0)
   def apply(v:Vec2) = new Vec2(v.x,v.y)
-  def apply( v: Float=0.f) = new Vec2( v, v)
+  def apply( v: Float=0f) = new Vec2( v, v)
   def apply( vv: Double) = { val v=vv.toFloat; new Vec2( v, v) }
   def apply( x: Float, y: Float) = new Vec2(x,y)
   def apply( x: Double, y: Double) =  new Vec2(x.toFloat,y.toFloat) 

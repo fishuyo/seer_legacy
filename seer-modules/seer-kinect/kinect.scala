@@ -40,7 +40,7 @@
 
 // 	var depthTextureID = 0
 // 	val cube = Cube() //Primitive3D.cube()
-// 	cube.scale.set(1.f, 480.f/640.f, .1f)
+// 	cube.scale.set(1f, 480f/640f, .1f)
 
 // 	val depthPix = new Pixmap(640,480, Pixmap.Format.RGBA8888)
 // 	val videoPix = new Pixmap(640,480, Pixmap.Format.RGB888)
@@ -59,7 +59,7 @@
 // 	val gamma = new Array[Float](2048)
 // 	for (i<-(0 until 2048)){
 // 		var v = i/2047.0
-// 		if( v == 1.f) v = 0.0
+// 		if( v == 1f) v = 0.0
 // 		else v = math.pow(v, 3)*6;
 // 		gamma(i) = v.toFloat;
 // 	}
@@ -114,7 +114,7 @@
 //         val pixel = histogram(depth).toShort;
 //         col(pos) = 0xFF000000 | (pixel << 16) | (pixel << 8);
 // 				depthData(pos) = (pixel).toByte
-// 				flo(pos) = depth / 255.f //histogram(depth)/255.f
+// 				flo(pos) = depth / 255f //histogram(depth)/255f
 //         pos += 1
 //       }
 
@@ -124,7 +124,7 @@
 // 			// 	val gb = (frame.get(2*i+1) & 0xFF).toShort
 // 			// 	val raw:Int = (gb) << 8 | lb
 // 			// 	var depth:Float = gamma(raw) 
-// 			// 	//var depth:Float = raw / 2048.f
+// 			// 	//var depth:Float = raw / 2048f
 
 // 			// 	case class Color(r:Int,g:Int,b:Int)
 // 			// 	var color = gb match {
@@ -139,7 +139,7 @@
 // 			// 	val c = color.r << 24 | color.g << 16 | color.b << 8 | 0xFF
 // 			// 	col(i) = c
 
-// 			// 	depthData(i) = (depth*255.f).toByte
+// 			// 	depthData(i) = (depth*255f).toByte
 // 			// 	flo(i) = depth
 // 			// }
 
@@ -162,13 +162,13 @@
 // 			blob(diff, detectPix)
 
 // 			for( y<-(0 until 480); x<-(0 until 640)){
-// 				val d = blob.mask.get(y,x)(0).toFloat / 255.f //( if (diff.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
-// 				detectPix.setColor(d,d,d,1.f)
+// 				val d = blob.mask.get(y,x)(0).toFloat / 255f //( if (diff.get(y,x)(0) > 0) 1f else 0f) //depthData(640*y+x).toFloat / 255f else 0f )
+// 				detectPix.setColor(d,d,d,1f)
 // 				detectPix.drawPixel(x,y)
 
-// 				// val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255.f
-// 				val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255.f
-// 				depthPix.setColor(v,v,v,1.f)
+// 				// val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255f
+// 				val v = flo(640*y+x) //depthData(640*y+x).toFloat / 255f
+// 				depthPix.setColor(v,v,v,1f)
 // 				// depthPix.setColor(col(640*y+x))
 // 				depthPix.drawPixel(x,y)
 
@@ -227,7 +227,7 @@
 //     PixmapIO.writePNG(file, depthPix)
 //   }
 
-//   def captureDepthPoints(scale:Float = 1000.f){
+//   def captureDepthPoints(scale:Float = 1000f){
 //   	Gdx.files.external("SeerData/points").file().mkdirs()
 //   	var file = Gdx.files.external("SeerData/points/kinect-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".xyz" ).file()
 
@@ -244,7 +244,7 @@
 
 //       val z = d * -scale
 
-//       if( d > 0.f){
+//       if( d > 0f){
 // 	      out.write( x + " " + y + " " + (z+off) + " 0 0 1\n" )
 // 	      out.write( x + " " + y + " " + (z-off) + " 0 0 -1\n" )
 // 	      out.write( x + " " + (y+off) + " " + z + " 0 1 0\n" )
@@ -283,7 +283,7 @@
 
 //     if (points > 0) {
 //     	for (i <- 1 until histogram.length)
-//     		histogram(i) = (256 * (1.0f - (histogram(i) / (1.f*points))));
+//     		histogram(i) = (256 * (1.0f - (histogram(i) / (1f*points))));
 //     }
 //     histogram
 //   }

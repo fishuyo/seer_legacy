@@ -107,6 +107,14 @@ class Model extends Drawable { // with geometry.Pickable {
     this
   }
 
+  def updateWorldTransform(){
+    MatrixStack.push()
+    MatrixStack.transform(pose,scale)
+    worldTransform.set(MatrixStack.model)
+    children.foreach( _.updateWorldTransform() )
+    MatrixStack.pop()
+  }
+
   override def draw(){
     MatrixStack.push()
 
@@ -114,26 +122,68 @@ class Model extends Drawable { // with geometry.Pickable {
     worldTransform.set(MatrixStack.model)
 
     // Shader.setColor(color)
-    val old = Shader.shader.get.name
-    if( shader != "" ){
-      Shader().end()
-      Shader(shader).begin()
-    }
-    Shader.setMaterial(material)
-    Shader.setMatrices()
+    // val old = Shader.shader.get.name
+    // if( shader != "" ){
+      // Shader().end()
+      // Shader(shader).begin()
+    // }
+    Renderer().setMaterialUniforms(material)
+    Renderer().setMatrixUniforms()
+    Renderer().shader.setUniforms()
 
     mesh.draw()
     primitives.foreach( _.draw() )
     children.foreach( _.draw() )
 
-    if( shader != ""){
-      Shader().end()
-      Shader(old).begin()
-    }
+    // if( shader != ""){
+      // Shader().end()
+      // Shader(old).begin()
+    // }
 
     MatrixStack.pop()
   }
 
+  def makeLineMesh() = {
+    val m = Mesh()
+    m.primitive = LineStrip //TriangleStrip
+    this.foreach( (mdl) => {
+      val v = new Vector3()
+      mdl.worldTransform.getTranslation(v)
+      m.vertices += Vec3(v.x,v.y,v.z)
+    })
+    m
+  }
+
+  def makeMesh(mesh:Mesh, r:Float, npoints:Int):Mesh = {
+    var m = mesh
+    if(m == null) m = Mesh()
+    m.primitive = TriangleStrip
+    children.foreach( (child) => {
+      val v = new Vector3()
+      this.worldTransform.getTranslation(v)
+      val p = Vec3(v.x,v.y,v.z)
+      child.worldTransform.getTranslation(v)
+      val pc = Vec3(v.x,v.y,v.z)
+      this.worldTransform.getScale(v)
+      val s = Vec3(v.x,v.y,v.z)
+      child.worldTransform.getScale(v)
+      val sc = Vec3(v.x,v.y,v.z)
+
+      for( i <- 0 to npoints){
+        val phase = i.toFloat / npoints * 2 * Pi
+        val x = r*math.cos(phase)
+        val y = r*math.sin(phase)
+        val off1 = pose.ur()*x*s.x + pose.uf()*y*s.y
+        val off2 = child.pose.ur()*x*sc.x + child.pose.uu()*y*sc.y
+        m.vertices += p + off1
+        m.normals += off1.normalized
+        m.vertices += pc + off2
+        m.normals += off2.normalized
+      }
+      child.makeMesh(m,r,npoints)
+    })
+    m
+  }
 
   // override def intersect(ray:Ray):Option[geometry.Hit] = {
     

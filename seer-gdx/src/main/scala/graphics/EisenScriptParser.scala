@@ -1,8 +1,7 @@
 package com.fishuyo.seer
-package parsers
+package graphics
 
 import spatial._
-import graphics._
 import util._
 
 import scala.io.Source
@@ -16,36 +15,65 @@ import scala.collection.mutable.Queue
 // import com.badlogic.gdx.Gdx
 // import com.badlogic.gdx.graphics._
 
-abstract trait Statement
+object EisenScriptASTNodes {
 
-case class Comment extends Statement
+  sealed trait ASTNode
 
-case class Var(k:String,v:Float) extends Statement
-case class Set(k:String,v:String) extends Statement
+  // statement top level line of code
+  case class VarDecl(k:String,v:Float) extends ASTNode
+  case class SetEnv(k:String,v:String) extends ASTNode
 
-case class Rule(name:String,mods:List[Mod],actions:List[Statement]) extends Statement
-abstract trait Mod extends Statement
-case class MaxDepth(d:Int) extends Mod
-case class Weight(w:Float) extends Mod
+  // Rule definition
+  case class RuleDef(name:String, mods:List[RuleMod], actions:List[Statement]) extends ASTNode
+  abstract trait RuleMod extends ASTNode
+  case class MaxDepth(d:Int) extends RuleMod
+  case class Weight(w:Float) extends RuleMod
 
-case class Action(loop:List[Statement], trans:List[Statement], prim:Primitive) extends Statement
+  // Action
+  abstract trait Statement extends ASTNode
+  case class Comment() extends Statement
+  case class Action(transforms:List[TransformExpr], call:Call) extends Statement
 
-case class TransLoop(times:Int,trans:List[Statement]) extends Statement
-case class TransLoopV(times:String,trans:List[Statement]) extends Statement
+  // Transforms
+  case class TransformExpr(times:Expr,list:List[Transform]) extends ASTNode
+  
+  abstract trait Transform extends ASTNode
+  // case class TransformFull(p:Pose,s:Vec3) extends Statement
+  // case class TransformV(param:String,value:String) extends Statement
+  case class XMove(e:Expr) extends Transform
+  case class YMove(e:Expr) extends Transform
+  case class ZMove(e:Expr) extends Transform
+  case class XRot(e:Expr) extends Transform
+  case class YRot(e:Expr) extends Transform
+  case class ZRot(e:Expr) extends Transform
+  case class Scale(e:Expr) extends Transform
+  case class Scale3(x:Expr,y:Expr,z:Expr) extends Transform
 
-case class Transform(p:Pose,s:Vec3) extends Statement
-case class TransformV(param:String,value:String) extends Statement
-case class ColorTransform(h:HSV) extends Statement
-case class Color(c:RGBA) extends Statement
-case class Alpha(a:Float) extends Statement
+  case class Hue(e:Expr) extends Transform
+  case class Sat(e:Expr) extends Transform
+  case class Bright(e:Expr) extends Transform
+  case class Alpha(e:Expr) extends Transform
+  case class ColorTransform(h:HSV) extends Transform
+  case class Color(c:RGBA) extends Transform
 
-abstract trait Primitive extends Statement
-case class Draw(m:Mesh) extends Primitive
-case class RuleCall(ident:String) extends Primitive
-case class Dont() extends Primitive
+  // Literal / ident
+  abstract trait Expr extends ASTNode
+  case class Literal(v:Float) extends Expr
+  case class Ident(v:String) extends Expr
 
+  abstract trait Call extends ASTNode
+  case class RuleCall(name:String) extends Call
+  case class DrawBox() extends Call
+  case class DrawGrid() extends Call
+  case class DrawSphere() extends Call
+  case class DrawCylinder() extends Call
+  // case class Draw(m:Mesh) extends Primitive
+  // case class RuleCall(ident:String) extends Primitive
+  // case class Dont() extends Primitive
+}
+import EisenScriptASTNodes._
 
-class MyLexer extends StdLexical {
+class EisenLexer extends StdLexical {
   override def digit = ( super.digit | hexDigit )
   lazy val hexDigits = Array('0','1','2','3','4','5','6','7','8','9','.','-')
   lazy val hexDigit = elem("hex digit", hexDigits.contains(_))
@@ -53,65 +81,68 @@ class MyLexer extends StdLexical {
 
 object EisenScriptParser extends StandardTokenParsers {
 
-	override val lexical:MyLexer = new MyLexer()
+	override val lexical:EisenLexer = new EisenLexer()
  
   lexical.delimiters ++= List("{","}","(", ")",",","*","=")
  	lexical.reserved += ("var","set","rule","md","maxdepth","w","weight",
- 											"x","y","z","rx","ry","rz","s",
+ 											"x","y","z","rx","ry","rz","s","scale",
  											"hue","h","sat","brightness","b","value","v","alpha","a","color",
  											"box","sphere","grid","cylinder")
  
   // grammar starts here
-  def program = stmt*
+  def program = line*
  
-  def stmt = set | action | rule | variable | comment
+  def line = set | varDecl | action | ruleDef | comment
 
   def comment = "//"~ ((ident | numericLit | stringLit )*) ~ "\n" ^^^ Comment()
-
-  def variable = "var" ~ ident ~ "=" ~ numericLit ^^ { case _~name~_~value => Var(name,value.toFloat) }
-  def set = ("set" ~ "maxdepth" ~ numericLit ^^ { case _~k~v => Set("maxdepth",v) }
-  					|"set" ~ ident ~ numericLit ^^ { case _~k~v => Set(k,v) })
+  def varDecl = "var" ~ ident ~ "=" ~ numericLit ^^ {
+    case _~name~_~value => VarDecl(name,value.toFloat)
+  }
+  def set = ("set" ~ "maxdepth" ~ numericLit ^^ { case _~k~v => SetEnv("maxdepth",v) }
+            |"set" ~ ident ~ numericLit ^^ { case _~k~v => SetEnv(k,v) })
   
-  def rule = "rule" ~ ident ~ opt(rule_mod*) ~ "{" ~ rule_body ~ "}" ^^ { case _~name~mods~_~list~_ => Rule(name,mods.getOrElse(List()),list) }
-  def rule_mod = (("md"|"maxdepth") ~ numericLit ^^ { case _~v => MaxDepth(v.toInt)}
+  // Rule
+  def ruleDef = "rule" ~ ident ~ opt(ruleMod*) ~ "{" ~ ruleBody ~ "}" ^^ {
+    case _~name~mods~_~list~_ => RuleDef(name,mods.getOrElse(List()),list)
+  }
+  def ruleMod = (("md"|"maxdepth") ~ numericLit ^^ { case _~v => MaxDepth(v.toInt)}
   							 |("w"|"weight") ~ numericLit ^^ { case _~v => Weight(v.toFloat)})
-  def rule_body = (set | action | comment)*
+  def ruleBody = (action | comment)*
 
-  def action = (tloop*) ~ opt(tlist) ~ primitive ^^ { case loop~list~prim => Action(loop,list.getOrElse(List()),prim)}
+  // Action
+  def action = (texpr*) ~ call ^^ { case ts~ca => Action(ts,ca)}
   
-  def tloop = (numericLit ~ "*" ~ tlist ^^ { case t~_~list => TransLoop(t.toInt, list)}
- 						| ident ~ "*" ~ tlist ^^ { case t~_~list => TransLoopV(t, list)})
+  def texpr = ( numericLit ~ "*" ~ tlist ^^ { case t~_~list => TransformExpr(Literal(t.toInt), list)}
+ 						| ident ~ "*" ~ tlist ^^ { case id~_~list => TransformExpr(Ident(id), list)}
+            | tlist ^^ { case list => TransformExpr(Literal(1), list)} )
 
   def tlist = "{" ~ (transformation*) ~ "}" ^^ { case _~list~_ => list }
 
-  def transformation = ("x"~numericLit ^^ { case _~v => Transform(Pose(Vec3(v.toFloat,0,0)),Vec3(1)) }
-  										| "y"~numericLit ^^ { case _~v => Transform(Pose(Vec3(0,v.toFloat,0)),Vec3(1)) }
-  										| "z"~numericLit ^^ { case _~v => Transform(Pose(Vec3(0,0,v.toFloat)),Vec3(1)) }
-  										| "rx"~numericLit ^^ { case _~v => Transform(Pose(Vec3(),Quat().fromEuler((v.toFloat.toRadians,0.f,0.f))),Vec3(1)) }
-  										| "ry"~numericLit ^^ { case _~v => Transform(Pose(Vec3(),Quat().fromEuler((0.f,v.toFloat.toRadians,0.f))),Vec3(1)) }
-  										| "rz"~numericLit ^^ { case _~v => Transform(Pose(Vec3(),Quat().fromEuler((0.f,0.f,v.toFloat.toRadians))),Vec3(1)) }
-  										| "s"~numericLit~numericLit~numericLit ^^ { case _~x~y~z => Transform(Pose(),Vec3(x.toFloat,y.toFloat,z.toFloat)) }
-  										| "s"~numericLit ^^ { case _~v => Transform(Pose(),Vec3(v.toFloat)) }
-  										| ("h"|"hue")~numericLit ^^ { case _~v => ColorTransform(HSV(v.toFloat,1,1)) }
-  										| ("sat")~numericLit ^^ { case _~v => ColorTransform(HSV(0,v.toFloat,1)) }
-  										| ("b"|"brightness")~numericLit ^^ { case _~v => ColorTransform(HSV(0,1,v.toFloat)) }
-  										| ("a"|"alpha")~numericLit ^^ { case _~v => Alpha(v.toFloat) }
+  def transformation = (
+      "x"~expr ^^ { case _~e => XMove(e) }
+    | "y"~expr ^^ { case _~e => YMove(e) }
+    | "z"~expr ^^ { case _~e => ZMove(e) }
+    | "rx"~expr ^^ { case _~e => XRot(e)  }
+    | "ry"~expr ^^ { case _~e => YRot(e)  }
+    | "rz"~expr ^^ { case _~e => ZRot(e)  }
+    | ("s"|"scale")~expr~expr~expr ^^ { case _~x~y~z => Scale3(x,y,z) }
+  	| ("s"|"scale")~expr ^^ { case _~e => Scale(e) }
+    | ("h"|"hue")~expr ^^ { case _~e => Hue(e) }
+    | ("sat")~expr ^^ { case _~e => Sat(e) }
+  	| ("b"|"brightness")~expr ^^ { case _~e => Bright(e) }
+  	| ("a"|"alpha")~expr ^^ { case _~e => Alpha(e) }
+  )
 
-  										| "x"~ident ^^ { case p~v => TransformV(p,v) }
-  										| "y"~ident ^^ { case p~v => TransformV(p,v) }
-  										| "z"~ident ^^ { case p~v => TransformV(p,v) }
-  										| "rx"~ident ^^ { case p~v => TransformV(p,v) }
-  										| "ry"~ident ^^ { case p~v => TransformV(p,v) }
-  										| "rz"~ident ^^ { case p~v => TransformV(p,v) }
-  										| "s"~ident ^^ { case p~v => TransformV(p,v) } )
-
-  def primitive = ( rulecall | box | sphere | grid | cylinder )
-
+  def call = ( rulecall | box | sphere | grid | cylinder )
   def rulecall = ident ^^ {case id => RuleCall(id)}
-  def box = "box" ^^^ Draw(Cube().mesh)
-  def grid = "grid" ^^^ Draw(Cube().mesh) //TODO wireframe
-  def sphere = "sphere" ^^^ Draw(Sphere().mesh)
-  def cylinder = "cylinder" ^^^ Draw(Cylinder().mesh)
+  def box = "box" ^^^ DrawBox() //Draw(Cube().mesh)
+  def grid = "grid" ^^^ DrawGrid() //Draw(Cube().mesh) //TODO wireframe
+  def sphere = "sphere" ^^^ DrawSphere()
+  def cylinder = "cylinder" ^^^ DrawCylinder()
+
+  def expr = (  ident ^^ { case id => Ident(id) } 
+              | numericLit ^^ { case n => Literal(n.toFloat)} )
+
 
 
   def apply( script: String ) = {
@@ -134,7 +165,7 @@ object EisenScriptParser extends StandardTokenParsers {
 }
 
 
-class ModelInterpreter(val tree: List[Statement]) {
+class ModelInterpreter(val tree: List[ASTNode]) {
 	
 	type SymTab = Map[String,String]
 	type Rule = (SymTab,List[Action])
@@ -159,27 +190,16 @@ class ModelInterpreter(val tree: List[Statement]) {
 
 	this(tree)
 
-	def apply(tree: List[Statement]):ModelInterpreter = {
+	def apply(tree: List[ASTNode]):ModelInterpreter = {
 
-		tree match {
-			case Var(n,v) :: rest => {
-				gst = gst + (n->v)
-				this(rest)
-			}
-
-			case Set(k,v) :: rest => {
-				env = env + (k->v)
-				this(rest)
-			}
-
-			case (a:Action) :: rest => {
-				initialActions = initialActions :+ a
-				this(rest)
-			}
-
-			case Rule(name,mods,list) :: rest => {
+		tree.foreach {
+			case VarDecl(n,v) => gst = gst + (n->v)
+      case SetEnv(k,v) => env = env + (k->v)
+			case (a:Action) => initialActions = initialActions :+ a
+			
+			case RuleDef(name,mods,list) => {
 				val lst = Map[String,String]()
-				var weight = 1.f
+				var weight = 1f
 
 				mods.foreach{
 					case Weight(w) => weight = w
@@ -188,7 +208,7 @@ class ModelInterpreter(val tree: List[Statement]) {
 
 				val rule = list.foldLeft((lst,List[Action]()))( (r:(SymTab,List[Action]),s:Statement) => {
 					s match {
-						case Set(k,v) => (r._1 + (k->v), r._2) 
+						// case Set(k,v) => (r._1 + (k->v), r._2) 
 						case a:Action => (r._1, r._2 :+ a)
 					}
 				})
@@ -199,7 +219,6 @@ class ModelInterpreter(val tree: List[Statement]) {
 				} else rules = rules + (name -> (ListBuffer(rule),ListBuffer(weight)))
 
 				// ruleDepth(name) = 0
-				this(rest)
 			}
 			case _ => ()
 
@@ -219,91 +238,88 @@ class ModelInterpreter(val tree: List[Statement]) {
 		// ruleDepth(name) = depth
 	}
 
-	def applyAction(pair:(Model,Action)) = {
-		pair match {
-			case (mdl,Action(loop,list,call)) => {
+	def applyAction(pair:(Model,Action)) = pair match {
+    case (mdl, Action(transformExprs, call)) => 
 
-				// merge transforms into single pose, scale, color
-				val (rp,rs,hsv) = mergeTransformList(list)
+      // aggregate nested transform loops right to left
+      var res = transformExprs.foldRight(Vector[Model]()) {
+        case (TransformExpr(times, transforms),m) =>
+          
+        // merge loops transform
+        val (p,s,c) = mergeTransformList(transforms)
+        var pp = Pose(p) //copy
+        var ss = Vec3(s) //copy
+        var cc = HSV(c)
+        var group = Vector[Model]()
 
-				// aggregate nested transform loops (magic?)
-				var res = loop.foldRight(Vector[Model]())( (tl,m) => {
-					var times = 0
-					var list:List[Statement] = List()
-					tl match {
-						case TransLoop(t,ts) => { times = t; list = ts }
-						case TransLoopV(t,ts) => { times = gst(t).toInt; list = ts }
-					}
-					// merge loops transform
-					val (p,s,h) = mergeTransformList(list)
-					var pp = Pose(p) //copy
-					var ss = Vec3(s) //copy
-					var cc = HSV(h)
-					var group = Vector[Model]()
+        // each time through the loop make model and stack transform
+        for( i <- (0 until eval(times).toInt )){
+          node = new Model{ pose = pp; scale = ss}
+          node.colorTransform = cc
 
-					// each time through the loop make model and stack transform
-					for( i <- (0 until times)){
+          // add existing models from outer right most loops as children
+          m.foreach( node.addChild(_) ) 
 
-						node = new Model{ pose = pp; scale = ss}
-						node.colorTransform = cc
-						m.foreach( node.addChild(_) ) // add existing models from outer loops as children?
+          group = group :+ node
+          pp = pp*p
+          ss = ss*s
+          cc = cc*c
+        }
+        group // return list of nodes
+      }
 
-						group = group :+ node
-						pp = pp*p
-						ss = ss*s
-						cc = cc*h
-					}
-					group // return list of nodes
-				})
+      if( res.length == 0) res = Vector(new Model())
+      res.foreach( _.getLeaves().foreach( (n) => {
+       applyPrimitive(call,n)
+      }))
 
-				if( res.length == 0) res = Vector(new Model())
-				res.foreach( _.getLeaves().foreach( (n) => {
-				  n.pose = n.pose * rp
-				  n.scale = n.scale * rs
-				  n.colorTransform = n.colorTransform * hsv
-				  applyPrimitive(call,n)
-				}))
-
-				res.foreach( mdl.addChild(_))
-				res
-			}
-		}
-
+      res.foreach( mdl.addChild(_))
+      res
 	}
-	def applyPrimitive(p:Primitive, n:Model){
+	def applyPrimitive(p:Call, n:Model){
 		if( primCount > env("maxobjects").toInt ) return
 		n.material = Material(model.material)
 		p match {
 			case RuleCall(r) => applyRule(r,n)
-			case Draw(m) => n.mesh = m; /*n.addPrimitive( d )*/; primCount += 1
-			case Dont() => ()
+      case DrawBox() => n.mesh = Cube().mesh; primCount += 1
+      case DrawGrid() => n.mesh = Cube().mesh; primCount += 1 //XXX
+      case DrawSphere() => n.mesh = Sphere().mesh; primCount += 1
+      case DrawCylinder() => n.mesh = Cylinder().mesh; primCount += 1
+
+			// case Draw(m) => n.mesh = m; /*n.addPrimitive( d )*/; primCount += 1
+			// case Dont() => ()
 		}
 	}
-	def mergeTransformList(ts:List[Statement]) = {
-		ts.foldLeft(Pose(),Vec3(1),HSV(0,1,1))( (m,t) => {
-			var pose = Pose()
-			var scale = Vec3(1)
-			var hsv = HSV(0,1,1)
 
+	def mergeTransformList(ts:List[Transform]) = {
+    val p = Pose()
+    val rot = Vec3(0)
+    val s = Vec3(1)
+    val c = HSV(0,1,1)
+		ts.foreach( (t) => {
 			t match {
-				case Transform(p,s) => { pose = p; scale = s; } //(m._1*p, m._2*s)
-				case TransformV(param,v) => {
-					param match {
-						case "x" => pose.pos.x = gst(v)
-						case "y" => pose.pos.y = gst(v)
-						case "z" => pose.pos.z = gst(v)
-						case "rx" => pose.quat.fromEuler((gst(v).toRadians,0.f,0.f))
-						case "ry" => pose.quat.fromEuler((0.f,gst(v).toRadians,0.f))
-						case "rz" => pose.quat.fromEuler((0.f,0.f,gst(v).toRadians))
-						case "s" => scale.set(gst(v))
-					}
-				}
-				case ColorTransform(h) => hsv = h
+        case XMove(e) => p.pos.x += eval(e)
+        case YMove(e) => p.pos.y += eval(e)
+        case ZMove(e) => p.pos.z += eval(e)
+        case XRot(e) => rot.x += eval(e).toRadians
+        case YRot(e) => rot.y += eval(e).toRadians
+        case ZRot(e) => rot.z += eval(e).toRadians
+        case Scale(e) => s *= Vec3(eval(e))
+        case Scale3(x,y,z) => s *= Vec3(eval(x),eval(y),eval(z))
+        case Hue(e) => c.h = (c.h + eval(e)) % 1f
+        case Sat(e) => c.s *= eval(e)
+        case Bright(e) => c.v *= eval(e)
+        case Alpha(e) => () //c.a *= eval(e)
 			}
-
-			(m._1*pose, m._2*scale, m._3*hsv)
 		})
+    p.quat = Quat().fromEuler(rot)
+    (p,s,c)
 	}
+
+  def eval(e:Expr):Float = e match {
+    case Literal(v) => v
+    case Ident(v) => gst(v)
+  }
 
 	def set(s:String,v:Float) = gst = gst + (s->v)
 

@@ -9,9 +9,11 @@ import scala.collection.mutable.ListBuffer
 
 class ParticleEmitter(var maxParticles:Int) extends Animatable {
 
-	var ttl = 10.f
+	var ttl = 10f
 	var particles = ListBuffer[Particle]()
 
+	def +=(p:Particle) = particles += p
+	def ++=(ps:Seq[Particle]) = particles ++= ps
 	def addParticle(p:Particle) = particles += p
 
 	override def animate(dt:Float){
@@ -19,7 +21,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 		particles = particles.filter( (p) => p.t < ttl )
 		if( particles.length > maxParticles ) particles = particles.takeRight(maxParticles)
 		particles.foreach( (p) => {
-			// p.applyForce(Gravity)
+			p.applyForce(Gravity)
 			p.step()
 		})
 

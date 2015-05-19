@@ -8,9 +8,9 @@ import io._
 object Script extends SeerScript {
 
   val n = 30
-  val s = 1.f / n
+  val s = 1f / n
 
-  var boost = 1.f 
+  var boost = 1f 
 
   val cubes = for(i <- 0 until n) yield { 
     val c = Cube().scale(1,s,1).translate(0,i*s - .5f,0)

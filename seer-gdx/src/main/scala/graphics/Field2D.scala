@@ -27,7 +27,7 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
   var data:FloatBuffer = BufferUtils.newFloatBuffer( 4*w*h );
   val quad = Plane()
   quad.material = Material.basic
-  quad.material.textureMix = 1.f
+  quad.material.textureMix = 1f
 
   var texture: FloatTexture = _
 
@@ -53,7 +53,7 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
   
   def set( i:Int, v:Float ) { 
     data.position(4*i)
-    data.put( Array(v,v,v,1.f),0, 4)
+    data.put( Array(v,v,v,1f),0, 4)
     data.rewind
   }
   def set( i:Int, c:RGBA ) { 
@@ -83,7 +83,7 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
 
     var s = scala.math.sqrt(k.length).toInt //assume square kernel
     s = s / 2
-    var v = 0.f
+    var v = 0f
     var c = 0
     for( j<-(-s to s); i<-(-s to s)){
       v += k(c) * getToroidal(x+i,y+j).r
@@ -122,7 +122,7 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
     
     for( j <- (0 until h); i <- (0 until w)){
       var v = (new java.awt.Color( image.getRGB(i,j) )).getColorComponents(null)
-      if( v.length > 1 ) set(i,h-1-j,(v(0)+v(1)+v(2))/3.f ) // TODO real grayscale conversion
+      if( v.length > 1 ) set(i,h-1-j,(v(0)+v(1)+v(2))/3f ) // TODO real grayscale conversion
       else set(i,h-1-j,v(0))
     }
   }

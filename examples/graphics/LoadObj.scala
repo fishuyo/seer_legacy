@@ -8,8 +8,11 @@ import graphics._
 object LoadObj extends SeerApp { 
 
 	var model:Model = _
+	var t = 0f
+
 
 	def downloadFile(url:String, file:String){
+		// see http://alvinalexander.com/scala/scala-how-to-download-url-contents-to-string-file
 		import sys.process._
 		import java.net.URL
 		import java.io.File
@@ -18,8 +21,8 @@ object LoadObj extends SeerApp {
 
 	override def init(){
 
-		// download bunny
-		downloadFile("http://graphics.stanford.edu/~mdfisher/Data/Meshes/bunny.obj", "bunny.obj")
+		// download a bunny from the internets
+		downloadFile("http://fishuyo.com/stuff/bunny.obj", "bunny.obj")
 
 		// load bunny
 		model = Model.loadOBJ("bunny.obj")
@@ -29,10 +32,13 @@ object LoadObj extends SeerApp {
 
 		// modify material
 		model.material = new SpecularMaterial
-		model.material.color = RGBA(0.f,.6f,.2f,1.f)
+		model.material.color = RGBA(0f,.6f,.6f,1f)
+		// model.mesh.primitive = Lines
+
 	}
 
 	override def draw(){
 		model.draw()
 	}
+
 }

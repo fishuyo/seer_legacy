@@ -11,7 +11,7 @@ import akka.actor._
 // import akka.contrib.pattern.DistributedPubSubMediator
 import com.typesafe.config.ConfigFactory
 
-import akka.zeromq._
+// import akka.zeromq._
 import akka.util.ByteString
 
 import akka.io._

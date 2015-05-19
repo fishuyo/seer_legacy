@@ -24,7 +24,7 @@ object ObjParser extends JavaTokenParsers {
 	case class Normal(n:Vec3) extends Statement
 	case class Face(u:String,v:String,w:String) extends Statement
 	case class TexCoord(u:Vec2) extends Statement
-	case class Empty extends Statement
+	case class Empty() extends Statement
  
  	def FP = floatingPointNumber
  	def WN = wholeNumber

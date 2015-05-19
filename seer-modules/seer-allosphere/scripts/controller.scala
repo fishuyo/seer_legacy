@@ -43,7 +43,7 @@ object ControllerScript extends SeerScript{
 
 		if( Mouse.status() == "drag"){
 			vel = (Mouse.xy() - lpos)/dt
-			ray = Camera.ray(Mouse.x()*Window.width, (1.f-Mouse.y()) * Window.height)
+			ray = Camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
 			publisher ! (vel,ray)
 		}
 		lpos = Mouse.xy()

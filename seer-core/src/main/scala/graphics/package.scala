@@ -11,6 +11,21 @@ package object graphics {
   val TriangleStrip = 5
   val TriangleFan = 6
 
+  val Zero = 0;
+	val One = 1;
+	val SrcColor = 0x0300;
+	val OneMinuSrcColor = 0x0301;
+	val SrcAlpha = 0x0302;
+	val OneMinusSrcAlpha = 0x0303;
+	val DstAlpha = 0x0304;
+	val OneMinusDstAlpha = 0x0305;
+	val DstColor = 0x0306;
+	val OneMinuDstColor = 0x0307;
+	val SrcAlphaSaturate = 0x0308;
+	val Add = 0x8006;
+	val Subtract = 0x800A;
+	val ReverseSubtract = 0x800B;
+
 	implicit def RGBA2Float(c:RGBA) = c.toGray
 	implicit def RGB2RGBA(c:RGB) = RGBA(c.r,c.g,c.b,1)
 	implicit def RGBA2RGB(c:RGBA) = RGB(c.r,c.g,c.b)
@@ -18,18 +33,18 @@ package object graphics {
 	// port of Allosystem color conversion code al_Color.cpp
 	implicit def HSV2RGB(c:HSV):RGB = {
 	
-		if(c.s == 0.f) return RGB(c.v)
+		if(c.s == 0f) return RGB(c.v)
 
-		val h = c.h*6.f
+		val h = c.h*6f
 											
 		val i = h.toInt 	// integer part of h
 		val f = h - i				// fractional part of h
-		val p = c.v * (1.f - c.s);
+		val p = c.v * (1f - c.s);
 
 		// depends on hue section being even or odd
-		val q = c.v * (1.f - c.s*( if((i&1)==1) f else (1.f - f) ))
+		val q = c.v * (1f - c.s*( if((i&1)==1) f else (1f - f) ))
 
-		var (r,g,b)=(0.f,0.f,0.f)
+		var (r,g,b)=(0f,0f,0f)
 		i match {
 			case 0 => r=c.v; g=q; b=p
 			case 1 =>	r=q; g=c.v; b=p
@@ -47,17 +62,17 @@ package object graphics {
 
 		val hsv = HSV(0,0,cmax)
 
-		if(del != 0.f && cmax != 0.f){		// chromatic data...
+		if(del != 0f && cmax != 0f){		// chromatic data...
 			hsv.s = del / cmax							// set saturation
 		
-			var hl = 0.f
+			var hl = 0f
 			if (c.r == cmax) hl = (c.g - c.b)/del;	// between yellow & magenta
-			else if(c.g == cmax)	hl = 2.f + (c.b - c.r)/del;	// between cyan & yellow
-			else hl = 4.f + (c.r - c.g)/del;	// between magenta & cyan
+			else if(c.g == cmax)	hl = 2f + (c.b - c.r)/del;	// between cyan & yellow
+			else hl = 4f + (c.r - c.g)/del;	// between magenta & cyan
 
-			if(hl < 0.f) hl += 6.f;
+			if(hl < 0f) hl += 6f;
 
-			hsv.h = hl * (1.f/6.f);
+			hsv.h = hl * (1f/6f);
 		} //else this is a gray, no chroma...
 	
 		hsv

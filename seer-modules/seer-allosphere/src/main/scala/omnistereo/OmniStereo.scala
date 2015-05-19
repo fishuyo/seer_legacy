@@ -98,9 +98,9 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 	var mClearColor = RGBA(0,0,0,0);
 
 	var mFace = 5
-	var mEyeParallax = 0.f
+	var mEyeParallax = 0f
 	var mNear = 0.1f
-	var mFar = 100.f
+	var mFar = 100f
 	var mNumProjections = 1
 	var mFrame = 0
 	var mMode = StereoMode.MONO
@@ -198,7 +198,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 	}
 
 	// configure generatively:
-	def configure(wm:WarpModeType, a:Float=2.f, f:Float=math.Pi) = {
+	def configure(wm:WarpModeType, a:Float=2f, f:Float=math.Pi) = {
 		mNumProjections = 1
 		val p = mProjections(0)
 		wm match {
@@ -215,7 +215,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 				WarpBlendGen.aspect = a;
 				// p.warp().array().fill(fillCylinder);
 			case _ =>
-				WarpBlendGen.fovy = f / 2.;
+				WarpBlendGen.fovy = f / 2.0;
 				WarpBlendGen.aspect = a;
 				// p.warp().array().fill(fillRect);
 		}
@@ -320,21 +320,21 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 
 	def onCreate() {
 
-		mCubeProgram = Shader.load("cubeProgram",OmniShader.vGeneric, OmniShader.fCube)
+		mCubeProgram = Shader.load(OmniShader.vGeneric, OmniShader.fCube)
 		mCubeProgram.uniforms("alphaMap") = 2
 		mCubeProgram.uniforms("pixelMap") = 1
 		mCubeProgram.uniforms("cubeMap") = 0
 
-		mSphereProgram = Shader.load("sphereProgram",OmniShader.vGeneric, OmniShader.fSphere)
+		mSphereProgram = Shader.load(OmniShader.vGeneric, OmniShader.fSphere)
 		mSphereProgram.uniforms("alphaMap") = 2
 		mSphereProgram.uniforms("pixelMap") = 1
 		mSphereProgram.uniforms("sphereMap") = 0
 
-		mWarpProgram = Shader.load("warpProgram",OmniShader.vGeneric, OmniShader.fWarp)
+		mWarpProgram = Shader.load(OmniShader.vGeneric, OmniShader.fWarp)
 		mWarpProgram.uniforms("alphaMap") = 2
 		mWarpProgram.uniforms("pixelMap") = 1
 
-		mDemoProgram = Shader.load("demoProgram",OmniShader.vGeneric, OmniShader.fDemo)
+		mDemoProgram = Shader.load(OmniShader.vGeneric, OmniShader.fDemo)
 		mDemoProgram.uniforms("alphaMap") = 2
 		mDemoProgram.uniforms("pixelMap") = 1
 
@@ -367,15 +367,15 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 			// float Y[4] = { 0,1,0,0 };
 			// float Z[4] = { 0,0,1,0 };
 			val buf = BufferUtils.newFloatBuffer(4)
-			var array = Array(1.f,0.f,0.f,0.f)
+			var array = Array(1f,0f,0f,0f)
 			buf.put(array)
 			buf.rewind
 			GL11.glTexGen( GL11.GL_S, GL11.GL_OBJECT_PLANE, buf );
-			array = Array(0.f,1.f,0.f,0.f)
+			array = Array(0f,1f,0f,0f)
 			buf.put(array)
 			buf.rewind
 			GL11.glTexGen( GL11.GL_T, GL11.GL_OBJECT_PLANE, buf );
-			array = Array(0.f,0.f,1.f,0.f)
+			array = Array(0f,0f,1f,0f)
 			buf.put(array)
 			buf.rewind
 			GL11.glTexGen( GL11.GL_R, GL11.GL_OBJECT_PLANE, buf );
@@ -422,8 +422,8 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 		//Does the GPU support current FBO configuration?
 		var status = gl.glCheckFramebufferStatus(GL20.GL_FRAMEBUFFER);
 		if (status != GL20.GL_FRAMEBUFFER_COMPLETE) {
-			printf("GPU does not support required FBO configuration\n");
-			exit(0);
+			printf("GPU does not support required FBO configuration!\n");
+			// exit(0);
 		}
 
 		// cleanup:
@@ -553,11 +553,11 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 				// Vec3d ux, uy, uz;
 				// pose.unitVectors(ux, uy, uz);
 				// mModelView = Matrix4.lookAt(-ux, -uy, uz, pos);
-				// MatrixStack.rotate(0,0,180.f.toRadians)
+				// MatrixStack.rotate(0,0,180f.toRadians)
 
 				mNear = lens.near
 				mFar = lens.far
-				//const double eyeSep = mStereo ? lens.eyeSep() : 0.;
+				//const double eyeSep = mStereo ? lens.eyeSep() : 0.0;
 
 				// apply camera transform:
 				// gl.modelView(mModelView);
@@ -573,7 +573,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 	}
 
 	def drawEye(pose:Pose, eye:Double) {
-		if (eye > 0.) {
+		if (eye > 0.0) {
 			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(1));
 		} else {
 			gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, mTex(0));

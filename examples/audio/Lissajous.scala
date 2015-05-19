@@ -6,14 +6,16 @@ import graphics._
 import audio._
 import spatial._
 import util._
+import io._
 
 object Lissajous extends SeerApp with AudioSource {
 
+	GdxAudio.bufferSize = 1024
 	GdxAudio.init
 
 	val mesh = Mesh()
-	for(i <- 0 until Audio().bufferSize) mesh.vertices += Vec3()
 	mesh.primitive = LineStrip
+	mesh.maxVertices = Audio().bufferSize
 
 	val model = Model(mesh)
 
@@ -27,17 +29,20 @@ object Lissajous extends SeerApp with AudioSource {
 	Audio().start
 
 	override def draw(){
-		model.draw
-	}
-
-	override def animate(dt:Float){
 		mesh.clear
 		mesh.vertices ++= buf
 		mesh.update
+
+		model.draw
 	}
+
+	override def animate(dt:Float){}
 
 	override def audioIO(io: AudioIOBuffer){
 		while(io()){
+			sin1.f = (Mouse.x() - 0.5f) * 440f
+			sin2.f = (Mouse.y() - 0.5f) * 440f
+
 			val s1 = sin1()
 			val s2 = sin2()
 
@@ -48,14 +53,15 @@ object Lissajous extends SeerApp with AudioSource {
 		}
 	}
 
-	io.Trackpad.connect
-	io.Trackpad.bind((touch) => {
-		touch.count match{
-			case 1 =>
-				sin1.f = (440.f * (touch.pos.x-0.5))
-				sin2.f = (440.f * (touch.pos.y-0.5))
-			case _ => ()
-		}
-	})
+	// io.Trackpad.connect
+	// io.Trackpad.bind((touch) => {
+	// 	touch.count match{
+	// 		case 1 =>
+	// 			sin1.f = (440f * (touch.pos.x-0.5))
+	// 			sin2.f = (440f * (touch.pos.y-0.5))
+	// 		case _ => ()
+	// 	}
+	// })
+	
 
 }

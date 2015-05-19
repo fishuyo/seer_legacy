@@ -9,11 +9,11 @@ import de.sciss.synth.io._
 
 object Audio {
   var interface:Option[AudioInterface] = None
-  def apply() = interface.getOrElse(new NullAudioInterface())
+  def apply() = interface.getOrElse({ interface = Some(new NullAudioInterface()); interface.get })
 }
 
 class NullAudioInterface extends AudioInterface {
-  println("No audio interface initialized.")
+  println( "Warning: No AudioInterface initialized.")
 }
 
 trait AudioInterface {
@@ -23,7 +23,7 @@ trait AudioInterface {
   var channelsIn = 1
   var channelsOut = 2
 
-  var gain = 1.f
+  var gain = 1f
 
   var playThru = false
   var recordThru = true

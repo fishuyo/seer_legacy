@@ -31,7 +31,7 @@ trait NavCamera extends GdxCamera {
   }
 }
 
-class PerspectiveCamera extends GdxPCam(67.f, Window.a0, 1.f) with NavCamera {
+class PerspectiveCamera extends GdxPCam(67f, Window.a0, 1f) with NavCamera {
   near = .01f
   def setFOV(f:Float) = fieldOfView = f
 }

@@ -16,10 +16,10 @@ class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
   var ctrl = false
 
   override def keyDown(k:Int) = {
-    var v = 1.f
-    var w = 45.f.toRadians
+    var v = 1f
+    var w = 45f.toRadians
     //if( shift ) v *= .1f
-    if( alt ) v *= 10.f
+    if( alt ) v *= 10f
     
     k match {
       case Keys.SHIFT_LEFT => nav.vel.y = -v

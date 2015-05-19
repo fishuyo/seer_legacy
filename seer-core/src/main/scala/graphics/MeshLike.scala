@@ -82,7 +82,13 @@ trait MeshLike extends Drawable {
 		  	})
 		  })
 
-		  normals.zip(count).foreach{ case (n,c) => n /= c }
+		  normals.zip(count).foreach{ case (n,c) =>
+        if(c > 0) n /= c
+        if( n.x.isNaN){
+          // println("NAAN!") // XXX FIX THIS
+          n.set(Vec3(0,0,1))
+        }
+      }
 
 	  } else if( vertices.length > 0 && vertices.length % 3 == 0 ){
 

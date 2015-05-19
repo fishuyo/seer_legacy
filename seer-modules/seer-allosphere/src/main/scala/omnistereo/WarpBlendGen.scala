@@ -2,22 +2,12 @@
 package com.fishuyo.seer
 package allosphere
 
-import graphics._
-import dynamic._
 import spatial._
-import spatial._
-import io._
-import util._
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.{Texture => GdxTexture}
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL30
-import com.badlogic.gdx.Gdx.{gl20 => gl }
 
 import java.nio.FloatBuffer
-
 
 
 object WarpBlendGen {
@@ -43,8 +33,8 @@ object WarpBlendGen {
 
 			val v = Vec3(cel*saz,sel,-cel*caz).normalize
 
-			// data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
-			data.put(Array(v.x,v.y,v.z,1.f))
+			// data.put(y*w+x, Array(v.x,v.y,v.z,1f))
+			data.put(Array(v.x,v.y,v.z,1f))
 
 		}
 		data.rewind
@@ -69,8 +59,8 @@ object WarpBlendGen {
 			val v = Vec3(y0*saz,y1,-y0*caz)
 			v.normalize
 
-			// data.put(y*w+x, Array(v.x,v.y,v.z,1.f))
-			data.put(Array(v.x,v.y,v.z,1.f), y*w+x, 4)
+			// data.put(y*w+x, Array(v.x,v.y,v.z,1f))
+			data.put(Array(v.x,v.y,v.z,1f), y*w+x, 4)
 
 		}
 		data.rewind
@@ -90,7 +80,7 @@ object WarpBlendGen {
 			val v = Vec3(f*sx*aspect,f*sy,-1)
 			v.normalize
 
-			data.put(Array(v.x,v.y,v.z,1.f), y*w+x, 4)
+			data.put(Array(v.x,v.y,v.z,1f), y*w+x, 4)
 
 		}
 		data.rewind
@@ -104,7 +94,7 @@ object WarpBlendGen {
 			val normx = x.toDouble / w.toDouble
 			val normy = y.toDouble / h.toDouble
 			// fade out at edges:
-			val v = math.sin(.5*Pi * math.min(1., mult*(0.5 - math.abs(normx-0.5)))) * math.sin(.5*Pi * math.min(1., mult*(0.5 - math.abs(normy-0.5))))
+			val v = math.sin(.5*Pi * math.min(1.0, mult*(0.5 - math.abs(normx-0.5)))) * math.sin(.5*Pi * math.min(1.0, mult*(0.5 - math.abs(normy-0.5))))
 			pix.setColor(v,v,v,v)
 			pix.drawPixel(x,y)
 		}

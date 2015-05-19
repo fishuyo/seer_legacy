@@ -8,8 +8,6 @@ import actor._
 import akka.actor._
 import scala.concurrent.duration._
 
-import system.dispatcher
-
 import collection.mutable.ListBuffer
 
 
@@ -41,14 +39,18 @@ object Schedule {
 
 	val events = ListBuffer[Cancellable]()
 
+	val system = System()
+	import system.dispatcher
+
+
 	def after(t:FiniteDuration)(f: =>Unit) = {
-		val e = system.scheduler.scheduleOnce(t)(f)
+		val e = System().scheduler.scheduleOnce(t)(f)
 		events += e
 		e
 	}
 
 	def every(t:FiniteDuration)(f: =>Unit) = {
-		val e = system.scheduler.schedule(t,t)(f)
+		val e = System().scheduler.schedule(t,t)(f)
 		events += e
 		e
 	}
@@ -60,7 +62,7 @@ object Schedule {
 				t += (speed * dt.toDouble).seconds
 				if(t > duration){
 					cancel()
-					f(1.f)
+					f(1f)
 				} else {
 					percent = t/duration
 					f(percent)
@@ -78,7 +80,7 @@ object Schedule {
 		// 			if(deadline.isOverdue){
 		// 				Scene.remove(this)
 		// 				cancelled = true
-		// 				f(1.f)
+		// 				f(1f)
 		// 			} else f(t/len)
 		// 		}
 		// 	}

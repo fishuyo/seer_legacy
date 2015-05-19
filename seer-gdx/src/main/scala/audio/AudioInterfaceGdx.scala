@@ -32,12 +32,12 @@ object GdxAudio extends AudioInterface {
   // val actor = system.actorOf(Props( new GdxAudioActor(sampleRate, bufferSize, 2)).withDispatcher("audio-dispatcher"), name = "audio-main")
 
   // ewww hack gross temporary while switching to akka actors
-  val out = Array.ofDim[Float](channelsOut, bufferSize)
+  // val out = Array.ofDim[Float](channelsOut, bufferSize)
 
   // def push(o:AudioSource) = actor ! Source(o)
 
   override def init(){
-    actor = system.actorOf(Props( new GdxAudioActor()), name = "audio-main")
+    actor = System().actorOf(Props( new GdxAudioActor()), name = "audio-main")
     super.init()
   }
 
@@ -66,10 +66,10 @@ class GdxAudioActor extends Actor {
   val in = Array.ofDim[Float](channelsIn, bufferSize)
   val inShort = new Array[Short](channelsIn * bufferSize)
 
-  // val out = Array.ofDim[Float](channelsOut, bufferSize)
+  val out = Array.ofDim[Float](channelsOut, bufferSize)
   val outInterleaved = new Array[Float](channelsOut * bufferSize)
 
-  val ioBuffer = new AudioIOBuffer(channelsIn, channelsOut, bufferSize, in, GdxAudio.out)
+  val ioBuffer = new AudioIOBuffer(channelsIn, channelsOut, bufferSize, in, out)
 
 
   override def preStart(){}
@@ -95,7 +95,7 @@ class GdxAudioActor extends Actor {
   def processLoop(){
     if( running ){
 
-      val out = GdxAudio.out
+      // val out = GdxAudio.out
 
       // read from input device, convert to float
       record.read(inShort, 0, bufferSize * channelsIn)
@@ -108,7 +108,7 @@ class GdxAudioActor extends Actor {
 
       // zero output buffers
       for( c <- (0 until channelsOut); i <- (0 until bufferSize))
-        out(c)(i) = 0.f
+        out(c)(i) = 0f
 
       // call audio callbacks
       ioBuffer.reset
@@ -138,7 +138,7 @@ class GdxAudioActor extends Actor {
 
   def toggleRecord(path:String){
     if( !recording ){
-      writer = system.actorOf(Props( new AudioFileWriterActor()))
+      writer = System().actorOf(Props( new AudioFileWriterActor()))
       writer ! Open(path)
       AudioPassInputLatencyCorrection.resetLatency(0.03f)
       recording = true

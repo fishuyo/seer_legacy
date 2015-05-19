@@ -14,8 +14,8 @@ object Nav{
 }
 /** Pose that moves through space */
 class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
-	var smooth = 0.f
-	var scale = 1.f
+	var smooth = 0f
+	var scale = 1f
 	var vel = Vec3(0); var velS = Vec3(0)
 	var angVel = Vec3(0); var angVelS = Vec3(0)
 	var turn = Vec3(0); var nudge = Vec3(0)
@@ -38,10 +38,10 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 		stop
 	}
 
-	// def lookAt( p: Vec3, amt:Float=1.f) = {
+	// def lookAt( p: Vec3, amt:Float=1f) = {
 
 	// }
-	def goTo( p:Vec3, amt:Float=1.f) = {
+	def goTo( p:Vec3, amt:Float=1f) = {
 		val dir = (p - pos).normalize
 	}
 
@@ -49,7 +49,7 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 
 	def step( dt:Float ) = {
 		scale = dt
-		val amt = 1.f - smooth
+		val amt = 1f - smooth
 
 		//smooth velocities
 		velS = velS.lerp( vel*dt + nudge, amt )

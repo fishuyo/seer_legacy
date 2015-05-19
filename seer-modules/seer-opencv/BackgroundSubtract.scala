@@ -20,7 +20,7 @@ class BackgroundSubtract {
 
 	var updateBG = true
 	var adaptiveBG = false
-	var threshold = 20.f
+	var threshold = 20f
 
 	def setThreshold(v:Float) = threshold = v
 
@@ -59,8 +59,8 @@ class BackgroundSubtract {
 		// val bg8u = new Mat()
 		// diff.convertTo(bg8u, CvType.CV_8UC1)
 
-		Imgproc.threshold(diff,mask,threshold,255.f, Imgproc.THRESH_BINARY)
-		// Imgproc.adaptiveThreshold(diff,mask,255.f, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 7, 10)
+		Imgproc.threshold(diff,mask,threshold,255f, Imgproc.THRESH_BINARY)
+		// Imgproc.adaptiveThreshold(diff,mask,255f, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 7, 10)
 
 		if( return_mask ) mask
 		else{
@@ -70,8 +70,8 @@ class BackgroundSubtract {
 		}
 
 		// for( y<-(0 until 480); x<-(0 until 640)){
-		// 	val d = ( if (mat.get(y,x)(0) > 0) 1.f else 0.f) //depthData(640*y+x).toFloat / 255.f else 0.f )
-		// 	depthPix.setColor(d,d,d,1.f)
+		// 	val d = ( if (mat.get(y,x)(0) > 0) 1f else 0f) //depthData(640*y+x).toFloat / 255f else 0f )
+		// 	depthPix.setColor(d,d,d,1f)
 		// 	depthPix.drawPixel(x,y)
 
 		// }

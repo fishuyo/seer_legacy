@@ -19,25 +19,63 @@ import collection.mutable.Map
 
 import de.sciss.osc.Message
 
-object OmniTest extends OmniApp {
+object OmniTest extends SeerApp { //extends OmniApp {
 
-	var loader:SeerScriptLoader = null
+	val loader = ScriptLoader("scripts/omnitest.scala")
+  // val script = loader.script //getScript()
 
-  override def onDrawOmni(){
-    Shader("omni").begin
-    omni.uniforms(omniShader);
-
-    if(loader.script != null) loader.script.draw()
-    
-    Shader("omni").end
-  }
+  var renderer:OmniCapture = _ //StereoRenderer = _
 
   override def init(){
-    super.init()
-    loader = new SeerScriptLoader("scripts/omnitest.scala")
+    RenderGraph.roots.clear
+    renderer = new OmniCapture //new OmniStereoRenderer
+    renderer.scene = Scene
+    renderer.camera = Camera
+    val node = new RenderNode(renderer)
+    RenderGraph.roots += node
+
+    val node2 = new RenderNode(new OmniRender(renderer.omni))
+    node.outputTo(node2)
+
+    // val comp = new CompositeNode
+    // node2.outputTo(comp)
+    // RenderGraph.roots(0).outputTo(comp)
+    // comp.outputTo(ScreenNode)
+    
+    // val fb = new FeedbackNode(0.98, 0.2)
+    // node2.outputTo(fb)
+    // fb.outputTo(ScreenNode)
   }
 
+  override def draw(){
+    // Cube().draw
+  }
+
+  // override def doOmniDraw(){
+  //   // Shader("omni").begin
+  //   // omni.uniforms(omniShader);
+
+  //   // if(script.isDefined) script.get.draw()
+  //   // omni.renderFace(0) = true
+  //   // omni.renderFace(1) = false
+  //   // omni.renderFace(2) = true
+  //   // omni.renderFace(3) = false
+  //   // omni.renderFace(4) = true
+  //   // omni.renderFace(5) = false
+  // Camera.nav.pos.set(0,0,0)
+
+  //   Cube().draw
+    
+  //   // Shader("omni").end
+  // }
+
+  // override def init(){
+    // super.init()
+    // loader = new SeerScriptLoader("scripts/omnitest.scala")
+  // }
+
   override def animate(dt:Float){
-    if(loader.script != null) loader.script.animate(dt)
+    // Scene.remove(this)
+    // if(script.isDefined) script.get.animate(dt)
   }
 }

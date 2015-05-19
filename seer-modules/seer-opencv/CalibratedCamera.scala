@@ -255,8 +255,8 @@ class CalibratedCamera {
   	distortion.get(0,0,dist)
 
   	val map = Map(
-	  	"CameraMatrix" -> List.fromArray(intr),
-	  	"DistortionCoefficients" -> List.fromArray(dist),
+	  	"CameraMatrix" -> intr.toList,
+	  	"DistortionCoefficients" -> dist.toList,
 	  	"hFOV" -> fovx,
 	  	"vFOV" -> fovy,
 	  	"FocalLength" -> focalLength,

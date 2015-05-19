@@ -29,25 +29,25 @@ class AbsoluteConstraint(val p:KinematicState, var q:KinematicState) extends Con
 }
 
 object LinearSpringConstraint {
-	def apply(p:Particle,q:Particle,l:Float=1.f,s:Float=1.f,tear:Float=0.f) = new LinearSpringConstraint(p,q,l,s,tear)
+	def apply(p:Particle,q:Particle,l:Float=1f,s:Float=1f,tear:Float=0f) = new LinearSpringConstraint(p,q,l,s,tear)
 }
 
 class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, stiffness:Float, tearThreshold:Float) extends Constraint {
-	var imP = 1.f/p.mass
-  var imQ = 1.f/q.mass
+	var imP = 1f/p.mass
+  var imQ = 1f/q.mass
   var wP = ( imP / (imP+imQ) ) * stiffness;
   var wQ = ( imQ / (imP+imQ) ) * stiffness;
 
-  var dist = 0.f
-  var error = 0.f
+  var dist = 0f
+  var error = 0f
   var torn = false
 
   def isTorn() = torn
   def length(v:Float){ length = v }
 
   def updateWeights(){
-		imP = 1.f/p.mass
-		imQ = 1.f/q.mass
+		imP = 1f/p.mass
+		imQ = 1f/q.mass
 		wP = ( imP / (imP+imQ) ) * stiffness;
 		wQ = ( imQ / (imP+imQ) ) * stiffness;
   }
@@ -57,9 +57,9 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, s
 
 		val d = p.position - q.position
     dist = d.mag
-    if( dist == 0.f ) return
+    if( dist == 0f ) return
 
-    if( tearThreshold > 0.f && dist > tearThreshold ){
+    if( tearThreshold > 0f && dist > tearThreshold ){
     	torn = true
     	return
     }
@@ -72,7 +72,7 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, s
 }
 
 // object LinearRigidConstraint {
-// 	def apply(p:Particle,q:Particle,l:Float=1.f) = new LinearRigidConstraint(p,q,l)
+// 	def apply(p:Particle,q:Particle,l:Float=1f) = new LinearRigidConstraint(p,q,l)
 // }
 
 // class LinearRigidConstraint(val p:Particle, val q:Particle, length:Float) extends Constraint {
@@ -93,7 +93,7 @@ class RotationalSpringConstraint(val p:Stick, var zeroQuat:Quat=Quat(), k:Float=
 
 		// val d = p.euler - zeroQuat.toEulerVec
   //   val dist = d.mag
-  //   if( dist == 0.f ) return
+  //   if( dist == 0f ) return
 
   //   p.euler = p.euler + d * k
 

@@ -1,73 +1,73 @@
 
-package com.fishuyo.seer
-package allosphere
-package livecluster
+// package com.fishuyo.seer
+// package allosphere
+// package livecluster
 
-import graphics._
-import dynamic._
-import spatial._
-import io._
-import util._
+// import graphics._
+// import dynamic._
+// import spatial._
+// import io._
+// import util._
 
-import allosphere.actor._
-
-
-import java.io._
-import scala.io.Source
+// import allosphere.actor._
 
 
-import akka.cluster.Cluster
-import akka.cluster.ClusterEvent._
-import akka.actor._
-import akka.contrib.pattern.DistributedPubSubExtension
-import akka.contrib.pattern.DistributedPubSubMediator
+// import java.io._
+// import scala.io.Source
 
-import monido._
 
-import ClusterSystem.system
-// import ClusterSystem.{ test3 => system }
+// import akka.cluster.Cluster
+// import akka.cluster.ClusterEvent._
+// import akka.actor._
+// import akka.contrib.pattern.DistributedPubSubExtension
+// import akka.contrib.pattern.DistributedPubSubMediator
 
-object Controller extends SeerApp {
+// import monido._
 
-	val loader = new SeerScriptLoader("scripts/controller.scala")
+// import ClusterSystem.system
+// // import ClusterSystem.{ test3 => system }
 
-  val monitor1 = FileMonido("scripts/simulator.scala"){
-    case ModifiedOrCreated(f) => 
-      val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
-      publisher ! ("simulator", code)
-    case _ => None
-  }
-  val monitor2 = FileMonido("scripts/renderer.scala"){
-    case ModifiedOrCreated(f) => 
-      val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
-      publisher ! ("renderer", code)
-    case _ => None
-  }
+// object Controller extends SeerApp {
 
-	var publisher = system.actorOf(Props( new SimPublisher()), name = "simpublisher")
+// 	val loader = new SeerScriptLoader("scripts/controller.scala")
 
-}
+//   val monitor1 = FileMonido("scripts/simulator.scala"){
+//     case ModifiedOrCreated(f) => 
+//       val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
+//       publisher ! ("simulator", code)
+//     case _ => None
+//   }
+//   val monitor2 = FileMonido("scripts/renderer.scala"){
+//     case ModifiedOrCreated(f) => 
+//       val code = Source.fromFile(f).getLines.reduceLeft[String](_ + '\n' + _)
+//       publisher ! ("renderer", code)
+//     case _ => None
+//   }
 
-class SimPublisher extends Actor with ActorLogging {
-  import DistributedPubSubMediator.Publish
+// 	var publisher = system.actorOf(Props( new SimPublisher()), name = "simpublisher")
 
-  // activate the extension
-  val mediator = DistributedPubSubExtension(system).mediator
+// }
+
+// class SimPublisher extends Actor with ActorLogging {
+//   import DistributedPubSubMediator.Publish
+
+//   // activate the extension
+//   val mediator = DistributedPubSubExtension(system).mediator
  
-  def receive = {
-    case (name:String, script:String) =>
-      println(s"Publishing script to $name..")
-      mediator ! Publish(name, script)
-    case _ => ()
-    // case MemberUp(member) =>
-    //   log.info("Member is Up: {}", member.address)
-    // case UnreachableMember(member) =>
-    //   log.info("Member detected as unreachable: {}", member)
-    // case MemberRemoved(member, previousStatus) =>
-    //   log.info("Member is Removed: {} after {}",
-    //     member.address, previousStatus)
-    // case _: MemberEvent => // ignore
-  }
-}
+//   def receive = {
+//     case (name:String, script:String) =>
+//       println(s"Publishing script to $name..")
+//       mediator ! Publish(name, script)
+//     case _ => ()
+//     // case MemberUp(member) =>
+//     //   log.info("Member is Up: {}", member.address)
+//     // case UnreachableMember(member) =>
+//     //   log.info("Member detected as unreachable: {}", member)
+//     // case MemberRemoved(member, previousStatus) =>
+//     //   log.info("Member is Removed: {} after {}",
+//     //     member.address, previousStatus)
+//     // case _: MemberEvent => // ignore
+//   }
+// }
 
 

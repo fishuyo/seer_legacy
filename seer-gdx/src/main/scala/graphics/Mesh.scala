@@ -15,6 +15,13 @@ import com.badlogic.gdx.graphics.g3d.loader._
 
 object Mesh {
 	def apply() = new Mesh()
+	def apply(m:MeshLike) = {
+		val n = new Mesh()
+		n.vertices ++= m.vertices
+		n.normals ++= m.normals 
+		n.texCoords ++= m.texCoords 
+		n.colors ++= m.colors 
+	}
 	def apply(m:GdxMesh) = new Mesh(){ gdxMesh = Some(m); getVerticesFromGdxMesh() }
 }
 
@@ -75,8 +82,8 @@ class Mesh extends MeshLike {
 		if( primitive == Lines && wireIndices.length > 0) count = math.min(wireIndices.length,maxIndices)
 		else if(indices.length > 0) count = math.min(indices.length,maxIndices)
 
-		if( hasColors ) Shader.shader.get.uniforms("u_hasColor") = 1
-    gdxMesh.get.render(Shader(), primitive, 0, count )
+		if( hasColors ) Renderer().shader.uniforms("u_hasColor") = 1
+    gdxMesh.get.render(Renderer().shader(), primitive, 0, count )
 	}
 
 	def dispose(){gdxMesh.foreach(_.dispose); gdxMesh = None}
@@ -116,5 +123,47 @@ class Mesh extends MeshLike {
 			} 
 		}
 	}
+	
+	def readPointCloud(path:String, resetMesh:Boolean=true){
+		try {
+			if(resetMesh){
+				vertices.clear
+				normals.clear
+			}
+			val source = scala.io.Source.fromFile(path)
+			source.getLines.foreach { case s =>
+				val v = s.split(" ").map( _.toFloat )
+				if( v.length >= 3) vertices += Vec3(v(0),v(1),v(2))
+				if(v.length >= 6) normals += Vec3(v(3),v(4),v(5))
+			}
+		} catch { case e:Exception => println(e.getMessage)}
+	}
+
+	def writePointCloud(){
+		var fullpath = ""
+    try{
+      val form = new java.text.SimpleDateFormat("yyyy-MM-dd-HH.mm.ss")
+      val filename = form.format(new java.util.Date()) + " " + util.Random.int() + ".xyz" 
+      var path = "SeerData/points/" + filename
+      Gdx.files.external("SeerData/points").file().mkdirs()
+      fullpath = Gdx.files.external(path).file().getAbsolutePath()
+
+      val out = new java.io.FileWriter( fullpath )
+
+      if(normals.length == vertices.length){
+		    vertices.zip(normals).foreach { 
+		      case(v,n) =>
+	          out.write( s"${v.x} ${v.y} ${v.z} ${n.x} ${n.y} ${n.z}\n" )
+		    }
+	  	} else {
+	  		vertices.foreach { 
+		      case v =>
+	          out.write( s"${v.x} ${v.y} ${v.z} 0 0 1\n" )
+		    }
+	  	}
+	    out.close
+
+    } catch { case e:Exception => println(s"Error: failed to open $fullpath")}
+  }
 
 }

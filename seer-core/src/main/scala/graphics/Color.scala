@@ -35,7 +35,7 @@ class RGB(var r:Float, var g:Float, var b:Float){
 }
 
 object RGBA{
-  def apply( r:Float, g:Float, b:Float, a:Float=1.f) = new RGBA(r,g,b,a)
+  def apply( r:Float, g:Float, b:Float, a:Float=1f) = new RGBA(r,g,b,a)
   def apply( v:Vec3, a:Float) = new RGBA(v.x,v.y,v.z,a)
   def apply( c:RGBA ) = new RGBA(0,0,0,0).set(c)
 
@@ -43,7 +43,7 @@ object RGBA{
 class RGBA( rr:Float, gg:Float, bb:Float, var a:Float ) extends RGB(rr,gg,bb){
   def value = toGray()
 
-  def set(r1:Float,g1:Float,b1:Float,a1:Float=1.f) = { r=r1; g=g1; b=b1; a=a1; this }
+  def set(r1:Float,g1:Float,b1:Float,a1:Float=1f) = { r=r1; g=g1; b=b1; a=a1; this }
   def set(c:RGBA) = { r=c.r; g=c.g; b=c.b; a=c.a; this }
 	def +(c: RGBA) = new RGBA(r+c.r, g+c.g, b+c.b, a+c.a)
 	override def *(s:Float) = new RGBA(r*s, g*s, b*s, a)
@@ -58,8 +58,8 @@ object HSV {
 }
 class HSV(var h:Float, var s:Float, var v:Float){
 
-  def *(c:HSV) = HSV((c.h+h)%1.f,c.s*s,c.v*v)
-  def *=(c:HSV) = {h+=c.h;h%=1.f;s*=c.s;v*=c.v}
+  def *(c:HSV) = HSV((c.h+h)%1f,c.s*s,c.v*v)
+  def *=(c:HSV) = {h+=c.h;h%=1f;s*=c.s;v*=c.v}
 
   override def toString() = "( " + h + " " + s + " " + v + " )"
 

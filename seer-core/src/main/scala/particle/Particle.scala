@@ -6,8 +6,8 @@ import spatial._
 
 
 trait KinematicState {
-	var _mass = 1.f
-	var invMass = 1.f
+	var _mass = 1f
+	var invMass = 1f
 
 	var position = Vec3()
 	var lPosition = Vec3()
@@ -16,7 +16,7 @@ trait KinematicState {
 	// var jerk = Vec3()
 
 	def mass = _mass
-	def mass_=(f:Float){ _mass = f; invMass = 1.f / f }
+	def mass_=(f:Float){ _mass = f; invMass = 1f / f }
 
 	def applyForce( f: Vec3 ) = acceleration = acceleration + (f * invMass)
   def applyGravity() = acceleration = acceleration + Gravity
@@ -34,11 +34,11 @@ trait KinematicState {
 
 trait RotationalState {
 
-	var _inertia = 1.f 
-	var invInertia = 1.f 
+	var _inertia = 1f 
+	var invInertia = 1f 
 
 	def inertia = _inertia
-	def inertia_=(f:Float){ _inertia = f; invInertia = 1.f / f }
+	def inertia_=(f:Float){ _inertia = f; invInertia = 1f / f }
 
   // var euler = Vec3(0)
   // var lEuler = Vec3(0)
@@ -56,7 +56,7 @@ trait RotationalState {
 
   def applyTorque( f: Vec3 ) = { torque = torque + f; dSpin = Quat().fromEuler(f*invInertia) * dSpin }
   def applyTorque( q: Quat ) = { dSpin = q * dSpin }
-  def applyAngularDamping( damp: Float ) = { torque = torque - angularVelocity * (damp); dSpin = spin.inverse.slerp(Quat(),1.f-damp) * dSpin }	
+  def applyAngularDamping( damp: Float ) = { torque = torque - angularVelocity * (damp); dSpin = spin.inverse.slerp(Quat(),1f-damp) * dSpin }	
 
 }
 
@@ -64,7 +64,7 @@ trait RotationalState {
 
 object Integrators {
 
-	var dt = 1/30.f
+	var dt = 1/30f
 	var dtdt_2 = dt*dt*.5f
 
 	def setTimeStep(timeStep:Float){
@@ -121,7 +121,7 @@ object Particle {
 
 class Particle extends KinematicState {
 	var initialPosition = Vec3()
-	var t = 0.f
+	var t = 0f
 
 	def step(){
 		t += Integrators.dt
@@ -152,8 +152,8 @@ object Stick {
 }
 
 class Stick extends KinematicState with RotationalState {
-	var t = 0.f
-	var length = 1.f
+	var t = 0f
+	var length = 1f
 	val end = new Particle
 
 	def step(){

@@ -2,6 +2,9 @@
 package com.fishuyo.seer
 package io
 
+import graphics.Camera
+import spatial.Nav
+
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
@@ -23,10 +26,18 @@ object Keyboard extends InputAdapter {
   val down = Var('\0')
   var observing = List[Obs]()
 
+  use()
+
   // def non()() = {}
 
-  def clear() = { observing.foreach( _.kill() ); observing = List(); /*charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear();*/ Inputs.removeProcessor(this) }
-  def use() = Inputs.addProcessor(this)
+  def clear() = { observing.foreach( _.kill() ); observing = List(); } // Inputs.removeProcessor(this) }
+  // def clear() = { observing.foreach( _.kill() ); observing = List(); /*charCallbacks.clear(); charUpCallbacks.clear(); callbacks.clear();*/ Inputs.removeProcessor(this) }
+  def use() = {
+    val ps = Inputs.getProcessors()
+    if(!ps.contains(this, true)) Inputs.addProcessor(this)
+  }
+  def remove() = Inputs.removeProcessor(this)
+
 
   def bind( s:String, f:()=>Unit){
     val k = s.charAt(0)
@@ -69,5 +80,11 @@ object Keyboard extends InputAdapter {
     // } catch { case e:Exception => println(e) }
     false
   }
+
+  val cameraNavInput = new KeyboardNavInput(Camera.nav)
+  def bindCamera() = if(!Inputs.getProcessors().contains(cameraNavInput, true)) Inputs.addProcessor(cameraNavInput)
+  def unbindCamera() = Inputs.removeProcessor(cameraNavInput)
+  
+  def bindNav(nav:Nav) = Inputs.addProcessor( new KeyboardNavInput(nav) )
 }
 

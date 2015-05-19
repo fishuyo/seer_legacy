@@ -35,7 +35,7 @@ object RendererScript extends SeerScript {
   val c = Cube()
   val nc = 3
   val cubes = for(z <- -nc to nc; y <- -nc to nc; x <- -nc to nc) yield {
-    val c = Cube().translate(Vec3(x,y,z)*3.f).scale(0.01)
+    val c = Cube().translate(Vec3(x,y,z)*3f).scale(0.01)
     c.material = Material.specular
     c.material.color = RGB(1,0,1)
     c
@@ -51,7 +51,7 @@ object RendererScript extends SeerScript {
   mesh.vertices.foreach{ case v => v.set(v.x,v.y+math.sin(v.x*v.z)*0.1,v.z) }
   val fabricVertices0 = mesh.vertices.clone
 
-  val fabric = new SpringMesh(mesh,1.f)
+  val fabric = new SpringMesh(mesh,1f)
   fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
   fabric.pins += AbsoluteConstraint(fabric.particles(n), fabric.particles(n).position)
   // fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
@@ -63,8 +63,8 @@ object RendererScript extends SeerScript {
 
   val cursor = Sphere().scale(0.05)
 
-  var t = 0.f
-  var scale = 1.f
+  var t = 0f
+  var scale = 1f
 
   val stateListener = system10g.actorOf(Props( new StateListener()), name = "statelistener")
 
@@ -99,9 +99,9 @@ object RendererScript extends SeerScript {
     Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
 
     // val s = Cube()
-    // s.scale(30.f,30.f,30.f)
+    // s.scale(30f,30f,30f)
     // s.material = Material.basic
-    // s.material.color = RGB(0/255.f,191.f/255,255/255.f)
+    // s.material.color = RGB(0/255f,191f/255,255/255f)
     // s.translate(Camera.nav.pos)
     // s.draw()
 
@@ -123,7 +123,7 @@ object RendererScript extends SeerScript {
     //   var l = List(p)
     //   p.material = Material.specular
     //   p.material.color = RGB(1,0,1)
-    //   p.translate(i*20.f,0.75f,5*math.sin(t))
+    //   p.translate(i*20f,0.75f,5*math.sin(t))
     //   p.scale(0.5,0.5,0.5)
       
     //   val r = rs(i)
@@ -132,7 +132,7 @@ object RendererScript extends SeerScript {
     //     c.material = Material.specular
     //     c.material.color = RGB(1,0,1)
 
-    //     c.translate(i*20.f, 0.75 + r * 0.6, 5*math.sin(r*0.8*t))
+    //     c.translate(i*20f, 0.75 + r * 0.6, 5*math.sin(r*0.8*t))
     //     c.scale(0.5,0.5,0.5)
     //     l = c :: l
     //   }
@@ -149,7 +149,7 @@ object RendererScript extends SeerScript {
     // p.draw
 
     // val p = Plane().draw
-    // p.rotate(Pi/2,0,0).scale(10.f)
+    // p.rotate(Pi/2,0,0).scale(10f)
     // p.draw()
     model.draw
     // cubes.foreach(_.draw)

@@ -23,7 +23,7 @@ import com.xuggle.xuggler.IPacket
 
 import com.badlogic.gdx.Gdx
 
-class VideoWriter(val path:String, val w:Int, val h:Int, val scale:Float=1.f, val framerate:Int=30, val codec:String = "mpeg4" ) {
+class VideoWriter(val path:String, val w:Int, val h:Int, val scale:Float=1f, val framerate:Int=30, val codec:String = "mpeg4" ) {
 
   var closing = false
 
@@ -102,9 +102,9 @@ object ScreenCapture extends Animatable {
   var skip = false
   var recording = false
   // var closing = false
-  var scale = 1.f
-  var framerate = 15.f
-  var dtAccum = 0.f
+  var scale = 1f
+  var framerate = 15f
+  var dtAccum = 0f
 
   def toggleRecord(){
     if( recording ) stop
@@ -147,7 +147,7 @@ object ScreenCapture extends Animatable {
 
   override def animate(dt:Float){
 
-    val timeStep = 1.f/framerate
+    val timeStep = 1f/framerate
     dtAccum += dt
     if( dtAccum > timeStep ){
       val bytes = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixels(true)

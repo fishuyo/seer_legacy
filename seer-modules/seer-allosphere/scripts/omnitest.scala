@@ -1,13 +1,13 @@
 
 import com.fishuyo.seer._
 
-import allosphere._
+import com.fishuyo.seer.allosphere._
 
 import graphics._
 import dynamic._
 import spatial._
 import io._
-import particle._
+import com.fishuyo.seer.particle._
 import util._
 
 import com.badlogic.gdx.Gdx
@@ -17,10 +17,10 @@ import de.sciss.osc.Message
 
 import collection.mutable.ArrayBuffer
 
-import allosphere.OmniTest
+// import com.fishuyo.seer.allosphere.OmniTest
 
-Scene.alpha = .3
-SceneGraph.root.depth = false
+// Scene.alpha = .3
+// SceneGraph.root.depth = false
 
 Mouse.clear
 Mouse.use
@@ -30,12 +30,12 @@ implicit def f2i(f:Float) = f.toInt
 object Script extends SeerScript {
 	
 
-  OmniTest.mode = "omni"
+  // OmniTest.mode = "omni"
 
   val c = Cube()
   val nc = 1
   val cubes = for(z <- -nc to nc; y <- -nc to nc; x <- -nc to nc) yield {
-    val c = Cube().translate(Vec3(x,y,z)*3.f)
+    val c = Cube().translate(Vec3(x,y,z)*3f)
     c.material = Material.specular
     c.material.color = RGB(1,0,1)
     c
@@ -51,7 +51,7 @@ object Script extends SeerScript {
   mesh.vertices.foreach{ case v => v.set(v.x,v.y+math.sin(v.x*v.z)*0.1,v.z) }
   val fabricVertices0 = mesh.vertices.clone
 
-  val fabric = new SpringMesh(mesh,1.f)
+  val fabric = new SpringMesh(mesh,1f)
   fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
   fabric.pins += AbsoluteConstraint(fabric.particles(n), fabric.particles(n).position)
   // fabric.pins += AbsoluteConstraint(fabric.particles(0), fabric.particles(0).position)
@@ -60,26 +60,33 @@ object Script extends SeerScript {
 
   mesh.primitive = Triangles
 
-  var t = 0.f
-  var scale = 1.f
+  var t = 0f
+  var scale = 1f
 
 	val cursor = Sphere().scale(0.05)
 	var lpos = Vec2()
 	var vel = Vec2()
 
+  val renderer = OmniTest.renderer//Renderer().asInstanceOf[OmniStereoRenderer] //RenderGraph.roots(0).asInstanceOf[OmniStereoRenderNode]
+  renderer.environment.alpha = 0.1f
+  renderer.environment.blend = true
+  renderer.environment.depth = false
+
 	override def preUnload(){
-		recv.clear()
-    recv.disconnect()
+		// recv.clear()
+    // recv.disconnect()
 	}
 
 	var inited = false
 	override def init(){
-    OmniTest.omniShader = Shader.load("omni", OmniShader.glsl + S.basic._1, S.basic._2 )
+    // renderer.shader = Shader.load(OmniShader.glsl + S.basic._1, S.basic._2 )
     // OmniTest.omni.configure("/Users/fishuyo/calib", "gr02")
     // OmniTest.omni.onCreate
 
-    OmniTest.omni.mStereo = 1
-		OmniTest.omni.mMode = StereoMode.ACTIVE
+    renderer.omni.mStereo = 1
+    // renderer.omni.mMode = StereoMode.ANAGLYPH
+    renderer.omni.mMode = StereoMode.ACTIVE
+		// renderer.omni.mMode = StereoMode.SEQUENTIAL
 		// OmniTest.omni.renderFace(0) = true
 		// OmniTest.omni.renderFace(1) = true
 		// OmniTest.omni.renderFace(2) = true
@@ -91,9 +98,9 @@ object Script extends SeerScript {
 	}
 
   override def draw(){
-		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
-    Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
-
+		// Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    // Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+    FPS.print
 
   	model.draw
     cubes.foreach(_.draw)
@@ -102,18 +109,18 @@ object Script extends SeerScript {
   override def animate(dt:Float){
   	if(!inited) init()
 
-  	OmniTest.lens.eyeSep = Mouse.y() * 0.5
+  	renderer.lens.eyeSep = Mouse.y() * 0.5
 
   	if( Mouse.status() == "drag"){
 			vel = (Mouse.xy() - lpos)/dt
 			// println(vel)
-			// s.applyForce( Vec3(vel.x,vel.y,0)*10.f)
-			val r = Camera.ray(Mouse.x()*Window.width, (1.f-Mouse.y()) * Window.height)
+			// s.applyForce( Vec3(vel.x,vel.y,0)*10f)
+			val r = Camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
 			fabric.particles.foreach( (p) => {
 				val t = r.intersectSphere(p.position, 0.25f)
 				if(t.isDefined){
 					// val p = r(t.get)
-					p.applyForce(Vec3(vel.x,vel.y,0)*150.f)
+					p.applyForce(Vec3(vel.x,vel.y,0)*150f)
 					cursor.pose.pos.set(r(t.get))
 				}
 			})
@@ -127,20 +134,20 @@ object Script extends SeerScript {
   }
 
 
-	val recv = new OSCRecv
-  recv.listen(12001)
-  recv.bindp {
-    case Message("/mx", x:Float) => Camera.nav.vel.x = -x
-    case Message("/my", x:Float) => Camera.nav.vel.y = x
-    case Message("/mz", x:Float) => Camera.nav.vel.z = x
-    case Message("/tx", x:Float) => Camera.nav.angVel.x = x * -.02
-    case Message("/ty", x:Float) => Camera.nav.angVel.y = x * .02
-    case Message("/tz", x:Float) => Camera.nav.angVel.z = x * -.02
-    case Message("/home") => Camera.nav.moveToOrigin
-    case Message("/halt") => Camera.nav.stop
+	// val recv = new OSCRecv
+ //  recv.listen(12001)
+ //  recv.bindp {
+ //    case Message("/mx", x:Float) => Camera.nav.vel.x = -x
+ //    case Message("/my", x:Float) => Camera.nav.vel.y = x
+ //    case Message("/mz", x:Float) => Camera.nav.vel.z = x
+ //    case Message("/tx", x:Float) => Camera.nav.angVel.x = x * -.02
+ //    case Message("/ty", x:Float) => Camera.nav.angVel.y = x * .02
+ //    case Message("/tz", x:Float) => Camera.nav.angVel.z = x * -.02
+ //    case Message("/home") => Camera.nav.moveToOrigin
+ //    case Message("/halt") => Camera.nav.stop
 
-    case _ => ()
-  }
+ //    case _ => ()
+ //  }
 
 }
 

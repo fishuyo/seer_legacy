@@ -10,10 +10,10 @@ class LoopBuffer( var maxSize:Int = 0) {
   
   var samples = new Array[Float](maxSize)
   var curSize = 0
-  var (rPos, wPos) = (0.f,0)
+  var (rPos, wPos) = (0f,0)
   var (rMin, rMax) = (0,0) //read limiters
   var times = 0
-  var speed = 1.f
+  var speed = 1f
 
   //resize sample buffer, default doubles current buffer size
   def resize(size:Int){
@@ -73,19 +73,19 @@ class LoopBuffer( var maxSize:Int = 0) {
     val i = s.toInt
     val i2 = if( i == rMax-1) 0 else i+1
     val f = s - i
-    samples(i)*(1.f-f) + samples(i2)*f
+    samples(i)*(1f-f) + samples(i2)*f
   }
 
   def addSampleAt(s:Float,v:Float) = {
     val i = s.toInt
     val i2 = if( i == rMax-1) 0 else i+1
     val f = s - i
-    samples(i) += v*(1.f-f)
+    samples(i) += v*(1f-f)
     samples(i2) += v*f
   }
 
   //read sample data at r_head, between r_min and r_max
-  def read( out:Array[Float], numSamples:Int, gain:Float=1.f){
+  def read( out:Array[Float], numSamples:Int, gain:Float=1f){
     if( rPos < rMin || rPos >= rMax){ rPos = rMin; times+=1; }
 
     var read = 0
@@ -120,7 +120,7 @@ class LoopBuffer( var maxSize:Int = 0) {
     // }
   }
 
-  def readR( out:Array[Float], numSamples:Int, gain:Float=1.f ){
+  def readR( out:Array[Float], numSamples:Int, gain:Float=1f ){
     this.synchronized{
       if( rPos < rMin || rPos >= rMax){ rPos = rMax-1; times+=1; }
 
@@ -165,7 +165,7 @@ class LoopBuffer( var maxSize:Int = 0) {
     }
   }
   
-  def addFrom( from:Array[Float], numSamples:Int, off:Float=0.f, inOff:Int=0 ){
+  def addFrom( from:Array[Float], numSamples:Int, off:Float=0f, inOff:Int=0 ){
     
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMin
@@ -282,14 +282,14 @@ class LoopBuffer( var maxSize:Int = 0) {
 }
 
 
-class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
+class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
   
   var b = new LoopBuffer()
   var numSamples = (seconds * sampleRate).toInt
   var times = 0
   var sync = 0
 
-  var (gain, pan, decay, rms) = (1.f,0.5f,0.5f,0.f)
+  var (gain, pan, decay, rms) = (1f,0.5f,0.5f,0f)
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
   var startStack, startRecord = false
   var slPos = new RingBuffer[Float](10000)
@@ -315,7 +315,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
       }else{
         b()
       }
-    }else{ 0.f }
+    }else{ 0f }
   }
   // gen = ()=>{
 
@@ -373,8 +373,8 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
     val numOut = io.channelsOut
     val count = io.bufferSize
 
-    var lPos = 0.f
-    val l = (1.f - pan )
+    var lPos = 0f
+    val l = (1f - pan )
     val r = pan
     
     if(recording){ //fresh loop
@@ -485,7 +485,7 @@ class Loop( var seconds:Float=0.f, var sampleRate:Int=44100) extends Gen {
 // #define RW_SIZE 4096
 
 // float LoopBuffer::getRMS(unsigned int numSamples, unsigned int offset){
-//   if( curSize == 0 ) return 0.f;
+//   if( curSize == 0 ) return 0f;
 //   double sum = 0.0;
 //   if( offset < rMin ) offset = rMin;
 //   unsigned int i = numSamples;
@@ -534,7 +534,7 @@ int Loop::load( const char* filename ){
         b[0].append( buffer, read ); break;
       case 2:
         //mix to single channel
-        for( int i=0; i < read/2; i++) buffer[i] = (buffer[2*i]+buffer[2*i+1]) / 2.f;
+        for( int i=0; i < read/2; i++) buffer[i] = (buffer[2*i]+buffer[2*i+1]) / 2f;
         b[0].append( buffer, read/2 ); break;
       default: return -2; break;
     }

@@ -26,27 +26,42 @@ object Mouse extends InputAdapter {
 	callbacks += ("move" -> List())
 	callbacks += ("scroll" -> List())
 
-	val x = Var(0.f)
-	val y = Var(0.f)
+  use()
+
+	val x = Var(0f)
+	val y = Var(0f)
 	val xy = Var(Vec2())
+
+  val dx = Var(0f)
+  val dy = Var(0f)
+  val vel = Var(Vec2())
 
 	val id = Var(0)
 	val button = Var(0)
-	val scroll = Var(0.f)
+	val scroll = Var(0f)
 	val status = Var("up")
 
 	def non()() = {}
 
-	def clear() = { callbacks.keys.foreach(callbacks(_) = List()); Inputs.removeProcessor(this) }
-	def use() = Inputs.addProcessor(this)
+	def clear() = { callbacks.keys.foreach(callbacks(_) = List()) } // Inputs.removeProcessor(this) }
+  def use() = {
+    val ps = Inputs.getProcessors()
+    if(!ps.contains(this, true)) Inputs.addProcessor(this)
+  }
+	def remove() = Inputs.removeProcessor(this)
 
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
 	def update(sx:Int, sy:Int, stat:String){
-		x() = sx * 1.f / Window.width
-		y() = 1.f - (sy * 1.f / Window.height)
+    val lx = x()
+    val ly = y()
+		x() = sx * 1f / Window.width
+		y() = 1f - (sy * 1f / Window.height)
 		xy() = Vec2(x(),y())
 		status() = stat
+    dx() = x() - lx
+    dy() = y() - ly
+    vel() = Vec2(dx(),dy())
 	}
   override def touchUp( sx:Int, sy:Int, pointer:Int, but:Int) = {
 		update(sx,sy,"up")
@@ -154,7 +169,7 @@ object Touch extends InputAdapter {
   }
  	override def touchDown( sx:Int, sy:Int, pointer:Int, button:Int) = {
   	down(pointer) = true
-  	pos(pointer) = Vec3(sx,sy,0.f)
+  	pos(pointer) = Vec3(sx,sy,0f)
 
     val indices = down.zipWithIndex.collect{ case (true,i) => i }
     val p = indices.map( pos(_) )

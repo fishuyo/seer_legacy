@@ -25,15 +25,15 @@ class VideoLoop extends VideoSource {
 
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
   val images = new ListBuffer[Mat]()
-  var frame = 0.f
-  var speed = 1.f
-  var alpha = 0.1f
-  var beta = 1.f-alpha
+  var frame = 0f
+  var speed = 1f
+  var alpha = 0.3f
+  var beta = 1f-alpha
 
   def play(){ playing = true; }
   def togglePlay() = playing = !playing
   def stop(){ playing = false; recording = false; stacking = false}
-  def rewind(){ frame = 0.f }
+  def rewind(){ frame = 0f }
   def record(){ recording = true; }
   def toggleRecord() = {
     if(!recording){
@@ -53,11 +53,11 @@ class VideoLoop extends VideoSource {
     stop()
     images.foreach( _.release )
   	images.clear()
-  	frame = 0.f
+  	frame = 0f
   }
 
   def setSpeed(v:Float) = speed = v
-  def setAlpha(a:Float) = {alpha = a; beta = 1.f-alpha}
+  def setAlpha(a:Float) = {alpha = a; beta = 1f-alpha}
   def setAlphaBeta(a:Float,b:Float) = {alpha = a; beta = b }
 
   override def videoIO(in:Mat, out:Mat){
@@ -74,8 +74,8 @@ class VideoLoop extends VideoSource {
   		}
   	}
   	
-  	if(frame < 0.f) frame = images.length-1
-  	else if(frame > images.length-1) frame = 0.f
+  	if(frame < 0f) frame = images.length-1
+  	else if(frame > images.length-1) frame = 0f
 
     if(stacking){
       if( images.length == 0) return
@@ -88,7 +88,7 @@ class VideoLoop extends VideoSource {
       }
       for( i<-(from.toInt until to.toInt)){
         var idx = i
-        if(i < 0.f) idx = images.length + i
+        if(i < 0f) idx = images.length + i
         else if(i > images.length-1) idx = i - images.length
 
         if( images.length > 0){
@@ -105,7 +105,7 @@ class VideoLoop extends VideoSource {
 
 
 
-  def writeToFile(path:String="default", scale:Float=1.f, codec:String="mpeg4"){
+  def writeToFile(path:String="default", scale:Float=1f, codec:String="mpeg4"){
 
     if( images.length == 0) return
 
@@ -119,7 +119,7 @@ class VideoLoop extends VideoSource {
 
     val bi = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR)
 
-    val writer = new VideoWriter(path, ww, hh, 1.f, 60, codec)
+    val writer = new VideoWriter(path, ww, hh, 1f, 60, codec)
     for( i<-(0 until images.length)){
 
       val mat = images(i)

@@ -28,7 +28,7 @@ object PortAudio extends AudioInterface {
 
         // zero output buffers
         for( c <- (0 until channelsOut))
-          for( i <- (0 until bufferSize)) out(c)(i) = 0.f
+          for( i <- (0 until bufferSize)) out(c)(i) = 0f
 
         // call audio callbacks
         ioBuffer.reset

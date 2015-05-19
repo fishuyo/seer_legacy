@@ -19,7 +19,7 @@ class Lens(
 
 	// setters
 	def setFovy(v:Double) = {
-		val cDeg2Rad = math.Pi / 180.;
+		val cDeg2Rad = math.Pi / 180.0;
 		fovy = v;
 		mTanFOV = math.tan(fovy * cDeg2Rad*0.5);
 		this
@@ -43,7 +43,7 @@ class Lens(
 	
 	// calculate desired fovy, given the Y height of the border at a specified Z depth:
 	// static double getFovyForHeight(double height, double depth) {
-		// return 2.*M_RAD2DEG*atan(height/depth);
+		// return 2.0*M_RAD2DEG*atan(height/depth);
 	// }
 
 	/// Calculate required fovy to produce a specific fovx
@@ -52,7 +52,7 @@ class Lens(
 	/// @return field-of-view in Y axis, usable by Lens.fovy() 
 	def getFovyForFovX(fovx:Double, aspect:Double) = {
 		val farW = math.tan(0.5*fovx.toRadians);
-		2.*math.atan(farW/aspect).toDegrees
+		2.0*math.atan(farW/aspect).toDegrees
 	}
 
 

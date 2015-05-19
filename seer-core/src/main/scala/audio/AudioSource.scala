@@ -21,7 +21,7 @@ class AudioIOBuffer(
   def reset() = index = -1
   // def zero()
 
-  def in(c:Int) = inputSamples(c)(index)
+  def in(c:Int=0) = inputSamples(c)(index)
   def out(c:Int) = outputSamples(c)(index)
   def outSet(c:Int)(v:Float) = outputSamples(c)(index) = v
   def outSum(c:Int)(v:Float) = outputSamples(c)(index) += v
@@ -70,8 +70,8 @@ object AudioPassInputLatencyCorrection extends AudioSource {
       
       } else {
         offset -= 1
-        io.outSet(0)(0.f)
-        io.outSet(1)(0.f)
+        io.outSet(0)(0f)
+        io.outSet(1)(0f)
       }
     }
   }

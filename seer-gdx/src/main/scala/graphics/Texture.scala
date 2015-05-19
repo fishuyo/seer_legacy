@@ -57,12 +57,12 @@ object Texture {
   	t.dispose()
   }
 
-  def bind(i:Int) = {
-  	val t = textures(i)
-  	val id = t.getTextureObjectHandle
-  	t.bind(id)
-    Shader().setUniformi("u_texture0", id );
-  }
+  // def bind(i:Int) = {
+  // 	val t = textures(i)
+  // 	val id = t.getTextureObjectHandle
+  // 	t.bind(id)
+  //   Shader().setUniformi("u_texture0", id );
+  // }
 
   // def getFloatBuffer(i:Int) = textures(i).getTextureData match { case td:FloatTextureDataExposed => td.getBuffer; case _ => null }
 }

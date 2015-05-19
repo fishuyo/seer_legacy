@@ -53,6 +53,6 @@ class Single[T](val x:T) extends Generator[T]{
 // 	}
 // }
 
-// Single(1.f).foldLeft(0.f)((v,g) => v + g() )
+// Single(1f).foldLeft(0f)((v,g) => v + g() )
 
 

@@ -23,7 +23,7 @@ class TrackpadState {
   var fingers = ListBuffer[Finger]()
   var pos = Vec2()
   var vel = Vec2()
-  var size = 0.f
+  var size = 0f
 
   def count = fingers.length
 }
@@ -140,13 +140,13 @@ object Trackpad extends Observer {
                 // val indx = down.indexWhere( _._1 == id );
                 val indx = state.fingers.indexWhere( _.id == id );
                 if( indx != -1){
-                  // down(indx) = ((id,Vec3(x,y,0.f)))
+                  // down(indx) = ((id,Vec3(x,y,0f)))
                   state.fingers(indx) = finger
-                  // gesture.touchDown(x*800.f,y*800.f,indx,0,ts)
+                  // gesture.touchDown(x*800f,y*800f,indx,0,ts)
                 } else {
-                  // down += ((id,Vec3(x,y,0.f)))
+                  // down += ((id,Vec3(x,y,0f)))
                   state.fingers += finger
-                  // gesture.touchDragged(x*800.f,y*800.f,down.length-1,ts)
+                  // gesture.touchDragged(x*800f,y*800f,down.length-1,ts)
                 }
 
                 
@@ -154,13 +154,13 @@ object Trackpad extends Observer {
               // val indx = down.indexWhere( _._1 == id );
               // down = down.filterNot( _._1 == id )
               state.fingers = state.fingers.filterNot( _.id == id )
-              // if( indx != -1 ) gesture.touchUp(x*800.f,y*800.f,indx,0,ts)
+              // if( indx != -1 ) gesture.touchUp(x*800f,y*800f,indx,0,ts)
             case _ => ()
           }
 
           val pos = Vec2()
           val vel = Vec2()
-          var sumsize = 0.f
+          var sumsize = 0f
           state.fingers.foreach { case f =>
             pos += f.pos
             vel += f.vel
@@ -172,7 +172,7 @@ object Trackpad extends Observer {
             state.size = sumsize / state.count
           }
 
-          // pos(id) = Vec3(x,y,0.f)
+          // pos(id) = Vec3(x,y,0f)
 
           // val indices = down.zipWithIndex.collect{ case (true,i) => i }
           // val p = indices.map( pos(_) )

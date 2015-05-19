@@ -2,6 +2,12 @@
 
 package com.fishuyo.seer
 
+import java.io.ByteArrayOutputStream
+import java.io.ByteArrayInputStream
+import java.io.ObjectOutputStream
+import java.io.ObjectInputStream
+
+
 package object util{
 
 	def clamper[@specialized(Int, Double) T : Ordering](low: T, high: T)(value:T): T = {
@@ -21,11 +27,11 @@ package object util{
 	// }
 
 	// @inline def lerp[@specialized(Int, Double) T : Ordering](v1:T, v2:T, t:T): T = {
-	//   v1*(1.f-t)+v2*t
+	//   v1*(1f-t)+v2*t
 	// }
 
 	class AutoMapper(var outlow:Float, var outhigh:Float){
-		var (inl,inh) = (0.f,1.f)
+		var (inl,inh) = (0f,1f)
 		def apply(v:Float) = {
 			if( v < inl) inl = v
 			if( v > inh) inh = v
@@ -40,7 +46,7 @@ package object util{
 	}
 
 	@inline def lerp(v1:Float, v2:Float, t:Float): Float = {
-	  v1*(1.f-t)+v2*t
+	  v1*(1f-t)+v2*t
 	}
 
 	@inline def wrap(v:Float,l:Float,h:Float):Float = {
@@ -48,5 +54,22 @@ package object util{
 		else if( v < l) v + h - l
 		else v 
 	}	
+
+	/**
+   * This method makes a "deep clone" of any Java object it is given.
+   */
+  def deepClone(obj:Object){
+   try {
+     val baos = new ByteArrayOutputStream();
+     val oos = new ObjectOutputStream(baos);
+     oos.writeObject(obj);
+     val bais = new ByteArrayInputStream(baos.toByteArray());
+     val ois = new ObjectInputStream(bais);
+     return ois.readObject();
+   }catch{ case e:Exception =>
+     e.printStackTrace();
+     return null;
+   }
+  }
 
 }
