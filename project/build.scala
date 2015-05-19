@@ -50,11 +50,13 @@ object SeerBuild extends Build {
     base = file("seer-core")
   )
 
+  // libgdx specific code
   lazy val seer_gdx = SeerProject (
     id = "seer-gdx",
     base = file("seer-gdx")
   ) dependsOn seer_core
 
+  // libgdx desktop specific code
   lazy val seer_gdx_desktop_app = SeerProject (
     id = "seer-gdx-desktop-app",
     base = file("seer-gdx/seer-gdx-desktop-app")
