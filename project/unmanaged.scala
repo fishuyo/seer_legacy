@@ -1,11 +1,11 @@
-package seer.unmanaged
+// package seer.unmanaged
 
 import sbt._
 
 import Keys._
 
 
-object SeerLibs {
+object SeerUnmanagedLibs {
 
   val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
   val updateLibgdx = TaskKey[Unit]("update-gdx", "Updates libgdx")
@@ -34,30 +34,29 @@ object SeerLibs {
     IO.download(url, zipFile)
 
     // Extract jars into their respective lib folders.
-    val coreDest = file("seer-core/lib")
+    // val coreDest = file("seer-core/lib")
     // val deskDest = file("seer-desktop/lib")
     val opencvDest = file("seer-modules/seer-opencv/lib")
-    val kinectDest = file("seer-modules/seer-kinect/lib")
+    // val kinectDest = file("seer-modules/seer-kinect/lib")
     val leapDest = file("seer-modules/seer-leap/lib")
     val touchDest = file("seer-modules/seer-multitouch/lib")
     val vrpnDest = file("seer-modules/seer-vrpn/lib")
     val nativeDest = file("lib")
+    
     val nativeFilter =  new ExactFilter("libGlulogicMT.dylib") | new ExactFilter("libLeap.dylib") | 
-                        new ExactFilter("libLeapJava.dylib") | new ExactFilter("libopencv_java245.dylib")
-                      
-                
-    val coreFilter =  new ExactFilter("monido-core_2.10-0.1.2.jar") //| new ExactFilter("gdx.jar")
+                        new ExactFilter("libLeapJava.dylib") | new ExactFilter("libopencv_java245.dylib")                                  
+    // val coreFilter =  new ExactFilter("monido-core_2.10-0.1.2.jar") //| new ExactFilter("gdx.jar")
     //val deskFilter =  new ExactFilter("gdx-natives.jar") | new ExactFilter("gdx-backend-lwjgl.jar") | new ExactFilter("gdx-backend-lwjgl-natives.jar")
     val opencvFilter = new ExactFilter("opencv-245.jar")
-    val kinectFilter = new ExactFilter("freenect-0.0.1.jar")
+    // val kinectFilter = new ExactFilter("freenect-0.0.1.jar")
     val leapFilter = new ExactFilter("LeapJava.jar")
     val touchFilter = new ExactFilter("GlulogicMT.jar")
     val vrpnFilter = new ExactFilter("vrpn.jar")
     
-    IO.unzip(zipFile, coreDest, coreFilter)
+    // IO.unzip(zipFile, coreDest, coreFilter)
     //IO.unzip(zipFile, deskDest, deskFilter)
     IO.unzip(zipFile, opencvDest, opencvFilter)
-    IO.unzip(zipFile, kinectDest, kinectFilter)
+    // IO.unzip(zipFile, kinectDest, kinectFilter)
     IO.unzip(zipFile, leapDest, leapFilter)
     IO.unzip(zipFile, touchDest, touchFilter)
     IO.unzip(zipFile, vrpnDest, vrpnFilter)
@@ -75,7 +74,7 @@ object SeerLibs {
     
     // Declare names
     val baseUrl = "http://libgdx.badlogicgames.com/releases"
-    val gdxName = "libgdx-1.4.1"
+    val gdxName = "libgdx-1.6.0" //"libgdx-1.4.1"
     // val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
     // val gdxName = "libgdx-nightly-latest"
 
@@ -96,11 +95,11 @@ object SeerLibs {
 
     val desktopDest = file("seer-gdx/seer-gdx-desktop-app/lib")
     val desktopFilter = new ExactFilter("gdx-natives.jar") |
-    new ExactFilter("gdx-backend-lwjgl.jar") |
-    new ExactFilter("gdx-backend-lwjgl-natives.jar") |
-    new ExactFilter("gdx-backend-jglfw.jar") |
-    new ExactFilter("gdx-backend-jglfw-natives.jar") //|
-    // new ExactFilter("gdx-tools.jar")
+                        new ExactFilter("gdx-backend-lwjgl.jar") |
+                        new ExactFilter("gdx-backend-lwjgl-natives.jar")
+                        // new ExactFilter("gdx-backend-jglfw.jar") |
+                        // new ExactFilter("gdx-backend-jglfw-natives.jar") //|
+                        // new ExactFilter("gdx-tools.jar")
     IO.unzip(zipFile, desktopDest, desktopFilter)
 
     // val androidDest = file("apps/android/loop/src/main/libs")

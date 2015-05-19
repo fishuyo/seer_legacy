@@ -4,94 +4,55 @@ import Keys._
 
 object SeerModulesBuild extends Build {
 
+  import SeerBuildSettings._
 	import SeerBuild.seer_core
   import SeerBuild.seer_gdx
   import SeerBuild.seer_gdx_desktop_app
 
+  lazy val seer_leap = project.in(file("seer-modules/seer-leap")).
+    settings(common: _*).dependsOn(seer_core)
 
-	// interaction
-  lazy val seer_kinect = SeerProject (
-    "seer-kinect",
-    file("seer-modules/seer-kinect")
-  ) dependsOn( seer_core, seer_opencv )
+  lazy val seer_osx_multitouch = project.in(file("seer-modules/seer-osx-multitouch")).
+    settings(common: _*).dependsOn(seer_core)
 
-  lazy val seer_leap = SeerProject (
-    "seer-leap",
-    file("seer-modules/seer-leap")
-  ) dependsOn seer_core
+  lazy val seer_vrpn = project.in(file("seer-modules/seer-vrpn")).
+    settings(common: _*).dependsOn(seer_core)
 
-  lazy val seer_multitouch = SeerProject (
-    "seer-multitouch",
-    file("seer-modules/seer-multitouch")
-  ) dependsOn (seer_gdx )
+  lazy val seer_openni = project.in(file("seer-modules/seer-openni")).
+    settings(common: _*).dependsOn(seer_gdx)
 
-  lazy val seer_vrpn = SeerProject ( // TODO get vrpn dependency..
-    "seer-vrpn",
-    file("seer-modules/seer-vrpn")
-  ) dependsOn seer_core
+  lazy val seer_opencv = project.in(file("seer-modules/seer-opencv")).
+    settings(common: _*).dependsOn(seer_video)
 
-  lazy val seer_openni = SeerProject(
-    "seer-openni",
-    file("seer-modules/seer-openni")
-  ) dependsOn seer_gdx
-
-  // image video computer vision
-  lazy val seer_opencv = SeerProject (
-    "seer-opencv",
-    file("seer-modules/seer-opencv")
-  ) dependsOn( seer_core, seer_video )
-
-  lazy val seer_video = SeerProject (
-    "seer-video",
-    file("seer-modules/seer-video")
-  ) dependsOn seer_gdx 
+  lazy val seer_video = project.in(file("seer-modules/seer-video")).
+    settings(common: _*).dependsOn(seer_gdx)
 
 
-  // audio
-  lazy val seer_portaudio = SeerProject (
-    "seer-portaudio",
-    file("seer-modules/seer-portaudio")
-  ) dependsOn seer_core
+  lazy val seer_portaudio = project.in(file("seer-modules/seer-portaudio")).
+    settings(common: _*).dependsOn(seer_core)
 
-  lazy val seer_rtaudio = SeerProject (
-    "seer-rtaudio",
-    file("seer-modules/seer-rtaudio")
-  ) dependsOn seer_core
+  lazy val seer_rtaudio = project.in(file("seer-modules/seer-rtaudio")).
+    settings(common: _*).dependsOn(seer_core)
 
 
-  // dynamic and livecoding related
-  lazy val seer_jruby = SeerProject (
-    "seer-jruby",
-    file("seer-modules/seer-dynamic/seer-jruby")
-  ) dependsOn seer_core
+  lazy val seer_jruby = project.in(file("seer-modules/seer-jruby")).
+    settings(common: _*).dependsOn(seer_core)
 
-  lazy val seer_luaj = SeerProject (
-    "seer-luaj",
-    file("seer-modules/seer-dynamic/seer-luaj")
-  ) dependsOn seer_core
+  lazy val seer_script = project.in(file("seer-modules/seer-script")).
+    settings(common: _*).dependsOn(seer_core)
 
-  lazy val seer_script = SeerProject (
-    "seer-eval",
-    file("seer-modules/seer-dynamic/seer-eval")
-  ) dependsOn( seer_core )
+  lazy val seer_repl = project.in(file("seer-modules/seer-repl")).
+    settings(common: _*).dependsOn(seer_core)
 
-  lazy val seer_repl = SeerProject (
-    "seer-repl",
-    file("seer-modules/seer-dynamic/seer-repl")
-  ) dependsOn seer_core 
-
-  // physics
-  lazy val seer_bullet = SeerProject (
-    "seer-bullet",
-    file("seer-modules/seer-bullet")
-  ) dependsOn seer_gdx
+  lazy val seer_luaj = project.in(file("seer-modules/seer-luaj")).
+    settings(common: _*).dependsOn(seer_core)
 
 
-  // allosphere related
-  lazy val seer_allosphere = SeerProject (
-    id = "seer-allosphere",
-    base = file("seer-modules/seer-allosphere"),
-    settings = BuildSettings.app
-  ) dependsOn ( seer_gdx_desktop_app, seer_luaj, seer_script )
+  lazy val seer_bullet = project.in(file("seer-modules/seer-bullet")).
+    settings(common: _*).dependsOn(seer_gdx)
+
+  lazy val seer_allosphere = project.in(file("seer-modules/seer-allosphere")).
+    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_luaj, seer_script)
+
 }
 

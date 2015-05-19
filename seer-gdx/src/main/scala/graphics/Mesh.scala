@@ -118,7 +118,7 @@ class Mesh extends MeshLike {
 					case Usage.Position => vertices += Vec3(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2))
 					case Usage.Normal => normals += Vec3(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2))
 					case Usage.TextureCoordinates => texCoords += Vec2(verts(sizeV*i+off),verts(sizeV*i+off+1))
-					case Usage.Color => colors += RGBA(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2),verts(sizeV*i+off+3))
+					case Usage.ColorUnpacked => colors += RGBA(verts(sizeV*i+off),verts(sizeV*i+off+1),verts(sizeV*i+off+2),verts(sizeV*i+off+3))
 				}
 			} 
 		}
