@@ -3,7 +3,7 @@ package com.fishuyo.seer
 import io._
 import audio._
 import graphics._
-import dynamic._
+//import dynamic._
 // import audio.PortAudio
 
 import com.badlogic.gdx.utils.GdxNativesLoader
@@ -145,7 +145,7 @@ object DesktopApp {
         // val method = util.getMethod("setWindowCanFullScreen", params);
         // method.invoke(util, window, true);
         // com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(frame,false)
-        com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(frame,true)
+        //com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(frame,true)
       } catch { case e:Exception => println(e) }
 
       // canvas.setBackground(Color.black)
