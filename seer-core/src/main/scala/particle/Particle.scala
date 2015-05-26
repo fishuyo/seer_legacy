@@ -132,7 +132,10 @@ class Particle extends KinematicState {
 }
 
 object Stick {
-	def apply(pos:Vec3, q:Quat) = { 
+  def apply(pose:Pose):Stick = { 
+    this(pose.pos,pose.quat)
+  }	
+  def apply(pos:Vec3, q:Quat):Stick = { 
 		val p = new Stick
 		p.position = pos
 		p.lPosition = pos
@@ -140,7 +143,7 @@ object Stick {
 		p.lOrientation = q
 		p 
 	}
-	def apply(pos:Vec3, vel:Vec3, quat:Quat, angVel:Vec3) = { 
+	def apply(pos:Vec3, vel:Vec3, quat:Quat, angVel:Vec3):Stick = { 
 		val p = new Stick
 		p.position = pos; 
 		p.velocity = vel; p.lPosition = pos - vel;

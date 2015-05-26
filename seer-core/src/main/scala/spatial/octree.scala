@@ -64,6 +64,25 @@ class Octree[T]( val parent:Octree[T], c:Vec3, halfsize:Float) extends AABB(c,ha
     false
   }
 
+  def remove(p:Vec3, value:T): Option[T] = {
+    //if point inside of octree AABB
+    if( contains( p ) ){
+      //reached leaf node
+      if( halfsize <= minSize ){
+        return values.remove(p)        
+      } else{ //remove from child octree
+        
+        if( children == null ) return None
+        val oct = octantId(p)
+        
+        if( children(oct) == null ) return None
+        
+        return children(oct).remove(p,value)
+      }
+    }
+    None
+  }
+
   def octantId( p:Vec3 ): Int = (if(p.x >= c.x) 1 else 0) + (if(p.y >= c.y) 2 else 0) + (if(p.z >= c.z) 4 else 0)
 
   def getAll():HashMap[Vec3,T] = {

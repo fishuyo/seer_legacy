@@ -28,6 +28,11 @@ object FPS {
   def print() = fps.log
 }
 
+object Time {
+  var elapsedTime = 0.0
+  def apply() = elapsedTime
+}
+
 class SeerAppListener extends ApplicationListener {
 
   var width = Window.w0
@@ -59,15 +64,16 @@ class SeerAppListener extends ApplicationListener {
 
     camera.nav.pos.z = 2f
 
-    val basic = Shader.load(DefaultShaders.basic)
+    // val basic = Shader.load(DefaultShaders.basic)
     // val basic = Shader.load("shaders/test")
     // basic.monitor
     
-    val root = new RenderNode
-    root.renderer.scene = Scene
-    root.renderer.camera = Camera 
-    root.renderer.shader = basic
-    RenderGraph.addNode(root)
+    // val root = new RenderNode
+    // root.renderer.scene = Scene
+    // root.renderer.camera = Camera 
+    // root.renderer.shader = basic
+    // RenderGraph.addNode(root)
+    RenderGraph.reset
     // val r = new Renderer
     // r.scene = Scene
     // r.camera = Camera 
@@ -90,6 +96,7 @@ class SeerAppListener extends ApplicationListener {
     
     // if( logfps ) fps.log
     val dt = Gdx.graphics.getDeltaTime()
+    Time.elapsedTime += dt
     if(fixedTimeStep){
       dtAccum += dt
       while( dtAccum > timeStep ){
