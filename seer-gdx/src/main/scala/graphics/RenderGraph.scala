@@ -1,6 +1,7 @@
 
 package com.fishuyo.seer
 package graphics
+
 import spatial._
 
 import scala.collection.mutable.ListBuffer
@@ -69,8 +70,9 @@ object RenderGraph {
     roots.foreach( (n) => renderChildren(n) )
   }
   def renderChildren(node:RenderNode){
-   node.render()
-   node.outputs.foreach( (n) => if( n != node) renderChildren(n) )
+    // println("node: " + node.getClass.getName)
+    node.render()
+    node.outputs.foreach( (n) => if( n != node) renderChildren(n) )
   }
 
   // def leaves() = {

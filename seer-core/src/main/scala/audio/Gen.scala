@@ -35,6 +35,21 @@ trait Gen extends AudioSource {
       value
     }
   }
+
+  def *(g:Gen) = new Gen{
+    def apply() = self.apply()*g()
+  }
+  def +(g:Gen) = new Gen{
+    def apply() = self.apply()+g()
+  }
+  def -(g:Gen) = new Gen{
+    def apply() = self.apply()-g()
+  }
+  def /(g:Gen) = new Gen{
+    def apply() = self.apply()/g()
+  }
+  def unary_-(g:Gen) = new Gen{ def apply() = -self.apply() }
+
 }
 
 /**

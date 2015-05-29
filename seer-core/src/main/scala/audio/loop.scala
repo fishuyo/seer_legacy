@@ -458,25 +458,25 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
   //   outFile.close
   // }
 
-  // def load(path:String){
-  //   var file = Gdx.files.external(path).file()
-  //   val in = AudioFile.openRead(file)
+  def load(path:String){
+    var file =  new java.io.File(path) // Gdx.files.external(path).file()
+    val in = AudioFile.openRead(file)
 
-  //   // create a buffer
-  //   val bufSz   = 8192  // perform operations in blocks of this size
-  //   val buf     = in.buffer(bufSz)
+    // create a buffer
+    val bufSz   = 8192  // perform operations in blocks of this size
+    val buf     = in.buffer(bufSz)
 
-  //   clear
-  //   var remain  = in.numFrames
-  //   while (remain > 0) {
-  //     val chunk = math.min(bufSz, remain).toInt
-  //     in.read(buf, 0, chunk)
-  //     b.append( buf(0), chunk )
-  //     remain -= chunk
-  //   }
-  //   in.close
-  //   dirty = true
-  // }
+    clear
+    var remain  = in.numFrames
+    while (remain > 0) {
+      val chunk = math.min(bufSz, remain).toInt
+      in.read(buf, 0, chunk)
+      b.append( buf(0), chunk )
+      remain -= chunk
+    }
+    in.close
+    dirty = true
+  }
 
 }
 

@@ -95,6 +95,52 @@ class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends Render
   }
 }
 
+class Composite3Node(var blend0:Float=0.33f, var blend1:Float=0.33f, var blend2:Float=0.33f) extends RenderNode {
+  var mode = 0
+
+  renderer.scene.push(Plane())
+  renderer.shader = Shader.load(DefaultShaders.composite._1,
+    """
+      #ifdef GL_ES
+       precision mediump float;
+      #endif
+
+      uniform sampler2D u_texture0;
+      uniform sampler2D u_texture1;
+      uniform sampler2D u_texture2;
+
+      uniform float u_blend0;
+      uniform float u_blend1;
+      uniform float u_blend2;
+
+      uniform int mode;
+
+      varying vec2 v_texCoords;
+
+      void main(){
+
+        // pull everything we want from the textures
+        vec4 color0 = texture2D(u_texture0, v_texCoords) * u_blend0;
+        vec4 color1 = texture2D(u_texture1, v_texCoords) * u_blend1;
+        vec4 color2 = texture2D(u_texture2, v_texCoords) * u_blend2;
+
+        if( mode == 0){
+          gl_FragColor = color0 + color1 + color2;
+        }else {
+          gl_FragColor = color0 * color1 * color2;
+        }
+      }
+    """
+  )
+  override def render(){
+    renderer.shader.uniforms("u_blend0") = blend0
+    renderer.shader.uniforms("u_blend1") = blend1
+    renderer.shader.uniforms("u_blend2") = blend2
+    renderer.shader.uniforms("mode") = mode
+    super.render()
+  }
+}
+
 /**
   * FeedbackNode uses the CompositeNode but feeds into itself creating a motion blur effect
   */

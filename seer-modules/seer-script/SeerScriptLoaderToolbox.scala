@@ -5,6 +5,7 @@ import actor._
 
 import graphics.Animatable
 import graphics.Scene
+import graphics.RenderGraph
 import audio.AudioSource
 import audio.Audio
 
@@ -147,6 +148,7 @@ class ScriptLoader extends Actor with ActorLogging {
     if(script.isEmpty) return
     val s = script.get
     Scene.push(s)
+    // RenderGraph.addNode(s.node)
     Audio().push(s)
     s.onLoad()
     loaded = true
@@ -169,6 +171,7 @@ class ScriptLoader extends Actor with ActorLogging {
     if(script.isEmpty) return
     val s = script.get
     Scene.remove(s)
+    // RenderGraph.removeNode(s.node)
     Audio().sources -= s
     s.onUnload()
     script = None

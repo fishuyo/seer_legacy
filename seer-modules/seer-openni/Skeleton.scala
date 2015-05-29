@@ -49,7 +49,7 @@ class Skeleton(val id:Int) {
 
   def updateJoint(s:String,pos:Vec3){
     val oldpos = joints.getOrElseUpdate(s,pos)
-    vel(s) = pos - oldpos
+    vel(s) = vel(s).lerp(pos - oldpos, 0.2)
     joints(s) = pos
     droppedFrames = 0
   }

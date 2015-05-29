@@ -19,6 +19,7 @@ class Environment {
   var blend = false
   var depth = true
   var lineWidth = 1f
+  // var pointSize = 1f
 
   var alpha = 1f
 
@@ -41,6 +42,7 @@ class Environment {
     // Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 
     Gdx.gl.glLineWidth(lineWidth)
+    // Gdx.gl.glPointSize(pointSize)
 
     if(blend) Gdx.gl.glEnable(GL20.GL_BLEND)
     else Gdx.gl.glDisable( GL20.GL_BLEND )

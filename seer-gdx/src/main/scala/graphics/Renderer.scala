@@ -74,6 +74,7 @@ class Renderer {
   }
 
   def animate(dt:Float){
+    if(!active) return
     scene.animate(dt)
     camera.step(dt)
   }
