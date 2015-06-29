@@ -102,6 +102,16 @@ object SeerUnmanagedLibs {
                         // new ExactFilter("gdx-tools.jar")
     IO.unzip(zipFile, desktopDest, desktopFilter)
 
+    val bulletDest = file("seer-modules/seer-bullet/lib")
+    val bulletFilter = new ExactFilter("extensions/gdx-bullet/gdx-bullet.jar") |
+                        new ExactFilter("extensions/gdx-bullet/gdx-bullet-natives.jar")
+    IO.unzip(zipFile, bulletDest, bulletFilter)
+
+    val box2dDest = file("seer-modules/seer-box2d/lib")
+    val box2dFilter = new ExactFilter("extensions/gdx-box2d/gdx-box2d.jar") |
+                        new ExactFilter("extensions/gdx-box2d/gdx-box2d-natives.jar")
+    IO.unzip(zipFile, box2dDest, box2dFilter)
+
     // val androidDest = file("apps/android/loop/src/main/libs")
     // val androidFilter = new ExactFilter("gdx-backend-android.jar") |
     // new ExactFilter("armeabi/libgdx.so") |

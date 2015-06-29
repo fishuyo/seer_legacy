@@ -51,6 +51,9 @@ object SeerModulesBuild extends Build {
   lazy val seer_bullet = project.in(file("seer-modules/seer-bullet")).
     settings(common: _*).dependsOn(seer_gdx)
 
+  lazy val seer_box2d = project.in(file("seer-modules/seer-box2d")).
+    settings(common: _*).dependsOn(seer_gdx)
+
   lazy val seer_allosphere = project.in(file("seer-modules/seer-allosphere")).
     settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_luaj, seer_script)
 
