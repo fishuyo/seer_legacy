@@ -2,6 +2,8 @@
 package com.fishuyo.seer
 package video
 
+import graphics.Texture 
+
 import com.badlogic.gdx.graphics.Pixmap
 
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
@@ -28,6 +30,8 @@ class VlcPlayer(val filename:String) extends RenderCallback { self =>
   // Make pixmap to hold texture data
   var pixmap:Pixmap = _
 
+  var texture:Texture = _
+
   // Logger.setLevel(Logger.Level.Error)
   // NativeLog.setLevel(uk.co.caprica.vlcj.binding.internal.libvlc_log_level_e.ERROR)
   new NativeDiscovery().discover()
@@ -44,29 +48,38 @@ class VlcPlayer(val filename:String) extends RenderCallback { self =>
       }
   }
 
-  mediaPlayerComponent.getMediaPlayer().playMedia(filename)
   mediaPlayerComponent.getMediaPlayer().setRepeat(true)
+  mediaPlayerComponent.getMediaPlayer().setPlaySubItems(true);
+  mediaPlayerComponent.getMediaPlayer().playMedia(filename)
 
   override def display( mediaPlayer:DirectMediaPlayer, nativeBuffer:Array[Memory], bufferFormat:BufferFormat ) {
-    if( pixmap == null){
-      println(s"Making pixmap: $width x $height")
+    // if( pixmap == null){
+    //   println(s"Making pixmap: $width x $height")
+    //   width = bufferFormat.getWidth()
+    //   height = bufferFormat.getHeight()
+    //   size = width * height * 4
+    //   pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888)
+    // }
+    // if( texture == null){
+      // println(s"Making texture: $width x $height")
       width = bufferFormat.getWidth()
       height = bufferFormat.getHeight()
       size = width * height * 4
-      pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888)
-    }
+      // texture = new Texture(width, height)
+    // }
     frame = nativeBuffer(0).getByteBuffer(0L, size) //.asIntBuffer().get(rgbBuffer(), 0, bufferFormat.getHeight() * bufferFormat.getWidth());
+    // texture.data = nativeBuffer(0).getByteBuffer(0L, size) 
     
-    if( frame != null){
-      val bb = pixmap.getPixels()
-      if( bb == null) return
+    // if( frame != null){
+    //   val bb = pixmap.getPixels()
+    //   if( bb == null) return
 
-      // println(s"${nativeBuffer(0).size()} | ${frame.capacity()} $size into ${bb.capacity()}")
-      // println(s"$width x $height")
+    //   // println(s"${nativeBuffer(0).size()} | ${frame.capacity()} $size into ${bb.capacity()}")
+    //   // println(s"$width x $height")
 
-      bb.put( frame )
-      bb.rewind()
-    }
+    //   bb.put( frame )
+    //   bb.rewind()
+    // }
   }
 
   def setRate(rate:Float) = mediaPlayerComponent.getMediaPlayer().setRate(rate)

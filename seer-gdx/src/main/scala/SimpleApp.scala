@@ -74,6 +74,7 @@ class SeerAppListener extends ApplicationListener {
     // root.renderer.shader = basic
     // RenderGraph.addNode(root)
     RenderGraph.reset
+    RootNode.renderer.scene.init()
     // val r = new Renderer
     // r.scene = Scene
     // r.camera = Camera 
