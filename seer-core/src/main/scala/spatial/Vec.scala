@@ -6,10 +6,13 @@ object Vec3 {
 
   def apply() = new Vec3(0,0,0)
   def apply(v:Vec3) = new Vec3(v.x,v.y,v.z)
-  def apply( v: Float=0f) = new Vec3( v, v, v)
-  def apply( vv: Double) = { val v=vv.toFloat; new Vec3( v, v, v) }
-  def apply( x: Float, y: Float, z: Float) = new Vec3(x,y,z)
-  def apply( x: Double, y: Double, z: Double) =  new Vec3(x.toFloat,y.toFloat,z.toFloat) 
+  def apply( v:Float) = new Vec3(v,v,v)
+  def apply( vv:Double) = { val v=vv.toFloat; new Vec3(v,v,v) }
+  def apply( x:Float, y:Float, z:Float) = new Vec3(x,y,z)
+  def apply( x:Double, y:Double, z:Double) =  new Vec3(x.toFloat,y.toFloat,z.toFloat) 
+
+  def apply(v:Vec2,z:Float=0) = new Vec3(v.x,v.y,z)
+  def apply(x:Float,v:Vec2) = new Vec3(x,v.x,v.y)
 
   def unapply( v: Vec3): Some[(Float,Float,Float)] = Some((v.x,v.y,v.z))
 

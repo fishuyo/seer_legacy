@@ -135,7 +135,7 @@ class Field2D(var w:Int, var h:Int) extends Animatable {
   def bind(){
     if(resized){
       texture = new FloatTexture(w,h)
-      texture.data = data
+      texture.buffer = data
       texture.bind(0)
       texture.update
       texture.params

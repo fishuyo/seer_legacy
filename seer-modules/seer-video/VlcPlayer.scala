@@ -2,7 +2,10 @@
 package com.fishuyo.seer
 package video
 
-import graphics.Texture 
+import graphics.Texture
+import graphics.Plane
+import graphics.Material 
+import graphics.Animatable 
 
 import com.badlogic.gdx.graphics.Pixmap
 
@@ -11,6 +14,7 @@ import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.direct.BufferFormat;
 import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
 import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.direct.RenderCallback;
 import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
@@ -20,17 +24,16 @@ import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 import com.sun.jna.Memory;
 import java.nio.ByteBuffer
 
+// object VLC {
+//   def loadNatives() = new NativeDiscovery().discover()
+// }
 
-class VlcPlayer(val filename:String) extends RenderCallback { self =>
+class VlcPlayer(val uri:String) extends RenderCallback { self =>
 
   var frame:ByteBuffer = _
   var (width, height) = (0, 0)
   var size = 0
-
-  // Make pixmap to hold texture data
-  var pixmap:Pixmap = _
-
-  var texture:Texture = _
+  var loaded = false
 
   // Logger.setLevel(Logger.Level.Error)
   // NativeLog.setLevel(uk.co.caprica.vlcj.binding.internal.libvlc_log_level_e.ERROR)
@@ -44,22 +47,18 @@ class VlcPlayer(val filename:String) extends RenderCallback { self =>
 
   var mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
       override def onGetRenderCallback():RenderCallback = {
-          return self
+        return self
+      }
+      override def newMedia(mediaPlayer:MediaPlayer){
+        loaded = true
       }
   }
 
   mediaPlayerComponent.getMediaPlayer().setRepeat(true)
   mediaPlayerComponent.getMediaPlayer().setPlaySubItems(true);
-  mediaPlayerComponent.getMediaPlayer().playMedia(filename)
+  mediaPlayerComponent.getMediaPlayer().playMedia(uri)
 
   override def display( mediaPlayer:DirectMediaPlayer, nativeBuffer:Array[Memory], bufferFormat:BufferFormat ) {
-    // if( pixmap == null){
-    //   println(s"Making pixmap: $width x $height")
-    //   width = bufferFormat.getWidth()
-    //   height = bufferFormat.getHeight()
-    //   size = width * height * 4
-    //   pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888)
-    // }
     // if( texture == null){
       // println(s"Making texture: $width x $height")
       width = bufferFormat.getWidth()
@@ -67,28 +66,55 @@ class VlcPlayer(val filename:String) extends RenderCallback { self =>
       size = width * height * 4
       // texture = new Texture(width, height)
     // }
-    frame = nativeBuffer(0).getByteBuffer(0L, size) //.asIntBuffer().get(rgbBuffer(), 0, bufferFormat.getHeight() * bufferFormat.getWidth());
+    frame = nativeBuffer(0).getByteBuffer(0L, size) 
     // texture.data = nativeBuffer(0).getByteBuffer(0L, size) 
     
-    // if( frame != null){
-    //   val bb = pixmap.getPixels()
-    //   if( bb == null) return
-
-    //   // println(s"${nativeBuffer(0).size()} | ${frame.capacity()} $size into ${bb.capacity()}")
-    //   // println(s"$width x $height")
-
-    //   bb.put( frame )
-    //   bb.rewind()
-    // }
   }
+
+  def load(uri:String) = mediaPlayerComponent.getMediaPlayer().playMedia(uri)
+  
+  def isLoaded() = ( width != 0 )
 
   def setRate(rate:Float) = mediaPlayerComponent.getMediaPlayer().setRate(rate)
 
   def togglePlaying() = mediaPlayerComponent.getMediaPlayer().pause()
   // def play(b:Boolean){ playing = b }
 
-  def close(){
+  def dispose(){
     mediaPlayerComponent.release()
+  }
+
+}
+
+class VideoTexture(uri:String) extends VlcPlayer(uri) with Animatable {
+
+  var texture:Texture = _
+  var quad = Plane()
+  var initd = false
+
+  override def init(){
+    var wait = 0
+    while(!isLoaded && wait < 10){
+      Thread.sleep(100)
+      wait += 1
+    }
+    texture = new Texture(width,height)
+    texture.format = org.lwjgl.opengl.GL12.GL_BGRA
+    quad.material = Material.basic
+    quad.material.loadTexture(texture)
+    quad.scale(1,-height*1f/width,1)
+    initd = true
+  }
+
+  override def draw(){ quad.draw }
+  override def animate(dt:Float){
+    update()
+  }
+  def update(){
+    if(!initd) init()
+    if(frame == null) return
+    texture.data = frame
+    texture.update
   }
 
 }

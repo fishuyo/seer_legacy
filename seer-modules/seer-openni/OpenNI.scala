@@ -7,8 +7,6 @@ import spatial._
 import util._
 import actor._
 
-// import scala.collection.JavaConversions._
-// import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
@@ -39,6 +37,31 @@ object OpenNI {
 	var userGen:UserGenerator = _
 	var skeletonCap:SkeletonCapability = _
 	var poseDetectionCap:PoseDetectionCapability = _
+
+  var debugImage = Image(w,h,4,1)
+  var depthImage = Image(w,h,1,2)
+  var rgbImage = Image(w,h,3,1)
+
+  val depthBytes = Array.fill(w*h*4)(255.toByte)
+  // val rgbbytes = Array.fill(w*h*4)(255.toByte)
+  val maskBytes = Array.fill(w*h*4)(0.toByte)
+  val maskBytes1 = Array.fill(w*h*4)(0.toByte)
+  val maskBytes2 = Array.fill(w*h*4)(0.toByte)
+  val maskBytes3 = Array.fill(w*h*4)(0.toByte)
+  val maskBytes4 = Array.fill(w*h*4)(0.toByte)
+
+  var depthBuffer:ShortBuffer = _ 
+  var sceneBuffer:ShortBuffer = _ 
+  var rgbBuffer:ByteBuffer = _ 
+
+  val meshBuffer = new Mesh() 
+  val pointMesh = new Mesh()
+  pointMesh.maxVertices = w*h
+  pointMesh.primitive = Points
+
+  val pointBuffer = ArrayBuffer[Point3D]()
+  var rem = 0
+  var pointCloudDensity = 4
 
   // val tracking = HashMap[Int,Boolean]()
   
@@ -127,46 +150,25 @@ object OpenNI {
     depth.rewind()
 
     var points = 0;
-    while(depth.remaining() > 0)
-    {
+    while(depth.remaining() > 0){
       val depthVal = depth.get();
-      if (depthVal != 0)
-      {
+      if (depthVal != 0){
         histogram(depthVal) += 1
         points += 1
       }
     }
         
-    for (i <- 1 until histogram.length)
-    {
+    for (i <- 1 until histogram.length){
       histogram(i) += histogram(i-1);
     }
 
-    if (points > 0)
-    {
-      for (i <- 1 until histogram.length)
-      {
+    if (points > 0){
+      for (i <- 1 until histogram.length){
         histogram(i) = 1.0f - (histogram(i) / points.toFloat)
       }
     }
   }
 
-  val depthBytes = Array.fill(w*h*3)(255.toByte)
-  // val rgbbytes = Array.fill(w*h*4)(255.toByte)
-  val maskBytes = Array.fill(w*h)(0.toByte)
-
-  var depthBuffer:ShortBuffer = _ 
-  var sceneBuffer:ShortBuffer = _ 
-  var rgbBuffer:ByteBuffer = _ 
-
-  val meshBuffer = new Mesh() 
-  val pointMesh = new Mesh()
-  pointMesh.maxVertices = w*h
-  pointMesh.primitive = Points
-
-  val pointBuffer = ArrayBuffer[Point3D]()
-  var rem = 0
-  var pointCloudDensity = 4
 
   def update(){
 
@@ -177,6 +179,10 @@ object OpenNI {
       if(rgb){
         val imageMD = imageGen.getMetaData();
         rgbBuffer = imageMD.getData().createByteBuffer();
+        rgbImage.buffer = rgbBuffer.duplicate
+        // rgbImage.buffer.rewind()
+        // rgbImage.buffer.put(rgbBuffer)
+        // rgbImage.buffer.rewind()
       }
 
       if(depth){
@@ -198,20 +204,36 @@ object OpenNI {
           val pos = depthBuffer.position();
           val z = depthBuffer.get();
           val user = sceneBuffer.get();
-              
-      		maskBytes(pos) = user.toByte //if(user != 0) 1.toByte else 0               	
+          
+          for( o <- 0 until 4){    
+        		maskBytes(4*pos+o) = user.toByte //if(user != 0) 1.toByte else 0               	
+            maskBytes1(4*pos+o) = 0
+            maskBytes2(4*pos+o) = 0
+            maskBytes3(4*pos+o) = 0
+            maskBytes4(4*pos+o) = 0
+
+            user match {
+              case 1 => maskBytes1(4*pos+o) = 255.toByte
+              case 2 => maskBytes2(4*pos+o) = 255.toByte
+              case 3 => maskBytes3(4*pos+o) = 255.toByte
+              case 4 => maskBytes4(4*pos+o) = 255.toByte
+              case _ => ()
+            }
+          }
 
         	var c = RGB.white
         	if (user > 0) c = RGB(0,1,0)
         	if (z != 0){
         		val histValue = histogram(z);
-        		depthBytes(3*pos) = (c.r * histValue*255).toByte 
-        		depthBytes(3*pos+1) = (c.g * histValue*255).toByte
-            depthBytes(3*pos+2) = (c.b * histValue*255).toByte
+        		depthBytes(4*pos) = (c.r * histValue*255).toByte 
+        		depthBytes(4*pos+1) = (c.g * histValue*255).toByte
+            depthBytes(4*pos+2) = (c.b * histValue*255).toByte
+            depthBytes(4*pos+3) = 255.toByte
         	} else{
-            depthBytes(3*pos) = 0.toByte 
-            depthBytes(3*pos+1) = 0.toByte
-            depthBytes(3*pos+2) = 0.toByte
+            depthBytes(4*pos) = 0.toByte 
+            depthBytes(4*pos+1) = 0.toByte
+            depthBytes(4*pos+2) = 0.toByte
+            depthBytes(4*pos+3) = 0.toByte
           }
 
           if(pointCloud){

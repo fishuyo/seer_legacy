@@ -68,8 +68,13 @@ class Renderer {
     if(camera.viewportHeight == 1f){
       camera.viewportWidth = vp.aspect
     }else{
-      // camera.viewportWidth = vp.w
-      // camera.viewportHeight = vp.h
+      camera match {
+        case ortho:OrthographicCamera =>
+          // camera.viewportWidth = vp.w / 400f
+          // camera.viewportHeight = vp.h / 400f
+        case _ => camera.viewportWidth = vp.w
+                  camera.viewportHeight = vp.h
+      }
     }
   }
 

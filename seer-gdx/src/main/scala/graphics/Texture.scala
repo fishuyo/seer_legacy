@@ -2,7 +2,7 @@ package com.fishuyo.seer
 package graphics
 
 import com.badlogic.gdx.graphics.{Texture => GdxTex}
-import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils._
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.BufferUtils
@@ -18,6 +18,7 @@ import com.badlogic.gdx.Gdx.{gl20 => gl }
 // import org.lwjgl.opengl.GL43
 
 import java.nio.Buffer
+import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.io.DataInputStream
 import java.io.FileInputStream
@@ -40,15 +41,44 @@ object Texture {
     t
 	}
 
+  def apply(w:Int,h:Int) = {
+    val t = new Texture(w,h)
+    t.allocate(w,h)
+    t.init()
+    t
+  }
+
+  def apply(image:Image) = {
+    val t = new Texture(image.w, image.h)
+    t.buffer = image.buffer
+    image.channels match {
+      case 1 => t.format = GL20.GL_LUMINANCE
+      case 2 => t.format = GL20.GL_LUMINANCE_ALPHA
+      case 3 => t.format = GL20.GL_RGB
+      case 4 => t.format = GL20.GL_RGBA
+      case _ => ()
+    }
+    image.bytesPerChannel match {
+      case 1 => t.dtype = GL20.GL_UNSIGNED_BYTE
+      case 2 => t.dtype = GL20.GL_UNSIGNED_SHORT
+      case 4 => t.dtype = GL20.GL_UNSIGNED_INT
+      case _ => ()
+    }
+    t.init
+    t
+  }
+
 }
 
 
 class Texture(var w:Int,var h:Int) {
   var (width, height) = (w,h)
 
-  var data:Buffer = _
+  var buffer:Buffer = _
 
-  var handle = getGLHandle()
+  def byteBuffer = buffer.asInstanceOf[ByteBuffer]
+
+  var handle = 0 //getGLHandle()
   val target = GL20.GL_TEXTURE_2D
   var iformat = GL20.GL_RGBA
   var format = GL20.GL_RGBA
@@ -63,18 +93,19 @@ class Texture(var w:Int,var h:Int) {
   var mWrapT = GL20.GL_REPEAT
   var mWrapR = GL20.GL_REPEAT
 
-  allocate(w,h)
-
-  params()
-  update()
+  // allocate(w,h)
+  // params()
+  // update()
 
   def init(){
     handle = getGLHandle()
+    params()
+    update()
   }
 
   def allocate(ww:Int, hh:Int){
     width = ww; height = hh;
-    data = BufferUtils.newByteBuffer(4*w*h)
+    buffer = BufferUtils.newByteBuffer(4*w*h)
   }
 
   private def getGLHandle() = {
@@ -104,10 +135,10 @@ class Texture(var w:Int,var h:Int) {
   }
 
   def update(){
-    data.rewind
+    buffer.rewind
     bind()
     // Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
-    Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,data)
+    Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,buffer)
     Gdx.gl.glGenerateMipmap(GL20.GL_TEXTURE_2D);
     // println(Gdx.gl.glGetError())
   }
@@ -125,13 +156,15 @@ class Texture(var w:Int,var h:Int) {
 }
 
 class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
-  // data = BufferUtils.newFloatBuffer( 4*w*h )
+  // buffer = BufferUtils.newFloatBuffer( 4*w*h )
   override val iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
   override val dtype = GL20.GL_FLOAT
 
+  def floatBuffer = buffer.asInstanceOf[FloatBuffer]
+
   override def allocate(ww:Int,hh:Int){
     width = ww; height = hh;
-    data = BufferUtils.newFloatBuffer(4*w*h)
+    buffer = BufferUtils.newFloatBuffer(4*w*h)
   }
 }
 
@@ -140,7 +173,7 @@ class GdxTexture(val gdxTexture:GdxTex) extends Texture(0,0){
 
   override def bind(i:Int=0) = gdxTexture.bind(i)
   override def params() = {}
-  override def update() = {}
+  override def update() = { }
   // override def getGLHandle() = -1 //{}
 }
 

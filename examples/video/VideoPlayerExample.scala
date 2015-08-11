@@ -6,7 +6,7 @@ import graphics._
 import video._
 import io._
 
-import com.badlogic.gdx.graphics.{Texture => GdxTexture}
+// import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 import com.badlogic.gdx.graphics.Pixmap
 
 object VideoPlayerExample extends SeerApp {
@@ -25,7 +25,7 @@ object VideoPlayerExample extends SeerApp {
     player = new VideoPlayer2("/Users/fishuyo/Desktop/water.mov")
     // player = new VideoPlayer2("/Users/fishuyo/Movies/trees/trees.mov")
 
-    texture = new GdxTexture(player.pixmap)
+    texture = Texture(player.pixmap)
     quad.material = Material.basic
     quad.material.texture = Some(texture)
     quad.material.textureMix = 1f
@@ -44,7 +44,7 @@ object VideoPlayerExample extends SeerApp {
     if(!inited) init()
 
     player.animate(dt)
-    texture.draw(player.pixmap,0,0)
+    texture.gdxTexture.draw(player.pixmap,0,0)
   }
 
   Keyboard.clear

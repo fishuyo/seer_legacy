@@ -68,7 +68,8 @@ class RenderNode(val renderer:Renderer = new Renderer()) {
 /**
   * ScreenNode renders to screen
   */
-object ScreenNode extends RenderNode {
+object ScreenNode extends ScreenNode
+class ScreenNode extends RenderNode {
   // clear = false
   renderer.scene.push(Plane())
   renderer.shader = Shader.load(DefaultShaders.texture)
@@ -86,11 +87,13 @@ object ScreenNode extends RenderNode {
   * CompositeNode blends two nodes output simply
   */
 class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends RenderNode {
+  var mode = 0
   renderer.scene.push(Plane())
   renderer.shader = Shader.load(DefaultShaders.composite)
   override def render(){
     renderer.shader.uniforms("u_blend0") = blend0
     renderer.shader.uniforms("u_blend1") = blend1
+    renderer.shader.uniforms("u_mode") = mode
     super.render()
   }
 }

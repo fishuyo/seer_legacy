@@ -281,7 +281,7 @@ object DefaultShaders {
       uniform float u_blend0;
       uniform float u_blend1;
 
-      uniform int mode;
+      uniform int u_mode;
 
       varying vec2 v_texCoords;
 
@@ -291,10 +291,10 @@ object DefaultShaders {
         vec4 color0 = texture2D(u_texture0, v_texCoords) * u_blend0;
         vec4 color1 = texture2D(u_texture1, v_texCoords) * u_blend1;
 
-        if( mode == 0){
+        if( u_mode == 0){
           gl_FragColor = color0 + color1;
         }else {
-        gl_FragColor = color0 * color1;
+          gl_FragColor = color0 * color1;
         }
       }
     """

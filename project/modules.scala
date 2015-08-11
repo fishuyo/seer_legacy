@@ -25,7 +25,7 @@ object SeerModulesBuild extends Build {
     settings(common: _*).dependsOn(seer_video)
 
   lazy val seer_video = project.in(file("seer-modules/seer-video")).
-    settings(common: _*).dependsOn(seer_gdx)
+    settings(common: _*).dependsOn(seer_gdx_desktop_app)
 
 
   lazy val seer_portaudio = project.in(file("seer-modules/seer-portaudio")).

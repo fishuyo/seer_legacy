@@ -49,6 +49,8 @@ object Trackpad extends Observer {
 
   var connected = false
 
+  connect()
+  
   // val down = ListBuffer.fill(20)(false)
 
   callbacks += ("multi" -> List()) // num [pos]
