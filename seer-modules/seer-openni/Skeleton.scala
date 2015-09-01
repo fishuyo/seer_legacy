@@ -22,6 +22,21 @@ object Bone {
 class Bone( var pos:Vec3, var quat:Quat, var length:Float)
 
 
+object Skeleton{
+  def apply(id:Int) = new Skeleton(id)
+
+  def apply(s:Skeleton) = {
+    val copy = new Skeleton(s.id)
+    copy.calibrating = s.calibrating
+    copy.tracking = s.tracking
+    copy.droppedFrames = s.droppedFrames
+    copy.joints = s.joints.clone
+    copy.vel = s.vel.clone
+    copy.bones = s.bones.clone
+    copy
+  }
+}
+
 class Skeleton(val id:Int) {
 
   var calibrating = false

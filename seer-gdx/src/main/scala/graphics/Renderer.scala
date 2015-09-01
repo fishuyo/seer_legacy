@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.GL20
   * Compainion object holding current renderer
   */
 object Renderer {
-  var renderer = new Renderer
+  var renderer = RootNode.renderer //new Renderer
   def apply() = renderer 
   def update(r:Renderer) = renderer = r
 }

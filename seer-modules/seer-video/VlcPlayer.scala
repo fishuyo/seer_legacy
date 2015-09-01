@@ -91,6 +91,7 @@ class VideoTexture(uri:String) extends VlcPlayer(uri) with Animatable {
   var texture:Texture = _
   var quad = Plane()
   var initd = false
+  var scale = 1f
 
   override def init(){
     var wait = 0
@@ -100,6 +101,8 @@ class VideoTexture(uri:String) extends VlcPlayer(uri) with Animatable {
     }
     texture = new Texture(width,height)
     texture.format = org.lwjgl.opengl.GL12.GL_BGRA
+    texture.allocate(width,height)
+    texture.init()
     quad.material = Material.basic
     quad.material.loadTexture(texture)
     quad.scale(1,-height*1f/width,1)
@@ -109,11 +112,12 @@ class VideoTexture(uri:String) extends VlcPlayer(uri) with Animatable {
   override def draw(){ quad.draw }
   override def animate(dt:Float){
     update()
+    quad.scale.set(scale, -height*scale/width, 1)
   }
   def update(){
     if(!initd) init()
     if(frame == null) return
-    texture.data = frame
+    texture.buffer = frame
     texture.update
   }
 

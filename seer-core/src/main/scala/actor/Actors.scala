@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 import collection.mutable.ListBuffer
 
 object System {
-  var system = ActorSystem("seer", ConfigFactory.load(ActorManager.regularConfig))
+  var system = ActorSystem("seer", ConfigFactory.load(ActorManager.config))
   def apply() = system
   def update(s:ActorSystem) = system = s
 }
@@ -54,7 +54,7 @@ object ActorManager {
   //     }
   // """)
 
-  val config = ConfigFactory.parseString("""
+  val config_remote = ConfigFactory.parseString("""
     akka {
       actor {
         provider = "akka.remote.RemoteActorRefProvider"
@@ -68,6 +68,14 @@ object ActorManager {
         compression-scheme = "zlib"
         zlib-compression-level = 1
      }
+    }
+  """)
+
+  val config = ConfigFactory.parseString("""
+    seer-dispatcher {
+      type = "Dispatcher"
+      executor = "com.fishuyo.seer.actor.SeerEventThreadExecutorServiceConfigurator"
+      throughput = 1
     }
   """)
 

@@ -13,7 +13,7 @@ object GenerateTexture extends SeerApp {
   val quad = Plane()
 
   for( i <- 0 until numChannels*image.w*image.h){
-    image.buffer.put(util.Random.int().toByte)
+    image.buffer.put((util.Random.float()*255).toByte)
   }
 
   override def init(){

@@ -20,6 +20,7 @@ object SimpleViewer extends SeerApp {
   OpenNI.initAll()
   OpenNI.start()
   OpenNI.pointCloud = true
+  OpenNI.makeDebugImage = true
 
   // val stickman = new StickMan(OpenNI.getSkeleton(1))
 
@@ -27,8 +28,8 @@ object SimpleViewer extends SeerApp {
   var quad2:Model = _
   // val dpix = new Pixmap(640,480, Pixmap.Format.RGB888)
   // val vpix = new Pixmap(640,480, Pixmap.Format.RGB888)
-  var tex1:Texture = _
-  var tex2:Texture = _
+  var depthTexture:Texture = _
+  var rgbTexture:Texture = _
 
   val mesh = new Mesh()
   mesh.primitive = Points 
@@ -38,16 +39,16 @@ object SimpleViewer extends SeerApp {
   override def init(){
     // loadShaders()
 
-    tex1 = Texture(640,480)
-    tex2 = Texture(640,480)
+    depthTexture = Texture(OpenNI.debugImage) //Texture(640,480)
+    rgbTexture = Texture(OpenNI.rgbImage) //Texture(640,480)
 
     quad1 = Plane().scale(1,-480f/640f,1).translate(-1.5f,0,0)
     quad2 = Plane().scale(1,-480f/640f,1).translate(1,0,0)
     quad1.material = Material.basic
-    quad1.material.texture = Some(tex1)
+    quad1.material.texture = Some(depthTexture)
     quad1.material.textureMix = 1f
     quad2.material = Material.basic
-    quad2.material.texture = Some(tex2)
+    quad2.material.texture = Some(rgbTexture)
     quad2.material.textureMix = 1f
 
     inited = true
@@ -73,16 +74,16 @@ object SimpleViewer extends SeerApp {
     // stickman.animate(dt)
     
    // val bb = dpix.getPixels
-    tex1.data.asInstanceOf[ByteBuffer].put(OpenNI.depthBytes)
-    tex1.update
+    // depthTexture.byteBuffer.put(OpenNI.depthBytes)
+    depthTexture.update
     // tex1.draw(dpix,0,0)
 
     // val bb2 = vpix.getPixels
-    tex2.data.asInstanceOf[ByteBuffer].put(OpenNI.rgbImage.buffer)
-    // tex2.data.rewind
-    // tex2.data = OpenNI.rgbBuffer
-    tex2.update
-    // tex2.draw(vpix,0,0)
+    // rgbTexture.byteBuffer.put(OpenNI.rgbImage.buffer)
+    // rgbTexture.data.rewind
+    // rgbTexture.data = OpenNI.rgbBuffer
+    rgbTexture.update
+    // rgbTexture.draw(vpix,0,0)
 
     try{
       // OpenNI.updatePoints()

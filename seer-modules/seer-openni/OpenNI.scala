@@ -38,8 +38,11 @@ object OpenNI {
 	var skeletonCap:SkeletonCapability = _
 	var poseDetectionCap:PoseDetectionCapability = _
 
-  var debugImage = Image(w,h,4,1)
+  var makeDebugImage = false
+  var debugImage = Image(w,h,3,1)
   var depthImage = Image(w,h,1,2)
+  var userImage = Image(w,h,1,2)
+  var userMaskImage = Image(w,h,1,1)
   var rgbImage = Image(w,h,3,1)
 
   val depthBytes = Array.fill(w*h*4)(255.toByte)
@@ -53,6 +56,9 @@ object OpenNI {
   var depthBuffer:ShortBuffer = _ 
   var sceneBuffer:ShortBuffer = _ 
   var rgbBuffer:ByteBuffer = _ 
+  var debugBuffer:ByteBuffer = _ 
+  var debugBufferSafe:ByteBuffer = _ 
+  var userMaskBufferSafe:ByteBuffer = userMaskImage.buffer.duplicate
 
   val meshBuffer = new Mesh() 
   val pointMesh = new Mesh()
@@ -65,8 +71,9 @@ object OpenNI {
 
   // val tracking = HashMap[Int,Boolean]()
   
-  val colors = RGB(1,0,0) :: RGB(0,1,0) :: RGB(0,0,1) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: RGB(1,1,1) :: List()
+  val colors = RGB(1,0,0) :: RGB(0,1,0) :: RGB(0,0,1) :: RGB(1,1,0) :: RGB(0,1,1) :: RGB(1,0,1) :: List()
   val skeletons = HashMap[Int,Skeleton]()
+  val users = HashMap[Int,User]()
 
   val actor = System().actorOf( Props[OpenNIActor], name="openni" )
 
@@ -178,73 +185,113 @@ object OpenNI {
 
       if(rgb){
         val imageMD = imageGen.getMetaData();
-        rgbBuffer = imageMD.getData().createByteBuffer();
-        rgbImage.buffer = rgbBuffer.duplicate
-        // rgbImage.buffer.rewind()
-        // rgbImage.buffer.put(rgbBuffer)
-        // rgbImage.buffer.rewind()
+        // rgbBuffer = imageMD.getData().createByteBuffer();
+        // rgbBuffer = rgbImage.buffer
+        imageMD.getData().copyToBuffer(rgbImage.buffer, rgbImage.sizeInBytes )
+        // rgbImage.buffer = imageMD.getData().createByteBuffer();
       }
 
       if(depth){
 
         val depthMD = depthGen.getMetaData();
         val sceneMD = userGen.getUserPixels(0);
-        sceneBuffer = sceneMD.getData().createShortBuffer();
-        depthBuffer = depthMD.getData().createShortBuffer();
 
-        // if(depthImage){
+        // sceneBuffer = sceneMD.getData().createShortBuffer();
+        sceneMD.getData().copyToBuffer(userImage.buffer, userImage.sizeInBytes)
+        sceneBuffer = userImage.buffer.asShortBuffer()
+
+        // depthBuffer = depthMD.getData().createShortBuffer();
+        depthMD.getData().copyToBuffer(depthImage.buffer, depthImage.sizeInBytes )
+        depthBuffer = depthImage.buffer.asShortBuffer()
+
+        if(makeDebugImage){
+          if( debugBuffer == null){
+            debugBuffer = ByteBuffer.allocateDirect(640*480*3);
+            debugBuffer.order(ByteOrder.nativeOrder());
+            debugBufferSafe = debugBuffer.duplicate
+          }
+          debugBuffer.rewind
           calcHist(depthBuffer);
           depthBuffer.rewind();
-        // }
+        }
           
         // meshBuffer.clear
         pointBuffer.clear
 
+        users.values.foreach { case user =>
+          if(user.updateMask){
+            // user.maskBufferSafe.rewind
+          }
+        }
+        userMaskBufferSafe.rewind
+
         while(depthBuffer.remaining() > 0){
           val pos = depthBuffer.position();
           val z = depthBuffer.get();
-          val user = sceneBuffer.get();
+          val userId = sceneBuffer.get();
           
-          for( o <- 0 until 4){    
-        		maskBytes(4*pos+o) = user.toByte //if(user != 0) 1.toByte else 0               	
-            maskBytes1(4*pos+o) = 0
-            maskBytes2(4*pos+o) = 0
-            maskBytes3(4*pos+o) = 0
-            maskBytes4(4*pos+o) = 0
-
-            user match {
-              case 1 => maskBytes1(4*pos+o) = 255.toByte
-              case 2 => maskBytes2(4*pos+o) = 255.toByte
-              case 3 => maskBytes3(4*pos+o) = 255.toByte
-              case 4 => maskBytes4(4*pos+o) = 255.toByte
-              case _ => ()
+          if(userId > 0) userMaskBufferSafe.put(255.toByte)
+          else userMaskBufferSafe.put(0.toByte)
+          
+          users.values.foreach { case user =>
+            if(user.updateMask){
+              // if(user.id == userId.toInt) user.maskBufferSafe.put(255.toByte)
+              // else user.maskBufferSafe.put(0.toByte)
             }
           }
 
-        	var c = RGB.white
-        	if (user > 0) c = RGB(0,1,0)
-        	if (z != 0){
-        		val histValue = histogram(z);
-        		depthBytes(4*pos) = (c.r * histValue*255).toByte 
-        		depthBytes(4*pos+1) = (c.g * histValue*255).toByte
-            depthBytes(4*pos+2) = (c.b * histValue*255).toByte
-            depthBytes(4*pos+3) = 255.toByte
-        	} else{
-            depthBytes(4*pos) = 0.toByte 
-            depthBytes(4*pos+1) = 0.toByte
-            depthBytes(4*pos+2) = 0.toByte
-            depthBytes(4*pos+3) = 0.toByte
+          // for( o <- 0 until 4){    
+        		// maskBytes(4*pos+o) = userId.toByte //if(userId != 0) 1.toByte else 0               	
+          //   maskBytes1(4*pos+o) = 0
+          //   maskBytes2(4*pos+o) = 0
+          //   maskBytes3(4*pos+o) = 0
+          //   maskBytes4(4*pos+o) = 0
+
+          //   userId match {
+          //     case 1 => maskBytes1(4*pos+o) = 255.toByte
+          //     case 2 => maskBytes2(4*pos+o) = 255.toByte
+          //     case 3 => maskBytes3(4*pos+o) = 255.toByte
+          //     case 4 => maskBytes4(4*pos+o) = 255.toByte
+          //     case _ => ()
+          //   }
+          // }
+
+          if(makeDebugImage){
+            var c = RGB.white
+            if (userId > 0) c = colors(userId)
+            if (z != 0){
+              val b = histogram(z);
+              // depthBytes(4*pos) = (c.r * histValue*255).toByte 
+              // depthBytes(4*pos+1) = (c.g * histValue*255).toByte
+              // depthBytes(4*pos+2) = (c.b * histValue*255).toByte
+              // depthBytes(4*pos+3) = 255.toByte
+              debugBuffer.put(Array[Byte]((c.r*b*255).toByte, (c.g*b*255).toByte, (c.b*b*255).toByte))
+            } else{
+              debugBuffer.put(Array[Byte](0,0,0))
+              // depthBytes(4*pos) = 0.toByte 
+              // depthBytes(4*pos+1) = 0.toByte
+              // depthBytes(4*pos+2) = 0.toByte
+              // depthBytes(4*pos+3) = 0.toByte
+            }
           }
+
+
 
           if(pointCloud){
             val y = pos / w
             val x = pos % w
-            if (z != 0 && user > 0 && x%pointCloudDensity==rem && y%pointCloudDensity==rem){
+            if (z != 0 && userId > 0 && x%pointCloudDensity==rem && y%pointCloudDensity==rem){
               pointBuffer += new Point3D(x, y, z)
               // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
               // meshBuffer.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
             }
           }
+        }
+        if(makeDebugImage){
+          // debugImage.buffer.rewind();
+          // debugImage.buffer.put(depthBytes)
+          debugBuffer.rewind
+          debugImage.buffer = debugBufferSafe
         }
         if(pointCloud){
           // pointMesh.clear 
@@ -289,6 +336,7 @@ object OpenNI {
   // }
 
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
+  def getUser(id:Int) = users.getOrElseUpdate(id, new User(id))
 
   def getJoints(user:Int){
     getJoint(user,"head")
@@ -347,6 +395,7 @@ class NewUserObserver extends IObserver[UserEventArgs]{
 		println("New user " + id + " pose: " + sk.needPoseForCalibration() );
 		sk.requestSkeletonCalibration(id, true);
     OpenNI.getSkeleton(id).calibrating = true
+    OpenNI.getUser(id).tracking = true
 	}
 }
 
@@ -357,6 +406,7 @@ class LostUserObserver extends IObserver[UserEventArgs]{
     // OpenNI.tracking(id) = false
     OpenNI.getSkeleton(id).tracking = false
     OpenNI.getSkeleton(id).calibrating = false
+    OpenNI.getUser(id).tracking = false
 	}
 }
 

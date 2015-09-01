@@ -49,21 +49,7 @@ object Texture {
   }
 
   def apply(image:Image) = {
-    val t = new Texture(image.w, image.h)
-    t.buffer = image.buffer
-    image.channels match {
-      case 1 => t.format = GL20.GL_LUMINANCE
-      case 2 => t.format = GL20.GL_LUMINANCE_ALPHA
-      case 3 => t.format = GL20.GL_RGB
-      case 4 => t.format = GL20.GL_RGBA
-      case _ => ()
-    }
-    image.bytesPerChannel match {
-      case 1 => t.dtype = GL20.GL_UNSIGNED_BYTE
-      case 2 => t.dtype = GL20.GL_UNSIGNED_SHORT
-      case 4 => t.dtype = GL20.GL_UNSIGNED_INT
-      case _ => ()
-    }
+    val t = new ImageTexture(image)
     t.init
     t
   }
@@ -157,14 +143,41 @@ class Texture(var w:Int,var h:Int) {
 
 class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
   // buffer = BufferUtils.newFloatBuffer( 4*w*h )
-  override val iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
-  override val dtype = GL20.GL_FLOAT
+  iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
+  dtype = GL20.GL_FLOAT
 
   def floatBuffer = buffer.asInstanceOf[FloatBuffer]
 
   override def allocate(ww:Int,hh:Int){
     width = ww; height = hh;
     buffer = BufferUtils.newFloatBuffer(4*w*h)
+  }
+}
+
+
+class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
+
+  image.channels match {
+    case 1 => format = GL20.GL_LUMINANCE
+    case 2 => format = GL20.GL_LUMINANCE_ALPHA
+    case 3 => format = GL20.GL_RGB
+    case 4 => format = GL20.GL_RGBA
+    case _ => ()
+  }
+  image.bytesPerChannel match {
+    case 1 => dtype = GL20.GL_UNSIGNED_BYTE
+    case 2 => dtype = GL20.GL_SHORT //GL20.GL_UNSIGNED_SHORT
+    case 4 => dtype = GL20.GL_UNSIGNED_INT
+    case _ => ()
+  }
+
+  override def update(){
+    bind()
+    // Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
+    image.buffer.rewind
+    Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,image.buffer)
+    Gdx.gl.glGenerateMipmap(GL20.GL_TEXTURE_2D);
+    // println(Gdx.gl.glGetError())
   }
 }
 

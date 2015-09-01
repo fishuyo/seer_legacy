@@ -5,7 +5,7 @@ package cv
 import cv._
 import video._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.JavaConversions._
 
 import com.badlogic.gdx.graphics.Pixmap
@@ -24,7 +24,7 @@ trait VideoSource {
 class VideoLoop extends VideoSource {
 
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
-  val images = new ListBuffer[Mat]()
+  val images = new ArrayBuffer[Mat]()
   var frame = 0f
   var speed = 1f
   var alpha = 0.3f
