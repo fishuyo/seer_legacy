@@ -127,6 +127,11 @@ class Particle extends KinematicState {
 		t += Integrators.dt
 		Integrators.verlet(this)
 	}
+
+  def setVelocity(v:Vec3){
+    velocity = v 
+    lPosition = position - v
+  }
 	
 	def reset(){ position = initialPosition; lPosition = initialPosition }
 }

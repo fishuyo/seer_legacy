@@ -12,18 +12,47 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 	var ttl = 10f
 	var particles = ListBuffer[Particle]()
 
+	var field:Option[spatial.VecField3D] = None
+	var fieldAsForce = true
+	var xt = 0f
+
 	def +=(p:Particle) = particles += p
 	def ++=(ps:Seq[Particle]) = particles ++= ps
 	def addParticle(p:Particle) = particles += p
+	def clear() = particles.clear
 
 	override def animate(dt:Float){
 
+		val timeStep = Integrators.dt
 		particles = particles.filter( (p) => p.t < ttl )
 		if( particles.length > maxParticles ) particles = particles.takeRight(maxParticles)
-		particles.foreach( (p) => {
-			p.applyForce(Gravity)
-			p.step()
-		})
+
+		val steps = ( (dt+xt) / timeStep ).toInt
+    xt += dt - steps * timeStep
+
+    for( t <- (0 until steps)){
+
+      particles.foreach( (p) => {
+        p.applyGravity()
+        // p.applyDamping(damping)
+  			if(field.isDefined){
+					if(fieldAsForce) p.applyForce(field.get(p.position))
+					else p.setVelocity(field.get(p.position))
+				}
+
+        p.step() // timeStep
+        // p.collideGround(-1f, 0.999999f) 
+      })
+
+    }
+		// particles.foreach( (p) => {
+			// p.applyForce(Gravity)
+		// 	if(field.isDefined){
+		// 		if(fieldAsForce) p.applyForce(field.get(p.position))
+		// 		else p.setVelocity(field.get(p.position))
+		// 	}
+		// 	p.step()
+		// })
 
 	}
 

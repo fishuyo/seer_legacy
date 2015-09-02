@@ -146,6 +146,9 @@ class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
   iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
   dtype = GL20.GL_FLOAT
 
+  allocate(w,h)
+  init()
+  
   def floatBuffer = buffer.asInstanceOf[FloatBuffer]
 
   override def allocate(ww:Int,hh:Int){
