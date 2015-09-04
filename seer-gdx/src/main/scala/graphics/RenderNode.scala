@@ -96,6 +96,7 @@ class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends Render
     renderer.shader.uniforms("u_mode") = mode
     super.render()
   }
+  def setBlend(a:Float,b:Float){ blend0 = a; blend1 = b}
 }
 
 class Composite3Node(var blend0:Float=0.33f, var blend1:Float=0.33f, var blend2:Float=0.33f) extends RenderNode {
