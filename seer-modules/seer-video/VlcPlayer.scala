@@ -76,6 +76,8 @@ class VlcPlayer(val uri:String) extends RenderCallback { self =>
   def isLoaded() = ( width != 0 )
 
   def setRate(rate:Float) = mediaPlayerComponent.getMediaPlayer().setRate(rate)
+  def setVolume(volume:Float) = mediaPlayerComponent.getMediaPlayer().setVolume((volume*100f).toInt)
+  def setAudioChannel(channel:Int) = mediaPlayerComponent.getMediaPlayer().setAudioChannel(channel)
 
   def togglePlaying() = mediaPlayerComponent.getMediaPlayer().pause()
   // def play(b:Boolean){ playing = b }

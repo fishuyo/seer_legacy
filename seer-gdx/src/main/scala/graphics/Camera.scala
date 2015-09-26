@@ -36,6 +36,6 @@ class PerspectiveCamera extends GdxPCam(67f, Window.a0, 1f) with NavCamera {
   def setFOV(f:Float) = fieldOfView = f
 }
 
-class OrthographicCamera(w:Int,h:Int) extends GdxOCam(w,h) with NavCamera
+class OrthographicCamera(w:Float,h:Float) extends GdxOCam(w,h) with NavCamera
  
 object Camera extends PerspectiveCamera

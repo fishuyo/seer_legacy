@@ -31,6 +31,7 @@ class Renderer {
   var active = true
   var clear = true
   var depth = true
+  var resize = true
   
   var material:BasicMaterial = new BasicMaterial
   
@@ -64,14 +65,15 @@ class Renderer {
   }
 
   def resize(vp:Viewport){
+    if(!resize) return
     viewport = vp
     if(camera.viewportHeight == 1f){
       camera.viewportWidth = vp.aspect
     }else{
       camera match {
         case ortho:OrthographicCamera =>
-          // camera.viewportWidth = vp.w / 400f
-          // camera.viewportHeight = vp.h / 400f
+          camera.viewportWidth = vp.aspect * camera.viewportHeight //vp.w
+          // camera.viewportHeight = vp.h
         case _ => camera.viewportWidth = vp.w
                   camera.viewportHeight = vp.h
       }

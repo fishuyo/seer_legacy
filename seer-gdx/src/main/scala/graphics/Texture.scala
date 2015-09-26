@@ -41,8 +41,9 @@ object Texture {
     t
 	}
 
-  def apply(w:Int,h:Int) = {
+  def apply(w:Int,h:Int,format:Int=GL20.GL_RGBA) = {
     val t = new Texture(w,h)
+    t.format = format
     t.allocate(w,h)
     t.init()
     t
@@ -173,6 +174,8 @@ class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
     case 4 => dtype = GL20.GL_UNSIGNED_INT
     case _ => ()
   }
+
+  override def byteBuffer = image.buffer
 
   override def update(){
     bind()
