@@ -327,8 +327,8 @@ class Shader {
     if( vertFile.isEmpty || fragFile.isEmpty ) return
     val that = this;
     try{
-      Monitor( vertFile.get.path() ){ (p) => that.reload }
-      Monitor( fragFile.get.path() ){ (p) => that.reload }
+      Monitor( vertFile.get.path() ){ (p) => {that.reload; println(s"reloading file ${that.vertFile.get.path()}") }}
+      Monitor( fragFile.get.path() ){ (p) => {that.reload; println(s"reloading file ${that.fragFile.get.path()}") }}
     } catch { case e:Exception => println(e) }
   } 
 }
