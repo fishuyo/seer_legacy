@@ -3,7 +3,7 @@
 package com.fishuyo.seer
 package examples.graphics
 
-import dynamic._
+// import dynamic._
 import graphics._
 import spatial._
 import io._

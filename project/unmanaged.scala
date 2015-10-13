@@ -63,7 +63,7 @@ object SeerUnmanagedLibs {
     IO.unzip(zipFile, nativeDest, nativeFilter)
 
     // Destroy the file.
-    zipFile.delete
+    // zipFile.delete
     s.log.info("Complete")
   }
   
