@@ -6,7 +6,7 @@ import sbt._
 import Keys._
 
 object Tasks {
-  import Settings.nativeExtractions
+  import SeerSettings.nativeExtractions
 
   lazy val extractNatives = TaskKey[Unit]("extract-natives", "Extracts native files")
 
@@ -25,7 +25,7 @@ object Tasks {
   )
 
   import java.io.{File => JFile}
-  import Settings.desktopJarName
+  import SeerSettings.desktopJarName
 
   lazy val assemblyKey = TaskKey[Unit]("assembly", "Assembly desktop using Proguard")
 
@@ -46,8 +46,8 @@ object Tasks {
     val outfile = "\""+(target/"%s-%s.jar".format(name, ver)).absolutePath+"\""
     val classfiles = "\"" + cd.absolutePath + "\""
     val manifest = "\"" + file("desktop/manifest").absolutePath + "\""
-    val proguardOptions = scala.io.Source.fromFile(file("core/proguard-project.txt")).getLines.toList ++
-                          scala.io.Source.fromFile(file("desktop/proguard-project.txt")).getLines.toList
+    val proguardOptions = scala.io.Source.fromFile(file("seer-core/proguard-project.txt")).getLines.toList ++
+                          scala.io.Source.fromFile(file("seer-gdx/proguard-project.txt")).getLines.toList
     val proguard = options ++ Seq("-cp", Path.makeString(cp.files), "proguard.ProGuard") ++ proguardOptions ++ Seq(
       "-injars", classfiles,
       "-injars", inJars,

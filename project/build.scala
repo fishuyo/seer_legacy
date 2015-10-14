@@ -10,7 +10,7 @@ import android.Keys._
 import android.Plugin.androidBuild
 import sbtrobovm.RobovmPlugin._
 
-object Settings {
+object SeerSettings {
   import SeerBuild.libgdxVersion
 
   lazy val nativeExtractions = SettingKey[Seq[(String, NameFilter, File)]](
@@ -20,9 +20,9 @@ object Settings {
   lazy val desktopJarName = SettingKey[String]("desktop-jar-name", "name of JAR file for desktop")
 
   lazy val core = plugins.JvmPlugin.projectSettings ++ Seq(
-    version := (version in LocalProject("all")).value,
-    libgdxVersion := (libgdxVersion in LocalProject("all")).value,
-    scalaVersion := (scalaVersion in LocalProject("all")).value,
+    version := (version in LocalProject("seer")).value,
+    libgdxVersion := (libgdxVersion in LocalProject("seer")).value,
+    scalaVersion := (scalaVersion in LocalProject("seer")).value,
     libraryDependencies ++= Seq(
       "com.badlogicgames.gdx" % "gdx" % libgdxVersion.value
     ),
@@ -112,37 +112,37 @@ object Settings {
 //   lazy val core = Project(
 //     id       = "core",
 //     base     = file("core"),
-//     settings = Settings.core
+//     settings = SeerSettings.core
 //   )
 
 //   lazy val desktop = Project(
 //     id       = "desktop",
 //     base     = file("desktop"),
-//     settings = Settings.desktop
+//     settings = SeerSettings.desktop
 //   ).dependsOn(core)
 
 //   lazy val android = Project(
 //     id       = "android",
 //     base     = file("android"),
-//     settings = Settings.android
+//     settings = SeerSettings.android
 //   ).dependsOn(core)
 
 //   lazy val ios = RobovmProject(
 //     id       = "ios",
 //     base     = file("ios"),
-//     settings = Settings.ios
+//     settings = SeerSettings.ios
 //   ).dependsOn(core)
 
 //   lazy val all = Project(
 //     id       = "all-platforms",
 //     base     = file("."),
-//     settings = Settings.core
+//     settings = SeerSettings.core
 //   ).aggregate(core, desktop, android, ios)
 // }
 
 object SeerBuild extends Build {
 
-  import Settings._
+  import SeerSettings._
   import SeerModulesBuild._
 
   lazy val libgdxVersion = settingKey[String]("version of Libgdx library")
@@ -189,8 +189,8 @@ object SeerBuild extends Build {
   lazy val examples_bullet = project.in(file("examples/bullet")).
     settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_bullet)
 
-  lazy val all = Project(
-    id       = "all",
+  lazy val seer = Project(
+    id       = "seer",
     base     = file("."),
     settings = core
   ).aggregate(seer_core, seer_gdx, seer_gdx_desktop_app, examples)

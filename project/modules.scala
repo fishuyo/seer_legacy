@@ -4,7 +4,7 @@ import Keys._
 
 object SeerModulesBuild extends Build {
 
-  import Settings._
+  import SeerSettings._
 	import SeerBuild.seer_core
   import SeerBuild.seer_gdx
   import SeerBuild.seer_gdx_desktop_app
@@ -55,7 +55,7 @@ object SeerModulesBuild extends Build {
     settings(core: _*).dependsOn(seer_gdx)
 
   lazy val seer_allosphere = project.in(file("seer-modules/seer-allosphere")).
-    settings(desktop: _*).dependsOn(seer_gdx_desktop_app, seer_luaj, seer_script)
+    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_luaj, seer_script)
 
 }
 
