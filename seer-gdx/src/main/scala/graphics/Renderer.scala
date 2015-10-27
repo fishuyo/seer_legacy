@@ -72,7 +72,7 @@ class Renderer {
     }else{
       camera match {
         case ortho:OrthographicCamera =>
-          camera.viewportWidth = vp.aspect * camera.viewportHeight //vp.w
+          // camera.viewportWidth = vp.aspect * camera.viewportHeight //vp.w
           // camera.viewportHeight = vp.h
         case _ => camera.viewportWidth = vp.w
                   camera.viewportHeight = vp.h

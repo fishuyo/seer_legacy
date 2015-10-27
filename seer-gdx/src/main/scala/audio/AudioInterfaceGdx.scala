@@ -24,7 +24,8 @@ case class Execute(f:()=>Unit)
 
 object GdxAudio extends AudioInterface {
 
-  bufferSize = 64
+  // bufferSize = 64
+  bufferSize = 512
   
   var actor:ActorRef = _
   // val system = ActorSystem("Audio", myConfig.getConfig("audio"))

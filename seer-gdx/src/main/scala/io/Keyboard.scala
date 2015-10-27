@@ -2,7 +2,7 @@
 package com.fishuyo.seer
 package io
 
-import graphics.Camera
+import graphics._
 import spatial.Nav
 
 import scala.collection.mutable.Map
@@ -82,7 +82,15 @@ object Keyboard extends InputAdapter {
   }
 
   val cameraNavInput = new KeyboardNavInput(Camera.nav)
-  def bindCamera() = if(!Inputs.getProcessors().contains(cameraNavInput, true)) Inputs.addProcessor(cameraNavInput)
+  def bindCamera(){ 
+    if(!Inputs.getProcessors().contains(cameraNavInput, true))
+      Inputs.addProcessor(cameraNavInput)
+  }
+  def bindCamera(c:NavCamera){
+    unbindCamera()
+    cameraNavInput.nav = c.nav
+    bindCamera()
+  }
   def unbindCamera() = Inputs.removeProcessor(cameraNavInput)
   
   def bindNav(nav:Nav) = Inputs.addProcessor( new KeyboardNavInput(nav) )

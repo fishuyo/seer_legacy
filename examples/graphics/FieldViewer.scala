@@ -35,11 +35,12 @@ class DiffuseFV extends FieldViewer(200,200) {
   var eta = 9f
   
   override def runOnce(){
-    field.set(util.Random.float(0.1,0.9)())
-    val (cx,cy) = (50,50)
+    // field.set(util.Random.float(0.1,0.9)())
+    field.set(1f)
+    val (cx,cy) = (100,100)
     var idx = 0
     val l = List(0.75f,0.5,0.5,0.75,1,0,0,1,0.75,0.5,0.5,0.75)
-    for( y <- -1 to 1; x <- -2 to 1){
+    for( y <- -1 to 1; x <- -1 to 1){
       field.set(cx+x,cy+y,l(idx))  
       idx +=1  
     }

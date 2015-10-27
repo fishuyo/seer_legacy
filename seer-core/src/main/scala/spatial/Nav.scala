@@ -5,18 +5,20 @@
 	Pablo Colapinto, 2010, wolftype@gmail.com
 */
 
-
 package com.fishuyo.seer
 package spatial
 
 object Nav{
 	def apply() = new Nav()
 }
+
 /** Pose that moves through space */
 class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
+
 	var smooth = 0f
 	var scale = 1f
 	var vel = Vec3(0); var velS = Vec3(0)
+	var worldVel = Vec3(0); var worldVelS = Vec3(0)
 	var angVel = Vec3(0); var angVelS = Vec3(0)
 	var turn = Vec3(0); var nudge = Vec3(0)
 	var mUR = Vec3(0); var mUU = Vec3(0); var mUF = Vec3(0)
@@ -28,6 +30,7 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 
 	def stop() = {
 		vel.zero; velS.zero;
+		worldVel.zero; worldVelS.zero;
 		angVel.zero; angVelS.zero;
 		turn.zero; nudge.zero;
 		updateDirVectors()
@@ -48,12 +51,13 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 	def updateDirVectors() = { quat = quat.normalize; mUR = ur(); mUU = uu(); mUF = uf() }
 
 	def step( dt:Float ) = {
-		scale = dt
+		var s = scale * dt
 		val amt = 1f - smooth
 
 		//smooth velocities
-		velS = velS.lerp( vel*dt + nudge, amt )
-		angVelS = angVelS.lerp( angVel*dt + turn, amt )
+		velS = velS.lerp( vel*s + nudge, amt )
+		angVelS = angVelS.lerp( angVel*s + turn, amt )
+		worldVelS = worldVelS.lerp( worldVel*s, amt )
 
 		nudge.zero; turn.zero
 
@@ -65,6 +69,7 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 		pos.x += velS dot Vec3( mUR.x, mUU.x, mUF.x)
 		pos.y += velS dot Vec3( mUR.y, mUU.y, mUF.y)
 		pos.z += velS dot Vec3( mUR.z, mUU.z, mUF.z)
+		println(pos)
 
 	}
 }
