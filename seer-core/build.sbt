@@ -5,6 +5,8 @@ resolvers in ThisBuild ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  //"com.lihaoyi" % "ammonite-repl" % "0.4.8" cross CrossVersion.full,
+  "com.lihaoyi" % "ammonite-sshd" % "0.4.8" cross CrossVersion.full,
 	"com.typesafe.akka" %% "akka-actor" % "2.3.4", //"2.4-SNAPSHOT",
 	//"org.scala-lang" % "scala-actors" % "2.11.2",
 	//"de.sciss" %% "scalaosc" % "1.1.+",

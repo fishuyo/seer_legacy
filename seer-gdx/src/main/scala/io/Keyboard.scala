@@ -26,6 +26,8 @@ object Keyboard extends InputAdapter {
   val down = Var('\0')
   var observing = List[Obs]()
 
+  var typedCallbacks = List[(Char)=>Unit]()
+
   use()
 
   // def non()() = {}
@@ -57,8 +59,12 @@ object Keyboard extends InputAdapter {
     val k = s.charAt(0)
     observing = Obs(up,skipInitial=true){ if( up() == k ) f() } :: observing
   }
+  def bindTyped(f:(Char=>Unit)){
+    typedCallbacks = f :: typedCallbacks
+  }
   override def keyTyped(k:Char) = {
     key() = k
+    typedCallbacks.foreach((f) => f(k))
     // try{
       // charCallbacks.getOrElse(k, non()_)()
     // } catch { case e:Exception => println(e) }

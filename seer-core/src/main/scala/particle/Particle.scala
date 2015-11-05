@@ -22,6 +22,9 @@ trait KinematicState {
   def applyGravity() = acceleration = acceleration + Gravity
   def applyDamping( damp: Float ) = acceleration = acceleration - velocity * (damp * invMass)
 
+  // def collide(p:Vec3,n:Vec3,r:Float){
+    
+  // }
   def collideGround(y:Float, r:Float){
   	if( position.y < y){
   		position.y = y

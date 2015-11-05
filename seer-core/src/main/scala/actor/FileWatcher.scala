@@ -16,20 +16,20 @@ object Monitor {
 
   val monitorActor = System().actorOf(MonitorActor(concurrency = 2))
 
-  def apply(path:String)(f:Callback){
+  def apply(path:String, rec:Boolean=false)(f:Callback){
     //This will receive callbacks for just the one file
     monitorActor ! RegisterCallback(
       ENTRY_MODIFY,
       Some(SensitivityWatchEventModifier.HIGH), //None,
-      recursive = false,
+      recursive = rec,
       path = Paths.get(path),
       f)
   }
 
-  def stop(path:String){
+  def stop(path:String, rec:Boolean=false){
     monitorActor ! UnRegisterCallback(
       ENTRY_MODIFY,
-      recursive = false,
+      recursive = rec,
       path = Paths.get(path)
       )
   }

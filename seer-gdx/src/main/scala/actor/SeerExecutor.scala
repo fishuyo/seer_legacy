@@ -10,7 +10,7 @@ import java.util.Collections
 
 import com.badlogic.gdx.Gdx
 
-// First we wrap invokeLater as an ExecutorService
+// First we wrap invokeLater as a ExecutorService
 object SeerExecutorService extends AbstractExecutorService { 
   def execute(command: Runnable) = Gdx.app.postRunnable(command)
   def shutdown(): Unit = ()

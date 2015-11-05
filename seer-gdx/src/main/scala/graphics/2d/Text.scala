@@ -3,6 +3,9 @@
 package com.fishuyo.seer
 package graphics
 
+import spatial.Vec3
+import spatial.Quat
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 // import com.badlogic.gdx.graphics.OrthographicCamera
@@ -15,6 +18,15 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 // import com.badlogic.gdx.tests.utils.GdxTest
 
+
+// class SpriteBatchRenderer extends Renderer {
+//   val sb = new SpriteBatch 
+// }
+
+// object Text extends RenderNode() {
+
+// }
+
 object Text {
 
 	var texture:GdxTex = null
@@ -23,6 +35,7 @@ object Text {
 	var sb:SpriteBatch = null
   var s:Shader = null
   var camera = Camera //new OrthographicCamera(800,800)
+  var scale = 0.01f
 
 	def setSmoothing(v:Float){ smoothing = v }
 
@@ -42,15 +55,17 @@ object Text {
     // sb.setShader(null);
     sb.end()
   }
-	def render(text:String, x:Float, y:Float){
+	def render(text:String, pos:Vec3){
 		if(font == null) return
 		// val s = Shader.shader.get.program.get
 		MatrixStack.push()
 
-    MatrixStack.translate(x,y,0);   
+    // MatrixStack.rotate(quat)
+    MatrixStack.scale(scale)
+    // MatrixStack.translate(x,y,0);   
 
-    MatrixStack.scale(0.01f) 
-    font.draw(sb, text, 0, 0);
+    font.draw(sb, text, pos.x*0.01f/scale, pos.y*0.01f/scale);
+    // font.draw(sb, text, x, y);
 
 		MatrixStack(camera)
 		s().setUniformMatrix("u_projTrans", MatrixStack.projectionModelViewMatrix())
