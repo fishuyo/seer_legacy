@@ -49,7 +49,7 @@ class Agent(name:String="A") {
 
   def animate(dt:Float){
     // nav.lookAt(Vec3(),0.001f)
-    nav.turn.set(0,util.Random.float(-.2,0.2)(),0)
+    nav.turn.set(0,Random.float(-.2,0.2)(),0)
     nav.step(dt)
     nav.pos.z = 0.0f
     nav.pos.lerpTo(Vec3(), 0.001f)

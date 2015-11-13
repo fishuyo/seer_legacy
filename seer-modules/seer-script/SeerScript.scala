@@ -2,7 +2,7 @@ package com.fishuyo.seer
 package dynamic 
 
 import graphics._
-import audio.AudioSource
+import audio._
 
 // import scala.language.dynamics
 
@@ -19,7 +19,12 @@ class SeerScript extends Animatable with AudioSource {
   // node.renderer.scene.push(this)
   // node.renderer.clear = false
 
-  def onLoad(){}
-  def onUnload(){}
-  def preUnload(){}
+  def load(){
+    Scene.push(this)
+    Audio().push(this)
+  }
+  def unload(){
+    Scene.remove(this)
+    Audio().sources -= this
+  }
 }

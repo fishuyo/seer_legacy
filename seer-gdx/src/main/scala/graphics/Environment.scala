@@ -32,6 +32,22 @@ class Environment {
   var srcBlend = GL20.GL_ONE
   var dstBlend = GL20.GL_ONE
 
+  def default(){
+    backgroundColor = RGBA(0,0,0,1)
+    fog = false
+    fogColor = RGB.white
+    blend = false
+    depth = true
+    lineWidth = 1f
+    alpha = 1f
+    lightPosition = Vec3(1,1,1)
+    lightAmbient = RGBA(.2f,.2f,.2f,1)
+    lightDiffuse = RGBA(.6f,.6f,.6f,1)
+    lightSpecular = RGBA(.4f,.4f,.4f,1)
+    srcBlend = GL20.GL_ONE
+    dstBlend = GL20.GL_ONE
+  }
+
   def blendFunc(src:Int, dst:Int){
     srcBlend = src
     dstBlend = dst

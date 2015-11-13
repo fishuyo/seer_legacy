@@ -18,6 +18,12 @@ object RootNode extends RenderNode {
   renderer.scene = Scene
   renderer.camera = Camera
   renderer.shader = Shader.load(DefaultShaders.basic)
+
+  def reset(){
+    // reset root node state
+    renderer.shader = Shader.load(DefaultShaders.basic)
+    renderer.environment.default()
+  }
 }
 
 object RenderGraph {

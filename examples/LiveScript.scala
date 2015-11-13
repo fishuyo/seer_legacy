@@ -16,7 +16,7 @@ object LiveScript extends SeerApp {
   // GdxAudio.init
   // Audio().start
   
-  val live = ScriptLoader("scripts/poemWorld.scala")
+  val live = ScriptManager.load("scripts/poemWorld.scala")
 
   override def draw(){}
   override def animate(dt:Float){}
