@@ -49,7 +49,7 @@ object VideoLooper extends SeerApp {
   var bytes:Array[Byte] = null
   var (w,ww,h,hh) = (0.0,0.0,0.0,0.0)
 
-  val s = new SpringMesh( Sphere.generateMesh(),1.f ) //Plane.generateMesh(2,2,10,10), 1.f) //Sphere()
+  val s = new SpringMesh( Sphere.generateMesh(),1.0f ) //Plane.generateMesh(2,2,10,10), 1.0f) //Sphere()
   s.particles.take(s.particles.length/2).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
   // s.particles.takeRight(10).foreach( (p) => s.pins += AbsoluteConstraint(p, p.position))
   // val cube = Model(s)
@@ -57,7 +57,7 @@ object VideoLooper extends SeerApp {
   val cube = Model(Cube())
   // cube.color.set(1,0,0,1)
   // cube.material = new BasicMaterial
-  cube.material.textureMix = 1.f
+  cube.material.textureMix = 1.0f
   Scene.push(cube)
 
   var pix:Pixmap = null
@@ -65,7 +65,7 @@ object VideoLooper extends SeerApp {
   
   val live = new Ruby("videoLoop.rb")
 
-  val audioLoop = new Loop(10.f)
+  val audioLoop = new Loop(10.0f)
 
   Audio().push(audioLoop)
 
@@ -86,8 +86,8 @@ object VideoLooper extends SeerApp {
 
     pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
     bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
-    cube.scale.set(1.f, (h/w).toFloat, 1.f)
-    // cube.translate(0,0,-1.f) //.set(1.f, (h/w).toFloat, 1.f)
+    cube.scale.set(1.0f, (h/w).toFloat, 1.0f)
+    // cube.translate(0,0,-1.0f) //.set(1.0f, (h/w).toFloat, 1.0f)
 
     // SceneGraph.root.camera = new OrthographicCamera(800,800)
 
@@ -96,7 +96,7 @@ object VideoLooper extends SeerApp {
 
   def resizeC(x1:Float,y1:Float, x2:Float, y2:Float){
     implicit def f2i(f:Float) = f.toInt
-    val c = clamper(0.f,1.f)_
+    val c = clamper(0.0f,1.0f)_
     val (l,r) = (if(x1>x2) (c(x2),c(x1)) else (c(x1),c(x2)) )
     val (t,b) = (if(y1>y2) (c(y2),c(y1)) else (c(y1),c(y2)) )
     println(s"resize: ${l*w} ${t*h} ${(r-l)*w} ${(b-t)*h}")
@@ -116,8 +116,8 @@ object VideoLooper extends SeerApp {
   }
 
   override def draw(){
-    Shader.lightingMix = 1.f
-    Shader.textureMix = 1.f
+    Shader.lightingMix = 1.0f
+    Shader.textureMix = 1.0f
     Texture.bind(0)
     cube.draw()
     Sphere().draw
@@ -130,7 +130,7 @@ object VideoLooper extends SeerApp {
     if( dirty ){  // resize everything if using sub image
       pix = new Pixmap(w.toInt/2,h.toInt/2, Pixmap.Format.RGB888)
       bytes = new Array[Byte](h.toInt/2*w.toInt/2*3)
-      cube.scale.set(1.f, (h/w).toFloat, 1.f)
+      cube.scale.set(1.0f, (h/w).toFloat, 1.0f)
       Texture.update(0, pix) 
     }
 

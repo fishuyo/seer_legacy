@@ -198,7 +198,7 @@ object TextExample extends SeerApp {
     if( Mouse.status() == "drag"){
       vel = (Mouse.xy() - lpos)/dt
       // println(vel)
-      // s.applyForce( Vec3(vel.x,vel.y,0)*10.f)
+      // s.applyForce( Vec3(vel.x,vel.y,0)*10.0f)
       val r = Text.camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
       agents.flatMap(_.particles).foreach( (p) => {
         val t = r.intersectSphere(p.position, 10f)

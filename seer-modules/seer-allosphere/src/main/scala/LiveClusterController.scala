@@ -29,7 +29,7 @@
 
 // object Controller extends SeerApp {
 
-// 	val loader = new SeerScriptLoader("scripts/controller.scala")
+// 	val loader = ScriptManager.load("scripts/controller.scala")
 
 //   val monitor1 = FileMonido("scripts/simulator.scala"){
 //     case ModifiedOrCreated(f) => 

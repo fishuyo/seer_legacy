@@ -71,7 +71,7 @@ object OmniTest extends SeerApp { //extends OmniApp {
 
   // override def init(){
     // super.init()
-    // loader = new SeerScriptLoader("scripts/omnitest.scala")
+    // loader = ScriptManager.load("scripts/omnitest.scala")
   // }
 
   override def animate(dt:Float){

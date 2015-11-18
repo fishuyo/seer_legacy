@@ -50,7 +50,7 @@ object VideoLooper extends SeerApp {
 
   printHelp()
 
-  // val audioLoop = new Loop(10.f)
+  // val audioLoop = new Loop(10.0f)
   // Audio().push(audioLoop)
 
   override def init(){
