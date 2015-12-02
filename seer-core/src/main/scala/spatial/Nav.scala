@@ -69,6 +69,7 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 		pos.x += velS dot Vec3( mUR.x, mUU.x, mUF.x)
 		pos.y += velS dot Vec3( mUR.y, mUU.y, mUF.y)
 		pos.z += velS dot Vec3( mUR.z, mUU.z, mUF.z)
+		pos += worldVelS
 	}
 }
 
