@@ -3,7 +3,7 @@ package com.fishuyo.seer
 package spatial
 
 
-class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1f)  extends AABB(c,halfsize) {
+class VecField3D( var n:Int, cen:Vec3=Vec3(0), hsize:Float=1f)  extends AABB(cen,hsize) {
 
   var data = new Array[Vec3](n*n*n) 
   val dn = (2*halfsize)/n
@@ -13,7 +13,7 @@ class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1f)  extends AABB(c,
   //linear interpolate 
   def apply( v:Vec3 ):Vec3 = {
     if( !contains(v) ) return Vec3(0)
-    val nv = ((v-c) + Vec3(halfsize)) * (n-1) / (2*halfsize)
+    val nv = ((v-center) + Vec3(halfsize)) * (n-1) / (2*halfsize)
     //println( "vecfield3d get: " + nv )
     if( nv.x >= n-1 ) nv.x = n - 1.001f
     if( nv.y >= n-1 ) nv.y = n - 1.001f
@@ -35,7 +35,7 @@ class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1f)  extends AABB(c,
 
   def update(p:Vec3, v:Vec3){
     if( !contains(p) ) return Vec3(0)
-    val nv = ((p-c) + Vec3(halfsize)) * (n-1) / (2*halfsize)
+    val nv = ((p-center) + Vec3(halfsize)) * (n-1) / (2*halfsize)
     //println( "vecfield3d get: " + nv )
     if( nv.x >= n-1 ) nv.x = n - 1.001f
     if( nv.y >= n-1 ) nv.y = n - 1.001f
@@ -65,10 +65,10 @@ class VecField3D( var n:Int, c:Vec3=Vec3(0), halfsize:Float=1f)  extends AABB(c,
 
   def binAt( v:Vec3 ):Option[Vec3] = {
     if( !contains(v) ) None
-    else Some(((v-c) + Vec3(halfsize)) * (n-1) / (2*halfsize))
+    else Some(((v-center) + Vec3(halfsize)) * (n-1) / (2*halfsize))
   }
   def centerOfBin(x:Int,y:Int,z:Int) :Vec3 = {
-    (c - Vec3(halfsize)) + Vec3(x,y,z)*dn + Vec3(dn/2)
+    (center - Vec3(halfsize)) + Vec3(x,y,z)*dn + Vec3(dn/2)
   }
 
 }

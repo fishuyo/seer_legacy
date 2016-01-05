@@ -41,6 +41,7 @@ object ScriptLoaderActor {
   case object Reload
   case object Unload
 
+  // def props = propsEval
   def props = propsToolbox
   def propsEval = Props(new ScriptLoaderActor(new EvalScriptLoader()))
   def propsToolbox = Props(new ScriptLoaderActor(new ToolboxScriptLoader()))
@@ -99,6 +100,9 @@ trait ScriptLoader {
         case a:ActorRef =>
           a ! "load"
           loaded = true
+        case l:List[ActorRef] =>
+          l.foreach{ case a => a ! "load" }
+          loaded = true
         case _ => println("Unrecognized return value from script.")
       }
     } catch { case e:Exception => loaded = false; println(e.getMessage) } 
@@ -122,6 +126,11 @@ trait ScriptLoader {
           obj = ret
           a ! "load"
           loaded = true
+        case l:List[ActorRef] =>
+          unload
+          obj = ret
+          l.foreach{ case a => a ! "load" }
+          loaded = true
         case _ => println("Unrecognized return value from script.")
       }
     } catch { case e:Exception => loaded = false; println(e.getMessage) }
@@ -136,6 +145,12 @@ trait ScriptLoader {
         a ! "unload"
         a ! akka.actor.PoisonPill
         obj = null
+        loaded = false
+      case l:List[ActorRef] =>
+        l.foreach{ case a =>
+          a ! "unload"
+          a ! akka.actor.PoisonPill
+        }
         loaded = false
       case _ => ()
     }
@@ -161,10 +176,15 @@ class ToolboxScriptLoader extends ScriptLoader {
 /**
   * Twitter Eval implementation of a ScriptLoader
   */
+object EvalScriptLoader {
+  val eval = new Eval()
+  def apply() = eval
+}
 class EvalScriptLoader extends ScriptLoader {
   def compile() = {
     val source = getCode()
-    val script = Eval[AnyRef](source)
+    val script = EvalScriptLoader.eval[AnyRef](source)  //.inPlace[AnyRef](source)
+    // val script = Eval[AnyRef](source,false)
     script
   }
 }

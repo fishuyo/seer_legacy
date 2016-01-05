@@ -2,34 +2,35 @@
 package com.fishuyo.seer
 package spatial
 
-
 object AABB {
-  def apply( a:Vec3, b:Vec3 ) = new AABB(a,b)
-  def apply( c:Vec3, halfsize:Float ) = new AABB(c,halfsize)
+  def apply( min:Vec3, max:Vec3 ) = new AABB(min,max)
+  def apply( cen:Vec3, halfsize:Float ) = new AABB(cen,halfsize)
 }
-class AABB( var a:Vec3, var b:Vec3 ) {
 
-  var c:Vec3 = a.lerp(b, .5f)
-  var halfsize = math.abs(c.x - a.x).toFloat
+class AABB( var min:Vec3, var max:Vec3 ) {
+
+  var center:Vec3 = min.lerp(max, .5f)
+  var halfsize = math.abs(center.x - min.x).toFloat
 
   //println( "AABB created center: " + a + " " + b + " "+c+" "+halfsize)
 
-  def this( center:Vec3, halfsize:Float ) = this( center - Vec3(halfsize), center + Vec3(halfsize))
+  def this( cen:Vec3, halfsize:Float ) = this( cen - Vec3(halfsize), cen + Vec3(halfsize))
 
   def contains( p:Vec3 ):Boolean = {
-    if( p.x < a.x || p.x > b.x) return false
-    if( p.y < a.y || p.y > b.y) return false
-    if( p.z < a.z || p.z > b.z) return false
+    if( p.x < min.x || p.x > max.x) return false
+    if( p.y < min.y || p.y > max.y) return false
+    if( p.z < min.z || p.z > max.z) return false
     true
   }
-  def intersectsSphere( c: Vec3, r: Float ):Boolean = {
+
+  def intersectsSphere( cen: Vec3, r: Float ):Boolean = {
     var dx = 0f; var dy = 0f; var dz = 0f; var d = 0f;
-    if( c.x < a.x ) dx = c.x - a.x
-    else if( c.x > b.x ) dx = c.x - b.x
-    if( c.y < a.y ) dy = c.y - a.y
-    else if( c.y > b.y ) dy = c.y - b.y
-    if( c.z < a.z ) dz = c.z - a.z
-    else if( c.z > b.z ) dz = c.z - b.z
+    if( cen.x < min.x ) dx = cen.x - min.x
+    else if( cen.x > max.x ) dx = cen.x - max.x
+    if( cen.y < min.y ) dy = cen.y - min.y
+    else if( cen.y > max.y ) dy = cen.y - max.y
+    if( cen.z < min.z ) dz = cen.z - min.z
+    else if( cen.z > max.z ) dz = cen.z - max.z
     d = dx*dx + dy*dy + dz*dz
     d <= r*r
   }
