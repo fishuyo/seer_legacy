@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
   * uses framebuffer targets, a nodes output framebuffer
   * is bound to corresponding input texture of next node
   */
-class RenderNode(val renderer:Renderer = new Renderer()) {
+class RenderNode(var renderer:Renderer = new Renderer()) {
   
   val inputs = new ListBuffer[RenderNode]
   val outputs = new ListBuffer[RenderNode]

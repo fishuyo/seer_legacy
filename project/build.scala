@@ -53,7 +53,8 @@ object SeerSettings {
 
   lazy val desktop = core ++ Seq(
     libraryDependencies ++= Seq(
-      "com.badlogicgames.gdx" % "gdx-backend-lwjgl" % libgdxVersion.value,
+      // "com.badlogicgames.gdx" % "gdx-backend-lwjgl" % libgdxVersion.value,
+      "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % libgdxVersion.value,
       "com.badlogicgames.gdx" % "gdx-platform" % libgdxVersion.value classifier "natives-desktop"
     )
     // unmanagedResourceDirectories in Compile += file("android/assets"),
