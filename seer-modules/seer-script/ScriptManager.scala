@@ -17,7 +17,7 @@ import akka.event.Logging
 import akka.pattern.ask
 import akka.util.Timeout
 
-import concurrent.Await
+import concurrent._
 import concurrent.duration._
 import scala.language.postfixOps
 
@@ -59,6 +59,24 @@ object ScriptManager {
     actor ! Code(code)
     actor ! Load
     actor
+  }
+
+  def remote(address:Address)(path:String, reloadOnChange:Boolean=true){
+    val remoteManager = System().actorSelection(address + "/user/ScriptManager")
+    val f = remoteManager ? Create()
+    val actor = Await.result(f, 10 seconds).asInstanceOf[ActorRef]
+    // f onComplete {
+      // case scala.util.Success(actor) =>
+        var code = Source.fromFile(new File(path)).mkString
+        actor ! Code(code)
+        actor ! Load
+        if(reloadOnChange) Monitor(path){ (p) => 
+          var code = Source.fromFile(new File(path)).mkString
+          actor ! Code(code)
+          actor ! Reload
+        }
+      // case scala.util.Failure(t) => println("An error has occured: " + t.getMessage)
+    // }
   }
 }
 
