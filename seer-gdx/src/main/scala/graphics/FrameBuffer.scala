@@ -22,6 +22,7 @@ import com.badlogic.gdx.Gdx.{gl20 => gl }
 
 trait RenderTarget {
 }
+
 class FrameBuffer(w:Int,h:Int,f:Format,depth:Boolean) extends GdxFrameBuffer(f,w,h,depth) with RenderTarget
 
 object FrameBuffer {
@@ -131,7 +132,8 @@ class FloatFrameBuffer(var w:Int,var h:Int,depth:Boolean=true) extends RenderTar
 	}
 
 	def setDefaultFrameBufferViewport(){
-		Gdx.graphics.getGL20().glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		// Gdx.graphics.getGL20().glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.graphics.getGL20().glViewport(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight());
 	}
 
 	def dispose(){

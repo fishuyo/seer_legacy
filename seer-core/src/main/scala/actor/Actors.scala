@@ -11,50 +11,46 @@ import com.typesafe.config.ConfigFactory
 import collection.mutable.ListBuffer
 
 object System {
-  var system = ActorSystem("seer", ConfigFactory.load(ActorManager.config))
-  def apply() = system
+  var system:ActorSystem = _
+  def apply() = {
+    if(system == null) system = ActorSystemManager.default()
+    system
+  }
   def update(s:ActorSystem) = system = s
 }
 
-object ActorManager {
+object ActorSystemManager {
 
-  // make a Config with just your special setting
-  // val config = ConfigFactory.parseString("""
-  //     audio {
-  //       audio-dispatcher {
-  //         type = "PinnedDispatcher"
-  //         executor = "thread-pool-executor"
-  //       }
+  def apply(address:Address) = {
+    address.protocol match {
+      case "akka.tcp" => tcp(address.host.get,address.port.get,address.system)
+      case "akka.udp" => udp(address.host.get,address.port.get,address.system)
+      case _ => default(address.system)
+    }
+  }
 
-  //       old-audio-dispatcher {
-  //         # Dispatcher is the name of the event-based dispatcher
-  //         type = Dispatcher
-  //         # What kind of ExecutionService to use
-  //         executor = "fork-join-executor"
-  //         # Configuration for the fork join pool
-  //         fork-join-executor {
-  //           # Min number of threads to cap factor-based parallelism number to
-  //           parallelism-min = 2
-  //           # Parallelism (threads) ... ceil(available processors * factor)
-  //           parallelism-factor = 2.0
-  //           # Max number of threads to cap factor-based parallelism number to
-  //           parallelism-max = 10
-  //         }
-  //         # Throughput defines the maximum number of messages to be
-  //         # processed per actor before the thread jumps to the next actor.
-  //         # Set to 1 for as fair as possible.
-  //         throughput = 100
-  //       }
+  def default(system:String = "seer") = ActorSystem(system, ConfigFactory.load(config))
+  def tcp(hn:String=Hostname(), port:Int=2552, system:String="seer") = ActorSystem(system, ConfigFactory.load(config_tcp(hn,port)))
+  def udp(hn:String=Hostname(), port:Int=2552, system:String="seer") = ActorSystem(system, ConfigFactory.load(config_udp(hn,port)))
 
-  //       akka.actor.deployment {
-  //         /audio-main {
-  //           dispatcher = audio-dispatcher
-  //         }
-  //       }
-  //     }
-  // """)
+  def config_tcp(hostname:String=Hostname(), port:Int=2552) = ConfigFactory.parseString(s"""
+    akka {
+      actor {
+        provider = "akka.remote.RemoteActorRefProvider"
+      }
+      remote {
+        enabled-transports = ["akka.remote.netty.tcp"]
+        netty.tcp {
+          hostname = "$hostname"
+          port = $port
+        }
+        compression-scheme = "zlib"
+        zlib-compression-level = 1
+     }
+    }
+  """)
 
-  val config_remote = ConfigFactory.parseString("""
+  def config_udp(hostname:String=Hostname(), port:Int=2552) = ConfigFactory.parseString(s"""
     akka {
       actor {
         provider = "akka.remote.RemoteActorRefProvider"
@@ -62,8 +58,8 @@ object ActorManager {
       remote {
         enabled-transports = ["akka.remote.netty.udp"]
         netty.udp {
-          hostname = "192.168.0.101"
-          port = 2552
+          hostname = "$hostname"
+          port = $port
         }
         compression-scheme = "zlib"
         zlib-compression-level = 1
@@ -80,32 +76,11 @@ object ActorManager {
   """)
 
   // load the normal config stack (system props, then application.conf, then reference.conf)
-  val regularConfig = ConfigFactory.load();
+  // val regularConfig = ConfigFactory.load();
   // override regular stack with config
-  val combined = config.withFallback(regularConfig);
+  // val combined = config.withFallback(regularConfig);
   // put the result in between the overrides (system props) and defaults again
-  val complete = ConfigFactory.load(combined);
+  // val complete = ConfigFactory.load(combined);
 
 }
-
-
-import akka.event.Logging
- 
-class StateActor extends Actor with akka.actor.ActorLogging {
-  override def preStart() = {
-    log.debug("Starting")
-  }
-  override def preRestart(reason: Throwable, message: Option[Any]) {
-    log.error(reason, "Restarting due to [{}] when processing [{}]",
-      reason.getMessage, message.getOrElse(""))
-  }
-
-  def receive = {
-    case "test" => log.info("Received test")
-    case x => log.warning("Received unknown message: {}", x)
-  }
-}
-
-
-
 

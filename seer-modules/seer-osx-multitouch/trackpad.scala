@@ -28,8 +28,11 @@ class TrackpadState {
   def count = fingers.length
 }
 
+object Trackpad extends Trackpad {
+  def apply() = new Trackpad 
+}
 
-object Trackpad extends Observer {
+class Trackpad extends Observer {
   
 
   type Callback = (Int,Array[Float])=>Unit

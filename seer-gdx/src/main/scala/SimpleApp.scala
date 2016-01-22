@@ -6,6 +6,7 @@ import io._
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.FPSLogger
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 
 object Window {
   def width = Gdx.graphics.getWidth()
@@ -80,7 +81,11 @@ class SeerAppListener extends ApplicationListener {
     println(s"App resize: $width $height")
     // Gdx.gl.glViewport(0, 0, width, height)
 
+    // val w = HdpiUtils.toBackBufferX(width)
+    // val h = HdpiUtils.toBackBufferY(height)
+    // RenderGraph.resize(Viewport(w,h))
     RenderGraph.resize(Viewport(width,height))
+
     // this.width = width
     // this.height = height
     // aspect = width * 1f / height

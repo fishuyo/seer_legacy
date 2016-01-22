@@ -79,6 +79,7 @@ class Keyboard extends InputAdapter {
   override def keyUp(k:Int) = {
     val c = (k+68).toChar
     up() = c
+    down() = '\0'
     false
   }
 }

@@ -21,8 +21,11 @@ object RootNode extends RenderNode {
 
   def reset(){
     // reset root node state
-    renderer.shader = Shader.load(DefaultShaders.basic)
+    // renderer.shader = Shader.load(DefaultShaders.basic)
     renderer.environment.default()
+    renderer.scene.clear
+    inputs.clear
+    outputs.clear
   }
 }
 
@@ -44,11 +47,11 @@ object RenderGraph {
 
   def addNode(n:RenderNode){
     roots += n
-    n.renderer.scene.init()
+    // n.renderer.scene.init()
   }
   def prependNode(n:RenderNode){
     roots.prepend(n)
-    n.renderer.scene.init()
+    // n.renderer.scene.init()
   }
 
   def removeNode(n:RenderNode){

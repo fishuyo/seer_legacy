@@ -20,6 +20,8 @@ import com.badlogic.gdx.Input.Keys
 // import org.lwjgl.opengl.AWTGLCanvas
 // import org.lwjgl.opengl.GL11;
 
+import org.lwjgl.glfw.GLFW
+
 object DesktopApp {
 
   // loadLibs()
@@ -67,9 +69,12 @@ object DesktopApp {
     cfg.setTitle("seer")
     cfg.setWindowedMode(Window.w0,Window.h0)
     cfg.setBackBufferConfig(8,8,8,8, 16, 0, 4)
+    // cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels)
     // cfg.useGL30 = true
     // cfg.width = Window.w0
     // cfg.height = Window.h0
+
+    GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
 
     new Lwjgl3Application( app, cfg )
     // new LwjglApplication( app, cfg )
@@ -91,7 +96,11 @@ object DesktopApp {
         app.resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight())
 
       }else{
+        // val monitors = Gdx.graphics.getMonitors()
+        // monitors.foreach{ case m => println(s"${m.name} ${m.virtualX} ${m.virtualY}")}
+
         val mode = Gdx.graphics.getDisplayMode()
+        // println(s"${mode.width} ${mode.height}")
         Gdx.graphics.setFullscreenMode(mode)
         app.resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight())
         // println(mode)

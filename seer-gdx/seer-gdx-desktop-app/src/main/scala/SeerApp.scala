@@ -4,9 +4,10 @@ package com.fishuyo.seer
 import graphics._
  
 class SeerApp extends Animatable {
+  DesktopApp.loadLibs()
 
   def main(args: Array[String]): Unit = {
-    DesktopApp.loadLibs()
+    // DesktopApp.loadLibs()
     Scene.push(this)
     DesktopApp.run()
   }

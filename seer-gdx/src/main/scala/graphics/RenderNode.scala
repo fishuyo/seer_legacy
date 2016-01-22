@@ -2,6 +2,7 @@
 package com.fishuyo.seer
 package graphics
 
+import com.badlogic.gdx.Gdx
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -24,7 +25,7 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
   def bindBuffer(i:Int) = buffer.get.getColorBufferTexture().bind(i)
 
   def bindTarget() = if( buffer.isDefined ) buffer.get.begin()
-  def unbindTarget() = if( buffer.isDefined ) buffer.get.end()
+  def unbindTarget() = if( buffer.isDefined ) buffer.get.end(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight())
 
   def resize(vp:Viewport){
     renderer.resize(vp)

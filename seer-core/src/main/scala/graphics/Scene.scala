@@ -33,7 +33,13 @@ class Scene {
   def clear() = { drawable.clear; animatable.clear }
   
   def init() = drawable.foreach( _.init() )
-  def animate( dt: Float ) = animatable.foreach( _.animate(dt) )
+  def animate( dt: Float ) = animatable.foreach( (a) => {
+    if(!a.__initd){
+      a.init()
+      a.__initd = true
+    }
+    a.animate(dt) 
+  })
   def draw() = drawable.foreach( _.draw() )
 
   //def pick( r: Ray ) = pickable.foreach( _.pick(r) )
