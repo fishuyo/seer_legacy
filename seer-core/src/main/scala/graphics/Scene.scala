@@ -34,9 +34,9 @@ class Scene {
   
   def init() = drawable.foreach( _.init() )
   def animate( dt: Float ) = animatable.foreach( (a) => {
-    if(!a.__initd){
+    if(!a.initialized){
       a.init()
-      a.__initd = true
+      a.initialized = true
     }
     a.animate(dt) 
   })

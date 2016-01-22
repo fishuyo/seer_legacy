@@ -3,7 +3,7 @@ package com.fishuyo.seer
 package graphics
 
 trait Drawable {
-  var __initd = false
+  var initialized = false
 	def init(){}
 	def draw(){}
   def animate(dt: Float){}

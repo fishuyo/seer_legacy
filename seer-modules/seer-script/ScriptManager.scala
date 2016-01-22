@@ -63,20 +63,40 @@ object ScriptManager {
 
   def remote(address:Address)(path:String, reloadOnChange:Boolean=true){
     val remoteManager = System().actorSelection(address + "/user/ScriptManager")
-    val f = remoteManager ? Create()
-    val actor = Await.result(f, 10 seconds).asInstanceOf[ActorRef]
-    // f onComplete {
-      // case scala.util.Success(actor) =>
-        var code = Source.fromFile(new File(path)).mkString
+
+    val file = new File(path)
+    if(file.isDirectory){
+
+      file.listFiles.filter(_.getPath.endsWith(".scala")).foreach { case f =>
+        val fu = remoteManager ? Create(f.getName)
+        val actor = Await.result(fu, 10 seconds).asInstanceOf[ActorRef]
+
+        var code = Source.fromFile(f).mkString
         actor ! Code(code)
         actor ! Load
-        if(reloadOnChange) Monitor(path){ (p) => 
-          var code = Source.fromFile(new File(path)).mkString
+        if(reloadOnChange) Monitor(f.getPath){ (p) => 
+          var code = Source.fromFile(f).mkString
           actor ! Code(code)
           actor ! Reload
         }
-      // case scala.util.Failure(t) => println("An error has occured: " + t.getMessage)
-    // }
+      }
+
+    }else if(file.isFile){
+      val f = remoteManager ? Create(file.getName)
+      val actor = Await.result(f, 10 seconds).asInstanceOf[ActorRef]
+
+      var code = Source.fromFile(file).mkString
+      actor ! Code(code)
+      actor ! Load
+      if(reloadOnChange) Monitor(path){ (p) => 
+        var code = Source.fromFile(file).mkString
+        actor ! Code(code)
+        actor ! Reload
+      }
+    } else {
+      println("Invalid path..")
+    }  
+
   }
 }
 
@@ -102,9 +122,12 @@ class ScriptManagerActor extends Actor with ActorLogging {
     case Create(n) => 
       var name = n
       if(n.isEmpty) name += "script"+scripts.size
-      val loader = context.actorOf( ScriptLoaderActor.props, name)
-      scripts(name) = loader
-      sender ! loader
+      if(scripts.isDefinedAt(name)) sender ! scripts(name)
+      else {
+        val loader = context.actorOf( ScriptLoaderActor.props, name)
+        scripts(name) = loader
+        sender ! loader
+      }
     case Path(path,reload) =>
       val file = new File(path)
       val name = file.getName
