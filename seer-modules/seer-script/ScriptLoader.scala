@@ -60,7 +60,8 @@ class ScriptLoaderActor(val loader:ScriptLoader) extends Actor with ActorLogging
     case Code(code) => 
       loader.setCode(code)
     case Load | "load" =>
-      loader.load()
+      log.info("loading..");
+      loader.reload()
     case Reload | "reload" => 
       log.info("reloading..");
       loader.reload()
@@ -89,7 +90,7 @@ trait ScriptLoader {
     importString + code
   }
 
-  def load(){
+  def load(){ //just using reload only
     try{
       obj = compile()
       // println(s"load $obj")
