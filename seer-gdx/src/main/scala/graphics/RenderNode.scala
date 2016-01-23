@@ -79,10 +79,10 @@ class ScreenNode extends RenderNode {
 /**
   * TextureNode just a texture to send to next node
   */
-// class TextureNode(var texture:GdxTexture) extends RenderNode {
-//   override def bindBuffer(i:Int) = texture.bind(i)  
-//   override def render(){}
-// }
+class TextureNode(var texture:Texture) extends RenderNode {
+  override def bindBuffer(i:Int) = texture.bind(i)  
+  override def render(){}
+}
 
 /**
   * CompositeNode blends two nodes output simply
