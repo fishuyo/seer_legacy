@@ -41,6 +41,9 @@ object ActorSystemManager {
       remote {
         enabled-transports = ["akka.remote.netty.tcp"]
         netty.tcp {
+          send-buffer-size = 20MiB
+          receive-buffer-size = 20MiB
+          maximum-frame-size = 10MiB
           hostname = "$hostname"
           port = $port
         }
@@ -58,6 +61,9 @@ object ActorSystemManager {
       remote {
         enabled-transports = ["akka.remote.netty.udp"]
         netty.udp {
+          send-buffer-size = 20MiB
+          receive-buffer-size = 20MiB
+          maximum-frame-size = 10MiB
           hostname = "$hostname"
           port = $port
         }

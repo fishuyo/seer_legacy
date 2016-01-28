@@ -74,7 +74,7 @@ object DesktopApp {
     // cfg.width = Window.w0
     // cfg.height = Window.h0
 
-    GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+    // GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
 
     new Lwjgl3Application( app, cfg )
     // new LwjglApplication( app, cfg )
@@ -99,9 +99,18 @@ object DesktopApp {
         // val monitors = Gdx.graphics.getMonitors()
         // monitors.foreach{ case m => println(s"${m.name} ${m.virtualX} ${m.virtualY}")}
 
-        val mode = Gdx.graphics.getDisplayMode()
         // println(s"${mode.width} ${mode.height}")
+        println("isFullscreen: " + Gdx.graphics.isFullscreen())
+        // val g = Gdx.graphics.asInstanceOf[com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics]
+        // val w = g.getWindow()
+        // val method = w.getClass().getDeclaredMethod("getWindowHandle"); //g.getWindow().getWindowHandle()
+        // method.setAccessible(true);
+        // val h = method.invoke(w).asInstanceOf[Long];
+        // GLFW.glfwSetWindowPos(h, 1440, 0);
+        
+        val mode = Gdx.graphics.getDisplayMode()
         Gdx.graphics.setFullscreenMode(mode)
+
         app.resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight())
         // println(mode)
         // Gdx.graphics.setDisplayMode( mode )

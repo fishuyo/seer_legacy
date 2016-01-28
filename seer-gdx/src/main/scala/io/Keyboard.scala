@@ -72,7 +72,9 @@ class Keyboard extends InputAdapter {
     false
   }
   override def keyDown(k:Int) = {
-    val c = (k+68).toChar
+    var c = '\0'
+    if(k >= Keys.A && k <= Keys.Z) c = (k+68).toChar
+    else if(k >= Keys.NUM_0 && k <= Keys.NUM_9) c = (k+41).toChar
     down() = c
     false
   }
