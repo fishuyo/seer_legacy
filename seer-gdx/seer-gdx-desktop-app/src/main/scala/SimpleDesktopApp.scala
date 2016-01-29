@@ -74,7 +74,8 @@ object DesktopApp {
     // cfg.width = Window.w0
     // cfg.height = Window.h0
 
-    // GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+    GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+    println("GLFW Version: " + GLFW.glfwGetVersionString())
 
     new Lwjgl3Application( app, cfg )
     // new LwjglApplication( app, cfg )
@@ -108,10 +109,14 @@ object DesktopApp {
         // val h = method.invoke(w).asInstanceOf[Long];
         // GLFW.glfwSetWindowPos(h, 1440, 0);
         
+        GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+
         val mode = Gdx.graphics.getDisplayMode()
         Gdx.graphics.setFullscreenMode(mode)
 
         app.resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight())
+        GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+
         // println(mode)
         // Gdx.graphics.setDisplayMode( mode )
       }
