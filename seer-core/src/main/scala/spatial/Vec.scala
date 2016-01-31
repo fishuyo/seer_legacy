@@ -69,6 +69,20 @@ class Vec3( var x: Float, var y: Float, var z: Float ){
     y = util.wrap(y,l.y,h.y)
     z = util.wrap(z,l.z,h.z)
   }
+  def min(v:Vec3) = {
+    var min = Vec3(this)
+    if(v.x < x) min.x = v.x
+    if(v.y < y) min.y = v.y
+    if(v.z < z) min.z = v.z
+    min
+  }
+  def max(v:Vec3) = {
+    var max = Vec3(this)
+    if(v.x > x) max.x = v.x
+    if(v.y > y) max.y = v.y
+    if(v.z > z) max.z = v.z
+    max
+  }
 
   def xy = Vec2(x,y)
   def xz = Vec2(x,z)

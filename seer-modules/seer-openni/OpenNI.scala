@@ -27,6 +27,7 @@ object OpenNI {
   val (w,h) = (640, 480)
   var connected = false
   var depth, rgb, tracking, pointCloud = false
+  var flipCamera = false
 	var context:Context = _
 
   var depthGen:DepthGenerator = _
@@ -298,7 +299,7 @@ object OpenNI {
           // pointMesh.vertices ++= meshBuffer.vertices
           // pointMesh.clear
           val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
-          val vs = ps.map { case p => Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f }
+          val vs = ps.map(point3DtoVec3(_))
           pointMesh.clear
           pointMesh.vertices ++= vs
           // rem = (rem+2) % 4
@@ -306,6 +307,11 @@ object OpenNI {
 
       }
     } catch { case e:Exception => e.printStackTrace(); }
+  }
+
+  def point3DtoVec3(p:Point3D) = {
+    if(flipCamera) Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f
+    else Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f
   }
 
   // def updatePoints(){
@@ -358,11 +364,7 @@ object OpenNI {
 
   def getJoint(user:Int, joint:String) = {
     val jpos = skeletonCap.getSkeletonJointPosition(user, Joint(joint))
-    val p = jpos.getPosition
-    val x = p.getX / 1000f
-    val y = p.getY / 1000f //+ 1f
-    val z = p.getZ / 1000f
-    val v = Vec3(x,y,-z)
+    val v = point3DtoVec3(jpos.getPosition)
     skeletons(user).updateJoint(joint,v)
     (v, jpos.getConfidence )
   }
@@ -372,7 +374,7 @@ object OpenNI {
 class OpenNIActor extends Actor with ActorLogging {
   var running = false
   def receive = {
-    case "start" => running = true; self ! "update"
+    case "start" => if(!running){ running = true; self ! "update" }
     case "update" => if(running){ OpenNI.update(); self ! "update" }
     case "stop" => running = false;
     case _ => ()

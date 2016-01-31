@@ -10,6 +10,7 @@ object RGB {
   def apply( i: Double) = new RGB(i.toFloat,i.toFloat,i.toFloat)
   def apply( r: Float, g: Float, b: Float) = new RGB(r,g,b)
   def apply( r:Double, g: Double, b: Double) = new RGB(r.toFloat,g.toFloat,b.toFloat)
+  def apply(v:Vec3) = new RGB(v.x,v.y,v.z)
   val black = RGB(0)	
 	val white = RGB(1)	
   val red = RGB(1,0,0)

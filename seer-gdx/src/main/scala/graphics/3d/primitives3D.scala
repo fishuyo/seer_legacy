@@ -130,49 +130,47 @@ object Cube extends ModelGenerator {
     }
 
     for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i) //.toShort
-    
-    
-    // mesh.setIndices( Array[Short](
-    //   0,1,1,3,3,2,2,0,
-    //   4,5,5,7,7,6,6,4,
-    //   0,4,1,5,2,6,3,7
-    // ))
-    // mesh.setVertices( Array[Float](
-    //   -1,1,1,   
-    //   1,1,1,    
-    //   -1,-1,1,  
-    //   1,-1,1,   
-
-    //   -1,1,-1,  
-    //   1,1,-1,    
-    //   -1,-1,-1,
-    //   1,-1,-1
-    // ))
-
-    // mesh.primitive = Triangles
-    // for( n<-(0 to 2); i<-List(-1,1); j<-List(-1,1); k<-List(-1,1)){
-    //   val u = (j+1)/2
-    //   val v = (1-k)/2
-    //   val (x,y,z) = (i*l,j*l,k*l)
-    //   mesh.texCoords += Vec2(u,v)      
-    //   n match {
-    //     case 0 => mesh.vertices += Vec3(x,y,z)  // left/right
-    //               mesh.normals += Vec3(i,0,0)
-    //     case 1 => mesh.vertices += Vec3(z,x,y)  // top/bottom
-    //               mesh.normals += Vec3(0,i,0)
-    //     case 2 => mesh.vertices += Vec3(y,z,x)  // front/back
-    //               mesh.normals += Vec3(i,0,0)
-    //   }
-    // }
-    
-    // for( f<-(0 until 6); i<-List(0,1,2,1,2,3)) mesh.indices += (4*f+i) //.toShort
-    // for( f<-(0 until 6); i<-List(0,1,1,3,3,2,2,0)) mesh.wireIndices += (4*f+i) //.toShort
 
     mesh
   }
 }
 class Cube extends Model {
   mesh = Cube.generateMesh()
+}
+
+object Box extends ModelGenerator {
+
+  override def generateMesh():Mesh = generateMesh(new Mesh())
+  def generateMesh( mesh:Mesh, l:Float=0.5f ):Mesh = {
+    mesh.primitive = Lines
+    mesh.indices ++= Array[Int](
+      0,1,1,3,3,2,2,0,
+      4,5,5,7,7,6,6,4,
+      0,4, 1,5, 3,7, 2,6
+    )
+
+    mesh.vertices += Vec3(-l,l,l)
+    mesh.vertices += Vec3(l,l,l)
+    mesh.vertices += Vec3(-l,-l,l)
+    mesh.vertices += Vec3(l,-l,l)
+
+    mesh.vertices += Vec3(-l,l,-l)
+    mesh.vertices += Vec3(l,l,-l)
+    mesh.vertices += Vec3(-l,-l,-l)
+    mesh.vertices += Vec3(l,-l,-l)
+
+    for( i <- 0 until 2){
+      mesh.texCoords += Vec2(0, 0)
+      mesh.texCoords += Vec2(1, 0)
+      mesh.texCoords += Vec2(1, 1)
+      mesh.texCoords += Vec2(0, 1)
+    }
+
+    mesh
+  }
+}
+class Box extends Model {
+  mesh = Box.generateMesh()
 }
 
 object Tetrahedron extends ModelGenerator {
