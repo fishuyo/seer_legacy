@@ -14,7 +14,7 @@ object Pose {
 	def apply( pos:Vec3=Vec3(0), quat:Quat=Quat(1,0,0,0)) = new Pose(pos,quat)
 }
 /** Class Pose represents a position and orientation in 3d space */
-class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ){
+class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ) extends Serializable {
   
   def vec = pos
 

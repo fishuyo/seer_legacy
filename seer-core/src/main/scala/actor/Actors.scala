@@ -52,6 +52,13 @@ object ActorSystemManager {
      }
     }
   """)
+    // akka.actor.serializers {
+    //   kryo = "com.twitter.chill.akka.AkkaSerializer"
+    // }
+    // akka.actor.serialization-bindings {
+    //  "com.fishuyo.seer.spatial.Vec3" = kryo
+    // }
+  // """)
 
   def config_udp(hostname:String=Hostname(), port:Int=2552) = ConfigFactory.parseString(s"""
     akka {

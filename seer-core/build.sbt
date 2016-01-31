@@ -9,6 +9,10 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" % "ammonite-sshd" % "0.4.8" cross CrossVersion.full,
   "com.typesafe.akka" %% "akka-actor" % "2.3.4", //"2.4-SNAPSHOT",
 	"com.typesafe.akka" %% "akka-remote" % "2.3.4", //"2.4-SNAPSHOT",
+  "com.twitter" %% "chill" % "0.5.2",
+  "com.twitter" %% "chill-bijection" % "0.5.2",
+  "com.twitter" %% "chill-akka" % "0.5.2",
+
 	//"org.scala-lang" % "scala-actors" % "2.11.2",
 	//"de.sciss" %% "scalaosc" % "1.1.+",
 	"de.sciss" %% "scalaaudiofile" % "1.4.3+", //"1.4.+",

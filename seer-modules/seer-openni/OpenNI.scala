@@ -28,6 +28,7 @@ object OpenNI {
   var connected = false
   var depth, rgb, tracking, pointCloud = false
   var flipCamera = false
+  var offset = Vec3()
 	var context:Context = _
 
   var depthGen:DepthGenerator = _
@@ -310,8 +311,8 @@ object OpenNI {
   }
 
   def point3DtoVec3(p:Point3D) = {
-    if(flipCamera) Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f
-    else Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f
+    if(flipCamera) Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + offset
+    else Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + offset
   }
 
   // def updatePoints(){
@@ -343,6 +344,8 @@ object OpenNI {
 
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
   def getUser(id:Int) = users.getOrElseUpdate(id, new User(id))
+
+  def getTrackedSkeleton() = skeletons.filter( _._2.tracking ).head._2
 
   def getJoints(user:Int){
     getJoint(user,"head")

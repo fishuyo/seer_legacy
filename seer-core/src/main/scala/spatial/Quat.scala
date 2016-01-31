@@ -25,7 +25,7 @@ object Quat {
   def back = this().fromEuler(0f,Pi,0f)
 }
 
-class Quat(var w:Float, var x:Float, var y:Float, var z:Float ){
+class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializable {
   // implicit def toF( d: Double ) = d.toFloat
 
   def unary_- = Quat( -w, -x, -y, -z ) 

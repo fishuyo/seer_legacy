@@ -30,7 +30,7 @@ object Vec3 {
   }
 }
 
-class Vec3( var x: Float, var y: Float, var z: Float ){
+class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   //def ==(v:Vec3) = {x==v.x && y==v.y && z==v.z}
   def apply(i:Int) = i match { case 0 => x; case 1 => y; case 2 => z;}
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v; case 2 => z=v;}
@@ -119,7 +119,7 @@ object Vec2 {
   }
 }
 
-class Vec2( var x: Float, var y: Float ){
+class Vec2( var x: Float, var y: Float ) extends Serializable {
   //def ==(v:Vec2) = {x==v.x && y==v.y && z==v.z}
   def apply(i:Int) = i match { case 0 => x; case 1 => y}
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v}
