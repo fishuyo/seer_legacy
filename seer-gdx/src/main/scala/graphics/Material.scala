@@ -24,7 +24,7 @@ object Material{
 		ret.visible = m.visible
 		ret.transparent = m.transparent
 		ret.wireframe = m.wireframe
-		ret.linewidth = m.linewidth
+		ret.lineWidth = m.lineWidth
 		ret.texture = m.texture
 		ret.normalMap = m.normalMap
 		ret.specularMap = m.specularMap
@@ -42,7 +42,7 @@ class BasicMaterial extends Material {
 	var visible = true
 	var transparent = false	
 	var wireframe = false
-	var linewidth = 1
+	var lineWidth = 1
 
 	var texture = None:Option[Texture]
 	var normalMap = None:Option[Texture]
@@ -58,6 +58,9 @@ class BasicMaterial extends Material {
 		texture = Some(t)
 		textureMix = 1f
 	}
+
+	def diffuse() = lightingMix = 1f; shininess = 0;
+	def specular() = lightingMix = 1f; shininess = 30;
 }
 
 class NoMaterial extends BasicMaterial

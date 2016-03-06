@@ -42,7 +42,7 @@ class Model extends Drawable { // with geometry.Pickable {
   var color = RGBA(1,1,1,1)
   var colorTransform = HSV(0,1,1)
 
-  var material:BasicMaterial = new NoMaterial
+  var material:BasicMaterial = new BasicMaterial
   var shader = ""
 
   var children = Vector[Model]()
@@ -116,6 +116,8 @@ class Model extends Drawable { // with geometry.Pickable {
   }
 
   override def draw(){
+    if(!material.visible) return
+    
     MatrixStack.push()
 
     MatrixStack.transform(pose,scale)

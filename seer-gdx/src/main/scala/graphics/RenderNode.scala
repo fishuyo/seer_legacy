@@ -219,7 +219,7 @@ class ColorizeNode extends RenderNode {
   var color4 = RGBA(0,0,1,0)
   var color5 = RGBA(1,1,1,1)
 
-  renderer.resize = false
+  // renderer.resize = false // ?
 
   renderer.scene.push(Plane())
 

@@ -20,7 +20,7 @@ object AudioSourceExample extends SeerApp {
 	var doClick = false
 
 	val click = new AudioSource {
-  	override def audioIO( io ){ 
+  	override def audioIO( io:AudioIOBuffer ){ 
   		if(doClick){
   			// set the first sample of each channel to 1.0
   			io.outputSamples(0)(0) = 1f

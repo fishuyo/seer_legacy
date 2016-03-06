@@ -22,7 +22,7 @@ object Renderer {
   */
 class Renderer {
 
-  var viewport = Viewport(0,0,800,800)
+  var viewport = Viewport(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight())
   var camera:NavCamera = new OrthographicCamera(2,2)
   var scene = new Scene 
   var environment = new Environment
@@ -123,7 +123,11 @@ class Renderer {
         if(m.transparent){
           Gdx.gl.glEnable(GL20.GL_BLEND)
           Gdx.gl.glDisable( GL20.GL_DEPTH_TEST )
+        } else {
+          Gdx.gl.glDisable(GL20.GL_BLEND)
+          Gdx.gl.glEnable( GL20.GL_DEPTH_TEST )          
         }
+        Gdx.gl.glLineWidth(m.lineWidth)
       case _ => () //setMaterial(defaultMaterial)
     }
   }

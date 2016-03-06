@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.glutils.HdpiUtils
 object Window {
   def width = Gdx.graphics.getWidth()
   def height = Gdx.graphics.getHeight()
+  def bufferWidth = Gdx.graphics.getBackBufferWidth()
+  def bufferHeight = Gdx.graphics.getBackBufferHeight()
   var w0 = 800
   var h0 = 800
   var a0 = 1f
@@ -81,10 +83,10 @@ class SeerAppListener extends ApplicationListener {
     println(s"App resize: $width $height")
     // Gdx.gl.glViewport(0, 0, width, height)
 
-    // val w = HdpiUtils.toBackBufferX(width)
-    // val h = HdpiUtils.toBackBufferY(height)
-    // RenderGraph.resize(Viewport(w,h))
-    RenderGraph.resize(Viewport(width,height))
+    val w = HdpiUtils.toBackBufferX(width)
+    val h = HdpiUtils.toBackBufferY(height)
+    RenderGraph.resize(Viewport(w,h))
+    // RenderGraph.resize(Viewport(width,height))
 
     // this.width = width
     // this.height = height

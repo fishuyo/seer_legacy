@@ -55,6 +55,15 @@ package object util{
 		else v 
 	}	
 
+
+  /**
+   * Easing functions thanks to: http://gizma.com/easing/
+   */
+
+  // @inline 
+
+
+
 	/**
    * This method makes a "deep clone" of any Java object it is given.
    */

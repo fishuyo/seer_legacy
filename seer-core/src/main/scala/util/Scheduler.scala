@@ -17,6 +17,7 @@ class Schedulable extends Cancellable with Animatable{
 	var t = 0 millis
 	var percent = 0.0
 	var speed = 1.0
+	var paused = false
 
 	Scene.push(this)
 
@@ -59,6 +60,7 @@ object Schedule {
 		val e = new Schedulable {
 			duration = len
 			override def animate(dt:Float){
+				if(paused) return
 				t += (speed * dt.toDouble).seconds
 				if(t > duration){
 					cancel()
@@ -97,10 +99,11 @@ object Schedule {
 		val e = new Schedulable {
 			duration = len
 			override def animate(dt:Float){
+				if(paused) return
 				t += (speed * dt.toDouble).seconds
+				if(t > duration) t -= duration 
 				percent = t/duration
 				f(percent)
-				if(t > duration) t -= duration
 			}
 		}
 		events += e

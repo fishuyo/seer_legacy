@@ -16,6 +16,7 @@ import com.alderstone.multitouch.mac.touchpad.FingerState;
 // import com.badlogic.gdx.input.TGestureDetector
 // import com.badlogic.gdx.math.Vector2
 
+import rx._
 
 case class Finger(id:Int, pos:Vec2, vel:Vec2, size:Float, angle:Float)
 
@@ -25,7 +26,7 @@ class TrackpadState {
   var vel = Vec2()
   var size = 0f
 
-  def count = fingers.length
+  val count = Var(fingers.length)
 }
 
 object Trackpad extends Trackpad {
@@ -171,7 +172,9 @@ class Trackpad extends Observer {
             vel += f.vel
             sumsize += f.size
           }
-          if(state.count > 0){
+          val c = state.fingers.length
+          state.count() = c
+          if(state.count() > 0){
             state.pos = pos / state.count
             state.vel = vel / state.count
             state.size = sumsize / state.count
