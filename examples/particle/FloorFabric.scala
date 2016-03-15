@@ -12,16 +12,13 @@ import io._
 
 import particle._
 
-object Fabric extends SeerApp { 
+object FloorFabric extends SeerApp { 
 
-  // var mesh:Mesh = _
-  // var model:Model = _
-  // var spring:SpringMesh = _
   var t = 0f
 
   val (nx,ny) = (50,50)
 
-  val mesh = Plane.generateMesh(4,4,nx,ny)
+  val mesh = Plane.generateMesh(4,4,nx,ny,Quat.up)
   mesh.primitive = Lines
 
   val spring = new SpringMesh(mesh,1f)
@@ -29,8 +26,12 @@ object Fabric extends SeerApp {
   // audio.Audio().sampleRate = nx
   // val s = new audio.Sine(1, 0.1)
   for(p <- spring.particles.takeRight(nx)){ //.sliding(1,nx/12).flatten){ 
-    spring.pins += AbsoluteConstraint(p,p.position * Vec3(1,1,1) + Vec3(0,4,Random.float()*0.01f))
+    // spring.pins += AbsoluteConstraint(p,p.position * Vec3(1,1,1) + Vec3(0,4,Random.float()*0.01f))
+    spring.pins += AbsoluteConstraint(p,p.position)
   //   spring.pins += AbsoluteConstraint(p,p.position * Vec3(0.9,1,1) + Vec3(0,4 - math.abs(s()),Random.float()*0.01f))
+  }
+  for(p <- spring.particles.take(nx)){
+    spring.pins += AbsoluteConstraint(p,p.position)
   }
   spring.updateNormals = true
   
@@ -39,14 +40,13 @@ object Fabric extends SeerApp {
   // modify material
   // model.material = new SpecularMaterial
   // model.material.color = RGBA(0f,.6f,.6f,1f)
-  // model.material.loadTexture("CassowaryJack.jpg")
 
   var lpos = Vec2()
   var vel = Vec2()
 
   var initd = false
 
-  Gravity.set(0,-5,0)
+  Gravity.set(0,0,0)
 
   Keyboard.bindCamera()
   

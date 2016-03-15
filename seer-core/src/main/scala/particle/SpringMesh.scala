@@ -36,7 +36,7 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) ext
 	  		val p = particles(xs(0))
 	  		val q = particles(xs(1))
         val dist = (p.position-q.position).mag
-	  		springs += LinearSpringConstraint(p, q, dist, stiff, tear*dist)		
+	  		springs += LinearSpringConstraint(p, q, dist, stiff)		
 	  })
 
   } else {
@@ -52,12 +52,13 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) ext
 	  		val q = Particle(xs(1))
 	  		particles ++= p :: q :: List()
         val dist = (p.position-q.position).mag
-	  		springs += LinearSpringConstraint(p, q, dist, stiff, tear*dist)		
+	  		springs += LinearSpringConstraint(p, q, dist, stiff)		
 	  })
   }
 
-  // for( i <- ( 0 until particles.length / 2)){
-  	// pins += AbsoluteConstraint(particles(i), particles(i).position)
+ //  val center = Particle(particles.map(_.position).sum / particles.length)
+ //  for(p <- particles){ 
+ //  	springs += LinearSpringConstraint(p, center, 0.05f)
 	// }
 
   def +=(p:Particle){

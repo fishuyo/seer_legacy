@@ -13,7 +13,7 @@ import collection.mutable.ListBuffer
 object Sines extends SeerApp {
 
 	// initialize the GdxAudio driver
-	GdxAudio.init
+	PortAudio.init
 
 	// start the audio actor
 	Audio().start

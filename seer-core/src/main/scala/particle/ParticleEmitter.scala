@@ -9,12 +9,14 @@ import scala.collection.mutable.ListBuffer
 
 class ParticleEmitter(var maxParticles:Int) extends Animatable {
 
-	var ttl = 10f
+	var ttl = 20f
 	var particles = ListBuffer[Particle]()
 
 	var field:Option[spatial.VecField3D] = None
 	var fieldAsForce = true
 	var xt = 0f
+
+  var damping = 0f
 
 	def +=(p:Particle) = particles += p
 	def ++=(ps:Seq[Particle]) = particles ++= ps
@@ -34,7 +36,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 
       particles.foreach( (p) => {
         p.applyGravity()
-        // p.applyDamping(damping)
+        p.applyDamping(damping)
   			if(field.isDefined){
 					if(fieldAsForce) p.applyForce(field.get(p.position))
 					else p.setVelocity(field.get(p.position))
@@ -43,16 +45,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
         p.step() // timeStep
         // p.collideGround(-1f, 0.999999f) 
       })
-
     }
-		// particles.foreach( (p) => {
-			// p.applyForce(Gravity)
-		// 	if(field.isDefined){
-		// 		if(fieldAsForce) p.applyForce(field.get(p.position))
-		// 		else p.setVelocity(field.get(p.position))
-		// 	}
-		// 	p.step()
-		// })
 
 	}
 

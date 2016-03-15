@@ -12,7 +12,7 @@ import concurrent.duration._
 
 object AudioSourceExample extends SeerApp {
 
-	GdxAudio.init
+	PortAudio.init
 	Audio().start
 
 	println("press spacebar...")

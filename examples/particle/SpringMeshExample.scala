@@ -1,7 +1,7 @@
 
 
 package com.fishuyo.seer
-package examples.graphics
+package examples.particle
 
 import graphics._
 import spatial._
@@ -54,15 +54,15 @@ object SpringMeshExample extends SeerApp {
 		t += dt 
 
 		implicit def f2i(f:Float) = f.toInt
-    if( Mouse.status() == "drag"){
-      val vel = (Mouse.xy() - lpos)/dt
-      val r = Camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
+    if( Mouse.status.now == "drag"){
+      val vel = (Mouse.xy.now - lpos)/dt
+      val r = Camera.ray(Mouse.x.now*Window.width, (1f-Mouse.y.now) * Window.height)
       spring.particles.foreach( (p) => {
         val t = r.intersectSphere(p.position, 0.25f)
         if(t.isDefined) p.applyForce(Vec3(vel.x,vel.y,0)*10f)
       })
     }
-    lpos = Mouse.xy()
+    lpos = Mouse.xy.now
 
 		// simulate the spring mesh
 		// this automatically recalculates normals, and updates the mesh

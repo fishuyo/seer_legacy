@@ -29,7 +29,13 @@ class AbsoluteConstraint(val p:KinematicState, var q:KinematicState) extends Con
 }
 
 object LinearSpringConstraint {
-	def apply(p:Particle,q:Particle,l:Float=1f,s:Float=1f,tear:Float=0f) = new LinearSpringConstraint(p,q,l,s,tear)
+  def apply(p:Particle,q:Particle,s:Float) = {
+    val dist = (p.position - q.position).mag
+    new LinearSpringConstraint(p,q,dist,s,0f)
+  }
+	def apply(p:Particle,q:Particle,l:Float,s:Float) = {
+    new LinearSpringConstraint(p,q,l,s,0f)
+  }
 }
 
 class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, stiffness:Float, tearThreshold:Float) extends Constraint {

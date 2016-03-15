@@ -10,8 +10,10 @@ import io._
 
 object Lissajous extends SeerApp with AudioSource {
 
-	GdxAudio.bufferSize = 1024
-	GdxAudio.init
+	// PortAudio.bufferSize = 1024
+	PortAudio.init
+	Audio().push(this)
+	Audio().start
 
 	val mesh = Mesh()
 	mesh.primitive = LineStrip
@@ -25,8 +27,6 @@ object Lissajous extends SeerApp with AudioSource {
 	val buf = new Array[Vec3](Audio().bufferSize)
 	for(i <- 0 until Audio().bufferSize) buf(i) = Vec3()
 
-	Audio().push(this)
-	Audio().start
 
 	override def draw(){
 		mesh.clear
@@ -40,8 +40,8 @@ object Lissajous extends SeerApp with AudioSource {
 
 	override def audioIO(io: AudioIOBuffer){
 		while(io()){
-			sin1.f = (Mouse.x() - 0.5f) * 440f
-			sin2.f = (Mouse.y() - 0.5f) * 440f
+			sin1.f = (Mouse.x.now - 0.5f) * 440f
+			sin2.f = (Mouse.y.now - 0.5f) * 440f
 
 			val s1 = sin1()
 			val s2 = sin2()
