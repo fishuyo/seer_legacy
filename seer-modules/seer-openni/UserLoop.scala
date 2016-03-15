@@ -5,6 +5,9 @@ package openni
 import collection.mutable.ListBuffer
 import collection.mutable.ArrayBuffer
 
+import com.twitter.chill.KryoInjection
+import scala.util.Success
+
 class UserLoop {
 
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
@@ -92,5 +95,33 @@ class UserLoop {
     if( frames.length > 0) out ++= frames(frame.toInt)
   }
 
+
+  def load(filename:String){
+    import java.io._
+    val bis = new BufferedInputStream(new FileInputStream(filename))
+    val aval = bis.available
+    val buffer = new Array[Byte](aval)
+    val red = bis.read(buffer)
+    println(s"read $red bytes of $aval")
+
+    var res:Option[ArrayBuffer[ListBuffer[User]]] = None
+    // var user:Option[User] = None
+    val decode = KryoInjection.invert(buffer)
+    decode match {
+      case Success(u:ArrayBuffer[ListBuffer[User]]) => res = Some(u.clone)
+      case m => println("Invert failed!" + m + " " + m.getClass.getSimpleName)
+    }
+    if(res.isDefined) frames = res.get
+  }
+  def save(){
+    import java.io._
+    val form = new java.text.SimpleDateFormat("yyyy-MM-dd-HH.mm.ss")
+    val filename = form.format(new java.util.Date()) + ".bin" 
+
+    val bytes = KryoInjection(frames)
+    val bos = new BufferedOutputStream(new FileOutputStream(filename))
+    Stream.continually(bos.write(bytes))
+    bos.close()
+  }
 
 }

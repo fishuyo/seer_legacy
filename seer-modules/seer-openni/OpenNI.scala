@@ -17,8 +17,6 @@ import java.nio._
 import org.openni._
 import org.openni.SkeletonJoint._
 
-// import com.primesense.nite._
-
 import akka.actor._
 import akka.event.Logging
 
@@ -104,15 +102,19 @@ object OpenNI {
 
   def initDepth(){
     if(!connect()) return
-    depthGen = DepthGenerator.create(context)
-    depthMD = depthGen.getMetaData()
-    depth = true
+    try{
+      depthGen = DepthGenerator.create(context)
+      depthMD = depthGen.getMetaData()
+      depth = true
+    } catch { case e:Exception => println(s"OpenNI.initDepth: $e") }
   }
   def initRGB(){
     if(!connect()) return
-    imageGen = ImageGenerator.create(context)
-    imageMD = imageGen.getMetaData()
-    rgb = true
+    try{
+      imageGen = ImageGenerator.create(context)
+      imageMD = imageGen.getMetaData()
+      rgb = true
+    } catch { case e:Exception => println(s"OpenNI.initRGB: $e") }
   }
   def alignDepthToRGB(){
     if(!(rgb && depth)) return
@@ -123,6 +125,7 @@ object OpenNI {
 
   def initTracking(){
     if(!depth) initDepth()
+    try {
     userGen = UserGenerator.create(context)
     skeletonCap = userGen.getSkeletonCapability()
     poseDetectionCap = userGen.getPoseDetectionCapability()
@@ -132,6 +135,7 @@ object OpenNI {
     skeletonCap.getCalibrationCompleteEvent().addObserver(new CalibrationObserver());
     skeletonCap.setSkeletonProfile(SkeletonProfile.ALL);
     tracking = true
+    } catch { case e:Exception => println(s"OpenNI.initTracking: $e") }
   }
 
   def initAll(){
@@ -149,6 +153,7 @@ object OpenNI {
     context.stopGeneratingAll()
     actor ! "stop"
   }
+
 
   val histogram = new Array[Float](10000)
   def calcHist(depth:ShortBuffer){
@@ -263,21 +268,11 @@ object OpenNI {
             if (userId > 0) c = colors(userId)
             if (z != 0){
               val b = histogram(z);
-              // depthBytes(4*pos) = (c.r * histValue*255).toByte 
-              // depthBytes(4*pos+1) = (c.g * histValue*255).toByte
-              // depthBytes(4*pos+2) = (c.b * histValue*255).toByte
-              // depthBytes(4*pos+3) = 255.toByte
               debugBuffer.put(Array[Byte]((c.r*b*255).toByte, (c.g*b*255).toByte, (c.b*b*255).toByte))
             } else{
               debugBuffer.put(Array[Byte](0,0,0))
-              // depthBytes(4*pos) = 0.toByte 
-              // depthBytes(4*pos+1) = 0.toByte
-              // depthBytes(4*pos+2) = 0.toByte
-              // depthBytes(4*pos+3) = 0.toByte
             }
           }
-
-
 
           if(pointCloud){
             val y = pos / w
@@ -315,64 +310,24 @@ object OpenNI {
     else Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + offset
   }
 
-  // def updatePoints(){
-  //   if(!depth) return
-
-  //   depthBuffer.rewind();
-  //   sceneBuffer.rewind();
-
-  //   // pointMesh.clear
-  //   pointBuffer.clear
-
-  //   while(depthBuffer.remaining() > 0){
-  //     val pos = depthBuffer.position();
-  //     val z = depthBuffer.get();
-  //     val user = sceneBuffer.get();
-          
-  //     val y = pos / w
-  //     val x = pos % w
-  //     if (z != 0 && user > 0 && x%pointCloudDensity==0 && y%pointCloudDensity==0){
-  //       pointBuffer += new Point3D(x, y, z)
-  //       // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
-  //       // pointMesh.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
-  //     }
-  //   }
-  //   pointMesh.clear
-  //   val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
-  //   pointMesh.vertices ++= ps.map { case p => Vec3(p.getX(), p.getY(), p.getZ()) / 1000f }
-  // }
-
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
   def getUser(id:Int) = users.getOrElseUpdate(id, new User(id))
 
   def getTrackedSkeleton() = skeletons.filter( _._2.tracking ).head._2
 
-  def getJoints(user:Int){
-    getJoint(user,"head")
-    getJoint(user,"neck")
-    getJoint(user,"torso")
-    getJoint(user,"l_shoulder")
-    getJoint(user,"l_elbow")
-    getJoint(user,"l_hand")
-    getJoint(user,"r_shoulder")
-    getJoint(user,"r_elbow")
-    getJoint(user,"r_hand")
-    getJoint(user,"l_hip")
-    getJoint(user,"l_knee")
-    getJoint(user,"l_foot")
-    getJoint(user,"r_hip")
-    getJoint(user,"r_knee")
-    getJoint(user,"r_foot")
-  }
+
+
+  def getJoints(user:Int) = for(j <- Joint.strings) yield (j,getJoint(user,j))
 
   def getJoint(user:Int, joint:String) = {
     val jpos = skeletonCap.getSkeletonJointPosition(user, Joint(joint))
     val v = point3DtoVec3(jpos.getPosition)
-    skeletons(user).updateJoint(joint,v)
-    (v, jpos.getConfidence )
+    // (v, jpos.getConfidence)
+    v
   }
 
 }
+
 
 class OpenNIActor extends Actor with ActorLogging {
   var running = false
