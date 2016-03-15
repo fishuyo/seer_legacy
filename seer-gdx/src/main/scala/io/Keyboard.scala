@@ -37,6 +37,7 @@ class Keyboard extends InputAdapter {
   val down = Var('\0')
   var observing = List[Obs]()
 
+  var callbacks = Map[Char,List[()=>Unit]]()
   var typedCallbacks = List[(Char)=>Unit]()
 
   use()
@@ -45,28 +46,30 @@ class Keyboard extends InputAdapter {
   def use() = Inputs.add(this)
   def remove() = Inputs.remove(this)
 
-  def bind(s:String, f:()=>Unit){
+  def bind(s:String, f:()=>Unit)(implicit ctx: Ctx.Owner){
     val k = s.charAt(0)
-    observing = Obs(key,skipInitial=true){ 
-      if( key() == k ) try{ 
+    observing = key.trigger {
+      // println(key.now)
+      if( key.now == k ) try{ 
         f()
       }catch{ case e:Exception => println(e) }
     } :: observing
   }
 
-  def bindDown( s:String, f:()=>Unit) = {
+  def bindDown( s:String, f:()=>Unit)(implicit ctx: Ctx.Owner) = {
     val k = s.charAt(0)
-    observing = Obs(down,skipInitial=true){ if( down() == k ) f() } :: observing
+    observing = down.trigger { if( down.now == k ) f() } :: observing
   }
-  def bindUp( s:String, f:()=>Unit) = {
+  def bindUp( s:String, f:()=>Unit)(implicit ctx: Ctx.Owner) = {
     val k = s.charAt(0)
-    observing = Obs(up,skipInitial=true){ if( up() == k ) f() } :: observing
+    observing = up.trigger { if( up.now == k ) f() } :: observing
   }
   def bindTyped(f:(Char=>Unit)){
     typedCallbacks = f :: typedCallbacks
   }
 
   override def keyTyped(k:Char) = {
+    key.Internal.value = '\0' // make rx propogate even if same key
     key() = k
     typedCallbacks.foreach((f) => f(k))
     false

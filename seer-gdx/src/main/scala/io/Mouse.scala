@@ -28,13 +28,13 @@ object Mouse extends InputAdapter {
 
   use()
 
-	val x = Var(0f)
-	val y = Var(0f)
 	val xy = Var(Vec2())
+  val x = xy.map(_.x)
+  val y = xy.map(_.y)
 
-  val dx = Var(0f)
-  val dy = Var(0f)
   val vel = Var(Vec2())
+  val dx = vel.map(_.x)
+  val dy = vel.map(_.y)
 
 	val id = Var(0)
 	val button = Var(0)
@@ -52,16 +52,12 @@ object Mouse extends InputAdapter {
 
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
-	def update(sx:Int, sy:Int, stat:String){
-    val lx = x()
-    val ly = y()
-		x() = sx * 1f / Window.width
-		y() = 1f - (sy * 1f / Window.height)
-		xy() = Vec2(x(),y())
-		status() = stat
-    dx() = x() - lx
-    dy() = y() - ly
-    vel() = Vec2(dx(),dy())
+	def update(sx:Int, sy:Int, stat:String){ //(implicit data:Ctx.Data){
+    status() = stat
+    val lx = x.now
+    val ly = y.now
+		xy() = Vec2(sx * 1f / Window.width, 1f - (sy * 1f / Window.height))
+    vel() = Vec2(x.now - lx, y.now - ly)
 	}
   override def touchUp( sx:Int, sy:Int, pointer:Int, but:Int) = {
 		update(sx,sy,"up")

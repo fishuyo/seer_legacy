@@ -57,5 +57,9 @@ object SeerModulesBuild extends Build {
   lazy val seer_allosphere = project.in(file("seer-modules/seer-allosphere")).
     settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_luaj, seer_script)
 
+
+  lazy val seer_tree = project.in(file("seer-modules/seer-tree")).settings(core: _*).
+    dependsOn(seer_gdx)
+
 }
 

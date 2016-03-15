@@ -18,6 +18,6 @@ libraryDependencies ++= Seq(
 	"de.sciss" %% "scalaaudiofile" % "1.4.3+", //"1.4.+",
   "de.sciss" %% "scalaosc" % "1.1.+",
 	"net.sourceforge.jtransforms" %  "jtransforms" % "2.4.0",
-	"com.scalarx" %% "scalarx" % "0.2.6",
+	"com.lihaoyi" %% "scalarx" % "0.3.1",
   "com.beachape.filemanagement" %% "schwatcher" % "0.1.5"
 )
