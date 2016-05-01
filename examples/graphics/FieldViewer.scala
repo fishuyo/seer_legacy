@@ -15,13 +15,11 @@ object FieldViewer extends SeerApp {
 
   override def animate(dt:Float){
     try{
-      val m = Mouse.xy() * fieldViewer.w
+      val m = Mouse.xy.now * fieldViewer.w
       fieldViewer.field.set(m.x.toInt,m.y.toInt,1f)
     } catch { case e:Exception => ()}
   }
 
-  Keyboard.clear
-  Keyboard.use
   Keyboard.bind("i", () => {fieldViewer.eta += 1; println(fieldViewer.eta)})
   Keyboard.bind("k", () => {fieldViewer.eta -= 1; println(fieldViewer.eta)})
 }

@@ -79,5 +79,8 @@ package object graphics {
 	}
 	implicit def HSV2RGBA(c:HSV) = RGB2RGBA(HSV2RGB(c))
 	implicit def RGBA2HSV(c:RGBA) = RGB2HSV(RGBA2RGB(c))
+
+	implicit def RGB2Vec3(c:RGB) = spatial.Vec3(c.r,c.g,c.b)
+	implicit def Vec32RGB(c:spatial.Vec3) = RGB(c.x,c.y,c.z)
 	
 }

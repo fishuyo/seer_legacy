@@ -56,11 +56,7 @@ package object util{
 	}	
 
 
-  /**
-   * Easing functions thanks to: http://gizma.com/easing/
-   */
 
-  // @inline 
 
 
 

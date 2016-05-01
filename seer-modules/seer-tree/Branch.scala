@@ -13,12 +13,14 @@ import scala.annotation.tailrec
   * Branch companion object for creating branches and initializing their state correctly
   */
 object Branch {
-  def apply(parent:Branch, relative:Pose) = new Branch(parent){
+  def apply(parent:Branch, relative:Pose, ratio:Float=0.999f) = new Branch(parent){
     relPose = relative
     if(parent != null){ 
-      // println(parent.pose + " " + parent.pose.pos + " " + parent.pose.quat)
       pose = parent.pose * relPose
       depth = parent.depth + 1
+      maxLength = parent.maxLength * ratio
+      length = parent.length * ratio
+      thick = parent.thick * ratio
     } else pose = Pose(relPose)
     lPose = Pose(pose)
     pose0 = Pose(pose)
@@ -39,6 +41,7 @@ class Branch(var parent:Branch){
   var age = 0f
   var depth = 0
   var length = 1f
+  var minLength = 0.0001f
   var maxLength = 1f
 
   var accel = Vec3(0)
@@ -49,12 +52,6 @@ class Branch(var parent:Branch){
 
   var thick = 0.2f
   var taper = .8f
-  // var pinned = false
-  // var size = 0;
-
-  // var r = 1/(length*length) * .1f
-  // var w = Randf(0,3.14f)()
-  // var f = 1.0f/length * 1.0f
   var k = 10.0f // * thick*thick*thick / (length*length*length)
 
   def updateConstants(){
@@ -100,7 +97,10 @@ class Branch(var parent:Branch){
   /** step growth */
   def grow(dt:Float){
     age += dt
-    if(length < maxLength) length += 0.001
+    // if(depth == 2) println(s"$length $maxLength")
+    length += 0.01 * dt
+    if(length > maxLength) length = maxLength
+    else if(length < minLength) length = minLength
     if(length > maxLength/4){
       children.foreach(_.grow(dt))
     }
@@ -119,7 +119,7 @@ class Branch(var parent:Branch){
       val w = b.euler - b.lEuler
       val ax = b.accel dot b.pose.quat.toX
       val ay = b.accel dot b.pose.quat.toY
-      var dw = Vec3(ay, ax, 0)
+      var dw = Vec3(-ay, ax, 0)
       
       dw -= w * (b.damp / b.mass)
       dw -= b.euler * b.k

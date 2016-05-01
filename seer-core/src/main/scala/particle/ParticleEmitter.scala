@@ -26,7 +26,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 	override def animate(dt:Float){
 
 		val timeStep = Integrators.dt
-		particles = particles.filter( (p) => p.t < ttl )
+		if(ttl > 0) particles = particles.filter( (p) => p.t < ttl )
 		if( particles.length > maxParticles ) particles = particles.takeRight(maxParticles)
 
 		val steps = ( (dt+xt) / timeStep ).toInt

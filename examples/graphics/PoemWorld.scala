@@ -195,11 +195,11 @@ object TextExample extends SeerApp {
 
     implicit def f2i(f:Float) = f.toInt
 
-    if( Mouse.status() == "drag"){
-      vel = (Mouse.xy() - lpos)/dt
+    if( Mouse.status.now == "drag"){
+      vel = (Mouse.xy.now - lpos)/dt
       // println(vel)
       // s.applyForce( Vec3(vel.x,vel.y,0)*10.0f)
-      val r = Text.camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
+      val r = Text.camera.ray(Mouse.x.now*Window.width, (1f-Mouse.y.now * Window.height))
       agents.flatMap(_.particles).foreach( (p) => {
         val t = r.intersectSphere(p.position, 10f)
         if(t.isDefined){
@@ -209,7 +209,7 @@ object TextExample extends SeerApp {
         }
       })
     }
-    lpos = Mouse.xy()
+    lpos = Mouse.xy.now
 
     agents.foreach{ case a =>
       particles.particles.zip(particles.chars).foreach { case (p,c) =>

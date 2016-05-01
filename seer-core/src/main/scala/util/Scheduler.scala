@@ -110,6 +110,27 @@ object Schedule {
 		e
 	}
 
+	def oscillate(len:FiniteDuration)(f:(Float)=>Unit) = {
+		val e = new Schedulable {
+			duration = len
+			override def animate(dt:Float){
+				if(paused) return
+				t += (speed * dt.toDouble).seconds
+				if(t > duration){
+					speed *= -1
+					t = duration
+				} else if(t < 0){
+					speed *= -1
+					t = 0
+				}
+				percent = t/duration
+				f(percent)
+			}
+		}
+		events += e
+		e
+	}
+
 	def clear(){events.foreach(_.cancel); events.clear}
 }
 
