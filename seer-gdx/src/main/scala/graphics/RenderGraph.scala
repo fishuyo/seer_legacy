@@ -45,6 +45,7 @@ object RenderGraph {
     roots += RootNode
   }
 
+  def +=(n:RenderNode){ addNode(n) }
   def addNode(n:RenderNode){
     roots += n
     // n.renderer.scene.init()

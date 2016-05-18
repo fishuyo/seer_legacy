@@ -191,6 +191,12 @@ object Shader {
     s.fragFile = Some(File(path+".frag"))
     s
   }
+  def loadFiles(pathV:String,pathF:String) = {
+    val s = new Shader
+    s.vertFile = Some(File(pathV))
+    s.fragFile = Some(File(pathF))
+    s
+  }
   def load(v:String, f:String) = {
     val s = new Shader
     s.vertCode = v
@@ -323,13 +329,14 @@ class Shader {
   }
 
   // reload shader when files modified
-  def monitor(){
-    if( vertFile.isEmpty || fragFile.isEmpty ) return
+  def monitor():Shader = {
+    if( vertFile.isEmpty || fragFile.isEmpty ) return this
     val that = this;
     try{
       Monitor( vertFile.get.path() ){ (p) => {that.reload; println(s"reloading file ${that.vertFile.get.path()}") }}
       Monitor( fragFile.get.path() ){ (p) => {that.reload; println(s"reloading file ${that.fragFile.get.path()}") }}
     } catch { case e:Exception => println(e) }
+    this
   } 
 }
 

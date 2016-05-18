@@ -33,6 +33,8 @@ class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ) extends Serializ
   //return Azimuth Elevation and distance to point v
   //def getAED(v:Vec3): (Float,Float,Float) = {}
 
+  def inverse = Pose(-pos, quat.inverse)
+
   def getUnitVectors():(Vec3,Vec3,Vec3) = (quat.toX, quat.toY, quat.toZ)
   def getDirVectors():(Vec3,Vec3,Vec3) = (quat.toX, quat.toY, -quat.toZ)
   def ur() = quat.toX

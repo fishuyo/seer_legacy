@@ -21,6 +21,7 @@ class Scene {
   //val pickable = new ListBuffer[GLPickable]
   //val lights = new ListBuffer[GLLight]
 
+  def +=(o:Any){ push(o) }
   def push(o:Any) = o match {
     case d:Animatable => animatable += d; drawable += d
     case d:Drawable => drawable += d

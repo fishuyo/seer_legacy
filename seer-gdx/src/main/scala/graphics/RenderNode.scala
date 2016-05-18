@@ -45,6 +45,8 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
     outputs += node
     node.addInput(this)
   }
+  def >>(node:RenderNode){ outputTo(node) }
+  def <<(node:RenderNode){ node.outputTo(this) }
 
   def animate(dt:Float){
     renderer.animate(dt)
@@ -97,6 +99,7 @@ class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends Render
     renderer.shader.uniforms("u_mode") = mode
     super.render()
   }
+  def xfade(a:Float){ blend0 = 1.0f-a; blend1 = a}
   def setBlend(a:Float,b:Float){ blend0 = a; blend1 = b}
 }
 

@@ -30,6 +30,11 @@ class Schedulable extends Cancellable with Animatable{
 		}
 	}
 
+	var onFinish:()=> Unit = null
+	def andThen(f: => Unit){
+		onFinish = f _
+	}
+
 	override def isCancelled = cancelled
 	override def cancel() = { Scene.remove(this); cancelled = true; true}
 }
@@ -65,6 +70,7 @@ object Schedule {
 				if(t > duration){
 					cancel()
 					f(1f)
+					if(onFinish != null) onFinish()
 				} else {
 					percent = t/duration
 					f(percent)
@@ -101,7 +107,10 @@ object Schedule {
 			override def animate(dt:Float){
 				if(paused) return
 				t += (speed * dt.toDouble).seconds
-				if(t > duration) t -= duration 
+				if(t > duration){
+					t -= duration 
+					if(onFinish != null) onFinish()
+				}
 				percent = t/duration
 				f(percent)
 			}
@@ -122,6 +131,7 @@ object Schedule {
 				} else if(t < 0){
 					speed *= -1
 					t = 0
+					if(onFinish != null) onFinish()
 				}
 				percent = t/duration
 				f(percent)

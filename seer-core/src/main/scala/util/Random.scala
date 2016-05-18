@@ -5,6 +5,7 @@ package util
 import types.Generator
 import spatial.Vec3
 import spatial.Quat
+import graphics.RGB
 
 
 object Random {
@@ -47,6 +48,10 @@ object Random {
 
 	def quat = new Generator[Quat]{
 		def apply() = Quat(float(-1f,1f)(),float(-1f,1f)(),float(-1f,1f)(),float(-1,1)()).normalize
+	}
+
+	def rgb = new Generator[RGB]{
+		def apply() = RGB(float(),float(),float())
 	}
 
 	def oneOf[T](xs: T*) = for(i <- int(0,xs.length)) yield xs(i)

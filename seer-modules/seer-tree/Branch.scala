@@ -13,15 +13,20 @@ import scala.annotation.tailrec
   * Branch companion object for creating branches and initializing their state correctly
   */
 object Branch {
-  def apply(parent:Branch, relative:Pose, ratio:Float=0.999f) = new Branch(parent){
-    relPose = relative
-    if(parent != null){ 
-      pose = parent.pose * relPose
+  def apply(parent0:Branch, p:Pose, ratio:Float=1f, relative:Boolean=true) = new Branch { 
+    parent = parent0
+    if(relative) relPose = p
+    if(parent != null){
+      if(relative) pose = parent.pose * p
+      else {
+        pose = Pose(p)
+        relPose = parent.pose.inverse * pose
+      }
       depth = parent.depth + 1
       maxLength = parent.maxLength * ratio
       length = parent.length * ratio
       thick = parent.thick * ratio
-    } else pose = Pose(relPose)
+    } else pose = Pose(p)
     lPose = Pose(pose)
     pose0 = Pose(pose)
     updateConstants()
@@ -31,13 +36,14 @@ object Branch {
 /**
   * Branch class as nodes in a tree
   */
-class Branch(var parent:Branch){
-
+class Branch {
+  var parent:Branch = null
   val children = ListBuffer[Branch]()
   var pose = Pose()     //current pose
   var lPose = Pose()    // last pose for rotational verlet integration
   var pose0 = Pose()    // equilibrium pose (pose of no restoring force)
   var relPose = Pose()  // relative pose from parent
+  var dir = Vec3()
   var age = 0f
   var depth = 0
   var length = 1f
@@ -50,13 +56,15 @@ class Branch(var parent:Branch){
   var mass = 1.0f
   var damp = 50.0f
 
-  var thick = 0.2f
-  var taper = .8f
+  var thick = 10.2f
+  var taper = .5f
   var k = 10.0f // * thick*thick*thick / (length*length*length)
 
+  var dna = ""
+
   def updateConstants(){
-    mass = 1.0f //thick*thick*length
-    k = 10.0f //* thick*thick*thick / (length*length*length)
+    mass = 1.0f //+ thick*thick*length * 100f
+    k = 10.0f  //+ thick*thick*thick / (length*length*length) * 10f
   }
 
   /** run a function on branch and all children breadth first */
@@ -101,7 +109,9 @@ class Branch(var parent:Branch){
     length += 0.01 * dt
     if(length > maxLength) length = maxLength
     else if(length < minLength) length = minLength
-    if(length > maxLength/4){
+    if(dt > 0 && length > maxLength/4){
+      children.foreach(_.grow(dt))
+    } else if(dt < 0 && length < maxLength/4) {
       children.foreach(_.grow(dt))
     }
   }
