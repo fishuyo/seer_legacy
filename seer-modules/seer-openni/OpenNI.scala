@@ -25,6 +25,7 @@ object OpenNI {
   val (w,h) = (640, 480)
   var connected = false
   var depth, rgb, tracking, pointCloud = false
+  var pointCloudEach = false
   var flipCamera = false
   var offset = Vec3()
 	var context:Context = _
@@ -64,10 +65,19 @@ object OpenNI {
   val pointMesh = new Mesh()
   pointMesh.maxVertices = w*h
   pointMesh.primitive = Points
+  val pointMeshes = ArrayBuffer[Mesh]()
 
   val pointBuffer = ArrayBuffer[Point3D]()
+  val pointBuffers = ArrayBuffer[ArrayBuffer[Point3D]]()
   var rem = 0
   var pointCloudDensity = 4
+
+  for( i <- 0 until 4){
+   pointMeshes += new Mesh
+   pointMesh.maxVertices = w*h 
+   pointMesh.primitive = Points 
+   pointBuffers += ArrayBuffer[Point3D]()
+  }
 
   // val tracking = HashMap[Int,Boolean]()
   
@@ -224,6 +234,7 @@ object OpenNI {
           
         // meshBuffer.clear
         pointBuffer.clear
+        pointBuffers.foreach( _.clear )
 
         users.values.foreach { case user =>
           if(user.updateMask){
@@ -275,12 +286,22 @@ object OpenNI {
           }
 
           if(pointCloud){
-            val y = pos / w
-            val x = pos % w
-            if (z != 0 && userId > 0 && x%pointCloudDensity==rem && y%pointCloudDensity==rem){
-              pointBuffer += new Point3D(x, y, z)
-              // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
-              // meshBuffer.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
+            if(pointCloudEach){
+              val y = pos / w
+              val x = pos % w
+              if (z != 0 && userId > 0 && x%pointCloudDensity==rem && y%pointCloudDensity==rem){
+                pointBuffers(userId) += new Point3D(x, y, z)
+                // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
+                // meshBuffer.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
+              }
+            } else{
+              val y = pos / w
+              val x = pos % w
+              if (z != 0 && userId > 0 && x%pointCloudDensity==rem && y%pointCloudDensity==rem){
+                pointBuffer += new Point3D(x, y, z)
+                // val p = depthGen.convertProjectiveToRealWorld(new Point3D(x, y, z));
+                // meshBuffer.vertices += Vec3(p.getX(), p.getY(), p.getZ()) / 1000
+              }
             }
           }
         }
@@ -291,14 +312,24 @@ object OpenNI {
           debugImage.buffer = debugBufferSafe
         }
         if(pointCloud){
-          // pointMesh.clear 
-          // pointMesh.vertices ++= meshBuffer.vertices
-          // pointMesh.clear
-          val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
-          val vs = ps.map(point3DtoVec3(_))
-          pointMesh.clear
-          pointMesh.vertices ++= vs
-          // rem = (rem+2) % 4
+          if(pointCloudEach){
+            pointBuffers.zipWithIndex.foreach { case (b,i) =>
+              val ps = depthGen.convertProjectiveToRealWorld(b.toArray)
+              val vs = ps.map(point3DtoVec3(_))
+              pointMeshes(i).clear
+              pointMeshes(i).vertices ++= vs
+            }            
+
+          } else {
+            // pointMesh.clear 
+            // pointMesh.vertices ++= meshBuffer.vertices
+            // pointMesh.clear
+            val ps = depthGen.convertProjectiveToRealWorld(pointBuffer.toArray)
+            val vs = ps.map(point3DtoVec3(_))
+            pointMesh.clear
+            pointMesh.vertices ++= vs
+            // rem = (rem+2) % 4     
+          }
         }
 
       }

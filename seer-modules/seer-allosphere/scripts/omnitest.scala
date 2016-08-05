@@ -25,6 +25,9 @@ import collection.mutable.ArrayBuffer
 Mouse.clear
 Mouse.use
 
+implicit val ctx = rx.Ctx.Owner.Unsafe
+
+
 implicit def f2i(f:Float) = f.toInt
 
 object Script extends SeerScript {
@@ -72,10 +75,10 @@ object Script extends SeerScript {
   renderer.environment.blend = true
   renderer.environment.depth = false
 
-	override def preUnload(){
+	// override def preUnload(){
 		// recv.clear()
     // recv.disconnect()
-	}
+	// }
 
 	var inited = false
 	override def init(){
@@ -83,9 +86,9 @@ object Script extends SeerScript {
     // OmniTest.omni.configure("/Users/fishuyo/calib", "gr02")
     // OmniTest.omni.onCreate
 
-    renderer.omni.mStereo = 1
+    // renderer.omni.mStereo = 1
     // renderer.omni.mMode = StereoMode.ANAGLYPH
-    renderer.omni.mMode = StereoMode.ACTIVE
+    // renderer.omni.mMode = StereoMode.ACTIVE
 		// renderer.omni.mMode = StereoMode.SEQUENTIAL
 		// OmniTest.omni.renderFace(0) = true
 		// OmniTest.omni.renderFace(1) = true
@@ -109,13 +112,13 @@ object Script extends SeerScript {
   override def animate(dt:Float){
   	if(!inited) init()
 
-  	renderer.lens.eyeSep = Mouse.y() * 0.5
+  	renderer.lens.eyeSep = Mouse.y.now * 0.5
 
-  	if( Mouse.status() == "drag"){
-			vel = (Mouse.xy() - lpos)/dt
+  	if( Mouse.status.now == "drag"){
+			vel = (Mouse.xy.now - lpos)/dt
 			// println(vel)
 			// s.applyForce( Vec3(vel.x,vel.y,0)*10f)
-			val r = Camera.ray(Mouse.x()*Window.width, (1f-Mouse.y()) * Window.height)
+			val r = Camera.ray(Mouse.x.now*Window.width, (1f-Mouse.y.now * Window.height))
 			fabric.particles.foreach( (p) => {
 				val t = r.intersectSphere(p.position, 0.25f)
 				if(t.isDefined){
@@ -125,7 +128,7 @@ object Script extends SeerScript {
 				}
 			})
 		}
-		lpos = Mouse.xy()
+		lpos = Mouse.xy.now
 
 
 

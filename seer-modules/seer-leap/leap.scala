@@ -1,5 +1,4 @@
 package com.fishuyo.seer
-package io
 package leap
 
 import spatial._

@@ -6,8 +6,11 @@ import graphics._
 class SeerApp extends Animatable {
   DesktopApp.loadLibs()
 
+  def parseArgs(args:Array[String]){}
+
   def main(args: Array[String]): Unit = {
     // DesktopApp.loadLibs()
+    parseArgs(args)
     Scene.push(this)
     DesktopApp.run()
   }

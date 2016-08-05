@@ -16,11 +16,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL30
+// import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.Gdx.{gl20 => gl }
 
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL12
+import org.lwjgl.opengl.GL14
+import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL43
 
 import java.nio.FloatBuffer
@@ -205,7 +207,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 			case FISHEYE =>
 				WarpBlendGen.fovy = f;
 				WarpBlendGen.aspect = a;
-				WarpBlendGen.fillFishEye(p.mWarp.data,p.mWarp.w,p.mWarp.h)
+				WarpBlendGen.fillFishEye(p.mWarp.floatBuffer,p.mWarp.w,p.mWarp.h)
 				p.mWarp.bind(0)
 				p.mWarp.update
 				// WarpBlendGen.fillFishEye(p.pWarp)
@@ -351,7 +353,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 			// each cube face should clamp at texture edges:
 			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL20.GL_CLAMP_TO_EDGE);
 			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_T, GL20.GL_CLAMP_TO_EDGE);
-			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL30.GL_TEXTURE_WRAP_R, GL20.GL_CLAMP_TO_EDGE);
+			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL12.GL_TEXTURE_WRAP_R, GL20.GL_CLAMP_TO_EDGE);
 
 			// filtering
 			gl.glTexParameteri(GL20.GL_TEXTURE_CUBE_MAP, GL20.GL_TEXTURE_MAG_FILTER, GL20.GL_LINEAR);
@@ -370,15 +372,15 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 			var array = Array(1f,0f,0f,0f)
 			buf.put(array)
 			buf.rewind
-			GL11.glTexGen( GL11.GL_S, GL11.GL_OBJECT_PLANE, buf );
+			GL11.glTexGenfv( GL11.GL_S, GL11.GL_OBJECT_PLANE, buf );
 			array = Array(0f,1f,0f,0f)
 			buf.put(array)
 			buf.rewind
-			GL11.glTexGen( GL11.GL_T, GL11.GL_OBJECT_PLANE, buf );
+			GL11.glTexGenfv( GL11.GL_T, GL11.GL_OBJECT_PLANE, buf );
 			array = Array(0f,0f,1f,0f)
 			buf.put(array)
 			buf.rewind
-			GL11.glTexGen( GL11.GL_R, GL11.GL_OBJECT_PLANE, buf );
+			GL11.glTexGenfv( GL11.GL_R, GL11.GL_OBJECT_PLANE, buf );
 
 			// RGBA8 Cubemap texture, 24 bit depth texture, mResolution x mResolution
 			// NULL means reserve texture memory, but texels are undefined
@@ -409,10 +411,10 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 		gl.glGenRenderbuffers(1, b);
 		mRbo = b.get()
 
-		gl.glBindRenderbuffer(GL43.GL_RENDERBUFFER, mRbo);
-		gl.glRenderbufferStorage(GL43.GL_RENDERBUFFER,GL30.GL_DEPTH_COMPONENT24, mResolution, mResolution);
+		gl.glBindRenderbuffer(GL30.GL_RENDERBUFFER, mRbo);
+		gl.glRenderbufferStorage(GL30.GL_RENDERBUFFER,GL14.GL_DEPTH_COMPONENT24, mResolution, mResolution);
 		// Attach depth buffer to FBO
-		gl.glFramebufferRenderbuffer(GL20.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL43.GL_RENDERBUFFER, mRbo);
+		gl.glFramebufferRenderbuffer(GL20.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, mRbo);
 
 		// ...and in the darkness bind them:
 		for (mFace <- (0 until 6)){
@@ -427,7 +429,7 @@ class OmniStereo(var mResolution:Int=1024, var mMipmap:Boolean=true) {
 		}
 
 		// cleanup:
-		gl.glBindRenderbuffer(GL43.GL_RENDERBUFFER, 0);
+		gl.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
 		gl.glBindFramebuffer(GL20.GL_FRAMEBUFFER, 0);
 
 		// Graphics.error("OmniStereo onCreate");

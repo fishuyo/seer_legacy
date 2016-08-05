@@ -5,6 +5,8 @@ package io
 import de.sciss.osc._
 import Implicits._
 
+import java.net.SocketAddress
+
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
 
@@ -18,6 +20,8 @@ object OSC extends OSCReceiver with OSCSender {
 class OSCRecv extends OSCReceiver
 trait OSCReceiver {
 
+  var client:SocketAddress = _
+  
 	// OSC recv config
   var cfg = UDP.Config()
   var rcv = UDP.Receiver(cfg) 
@@ -48,27 +52,28 @@ trait OSCReceiver {
 
 	  rcv.action = {
 
-      case (b:Bundle, _) => handleBundle(b)
-      case (m:Message, _) => handleMessage(m)
+      case (b:Bundle, addr) => handleBundle(b,addr)
+      case (m:Message, addr) => handleMessage(m,addr)
        
       case (p, addr) => println( "Ignoring: " + p + " from " + addr )
     }
 	  rcv.connect()
 	}
 
-	def handleBundle(bundle:Bundle){
+	def handleBundle(bundle:Bundle, addr:SocketAddress){
     bundle match {
       case Bundle(t, msgs @ _*) =>
         msgs.foreach{
-          case b:Bundle => handleBundle(b)
-          case m:Message => handleMessage(m)
+          case b:Bundle => handleBundle(b,addr)
+          case m:Message => handleMessage(m,addr)
           case _ => println("unhandled object in bundle")
         }
       case _ => println("bad bundle")
     }
   }
 
-  def handleMessage(msg:Message){
+  def handleMessage(msg:Message, addr:SocketAddress){
+    client = addr
   	phandlers.foreach(_(msg))
     msg match {
     	case Message( name, vals @ _* ) =>

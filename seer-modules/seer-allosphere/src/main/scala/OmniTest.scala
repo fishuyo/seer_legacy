@@ -21,7 +21,7 @@ import de.sciss.osc.Message
 
 object OmniTest extends SeerApp { //extends OmniApp {
 
-	val loader = ScriptLoader("scripts/omnitest.scala")
+	val loader = ScriptManager.load("scripts/omnitest.scala")
   // val script = loader.script //getScript()
 
   var renderer:OmniCapture = _ //StereoRenderer = _

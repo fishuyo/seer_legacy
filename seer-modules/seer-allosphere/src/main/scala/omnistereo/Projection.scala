@@ -272,7 +272,7 @@ class Projection {
 			val idx = y1*w+x
 
 	    // mWarp.data.position(4*idx)
-	    mWarp.data.put( Array(t(idx),u(idx),v(idx),1f)) //,0, 4)
+	    mWarp.floatBuffer.put( Array(t(idx),u(idx),v(idx),1f)) //,0, 4)
 
 		}
 
