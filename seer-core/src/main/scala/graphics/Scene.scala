@@ -33,7 +33,7 @@ class Scene {
 
   def clear() = { drawable.clear; animatable.clear }
   
-  def init() = drawable.foreach( _.init() )
+  def init() = drawable.foreach( d => { d.init(); d.initialized = true })
   def animate( dt: Float ) = animatable.foreach( (a) => {
     if(!a.initialized){
       a.init()

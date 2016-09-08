@@ -31,6 +31,22 @@ trait NavCamera extends GdxCamera {
   }
 }
 
+class ManualCamera extends GdxCamera with NavCamera {
+  val tmp = new com.badlogic.gdx.math.Vector3()
+  override def update(){ update(true) }
+  override def update(updateFrustum:Boolean){
+    view.setToLookAt(position, tmp.set(position).add(direction), up);
+    combined.set(projection);
+    Matrix4.mul(combined.`val`, view.`val`);
+
+    if (updateFrustum) {
+      invProjectionView.set(combined);
+      Matrix4.inv(invProjectionView.`val`);
+      frustum.update(invProjectionView);
+    }
+  }
+}
+
 class PerspectiveCamera extends GdxPCam(67f, Window.a0, 1f) with NavCamera {
   near = .01f
   def setFOV(f:Float) = fieldOfView = f

@@ -74,6 +74,7 @@ class Renderer {
         case ortho:OrthographicCamera =>
           // camera.viewportWidth = vp.aspect * camera.viewportHeight //vp.w
           // camera.viewportHeight = vp.h
+        case cam:ManualCamera => ()
         case _ => camera.viewportWidth = vp.w
                   camera.viewportHeight = vp.h
       }
