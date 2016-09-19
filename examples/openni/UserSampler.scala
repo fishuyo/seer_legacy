@@ -19,6 +19,7 @@ object UserSampler extends SeerApp {
   OpenNI.initAll()
   OpenNI.start()
   OpenNI.pointCloud = true
+  OpenNI.pointCloudDensity = 2
 
   val loop = new UserLoop()
   val out = ListBuffer[User]()

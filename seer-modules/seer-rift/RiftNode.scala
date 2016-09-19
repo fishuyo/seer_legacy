@@ -3,6 +3,7 @@ package com.fishuyo.seer
 
 import graphics._
 import spatial._
+import io._
 
 import com.oculusvr.capi.Hmd
 import com.oculusvr.capi.OvrLibrary
@@ -21,37 +22,37 @@ import org.lwjgl.opengl.GL11._
 
 // example SeerApp usage
 //
-// object Main extends SeerApp {
-//   // Window.w0 = 960 //780
-//   // Window.h0 = 540 //438
-//   val models = for(i <- -3 to 3; j <- -3 to 3; k <- -3 to 3) yield {
-//     val m = Cube().translate(i,j,k).scale(0.1)
-//     m.material.specular()
-//     m
-//   }
+object RiftTest extends SeerApp {
+  // Window.w0 = 960 //780
+  // Window.h0 = 540 //438
+  val models = for(i <- -3 to 3; j <- -3 to 3; k <- -3 to 3) yield {
+    val m = Cube().translate(i,j,k).scale(0.1)
+    m.material.specular()
+    m
+  }
 
-//   override def init(){
-//     // com.badlogic.gdx.Gdx.graphics.setVSync(true)
-//     // DesktopApp.app.resize(780,438)
-//     // println(Rift.hmd)
+  override def init(){
+    // com.badlogic.gdx.Gdx.graphics.setVSync(true)
+    // DesktopApp.app.resize(780,438)
+    // println(Rift.hmd)
 
-//     // DesktopApp.toggleFullscreen
+    // DesktopApp.toggleFullscreen
 
-//     RenderGraph.clear
-//     RenderGraph += new RiftNode
-//   }
+    RenderGraph.clear
+    RenderGraph += new RiftNode
+  }
 
-//   override def draw(){
-//     FPS.print
-//     models.foreach(_.draw)
-//   }
-//   override def animate(dt:Float){
-//     Camera.step(dt)
-//     RenderGraph.roots(0).renderer.camera.nav.set( Camera.nav )
-//     models.foreach(_.rotate(0.01,0.01,.02))
-//   }
+  override def draw(){
+    FPS.print
+    models.foreach(_.draw)
+  }
+  override def animate(dt:Float){
+    // Camera.step(dt)
+    // RenderGraph.roots(0).renderer.camera.nav.set( Camera.nav )
+    models.foreach(_.rotate(0.01,0.01,.02))
+  }
 
-// }
+}
 
 
 class RiftNode extends RenderNode {
@@ -61,6 +62,10 @@ class RiftNode extends RenderNode {
 
   DesktopApp.toggleFullscreen
 
+  val nav0 = Nav()
+  val navMove = Nav()
+  Keyboard.bindNav(nav0)
+  Keyboard.bindNav(navMove)
 
   var hmd:Hmd = initHmd()
   hmd.configureTracking(ovrTrackingCap_Orientation | ovrTrackingCap_Position | ovrTrackingCap_MagYawCorrection, 0)
@@ -157,6 +162,8 @@ class RiftNode extends RenderNode {
     val hswState = hmd.getHSWDisplayState()
     if (hswState.Displayed != 0) hmd.dismissHSWDisplay()
 
+    navMove.step(dt)
+    nav0.step(dt)
     renderer.animate(dt)
   }
 
@@ -193,8 +200,10 @@ class RiftNode extends RenderNode {
       val quat = Quat(pose.Orientation.w,pose.Orientation.x, pose.Orientation.y, pose.Orientation.z)// RH
 
       // Camera.nav.pos.set(matPos)
-      Camera.nav.quat.set(quat)
-      renderer.camera.nav.quat.set(quat)
+      // Camera.nav.quat.set(quat)
+      navMove.quat.set(quat)
+      renderer.camera.nav.quat.set(nav0.quat*quat)
+      renderer.camera.nav.pos.set(navMove.pos)
       renderer.camera.asInstanceOf[ManualCamera].projection.set(P).tra()
       renderer.camera.update
       
