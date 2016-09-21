@@ -3,8 +3,8 @@ package com.fishuyo.seer
 package audio
 
 import spatial._
-import graphics._
-import util._
+// import graphics._
+// import util._
 
 // import com.badlogic.gdx.graphics.Pixmap
 // import com.badlogic.gdx.graphics.{Texture => GdxTexture}

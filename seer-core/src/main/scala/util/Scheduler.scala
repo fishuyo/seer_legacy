@@ -10,6 +10,8 @@ import scala.concurrent.duration._
 
 import collection.mutable.ListBuffer
 
+import scala.language.postfixOps
+import scala.language.implicitConversions
 
 class Schedulable extends Cancellable with Animatable{
 	var cancelled = false

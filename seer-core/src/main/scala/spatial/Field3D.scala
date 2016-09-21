@@ -34,7 +34,7 @@ class VecField3D( var n:Int, cen:Vec3=Vec3(0), hsize:Float=1f)  extends AABB(cen
   }
 
   def update(p:Vec3, v:Vec3){
-    if( !contains(p) ) return Vec3(0)
+    if( !contains(p) ) return
     val nv = ((p-center) + Vec3(halfsize)) * (n-1) / (2*halfsize)
     //println( "vecfield3d get: " + nv )
     if( nv.x >= n-1 ) nv.x = n - 1.001f
@@ -61,7 +61,7 @@ class VecField3D( var n:Int, cen:Vec3=Vec3(0), hsize:Float=1f)  extends AABB(cen
   def set(i:Int, v:Vec3) = data(i) = v
   def sset(x:Int,y:Int,z:Int, v:Vec3)= if(!(x<0||x>=n||y<0||y>=n||z<0||z>=n)) data(z*n*n + y*n + x) = v
 
-  def clear = for( i<-(0 until n*n*n)) set(i, Vec3(0))
+  def clear() = for( i<-(0 until n*n*n)) set(i, Vec3(0))
 
   def binAt( v:Vec3 ):Option[Vec3] = {
     if( !contains(v) ) None

@@ -8,7 +8,9 @@ import rx.async._
 import rx.async.Platform._
 import scala.concurrent.duration._
 
-class Sampler[T:ClassManifest](val in:Rx[T])(implicit ownerCtx: rx.Ctx.Owner){
+import scala.language.postfixOps
+
+class Sampler[T:scala.reflect.ClassTag](val in:Rx[T])(implicit ownerCtx: rx.Ctx.Owner){
 
   val buffer = new LoopBuffer[T](1000)
   val out = Var[T](in.now)

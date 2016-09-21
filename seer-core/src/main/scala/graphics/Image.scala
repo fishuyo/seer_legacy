@@ -2,9 +2,9 @@
 package com.fishuyo.seer
 package graphics
 
-import java.nio.Buffer
+// import java.nio.Buffer
 import java.nio.ByteBuffer
-import java.nio.FloatBuffer
+// import java.nio.FloatBuffer
 import java.nio.ByteOrder
 
 object Image {

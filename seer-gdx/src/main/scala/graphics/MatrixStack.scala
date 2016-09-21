@@ -5,14 +5,12 @@ package graphics
 import spatial._
 import spatial._
 
-import collection.immutable.Stack
-
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Quaternion
 
 object MatrixStack {
 
-	var stack = new Stack[Matrix4]()
+	var stack = List[Matrix4]()
 	var model = new Matrix4()
 	var projModelView = new Matrix4()
   var modelView = new Matrix4()
@@ -22,8 +20,8 @@ object MatrixStack {
   var worldPose = Pose()
   var worldScale = Vec3(1)
 
-	def push(){ stack = stack.push(new Matrix4(model)) }
-	def pop(){ model = stack.top; stack = stack.pop }
+	def push(){ stack = new Matrix4(model) :: stack }
+	def pop(){ model = stack.head; stack = stack.tail }
 
   def translate(x:Float,y:Float,z:Float){ translate(Vec3(x,y,z)) }
 	def translate(p:Vec3){
@@ -51,7 +49,7 @@ object MatrixStack {
 		Matrix4.mul(model.`val`, m.`val`)
 	}
 
-	def clear() = { stack = new Stack[Matrix4](); model.idt; transform(worldPose,worldScale) }
+	def clear() = { stack = List[Matrix4](); model.idt; transform(worldPose,worldScale) }
 	def setIdentity() = model.idt
 
 	def apply(camera:NavCamera=Camera) = {
@@ -74,15 +72,15 @@ object MatrixStack {
 
 object ColorStack {
 
-	var stack = new Stack[HSV]()
+	var stack = List[HSV]()
 	var hsv = HSV(0,1,1)
 
-	def push(){ stack = stack.push(HSV(hsv)) }
-	def pop(){ hsv = stack.top; stack = stack.pop }
+	def push(){ stack = HSV(hsv) :: stack }
+	def pop(){ hsv = stack.head; stack = stack.tail }
 
 	def transform(c:HSV){
 		hsv *= c
 	}
 
-	def clear() = { stack = new Stack[HSV]() }
+	def clear() = { stack = List[HSV]() }
 }

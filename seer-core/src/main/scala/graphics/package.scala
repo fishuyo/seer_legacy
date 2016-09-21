@@ -1,5 +1,6 @@
 
 package com.fishuyo.seer
+import scala.language.implicitConversions
 
 package object graphics {
 

@@ -4,7 +4,7 @@ package examples.opencv
 import graphics._
 import io._
 import spatial._
-import dynamic._
+// import dynamic._
 import cv._
 
 import scala.collection.mutable.ListBuffer

@@ -32,9 +32,9 @@ object Keyboard extends Keyboard {
 }
 
 class Keyboard extends InputAdapter {
-  val key = Var('\0')
-  val up = Var('\0')
-  val down = Var('\0')
+  val key = Var('\u0000')
+  val up = Var('\u0000')
+  val down = Var('\u0000')
   var observing = List[Obs]()
 
   var callbacks = Map[Char,List[()=>Unit]]()
@@ -69,13 +69,13 @@ class Keyboard extends InputAdapter {
   }
 
   override def keyTyped(k:Char) = {
-    key.Internal.value = '\0' // make rx propogate even if same key
+    key.Internal.value = '\u0000' // make rx propogate even if same key
     key() = k
     typedCallbacks.foreach((f) => f(k))
     false
   }
   override def keyDown(k:Int) = {
-    var c = '\0'
+    var c = '\u0000'
     if(k >= Keys.A && k <= Keys.Z) c = (k+68).toChar
     else if(k >= Keys.NUM_0 && k <= Keys.NUM_9) c = (k+41).toChar
     down() = c
@@ -84,7 +84,7 @@ class Keyboard extends InputAdapter {
   override def keyUp(k:Int) = {
     val c = (k+68).toChar
     up() = c
-    down() = '\0'
+    down() = '\u0000'
     false
   }
 }

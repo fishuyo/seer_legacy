@@ -4,6 +4,8 @@ package spatial.numerics
 
 import scala.math.Numeric._
 
+import scala.language.implicitConversions
+
 object Floating {
   trait ExtraImplicits {
     implicit def infixFloatingOps[T](x: T)(implicit num: Floating[T]): Floating[T]#FloatingOps =

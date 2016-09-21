@@ -1,4 +1,3 @@
-// package seer.unmanaged
 
 import sbt._
 
@@ -7,18 +6,11 @@ import Keys._
 
 object SeerUnmanagedLibs {
 
-  val downloadLibs = TaskKey[Unit]("download-libs", "Downloads/Updates required libs")
-  val updateLibgdx = TaskKey[Unit]("update-gdx", "Updates libgdx")
-
-  val downloadTask = downloadLibs <<= streams map { (s: TaskStreams) =>
-    doDownloadLibs(s)
-  }
-
-  val updateGdxTask = updateLibgdx <<= streams map { (s: TaskStreams) =>
-    doUpdateLibgdx(s)
-  }
+  lazy val downloadLibs = taskKey[Unit]("Downloads unmanaged libs and puts them where needed.")
+  val downloadTask = downloadLibs <<= streams map { (s: TaskStreams) => doDownloadLibs(s) }
 
   def doDownloadLibs(s:TaskStreams) = {
+  // downloadLibs := {
     import Process._
     import java.io._
     import java.net.URL
@@ -29,7 +21,7 @@ object SeerUnmanagedLibs {
     val zipFile = new java.io.File(zipName)
 
     // Fetch the file.
-    s.log.info("Pulling %s" format(zipName))
+    println(s"Pulling $zipName")
     val url = new URL("%s/%s" format(baseUrl, zipName))
     IO.download(url, zipFile)
 
@@ -64,69 +56,7 @@ object SeerUnmanagedLibs {
 
     // Destroy the file.
     // zipFile.delete
-    s.log.info("Complete")
+    println("downloadLibs Complete.")
   }
   
-  def doUpdateLibgdx(s:TaskStreams) = {
-    import Process._
-    import java.io._
-    import java.net.URL
-    
-    // Declare names
-    val baseUrl = "http://libgdx.badlogicgames.com/releases"
-    val gdxName = "libgdx-1.6.0" //"libgdx-1.4.1"
-    // val baseUrl = "http://libgdx.badlogicgames.com/nightlies"
-    // val gdxName = "libgdx-nightly-latest"
-
-    // Fetch the file.
-    s.log.info("Pulling %s" format(gdxName))
-    s.log.warn("This may take a few minutes...")
-    val zipName = "%s.zip" format(gdxName)
-    val zipFile = new java.io.File(zipName)
-    val url = new URL("%s/%s" format(baseUrl, zipName))
-    IO.download(url, zipFile)
-
-    s.log.info("Extracting..")
-
-    // Extract jars into their respective lib folders.
-    val commonDest = file("seer-gdx/lib")
-    val commonFilter = new ExactFilter("gdx.jar")
-    IO.unzip(zipFile, commonDest, commonFilter)
-
-    val desktopDest = file("seer-gdx/seer-gdx-desktop-app/lib")
-    val desktopFilter = new ExactFilter("gdx-natives.jar") |
-                        new ExactFilter("gdx-backend-lwjgl.jar") |
-                        new ExactFilter("gdx-backend-lwjgl-natives.jar")
-                        // new ExactFilter("gdx-backend-jglfw.jar") |
-                        // new ExactFilter("gdx-backend-jglfw-natives.jar") //|
-                        // new ExactFilter("gdx-tools.jar")
-    IO.unzip(zipFile, desktopDest, desktopFilter)
-
-    val bulletDest = file("seer-modules/seer-bullet/lib")
-    val bulletFilter = new ExactFilter("extensions/gdx-bullet/gdx-bullet.jar") |
-                        new ExactFilter("extensions/gdx-bullet/gdx-bullet-natives.jar")
-    IO.unzip(zipFile, bulletDest, bulletFilter)
-
-    val box2dDest = file("seer-modules/seer-box2d/lib")
-    val box2dFilter = new ExactFilter("extensions/gdx-box2d/gdx-box2d.jar") |
-                        new ExactFilter("extensions/gdx-box2d/gdx-box2d-natives.jar")
-    IO.unzip(zipFile, box2dDest, box2dFilter)
-
-    // val androidDest = file("apps/android/loop/src/main/libs")
-    // val androidFilter = new ExactFilter("gdx-backend-android.jar") |
-    // new ExactFilter("armeabi/libgdx.so") |
-    // new ExactFilter("armeabi/libandroidgl20.so") |
-    // new ExactFilter("armeabi-v7a/libgdx.so") |
-    // new ExactFilter("armeabi-v7a/libandroidgl20.so") |
-    // commonFilter
-    // IO.unzip(zipFile, androidDest, androidFilter)
-    //check this copy?
-    //IO.copyFile( (androidDest+"gdx-backend-android.jar").asFile , "android/lib/".asFile )
-
-    // Destroy the file.
-    zipFile.delete
-    s.log.info("Complete")
-  }
-
-
 }

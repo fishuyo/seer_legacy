@@ -30,15 +30,15 @@ package object util{
 	//   v1*(1f-t)+v2*t
 	// }
 
-	class AutoMapper(var outlow:Float, var outhigh:Float){
-		var (inl,inh) = (0f,1f)
-		def apply(v:Float) = {
-			if( v < inl) inl = v
-			if( v > inh) inh = v
-			map(v,inl,inh,outlow,outhigh)	
-		}
-	}
-	def automapper(outlow:Float,outhigh:Float) = new AutoMapper(outlow,outhigh)
+	// class AutoMapper(var outlow:Float, var outhigh:Float){
+	// 	var (inl,inh) = (0f,1f)
+	// 	def apply(v:Float) = {
+	// 		if( v < inl) inl = v
+	// 		if( v > inh) inh = v
+	// 		map(v,inl,inh,outlow,outhigh)	
+	// 	}
+	// }
+	// def automapper(outlow:Float,outhigh:Float) = new AutoMapper(outlow,outhigh)
 
 	@inline def map(value: Float, inlow: Float, inhigh: Float, outlow:Float, outhigh:Float): Float = {
 	  val tmp = (value - inlow) / (inhigh-inlow)
@@ -63,18 +63,18 @@ package object util{
 	/**
    * This method makes a "deep clone" of any Java object it is given.
    */
-  def deepClone(obj:Object){
-   try {
-     val baos = new ByteArrayOutputStream();
-     val oos = new ObjectOutputStream(baos);
-     oos.writeObject(obj);
-     val bais = new ByteArrayInputStream(baos.toByteArray());
-     val ois = new ObjectInputStream(bais);
-     return ois.readObject();
-   }catch{ case e:Exception =>
-     e.printStackTrace();
-     return null;
-   }
-  }
+  // def deepClone(obj:Object) = {
+  //  try {
+  //    val baos = new ByteArrayOutputStream();
+  //    val oos = new ObjectOutputStream(baos);
+  //    oos.writeObject(obj);
+  //    val bais = new ByteArrayInputStream(baos.toByteArray());
+  //    val ois = new ObjectInputStream(bais);
+  //    return ois.readObject();
+  //  }catch{ case e:Exception =>
+  //    e.printStackTrace();
+  //    return null;
+  //  }
+  // }
 
 }

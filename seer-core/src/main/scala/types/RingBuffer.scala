@@ -8,7 +8,7 @@ package types
 
 import collection.mutable.ArrayBuffer
 
-class RingBuffer[A: ClassManifest](val maxSize: Int) extends Seq[A] {
+class RingBuffer[A: scala.reflect.ClassTag](val maxSize: Int) extends Seq[A] {
   val array = new Array[A](maxSize)
   var read = 0
   var write = 0
@@ -107,7 +107,7 @@ class RingBuffer[A: ClassManifest](val maxSize: Int) extends Seq[A] {
 }
 
 
-class LoopBuffer[A: ClassManifest](override val maxSize:Int) extends RingBuffer[A](maxSize){
+class LoopBuffer[A: scala.reflect.ClassTag](override val maxSize:Int) extends RingBuffer[A](maxSize){
 
 	private var pos = 0
 

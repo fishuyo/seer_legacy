@@ -50,7 +50,7 @@ object AudioPassInputLatencyCorrection extends AudioSource {
   val ms = (Audio().sampleRate * .200f).toInt
   val b = Array(new RingBuffer[Float](ms), new RingBuffer[Float](ms))
 
-  var latency = 0.06
+  var latency = 0.06f
   var offset = 0
 
   def resetLatency(f:Float){

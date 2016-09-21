@@ -56,7 +56,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
 
   def conj = Quat( w, -x,-y,-z )
   def sgn = Quat(w,x,y,z).normalize
-  def inverse = sgn conj
+  def inverse = sgn.conj
   def recip = conj / magSq   
 
   def zero() = {w=0;x=0;y=0;z=0;this}

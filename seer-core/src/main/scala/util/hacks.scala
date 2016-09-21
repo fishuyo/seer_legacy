@@ -17,8 +17,8 @@ object Hack{
     }
   } catch {
     case _: IllegalAccessException =>
-      error("Insufficient permissions; can't modify private variables.")
+      sys.error("Insufficient permissions; can't modify private variables.")
     case _: NoSuchFieldException =>
-      error("JVM implementation incompatible with path hack")
+      sys.error("JVM implementation incompatible with path hack")
   }
 }
