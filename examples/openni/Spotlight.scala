@@ -40,6 +40,7 @@ object Spotlight extends SeerApp {
 
   Keyboard.bind("g", () => Camera.nav.pos.set(0,0,0))
   Keyboard.bind("b", () => println(s"bounds: $min $max ${(max+min)/2.0f}"))
+  Keyboard.bind("r", () => OpenNI.resetTracking)
 
   override def draw(){
     FPS.print

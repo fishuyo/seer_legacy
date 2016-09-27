@@ -17,6 +17,12 @@ object System {
     system
   }
   def update(s:ActorSystem) = system = s
+
+  def broadcast(msg:Any){
+    val sys = apply()
+    val ref = sys.actorSelection("/user/live.*")
+    ref ! msg
+  }
 }
 
 object ActorSystemManager {

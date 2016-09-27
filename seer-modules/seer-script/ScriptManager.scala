@@ -40,9 +40,11 @@ object ScriptManager {
 
   val imports = ListBuffer[String]()
   imports += "com.fishuyo.seer._"
-  imports += "com.fishuyo.seer.graphics._"
   imports += "com.fishuyo.seer.dynamic._"
+  imports += "com.fishuyo.seer.actor._"
   imports += "com.fishuyo.seer.spatial._"
+  imports += "com.fishuyo.seer.graphics._"
+  imports += "com.fishuyo.seer.audio._"
   imports += "com.fishuyo.seer.io._"
   imports += "com.fishuyo.seer.util._"
 
@@ -146,7 +148,7 @@ class ScriptManagerActor extends Actor with ActorLogging {
       } else {
         log.error("Invalid path..")
       }  
-    case x => log.warning("Received unknown message: {}", x)
+    case x => () //log.warning("Received unknown message: {}", x)
   }
 
   def logToolboxErrorLocation(){

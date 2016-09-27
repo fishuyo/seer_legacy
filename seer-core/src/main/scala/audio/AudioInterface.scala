@@ -10,6 +10,10 @@ import de.sciss.synth.io._
 object Audio {
   var interface:Option[AudioInterface] = None
   def apply() = interface.getOrElse({ interface = Some(new NullAudioInterface()); interface.get })
+
+  lazy val out = new Gen {
+    def apply() = 0f
+  } 
 }
 
 class NullAudioInterface extends AudioInterface {

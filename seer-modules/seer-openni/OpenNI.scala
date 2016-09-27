@@ -148,6 +148,13 @@ object OpenNI {
     } catch { case e:Exception => println(s"OpenNI.initTracking: $e") }
   }
 
+  def resetTracking(){
+    users.values.foreach { case u =>
+      skeletonCap.reset(u.id)
+      skeletonCap.startTracking(u.id)
+    }
+  }
+
   def initAll(){
     initDepth()
     initRGB()
@@ -318,6 +325,7 @@ object OpenNI {
               val vs = ps.map(point3DtoVec3(_))
               pointMeshes(i).clear
               pointMeshes(i).vertices ++= vs
+              getUser(i).points = vs
             }            
 
           } else {
@@ -328,11 +336,22 @@ object OpenNI {
             val vs = ps.map(point3DtoVec3(_))
             pointMesh.clear
             pointMesh.vertices ++= vs
+            users.values.foreach( _.points = vs )
             // rem = (rem+2) % 4     
           }
         }
 
       }
+
+      callbacks.values.foreach{ case f =>  
+        val users = getTrackedUsers().toList
+        users.foreach{ case u => 
+          u.skeleton.updateJoints 
+          u.skeleton.updateBones
+        }
+        f(users)
+      }
+
     } catch { case e:Exception => e.printStackTrace(); }
   }
 
@@ -345,6 +364,7 @@ object OpenNI {
   def getUser(id:Int) = users.getOrElseUpdate(id, new User(id))
 
   def getTrackedSkeleton() = skeletons.filter( _._2.tracking ).head._2
+  def getTrackedUsers() = users.filter( _._2.tracking ).values
 
 
 
@@ -356,6 +376,17 @@ object OpenNI {
     // (v, jpos.getConfidence)
     v
   }
+
+  val callbacks = HashMap[String, PartialFunction[List[User],Unit]]()
+  def listen(p:PartialFunction[List[User],Unit])(implicit name:String){
+    if(!connected){
+      initAll()
+      start()
+      pointCloud = true
+    }
+    callbacks(name) = p
+  }
+  def unlisten(name:String) = callbacks.remove(name)
 
 }
 

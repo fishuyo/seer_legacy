@@ -103,7 +103,7 @@ object SeerBuild extends Build {
     settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_portaudio)
 
   lazy val examples_live = project.in(file("examples/live")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_portaudio)
+    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio)
 
   lazy val examples_particle = project.in(file("examples/particle")).
     settings(app: _*).dependsOn(seer_gdx_desktop_app)
@@ -119,6 +119,9 @@ object SeerBuild extends Build {
 
   lazy val examples_openni = project.in(file("examples/openni")).
     settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_openni)
+
+  lazy val examples_iclc = project.in(file("examples/iclc")).
+    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio, seer_openni)
 
 }
 

@@ -90,24 +90,27 @@ trait ScriptLoader {
     importString + code
   }
 
-  def load(){ //just using reload only
-    try{
-      obj = compile()
-      // println(s"load $obj")
-      obj match {
-        case s:SeerScript =>
-          s.load()
-          loaded = true
-        case a:ActorRef =>
-          a ! "load"
-          loaded = true
-        case l:List[ActorRef] =>
-          l.foreach{ case a => a ! "load" }
-          loaded = true
-        case _ => println("Unrecognized return value from script.")
-      }
-    } catch { case e:Exception => loaded = false; println(e.getMessage) } 
-  }
+  // def load(){ //just using reload only
+  //   try{
+  //     obj = compile()
+  //     // println(s"load $obj")
+  //     obj match {
+  //       case s:SeerScript =>
+  //         s.load()
+  //         loaded = true
+  //       case a:ActorRef =>
+  //         a ! "load"
+  //         loaded = true
+  //       case l:List[ActorRef] =>
+  //         l.foreach{ case a => a ! "load" }
+  //         loaded = true
+  //       case c:Class[_]  =>
+  //         val name = c.getSimpleName
+  //         println( s"got class: $name")
+  //       case obj => println(s"Unrecognized return value from script: $obj")
+  //     }
+  //   } catch { case e:Exception => loaded = false; println(e.getMessage) } 
+  // }
   def reload(){
     try{
       // obj match {
@@ -132,7 +135,18 @@ trait ScriptLoader {
           obj = ret
           l.foreach{ case a => a ! "load" }
           loaded = true
-        case _ => println("Unrecognized return value from script.")
+        case c:Class[_] if c.getSuperclass == classOf[SeerActor] =>
+          val r = ".*\\$(.*)\\$.".r
+          val r(simple) = c.getName
+          // println( s"got class: $simple")
+          val a = System().actorOf( SeerActor.props(c), s"live.$simple.${util.Random.int()}" )
+          unload
+          obj = a
+          a ! SeerActor.Name(simple)
+          a ! "load"
+          loaded = true
+        case obj => println(s"Unrecognized return value from script: $obj")
+
       }
     } catch { case e:Exception => loaded = false; println(e.getMessage) }
   }

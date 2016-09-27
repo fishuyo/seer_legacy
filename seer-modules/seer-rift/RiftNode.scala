@@ -201,7 +201,7 @@ class RiftNode extends RenderNode {
 
       // Camera.nav.pos.set(matPos)
       // Camera.nav.quat.set(quat)
-      navMove.quat.set(quat)
+      navMove.quat.set(nav0.quat*quat)
       renderer.camera.nav.quat.set(nav0.quat*quat)
       renderer.camera.nav.pos.set(navMove.pos)
       renderer.camera.asInstanceOf[ManualCamera].projection.set(P).tra()

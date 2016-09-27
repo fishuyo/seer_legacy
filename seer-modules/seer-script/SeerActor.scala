@@ -8,20 +8,30 @@ import audio._
 import akka.actor._
 import akka.event.Logging
 
-// object SeerActor {
-//   def actorOf(a:SeerActor, name:String) = System().actorOf(Props(a), name)
-//   def props = Props(new SeerActor())
-//   def props(a:SeerActor) = Props(a)
-// }
+object SeerActor {
+  def props(c:Class[_]) = Props(c)
+
+  case class Name(n:String)
+}
 
 class SeerActor extends Actor with ActorLogging with Animatable with AudioSource {
+  import SeerActor._
+
+  implicit var name = "default"
+
   def receive = {
-    case "load" => 
-      Scene.push(this)
-      Audio().push(this)
-    case "unload" =>
-      Scene.remove(this)
-      Audio().sources -= this
+    case "load" => load()
+    case "unload" => unload()
+    case Name(n) => name = n
+  }
+
+  def load(){
+    Scene.push(this)
+    Audio().push(this)
+  }
+  def unload(){
+    Scene.remove(this)
+    Audio().sources -= this
   }
 }
 

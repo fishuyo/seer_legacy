@@ -10,7 +10,8 @@ trait Gen extends AudioSource {
 
   var value = 0f
 
-	def apply():Float
+  def apply():Float
+	def apply(in:Float):Float = apply()
 
 	override def audioIO( io:AudioIOBuffer ){ 
     while(io()){
@@ -50,6 +51,11 @@ trait Gen extends AudioSource {
   }
   def unary_-(g:Gen) = new Gen{ def apply() = -self.apply() }
 
+  def >>(g:Gen):Gen = g match {
+    case Audio.out => Audio().sources += self; new Gen{ def apply()=0f }    // return dummy Gen.. hacky
+    case _ => new Gen{ def apply() = g(self.apply()) }
+  }
+
 }
 
 /**
@@ -64,11 +70,16 @@ class Osc(var f:Gen) extends Gen{
     phase %= 1f
     phase
   }
+  override def apply(in:Float) = { 
+    f = in
+    apply()
+  }
 }
 
 /**
   * Inefficient sin wave oscillator
   */
+object Sine { def apply(f:Float=440f, a:Float=1f) = new Sine(f,a) }
 class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
   override def apply() = {
     super.apply()
@@ -171,7 +182,7 @@ class Ramp(start:Float, end:Float, len:Int) extends Gen {
 class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen {
   val ring = new types.LoopBuffer[Float](maxDelay)
 
-  def apply(in:Float) = {
+  override def apply(in:Float) = {
     val d = delay().toInt
     if(d > 0 && d <= maxDelay) ring.count_ = d
     val s = in + ring() * c()

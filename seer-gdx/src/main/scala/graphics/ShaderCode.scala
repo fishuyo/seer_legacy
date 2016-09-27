@@ -86,7 +86,7 @@ object DefaultShaders {
         vec3 flen = u_cameraPosition.xyz - pos.xyz;
         float fog = dot(flen, flen); // * u_cameraPosition.w;
         // v_fog = min(fog, 1.0);
-        float fogDensity = 0.04;
+        float fogDensity = 0.035;
         v_fog = 1.0-clamp(exp(-pow(fogDensity*length(flen), 2.0)), 0.0, 1.0);
 
         gl_Position = u_projectionViewMatrix * vec4(a_position,1); 

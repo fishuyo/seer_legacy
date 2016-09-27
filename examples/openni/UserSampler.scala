@@ -39,12 +39,12 @@ object UserSampler extends SeerApp {
     val users = OpenNI.users.values.filter(_.tracking)
     users.foreach { case user => 
       user.skeleton.updateJoints
-      user.points.clear 
+      // user.points.clear 
     }
 
     try{
       // hack to put point data in user object for now
-      if(!users.isEmpty) users.head.points ++= OpenNI.pointMesh.vertices
+      // if(!users.isEmpty) users.head.points ++= OpenNI.pointMesh.vertices
       
       // copy users
       val in = ListBuffer[User]()

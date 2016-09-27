@@ -79,6 +79,31 @@ class Skeleton(val id:Int) {
     }
   }
 
+  def head = joints("head")
+  def neck = joints("neck")
+  def torso = joints("torso")
+  def waist = joints("waist")
+  def l_collar = joints("l_collar")
+  def l_shoulder = joints("l_shoulder")
+  def l_elbow = joints("l_elbow")
+  def l_wrist = joints("l_wrist")
+  def l_hand = joints("l_hand")
+  def l_fingers = joints("l_fingers")
+  def r_collar = joints("r_collar")
+  def r_shoulder = joints("r_shoulder")
+  def r_elbow = joints("r_elbow")
+  def r_wrist = joints("r_wrist")
+  def r_hand = joints("r_hand")
+  def r_fingers = joints("r_fingers")
+  def l_hip = joints("l_hip")
+  def l_knee = joints("l_knee")
+  def l_ankle = joints("l_ankle")
+  def l_foot = joints("l_foot")
+  def r_hip = joints("r_hip")
+  def r_knee = joints("r_knee")
+  def r_ankle = joints("r_ankle")
+  def r_foot = joints("r_foot")
+
 }
 
 object Joint {

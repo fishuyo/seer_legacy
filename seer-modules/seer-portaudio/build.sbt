@@ -5,6 +5,6 @@ resolvers in ThisBuild ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
-  "com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT"
+  //"com.github.rjeschke" % "jpa" % "0.1-SNAPSHOT",
+  //"com.github.rjeschke" % "jpa-macos" % "0.1-SNAPSHOT"
 )
