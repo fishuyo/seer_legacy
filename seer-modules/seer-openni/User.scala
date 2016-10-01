@@ -30,7 +30,7 @@ class User(val id:Int){
 
   var skeleton = OpenNI.getSkeleton(id)
 
-  var points = Array[Vec3]()
+  var points = ArrayBuffer[Vec3]()
 
   // val mask = Image(OpenNI.w,OpenNI.h,1,1)
   // val maskBufferSafe = mask.buffer.duplicate

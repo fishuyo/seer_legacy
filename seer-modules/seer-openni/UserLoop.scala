@@ -92,7 +92,7 @@ class UserLoop {
       }
     }
 
-    if( frames.length > 0) out ++= frames(frame.toInt)
+    if( frames.length > 0 && playing) out ++= frames(frame.toInt)
   }
 
 
@@ -112,6 +112,7 @@ class UserLoop {
       case m => println("Invert failed!" + m + " " + m.getClass.getSimpleName)
     }
     if(res.isDefined) frames = res.get
+    bis.close()
   }
   def save(){
     import java.io._

@@ -151,6 +151,7 @@ class Impulse extends Gen {
   def apply() = { val s=value; value=0f; s}
 }
 
+object Noise { def apply() = new Noise }
 class Noise extends Gen {
   def apply() = util.Random.float()
 }
@@ -192,6 +193,21 @@ class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen 
   def apply = apply(0f)
 } 
 
+
+class StereoPanner(in:Gen, var pan:Gen = 0.5f) extends Gen {
+  override def apply() = {
+    in()
+  }
+
+  override def audioIO( io:AudioIOBuffer ){ 
+    while(io()){
+      val s = apply()
+      val p = pan()
+      io.outSum(0)(s*(1-p))
+      io.outSum(1)(s*p)
+    }
+  }
+}
 
 // //class Val(var)
 

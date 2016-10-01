@@ -55,6 +55,7 @@ object RiftTest extends SeerApp {
 }
 
 
+object RiftNode extends RiftNode
 class RiftNode extends RenderNode {
   // renderer.clear = false
   renderer.camera = new ManualCamera

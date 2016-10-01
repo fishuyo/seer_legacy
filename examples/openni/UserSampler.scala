@@ -19,7 +19,7 @@ object UserSampler extends SeerApp {
   OpenNI.initAll()
   OpenNI.start()
   OpenNI.pointCloud = true
-  OpenNI.pointCloudDensity = 2
+  OpenNI.pointCloudDensity = 4
 
   val loop = new UserLoop()
   val out = ListBuffer[User]()
@@ -84,6 +84,14 @@ object UserSampler extends SeerApp {
   Keyboard.bind("l", () => {
     // loop.load("2016-03-14-18.07.26.bin")
     loop.load("../../../dailyworlds/emily_fela_dance.bin")
+  })
+  Keyboard.bind("y", () => {
+    loop.frames.trimStart(loop.frame)
+    loop.frame = 0
+  })
+  Keyboard.bind("u", () => {
+    loop.frames.trimEnd(looploop.frame)
+    loop.frame = 0
   })
 
 

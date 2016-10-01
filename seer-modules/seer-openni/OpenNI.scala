@@ -24,17 +24,16 @@ object OpenNI {
 
   val (w,h) = (640, 480)
   var connected = false
-  var depth, rgb, tracking, pointCloud = false
-  var pointCloudEach = false
-  var flipCamera = false
+  var depth, rgb, tracking, running = false
+  var pointCloud, pointCloudEach = false
+  var flipCamera, mirror = false
   var offset = Vec3()
-	var context:Context = _
 
+	var context:Context = _
   var depthGen:DepthGenerator = _
   var depthMD:DepthMetaData = _
   var imageGen:ImageGenerator = _
 	var imageMD:ImageMetaData = _
-
 	var userGen:UserGenerator = _
 	var skeletonCap:SkeletonCapability = _
 	var poseDetectionCap:PoseDetectionCapability = _
@@ -111,7 +110,7 @@ object OpenNI {
 	}
 
   def initDepth(){
-    if(!connect()) return
+    if(!connect() || depth) return
     try{
       depthGen = DepthGenerator.create(context)
       depthMD = depthGen.getMetaData()
@@ -119,7 +118,7 @@ object OpenNI {
     } catch { case e:Exception => println(s"OpenNI.initDepth: $e") }
   }
   def initRGB(){
-    if(!connect()) return
+    if(!connect() || rgb) return
     try{
       imageGen = ImageGenerator.create(context)
       imageMD = imageGen.getMetaData()
@@ -134,6 +133,7 @@ object OpenNI {
   }
 
   def initTracking(){
+    if(tracking) return
     if(!depth) initDepth()
     try {
     userGen = UserGenerator.create(context)
@@ -325,7 +325,7 @@ object OpenNI {
               val vs = ps.map(point3DtoVec3(_))
               pointMeshes(i).clear
               pointMeshes(i).vertices ++= vs
-              getUser(i).points = vs
+              getUser(i).points = (ArrayBuffer[Vec3]() ++= vs)
             }            
 
           } else {
@@ -336,7 +336,7 @@ object OpenNI {
             val vs = ps.map(point3DtoVec3(_))
             pointMesh.clear
             pointMesh.vertices ++= vs
-            users.values.foreach( _.points = vs )
+            users.values.foreach( _.points = (ArrayBuffer[Vec3]() ++= vs) )
             // rem = (rem+2) % 4     
           }
         }
@@ -356,8 +356,11 @@ object OpenNI {
   }
 
   def point3DtoVec3(p:Point3D) = {
-    if(flipCamera) Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + offset
-    else Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + offset
+    var v:Vec3 = null
+    if(flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + offset
+    else v= Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + offset
+    if(mirror) v.x *= -1
+    v
   }
 
   def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))

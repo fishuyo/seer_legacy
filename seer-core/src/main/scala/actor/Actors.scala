@@ -23,6 +23,11 @@ object System {
     val ref = sys.actorSelection("/user/live.*")
     ref ! msg
   }
+  def send(actor:String, msg:Any){
+    val sys = apply()
+    val ref = sys.actorSelection(s"/user/live.$actor.*")
+    ref ! msg
+  }
 }
 
 object ActorSystemManager {
