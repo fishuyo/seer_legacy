@@ -71,28 +71,30 @@ object UserSampler extends SeerApp {
 
   var speed = 1f
   implicit val ctx = rx.Ctx.Owner.Unsafe
-  Keyboard.bind("r", () => loop.toggleRecord() )
-  Keyboard.bind("t", () => loop.togglePlay() )
-  Keyboard.bind("x", () => loop.stack() )
-  Keyboard.bind("c", () => loop.clear() )
-  Keyboard.bind("\t", () => loop.reverse() )
-  // Keyboard.bind("j", () => loop.setAlphaBeta(1f,.99f) )
-  Keyboard.bind("i", () => {speed *=2; loop.setSpeed(speed) })
-  Keyboard.bind("k", () => {speed /=2; loop.setSpeed(speed) })
+  Keyboard.bindTyped( (c) => c match {
+    case 'r' => loop.toggleRecord()
+    case 't' => loop.togglePlay()
+    case 'x' => loop.stack()
+    case 'c' => loop.clear()
+    case '\t' => loop.reverse()
+    case 'i' => speed *=2; loop.setSpeed(speed)
+    case 'k' => speed /=2; loop.setSpeed(speed)
+    case 'o' => loop.save()
+    case 'l' => 
+      // loop.load("2016-09-29-23.23.09.bin") //left off
+      // loop.load("2016-09-29-23.20.19.bin") //spin powerful
+      // loop.load("2016-09-29-23.18.26.bin") //twist bounce meh 
 
-  Keyboard.bind("o", () => loop.save())
-  Keyboard.bind("l", () => {
-    // loop.load("2016-03-14-18.07.26.bin")
-    loop.load("../../../dailyworlds/emily_fela_dance.bin")
+    case 'y' =>
+      loop.frames.trimStart(loop.frame.toInt)
+      loop.frame = 0
+    case 'u' =>
+      loop.frames.trimEnd(loop.frames.length-1 - loop.frame.toInt)
+      loop.frame = 0
+
+    case _ => ()
   })
-  Keyboard.bind("y", () => {
-    loop.frames.trimStart(loop.frame)
-    loop.frame = 0
-  })
-  Keyboard.bind("u", () => {
-    loop.frames.trimEnd(looploop.frame)
-    loop.frame = 0
-  })
+
 
 
 }

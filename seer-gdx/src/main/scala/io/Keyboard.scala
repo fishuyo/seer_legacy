@@ -46,7 +46,7 @@ class Keyboard extends InputAdapter {
   def use() = Inputs.add(this)
   def remove() = Inputs.remove(this)
 
-  def bind(s:String, f: =>Unit)(implicit ctx: Ctx.Owner){
+  def bind(s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner){
     val k = s.charAt(0)
     observing = key.trigger {
       // println(key.now)
@@ -56,11 +56,11 @@ class Keyboard extends InputAdapter {
     } :: observing
   }
 
-  def bindDown( s:String, f: =>Unit)(implicit ctx: Ctx.Owner) = {
+  def bindDown( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
     val k = s.charAt(0)
     observing = down.trigger { if( down.now == k ) f } :: observing
   }
-  def bindUp( s:String, f: =>Unit)(implicit ctx: Ctx.Owner) = {
+  def bindUp( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
     val k = s.charAt(0)
     observing = up.trigger { if( up.now == k ) f } :: observing
   }

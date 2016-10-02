@@ -114,6 +114,7 @@ object OpenNI {
     try{
       depthGen = DepthGenerator.create(context)
       depthMD = depthGen.getMetaData()
+      println(s"OpenNI.initDepth")
       depth = true
     } catch { case e:Exception => println(s"OpenNI.initDepth: $e") }
   }
@@ -122,6 +123,7 @@ object OpenNI {
     try{
       imageGen = ImageGenerator.create(context)
       imageMD = imageGen.getMetaData()
+      println(s"OpenNI.initRGB")
       rgb = true
     } catch { case e:Exception => println(s"OpenNI.initRGB: $e") }
   }
@@ -144,6 +146,7 @@ object OpenNI {
     userGen.getLostUserEvent().addObserver(new LostUserObserver())
     skeletonCap.getCalibrationCompleteEvent().addObserver(new CalibrationObserver());
     skeletonCap.setSkeletonProfile(SkeletonProfile.ALL);
+    println(s"OpenNI.initTracking")  
     tracking = true
     } catch { case e:Exception => println(s"OpenNI.initTracking: $e") }
   }
@@ -397,7 +400,7 @@ object OpenNI {
 class OpenNIActor extends Actor with ActorLogging {
   var running = false
   def receive = {
-    case "start" => if(!running){ running = true; self ! "update" }
+    case "start" => if(!running){ println("OpenNIActor started."); running = true; self ! "update" }
     case "update" => if(running){ OpenNI.update(); self ! "update" }
     case "stop" => running = false;
     case _ => ()
