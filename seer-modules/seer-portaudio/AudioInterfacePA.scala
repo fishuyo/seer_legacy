@@ -14,12 +14,12 @@ import com.github.rjeschke.jpa._
 
 object PortAudio extends AudioInterface {
 
-  val in = Array(new Array[Float](bufferSize))
+  // val in = Array(new Array[Float](bufferSize))
 
-  val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
-  val outInterleaved = new Array[Float](bufferSize*channelsOut)
+  // val out = Array(new Array[Float](bufferSize), new Array[Float](bufferSize))
+  // val outInterleaved = new Array[Float](bufferSize*channelsOut)
 
-  val ioBuffer = new AudioIOBuffer(channelsIn,channelsOut,bufferSize,in,out)
+  // val ioBuffer = new AudioIOBuffer(channelsIn,channelsOut,bufferSize,in,out)
 
   var callback = new PaCallback {
   	def paCallback(paIn:PaBuffer, paOut:PaBuffer, nframes:Int){

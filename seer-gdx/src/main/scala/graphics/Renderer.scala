@@ -26,7 +26,7 @@ class Renderer {
   var camera:NavCamera = new OrthographicCamera(2,2)
   var scene = new Scene 
   var environment = new Environment
-  var shader = Shader.load(DefaultShaders.basic) //new Shader
+  var shader = Shader("basic") //Shader.load("basic") DefaultShaders.basic) //new Shader
 
   var active = true
   var clear = true

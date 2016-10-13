@@ -15,33 +15,35 @@ import io._
 	*/
 object LiveShader extends SeerApp {
 
-	// Render node encapsulates a scene, camera, and shader
-	val node = new RenderNode 
-
-	// load and automatically reload shader live.vert / live.frag
-	var shader = Shader.load("shaders/live")
-	shader.monitor()
-	node.renderer.shader = shader
-
-	// add a screen filling quad to the scene		
-	node.renderer.scene.push( Plane() )
-
-	// add render node to the Scene graph to have it be rendered
-	RenderGraph.addNode(node) 
-
 	// to use as uniforms
 	var t = 0f 
 	var zoom = 1f 
 	var mouse = Vec2()
+	var shader:Shader = _
 
 	override def init(){
 		// shader = Shader.load("live", File("shaders/live.vert"),File("shaders/live.frag"))
 		// shader.monitor
+
+		// Render node encapsulates a scene, camera, and shader
+		val node = new RenderNode 
+
+		// load and automatically reload shader live.vert / live.frag
+		shader = Shader.load("live", "shaders/live")
+		shader.monitor()
+		node.renderer.shader = shader
+
+		// add a screen filling quad to the scene		
+		node.renderer.scene.push( Plane() )
+
+		// add render node to the Scene graph to have it be rendered
+		RenderGraph.addNode(node) 
+
 	}
 
 	// since the RenderNode has been added to the Scene Graph
 	// we don't need to draw anything here
-	override def draw(){}
+	override def draw(){ FPS.print }
 
 	override def animate(dt:Float){
 		t += dt

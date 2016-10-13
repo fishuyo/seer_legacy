@@ -17,7 +17,11 @@ import com.badlogic.gdx.math.Vector2
 
 import rx._
 
-object Mouse extends InputAdapter {
+object Mouse extends Mouse {
+  def apply() = new Mouse
+}
+
+class Mouse extends InputAdapter {
 	type Callback = (Array[Int])=>Unit
 	var callbacks = Map[String,List[Callback]]()
 	callbacks += ("up" -> List())
@@ -26,15 +30,20 @@ object Mouse extends InputAdapter {
 	callbacks += ("move" -> List())
 	callbacks += ("scroll" -> List())
 
+  val pfuncs = ListBuffer[PartialFunction[Any,Unit]]()
+  val nullfunc:PartialFunction[Any,Unit] = { case _ => () }
+  type Event = List[Any] //Event(name:String,x:Float,y:Float,dx:Float,dy:Float,button:Int,scroll:Float)
+
+
   use()
 
 	val xy = Var(Vec2())
-  val x = xy.map(_.x)
-  val y = xy.map(_.y)
+  val x = Var(0f) //xy.map(_.x)
+  val y = Var(0f) //xy.map(_.y)
 
   val vel = Var(Vec2())
-  val dx = vel.map(_.x)
-  val dy = vel.map(_.y)
+  val dx = Var(0f) //vel.map(_.x)
+  val dy = Var(0f) //vel.map(_.y)
 
 	val id = Var(0)
 	val button = Var(0)
@@ -52,12 +61,20 @@ object Mouse extends InputAdapter {
 
 	def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())	
 
+  def listen(f:PartialFunction[Any,Unit]) = pfuncs += f
+
 	def update(sx:Int, sy:Int, stat:String){ //(implicit data:Ctx.Data){
     status() = stat
     val lx = x.now
     val ly = y.now
 		xy() = Vec2(sx * 1f / Window.width, 1f - (sy * 1f / Window.height))
+    x() = xy.now.x
+    y() = xy.now.y
     vel() = Vec2(x.now - lx, y.now - ly)
+    dx() = vel.now.x
+    dy() = vel.now.y
+    val e = List(stat, x.now, y.now, dx.now, dy.now)
+    pfuncs.foreach( (f) => f.orElse(nullfunc).apply( e ))
 	}
   override def touchUp( sx:Int, sy:Int, pointer:Int, but:Int) = {
 		update(sx,sy,"up")

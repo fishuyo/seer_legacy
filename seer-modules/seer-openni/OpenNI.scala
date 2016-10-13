@@ -20,6 +20,17 @@ import org.openni.SkeletonJoint._
 import akka.actor._
 import akka.event.Logging
 
+
+class OpenNIListener {
+  var callback:PartialFunction[List[User],Unit] = _ 
+  def listen(f:PartialFunction[List[User],Unit]){
+    callback = f
+    OpenNI.listen(this)
+  }
+  def remove() = OpenNI.remove(this)
+}
+
+
 object OpenNI {
 
   val (w,h) = (640, 480)
@@ -346,13 +357,14 @@ object OpenNI {
 
       }
 
-      callbacks.values.foreach{ case f =>  
-        val users = getTrackedUsers().toList
-        users.foreach{ case u => 
+      val us = getTrackedUsers().toList
+      if( callbacks.size > 0 || listeners.length > 0){
+        us.foreach{ case u => 
           u.skeleton.updateJoints 
           u.skeleton.updateBones
-        }
-        f(users)
+        }  
+        callbacks.values.foreach{ case f => f(us) }
+        listeners.foreach{ case l => l.callback(us) }    
       }
 
     } catch { case e:Exception => e.printStackTrace(); }
@@ -384,6 +396,19 @@ object OpenNI {
   }
 
   val callbacks = HashMap[String, PartialFunction[List[User],Unit]]()
+  val listeners = ListBuffer[OpenNIListener]()
+  val nullfunc:PartialFunction[List[User],Unit] = { case _ => () }
+
+  def listen(l:OpenNIListener){
+    if(!connected){
+      initAll()
+      start()
+      pointCloud = true
+    }
+    listeners += l
+  }
+  def remove(l:OpenNIListener) = listeners -= l
+
   def listen(p:PartialFunction[List[User],Unit])(implicit name:String){
     if(!connected){
       initAll()
@@ -392,7 +417,7 @@ object OpenNI {
     }
     callbacks(name) = p
   }
-  def unlisten(name:String) = callbacks.remove(name)
+  def remove(name:String) = if(callbacks.contains(name)) callbacks.remove(name)
 
 }
 

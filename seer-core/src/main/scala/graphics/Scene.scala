@@ -4,12 +4,23 @@ package graphics
 import spatial._
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashMap
 
 
 /**
   * Singleton scene object to contain list of scene drawables
   */ 
-object Scene extends Scene
+object Scene extends Scene {
+
+  val loadedScenes = new HashMap[String,Scene]()
+
+  def apply() = new Scene
+  def apply(name:String) = loadedScenes.getOrElseUpdate(name, new Scene) 
+
+  def become(name:String) = {
+
+  }
+}
 
 /**
   * A Scene contains animatable / drawable models to be rendered by a Renderer
@@ -26,6 +37,7 @@ class Scene {
     case d:Animatable => animatable += d; drawable += d
     case d:Drawable => drawable += d
   } 
+  def -=(o:Any){ remove(o) }
   def remove(o:Any) = o match {
     case d:Animatable => animatable -= d; drawable -= d
     case d:Drawable => drawable -= d

@@ -10,6 +10,7 @@ import scala.collection.mutable.ListBuffer
   * uses framebuffer targets, a nodes output framebuffer
   * is bound to corresponding input texture of next node
   */
+object RenderNode{ def apply() = new RenderNode }
 class RenderNode(var renderer:Renderer = new Renderer()) {
   
   val inputs = new ListBuffer[RenderNode]
@@ -26,6 +27,13 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
 
   def bindTarget() = if( buffer.isDefined ) buffer.get.begin()
   def unbindTarget() = if( buffer.isDefined ) buffer.get.end(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight())
+
+  def reset(){
+    if(buffer.isDefined) buffer.get.dispose
+    buffer = None
+    outputs.clear
+    inputs.clear
+  }
 
   def resize(vp:Viewport){
     renderer.resize(vp)
@@ -46,6 +54,12 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
     node.addInput(this)
   }
   def >>(node:RenderNode){ outputTo(node) }
+  def >>(i:Int)(node:RenderNode){
+    createBuffer()
+    outputs += node
+    if(node.inputs.length > i) node.inputs(i) = this
+    else node.inputs += this //XXX this isn't right..
+  }
   def <<(node:RenderNode){ node.outputTo(this) }
 
   def animate(dt:Float){
@@ -75,7 +89,7 @@ object ScreenNode extends ScreenNode
 class ScreenNode extends RenderNode {
   // clear = false
   renderer.scene.push(Plane())
-  renderer.shader = Shader.load(DefaultShaders.texture)
+  renderer.shader = Shader.load("texture",DefaultShaders.texture)
 }
 
 /**
@@ -92,7 +106,7 @@ class TextureNode(var texture:Texture) extends RenderNode {
 class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends RenderNode {
   var mode = 0
   renderer.scene.push(Plane())
-  renderer.shader = Shader.load(DefaultShaders.composite)
+  renderer.shader = Shader.load("composite",DefaultShaders.composite)
   override def render(){
     renderer.shader.uniforms("u_blend0") = blend0
     renderer.shader.uniforms("u_blend1") = blend1
@@ -107,7 +121,7 @@ class Composite3Node(var blend0:Float=0.33f, var blend1:Float=0.33f, var blend2:
   var mode = 0
 
   renderer.scene.push(Plane())
-  renderer.shader = Shader.load(DefaultShaders.composite._1,
+  renderer.shader = Shader.load("composite3", DefaultShaders.composite._1,
     """
       #ifdef GL_ES
        precision mediump float;
@@ -226,7 +240,7 @@ class ColorizeNode extends RenderNode {
 
   renderer.scene.push(Plane())
 
-  renderer.shader = Shader.load(
+  renderer.shader = Shader.load("colorize",
     """
     attribute vec4 a_position;
     attribute vec4 a_normal;
@@ -313,7 +327,7 @@ class BlurNode extends RenderNode {
 
   renderer.scene.push(Plane())
 
-  renderer.shader = Shader.load(
+  renderer.shader = Shader.load("blur",
     """
     attribute vec4 a_position;
     attribute vec4 a_normal;

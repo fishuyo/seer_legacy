@@ -3,7 +3,7 @@ package com.fishuyo.seer
 package graphics
 
 import spatial._
-
+import util._
 import scala.collection.mutable.ListBuffer
 //import javax.media.opengl._
 
@@ -13,24 +13,62 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.{Texture => GdxTexture}
 
+import scala.concurrent.duration._
 
 object RootNode extends RenderNode {
   renderer.scene = Scene
   renderer.camera = Camera
-  renderer.shader = Shader.load(DefaultShaders.basic)
+  renderer.shader = Shader.load("basic",DefaultShaders.basic)
 
-  def reset(){
+  override def reset(){
     // reset root node state
     // renderer.shader = Shader.load(DefaultShaders.basic)
     renderer.environment.default()
     renderer.scene.clear
-    inputs.clear
-    outputs.clear
+    super.reset()
+  }
+}
+
+object Become {
+  def apply(name:String) = {
+    val scene = Scene(name)
+    val node = RenderGraph.roots.filter( _.renderer.scene == scene)
+    node.toList match {
+      case n :: ns => new Become(n)
+      case _ => println(s"Error no renderer node with scene $name in graph."); new Become(null)
+    }
+  }
+}
+class Become(node:RenderNode) {
+
+  def setup(){
+    if(node == null) return
+    Run.animate {
+      val c =  RenderGraph.compositor
+      c.inputs(0) = c.inputs(1)
+      c.inputs(1) = node
+      node.renderer.active = true
+    }
+  }
+  def now = {
+    setup()
+  }
+  def over(dur:FiniteDuration){
+    if(node == null) return
+    setup()
+    Schedule.over(dur){ case t => 
+      RenderGraph.compositor.xfade(t)
+      if(t == 1f) RenderGraph.compositor.inputs(0).renderer.active = false
+    }    
   }
 }
 
 object RenderGraph {
   val roots = ListBuffer[RenderNode]()
+
+  val compositor = new CompositeNode(0f,1f)
+  RootNode >> compositor
+  RootNode >> compositor
   // var root:RenderNode = new BasicNode
   // root.scene = Scene
   // root.camera = Camera
@@ -55,6 +93,7 @@ object RenderGraph {
     // n.renderer.scene.init()
   }
 
+  def -=(n:RenderNode){ removeNode(n) }
   def removeNode(n:RenderNode){
     //TODO cleanup inputs outputs
     roots -= n

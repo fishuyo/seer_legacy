@@ -36,6 +36,12 @@ trait AudioInterface {
   var outFile:AudioFile = null
 
   val sources = new ListBuffer[AudioSource]
+
+  val in = Array.ofDim[Float](channelsIn, bufferSize)
+  val out = Array.ofDim[Float](channelsOut, bufferSize)
+  val outInterleaved = new Array[Float](channelsOut * bufferSize)
+  val ioBuffer = new AudioIOBuffer(channelsIn, channelsOut, bufferSize, in, out)
+
   
   // add audio source
   def push(s:AudioSource) = sources += s

@@ -4,6 +4,8 @@ package audio
 
 import types.RingBuffer
 
+import collection.mutable.ListBuffer
+
 class AudioIOBuffer(
   val channelsIn:Int,
   val channelsOut:Int,
@@ -26,6 +28,17 @@ class AudioIOBuffer(
   def outSet(c:Int)(v:Float) = outputSamples(c)(index) = v
   def outSum(c:Int)(v:Float) = outputSamples(c)(index) += v
 
+  def *=(gain:Gen) = for(s <- 0 until bufferSize){
+    val g = gain()
+    outputSamples(0)(s) *= g
+    outputSamples(1)(s) *= g
+  }
+
+  def +=(buffer:AudioIOBuffer) = for(s <- 0 until bufferSize){
+    outputSamples(0)(s) += buffer.outputSamples(0)(s)
+    outputSamples(1)(s) += buffer.outputSamples(1)(s)
+  }
+
   override def clone() = new AudioIOBuffer(channelsIn,channelsOut,bufferSize, inputSamples.map(_.clone), outputSamples.map(_.clone))
   
 
@@ -34,6 +47,25 @@ class AudioIOBuffer(
 trait AudioSource {
   def audioIO( io:AudioIOBuffer ){}
   // def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){}
+}
+
+object AudioScene {
+  def apply() = new AudioScene
+}
+class AudioScene extends AudioSource {
+  val sources = ListBuffer[AudioSource]()
+  var gain:Gen = 1f
+  var buffer = Audio().ioBuffer.clone
+
+  def +=(s:AudioSource) = sources += s
+  def -=(s:AudioSource) = sources -= s
+
+  override def audioIO( io:AudioIOBuffer){
+    buffer.reset
+    sources.foreach { case s => s.audioIO(buffer); buffer.reset }
+    buffer *= gain
+    io += buffer
+  }
 }
 
 object AudioPass extends AudioSource {

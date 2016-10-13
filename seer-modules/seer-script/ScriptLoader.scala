@@ -138,11 +138,12 @@ trait ScriptLoader {
         case c:Class[_] if c.getSuperclass == classOf[SeerActor] =>
           val r = ".*\\$(.*)\\$.".r
           val r(simple) = c.getName
+          val id = s"live.$simple.${util.Random.int()}"
           // println( s"got class: $simple")
-          val a = System().actorOf( SeerActor.props(c), s"live.$simple.${util.Random.int()}" )
+          val a = System().actorOf( SeerActor.props(c), id )
           unload
           obj = a
-          a ! SeerActor.Name(simple)
+          a ! SeerActor.Name(id)
           a ! "load"
           loaded = true
         case obj => println(s"Unrecognized return value from script: $obj")

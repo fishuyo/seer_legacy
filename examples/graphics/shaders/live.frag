@@ -23,7 +23,7 @@ void main(){
     float m2 = 0.0;
     float co = 0.0;
 
-    for( int i=0; i<256; i++ ){
+    for( int i=0; i<64; i++ ){
         if( m2<1024.0 ){
             z = cc + vec2( z.x*z.x - z.y*z.y, 2.0*z.x*z.y );
             m2 = dot(z,z);

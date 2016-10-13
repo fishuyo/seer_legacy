@@ -52,8 +52,13 @@ trait Gen extends AudioSource {
   def unary_-(g:Gen) = new Gen{ def apply() = -self.apply() }
 
   def >>(g:Gen):Gen = g match {
+    // case scene if scene.getClass == classOf[AudioScene] => scene += self; new Gen{ def apply()=0f } // return dummy Gen.. hack..temporary
     case Audio.out => Audio().sources += self; new Gen{ def apply()=0f }    // return dummy Gen.. hacky
     case _ => new Gen{ def apply() = g(self.apply()) }
+  }
+
+  def >>(scene:AudioScene){
+    scene += self
   }
 
 }
@@ -168,6 +173,7 @@ class Add(var add:Float=1f) extends Gen{
 
 class Line(var begin:Float=0f, var end:Float=1f, var len:Float=44100) extends Add((end-begin)/len)
 
+object Ramp { def apply(s:Float,e:Float,l:Int) = new Ramp(s,e,l)}
 class Ramp(start:Float, end:Float, len:Int) extends Gen {
   var add = (end-start) / len
   value = start

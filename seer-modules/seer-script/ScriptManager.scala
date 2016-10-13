@@ -47,6 +47,10 @@ object ScriptManager {
   imports += "com.fishuyo.seer.audio._"
   imports += "com.fishuyo.seer.io._"
   imports += "com.fishuyo.seer.util._"
+  imports += "scala.concurrent.duration._"
+  imports += "collection.mutable.ListBuffer"
+  imports += "collection.mutable.ArrayBuffer"
+  imports += "collection.mutable.HashMap"
 
   def apply() = Await.result(manager ? Create(), 3 seconds).asInstanceOf[ActorRef]
 
