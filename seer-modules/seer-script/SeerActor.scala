@@ -29,11 +29,11 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   var camera = Camera
   var shader = Shader("basic")
   var node = RenderNode()
-  var xFadeTime = 5f
+  var xFadeTime = 1f
   updateRenderer()
 
   val Out = AudioScene()
-  var audioXFadeTime = 5f
+  var audioXFadeTime = 1f
   Out += this
 
   def receive = {

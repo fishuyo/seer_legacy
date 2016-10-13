@@ -60,6 +60,13 @@ class Environment {
     Gdx.gl.glLineWidth(lineWidth)
     // Gdx.gl.glPointSize(pointSize)
 
+    com.badlogic.gdx.Gdx.gl.glEnable( 0x8642 ); // enable gl_PointSize ???
+    com.badlogic.gdx.Gdx.gl.glEnable( 0x2848 ); // enable gl_linesmooth
+    com.badlogic.gdx.Gdx.gl.glEnable( 0x2832 ); // enable gl_linesmooth
+    // GL11.glEnable(GL11.GL_LINE_SMOOTH);
+    // GL11.glEnable(GL11.GL_POINT_SMOOTH);
+
+
     if(blend) Gdx.gl.glEnable(GL20.GL_BLEND)
     else Gdx.gl.glDisable( GL20.GL_BLEND )
     Gdx.gl.glBlendFunc(srcBlend, dstBlend)

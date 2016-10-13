@@ -39,6 +39,12 @@ class AudioIOBuffer(
     outputSamples(1)(s) += buffer.outputSamples(1)(s)
   }
 
+  def zero() = {
+    for( c <- (0 until channelsOut))
+      for( i <- (0 until bufferSize)) outputSamples(c)(i) = 0f
+  }
+
+
   override def clone() = new AudioIOBuffer(channelsIn,channelsOut,bufferSize, inputSamples.map(_.clone), outputSamples.map(_.clone))
   
 
@@ -62,6 +68,7 @@ class AudioScene extends AudioSource {
 
   override def audioIO( io:AudioIOBuffer){
     buffer.reset
+    buffer.zero
     sources.foreach { case s => s.audioIO(buffer); buffer.reset }
     buffer *= gain
     io += buffer

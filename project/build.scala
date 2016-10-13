@@ -31,13 +31,13 @@ object SeerSettings {
     ),
     scalacOptions ++= Seq(
       "-Xlint",
-      "-Ywarn-dead-code",
+      // "-Ywarn-dead-code",
       // "-Ywarn-value-discard",
       // "-Ywarn-numeric-widen",
       // "-Ywarn-unused",
       // "-Ywarn-unused-import",
-      "-unchecked",
-      "-deprecation",
+      // "-unchecked",
+      // "-deprecation",
       "-feature",
       "-encoding", "UTF-8",
       "-target:jvm-1.6"
@@ -91,37 +91,42 @@ object SeerBuild extends Build {
   lazy val seer_gdx_desktop_app = project.in(file("seer-gdx/seer-gdx-desktop-app")).
     settings(desktop: _*).dependsOn(seer_gdx)
 
+  //iclc
+  lazy val iclc = project.in(file("iclc")).settings(app: _*).
+    dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio, seer_openni, seer_tree)
+
   // examples
-  lazy val examples = project.in(file("examples")).settings(app: _*).
-    aggregate(examples_graphics, examples_audio, examples_live, examples_particle,
-      examples_trackpad, examples_video, examples_opencv, examples_openni)
+  // lazy val examples = project.in(file("examples/iclc")).settings(app: _*).
+  //   dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio, seer_openni)
+    //aggregate(examples_graphics, examples_audio, examples_live, examples_particle,
+     // examples_trackpad, examples_video, examples_opencv, examples_openni)
 
-  lazy val examples_graphics = project.in(file("examples/graphics")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_osx_multitouch)
+  // lazy val examples_graphics = project.in(file("examples/graphics")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_osx_multitouch)
 
-  lazy val examples_audio = project.in(file("examples/audio")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_portaudio)
+  // lazy val examples_audio = project.in(file("examples/audio")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_portaudio)
 
-  lazy val examples_live = project.in(file("examples/live")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio)
+  // lazy val examples_live = project.in(file("examples/live")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio)
 
-  lazy val examples_particle = project.in(file("examples/particle")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app)
+  // lazy val examples_particle = project.in(file("examples/particle")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app)
 
-  lazy val examples_trackpad = project.in(file("examples/trackpad")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_osx_multitouch)
+  // lazy val examples_trackpad = project.in(file("examples/trackpad")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_osx_multitouch)
 
-  lazy val examples_video = project.in(file("examples/video")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_video)
+  // lazy val examples_video = project.in(file("examples/video")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_video)
 
-  lazy val examples_opencv = project.in(file("examples/opencv")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_opencv)
+  // lazy val examples_opencv = project.in(file("examples/opencv")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_opencv)
 
-  lazy val examples_openni = project.in(file("examples/openni")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_openni)
+  // lazy val examples_openni = project.in(file("examples/openni")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_openni)
 
-  lazy val examples_iclc = project.in(file("examples/iclc")).
-    settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio, seer_openni)
+  // lazy val examples_iclc = project.in(file("examples/iclc")).
+  //   settings(app: _*).dependsOn(seer_gdx_desktop_app, seer_script, seer_portaudio, seer_openni)
 
 }
 

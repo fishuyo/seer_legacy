@@ -174,7 +174,7 @@ class Add(var add:Float=1f) extends Gen{
 class Line(var begin:Float=0f, var end:Float=1f, var len:Float=44100) extends Add((end-begin)/len)
 
 object Ramp { def apply(s:Float,e:Float,l:Int) = new Ramp(s,e,l)}
-class Ramp(start:Float, end:Float, len:Int) extends Gen {
+class Ramp(var start:Float, var end:Float, var len:Int) extends Gen {
   var add = (end-start) / len
   value = start
 
