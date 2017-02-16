@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "com.twitter" % "util-eval_2.11" % "6.29.0",
   //"org.scalameta" %% "scalameta" % "0.1.0-SNAPSHOT",
   //"org.scalameta" %% "scalahost" % "0.1.0-SNAPSHOT",
-  "org.scala-lang" % "scala-reflect" % "2.11.7",
-  "org.scala-lang" % "scala-compiler" % "2.11.7",
-  "org.scala-lang" % "scala-library" % "2.11.7"
+  "org.scala-lang" % "scala-reflect" % "2.11.8",
+  "org.scala-lang" % "scala-compiler" % "2.11.8",
+  "org.scala-lang" % "scala-library" % "2.11.8"
 )

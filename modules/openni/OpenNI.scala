@@ -71,11 +71,11 @@ object OpenNI {
   var debugBufferSafe:ByteBuffer = _ 
   var userMaskBufferSafe:ByteBuffer = userMaskImage.buffer.duplicate
 
-  val meshBuffer = new Mesh() 
-  val pointMesh = new Mesh()
+  val meshBuffer = new MeshLike() 
+  val pointMesh = new MeshLike()
   pointMesh.maxVertices = w*h
   pointMesh.primitive = Points
-  val pointMeshes = ArrayBuffer[Mesh]()
+  val pointMeshes = ArrayBuffer[MeshLike]()
 
   val pointBuffer = ArrayBuffer[Point3D]()
   val pointBuffers = ArrayBuffer[ArrayBuffer[Point3D]]()
@@ -83,7 +83,7 @@ object OpenNI {
   var pointCloudDensity = 4
 
   for( i <- 0 until 4){
-   pointMeshes += new Mesh
+   pointMeshes += new MeshLike
    pointMesh.maxVertices = w*h 
    pointMesh.primitive = Points 
    pointBuffers += ArrayBuffer[Point3D]()

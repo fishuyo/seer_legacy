@@ -8,7 +8,7 @@ import collection.mutable.ArrayBuffer
 
 
 /** MeshLike trait represents 3d mesh data interface */
-trait MeshLike extends Drawable with Serializable {
+class MeshLike extends Drawable with Serializable {
 
 	val vertices = new ArrayBuffer[Vec3]
 	val normals = new ArrayBuffer[Vec3]
