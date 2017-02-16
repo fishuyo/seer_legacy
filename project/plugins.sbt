@@ -1,3 +1,7 @@
+
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.14")
+
+
 //resolvers += Resolver.url("scalasbt snapshots", new
 //        URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns)
 
@@ -13,7 +17,7 @@
 
 
 
-resolvers += Resolver.url("scalasbt snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns)
+// resolvers += Resolver.url("scalasbt snapshots", new URL("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns)
 
 //addSbtPlugin("com.hanhuy.sbt" % "android-sdk-plugin" % "1.5.5")
 

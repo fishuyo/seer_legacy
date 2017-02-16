@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>The Scala.js Tutorial</title>
+  </head>
+  <body>
+
+    <!-- <div>
+      <canvas style="display:block; width:98vw; height:98vh" id="canvas" width="1280" height="800"/>
+    </div> -->
+
+    <!-- Include Scala.js compiled code -->
+    <script type="text/javascript" src="./target/scala-2.11/particle-fastopt.js"></script>
+    <!-- Include JavaScript dependencies -->
+    <script type="text/javascript" src="./target/scala-2.11/particle-jsdeps.js"></script>
+
+    <!-- Run tutorial.webapp.TutorialApp -->
+    <script type="text/javascript">
+      com.fishuyo.seer.js.WebGLApp().main();
+      // com.fishuyo.seer.js.WebGLApp().setCanvas(document.getElementById('canvas'));
+      // com.fishuyo.seer.js.WebGLApp().start();
+
+    </script>
+  </body>
+</html>
