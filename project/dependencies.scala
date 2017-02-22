@@ -4,12 +4,13 @@ import sbt._
 
 object Dependencies {
   // versions
-  val akkaV = "2.3.4" 
+  val akkaV = "2.4.17" //"2.3.4" 
   val libgdxV = "1.9.2"
 
   // libs
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaV
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaV
+  val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaV
   val spire = "org.spire-math" %% "spire" % "0.13.0"
   val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
 
@@ -18,7 +19,7 @@ object Dependencies {
   val coreD = Seq(
     //"com.lihaoyi" % "ammonite-repl" % "0.4.8" cross CrossVersion.full,
     //"com.lihaoyi" % "ammonite-sshd" % "0.4.8" cross CrossVersion.full,
-    akkaActor, akkaRemote,
+    akkaActor, akkaRemote, akkaStream,
     spire,
     "com.twitter" %% "chill" % "0.5.2",
     "com.twitter" %% "chill-bijection" % "0.5.2",
@@ -31,11 +32,13 @@ object Dependencies {
   )
 
   val gdxD = Seq(
+    akkaActor, akkaRemote, akkaStream,
     "com.badlogicgames.gdx" % "gdx" % libgdxV,
     parsers
   )
 
   val gdxAppDesktopD = Seq(
+    akkaActor, akkaRemote, akkaStream,
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % libgdxV,
     "com.badlogicgames.gdx" % "gdx-platform" % libgdxV classifier "natives-desktop"
   )

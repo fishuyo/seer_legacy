@@ -171,7 +171,7 @@ class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
   image.bytesPerChannel match {
     case 1 => dtype = GL20.GL_UNSIGNED_BYTE
     case 2 => dtype = GL20.GL_SHORT //GL20.GL_UNSIGNED_SHORT
-    case 4 => dtype = GL20.GL_UNSIGNED_INT
+    case 4 => dtype = GL20.GL_FLOAT //GL20.GL_UNSIGNED_INT
     case _ => ()
   }
 

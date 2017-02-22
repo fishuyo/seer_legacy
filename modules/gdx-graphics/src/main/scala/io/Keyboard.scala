@@ -15,6 +15,12 @@ import com.badlogic.gdx.input._
 
 import rx._
 
+import actor._
+import akka.actor._
+import akka.stream._
+import akka.stream.scaladsl._
+import scala.concurrent._
+
 object Keyboard extends Keyboard {
 
   def apply() = new Keyboard 
@@ -32,6 +38,19 @@ object Keyboard extends Keyboard {
 }
 
 class Keyboard extends InputAdapter {
+
+  implicit val system = System()
+  implicit val materializer = ActorMaterializer()
+
+  var _promise = Promise[Option[(Char,Char)]]()
+  def promise = _promise
+
+  val keypress = Source.unfoldAsync('\u0000'){
+    case s => 
+      promise.future
+  }
+  // keypress.map { c => println(c); c }.runWith( Sink.ignore )
+
   val key = Var('\u0000')
   val up = Var('\u0000')
   val down = Var('\u0000')
@@ -43,6 +62,18 @@ class Keyboard extends InputAdapter {
   val nullfunc:PartialFunction[Char,Unit] = { case _ => () }
 
   use()
+
+  val keyStream = Source
+    .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
+    .mapMaterializedValue(bindKeyEvent)
+
+  keyStream.map { c => println(c); c }.runWith( Sink.ignore )
+
+  def bindKeyEvent(a:ActorRef){
+    this.listen {
+      case c => a ! c
+    }
+  }
 
   def clear() = { observing.foreach( _.kill() ); observing = List(); typedCallbacks = List[(Char)=>Unit]()}
   def use() = Inputs.add(this)
@@ -77,6 +108,9 @@ class Keyboard extends InputAdapter {
     key() = k
     typedCallbacks.foreach((f) => f(k))
     pfuncs.foreach( (f) => f.orElse(nullfunc).apply(k) )
+    val p = promise
+    _promise = Promise[Option[(Char,Char)]]()
+    p.success(Some(k,k))
     false
   }
   override def keyDown(k:Int) = {

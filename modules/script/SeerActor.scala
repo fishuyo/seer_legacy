@@ -45,27 +45,29 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   def load(){
     scene += this
     Run.animate {
-      val c =  RenderGraph.compositor
-      node.>>(1)(c)
+      // val c =  RenderGraph.compositor
+      // node.>>(1)(c)
       RenderGraph += node
-      Schedule.over(xFadeTime seconds){ case t => c.xfade(t) }
+      // Schedule.over(xFadeTime seconds){ case t => c.xfade(t) }
     }
     Out.gain = Ramp(0f,1f,(44100 * audioXFadeTime).toInt )
     Audio().push(Out)
   }
   def unload(){
     Run.animate {
-      val c =  RenderGraph.compositor
-      node.>>(0)(c)
-      Schedule.after(xFadeTime seconds){ RenderGraph -= node; scene -= this }
+      // val c =  RenderGraph.compositor
+      // node.>>(0)(c)
+      // Schedule.after(xFadeTime seconds){ RenderGraph -= node; scene -= this }
+      RenderGraph -= node; scene -= this 
     }
     Out.gain = Ramp(Out.gain.value, 0f, (44100 * audioXFadeTime).toInt)
     Schedule.after(audioXFadeTime seconds){ 
       Audio().sources -= Out 
-      if(_keyboard.isDefined) _keyboard.get.remove
-      if(_mouse.isDefined) _mouse.get.remove
-      if(_openni.isDefined) _openni.get.remove
     }
+    if(_keyboard.isDefined) _keyboard.get.remove
+    if(_mouse.isDefined) _mouse.get.remove
+    if(_openni.isDefined) _openni.get.remove
+
     // shader.stopMonitor() ??
   }
 

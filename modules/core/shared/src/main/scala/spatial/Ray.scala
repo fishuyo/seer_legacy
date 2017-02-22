@@ -57,15 +57,3 @@ class Ray( val o: Vec3, val d: Vec3 ){
 
 	override def toString() = o + " -> " + d
 }
-
-//Intersection with Geometry
-
-// 1.0 Geometry.intersect( ray )
-
-// 2.0 intersect( Geometry, ray )
-
-// 3.0 ray.intersect( Geometry )
-
-
-// val ray = Camera.ray(x,y)
-// ray.intersect( )
