@@ -6,8 +6,8 @@ import spatial._
 import io._
 
 import openvrprovider._
-import org.joml.Matrix4f
-import org.joml.Vector3f
+import org.joml._ //Matrix4f
+// import org.joml.Vector3f
 // import com.sun.jna.Structure
 
 // import org.lwjgl.opengl.GL11
@@ -95,21 +95,30 @@ class OpenVRNode(val vrProvider:OpenVRProvider) extends RenderNode {
       val matView = new Matrix4f(eyePose).invert();
       val eyeProjection = vrProvider.vrState.getEyeProjectionMatrix(i);
       val matMVP = eyeProjection.mul(matView);
-      
+
+      val mat4 = new Array[Float](16)      
+      eyeProjection.get(mat4)
+
+      val pos = new Vector3f
+      eyePose.getTranslation(pos)
+
+      val q = new Quaternionf
+      eyePose.getNormalizedRotation(q)
+
       // shader.setUniformMatrix("MVP", false, matMVP);
 
       // val eye = hmd.EyeRenderOrder(i)
       // val P = projections(eye)
       // val pose = headPosesToUse(eye)
       
-      // val matPos = Vec3(-pose.Position.x, -pose.Position.y, -pose.Position.z)
-      // val quat = Quat(pose.Orientation.w,pose.Orientation.x, pose.Orientation.y, pose.Orientation.z)// RH
+      val matPos = Vec3(-pos.x, -pos.y, -pos.z)
+      val quat = Quat(q.w, q.x, q.y, q.z)// RH
 
-      // navMove.quat.set(nav0.quat*quat)
-      // renderer.camera.nav.quat.set(nav0.quat*quat)
-      // renderer.camera.nav.pos.set(navMove.pos)
-      // renderer.camera.asInstanceOf[ManualCamera].projection.set(eyeProjection).tra()
-      // renderer.camera.update
+      navMove.quat.set(nav0.quat*quat)
+      renderer.camera.nav.quat.set(nav0.quat*quat)
+      renderer.camera.nav.pos.set(matPos) //navMove.pos)
+      renderer.camera.asInstanceOf[ManualCamera].projection.set(mat4) //.tra()
+      renderer.camera.update
       
       // framebuffers(eye).begin()
       renderer.render()
