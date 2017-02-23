@@ -49,6 +49,11 @@ lazy val script = project.in(file("modules/script")).
   dependsOn(coreJVM, gdx_graphics, openni).
   settings(Common.settings: _*)
 
+lazy val openvr = project.in(file("modules/openvr")).
+  dependsOn(coreJVM, gdx_graphics, gdx_app_desktop).
+  settings(Common.settings: _*).
+  settings(libraryDependencies ++= Dependencies.openvrD)
+
 
 /**
 * EXAMPLES

@@ -48,4 +48,9 @@ object Dependencies {
     // "org.openpnp" % "opencv" % "2.4.13-0",
     parsers
   )
+
+  val openvrD = Seq(
+    "net.java.dev.jna" % "jna" % "3.5.0",
+    "org.joml" % "joml" % "1.8.1"
+  )
 }

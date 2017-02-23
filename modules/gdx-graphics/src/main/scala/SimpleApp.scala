@@ -101,6 +101,7 @@ class SeerAppListener extends ApplicationListener {
   }
   def dispose(){
     println("App dispose.")
+    System.exit(0)
   }
 
 }
