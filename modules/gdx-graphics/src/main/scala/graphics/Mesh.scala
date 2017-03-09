@@ -36,15 +36,15 @@ class Mesh extends MeshLike {
 		if( gdxMesh.isDefined ) return
 		
 		var attrs = Vector(VertexAttribute.Position)
-		if(normals.length > 0){
+		if(normals.length > 0 || hasNormals){
 			hasNormals = true
 			attrs = attrs :+ VertexAttribute.Normal
 		}
-		if(texCoords.length > 0){
+		if(texCoords.length > 0 || hasTexCoords){
 			hasTexCoords = true
 			attrs = attrs :+ VertexAttribute.TexCoords(0)
 		}
-		if(colors.length > 0){
+		if(colors.length > 0 || hasColors){
 			hasColors = true
 			attrs = attrs :+ VertexAttribute.ColorUnpacked
 		}
@@ -82,7 +82,8 @@ class Mesh extends MeshLike {
 		if( primitive == Lines && wireIndices.length > 0) count = math.min(wireIndices.length,maxIndices)
 		else if(indices.length > 0) count = math.min(indices.length,maxIndices)
 
-		if( hasColors ) Renderer().shader.uniforms("u_hasColor") = 1
+		// if( hasColors ) Renderer().shader.uniforms("u_hasColor") = 1
+		// else Renderer().shader.uniforms("u_hasColor") = 0
     gdxMesh.get.render(Renderer().shader(), primitive, 0, count )
 	}
 

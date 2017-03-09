@@ -8,8 +8,8 @@ lazy val seer = project.in(file(".")). //SeerUnmanagedLibs.downloadTask).
 * Core Modules
 */
 lazy val core = crossProject.in(file("modules/core")).
-  settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.coreD)
+  settings(Common.settings: _*)
+  // settings(libraryDependencies ++= Dependencies.coreD)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
@@ -54,10 +54,24 @@ lazy val openvr = project.in(file("modules/openvr")).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.openvrD)
 
+lazy val rift = project.in(file("modules/rift")).
+  dependsOn(coreJVM, gdx_graphics, gdx_app_desktop).
+  settings(Common.settings: _*)
+
+lazy val hid = project.in(file("modules/hid")).
+  dependsOn(coreJVM).
+  settings(Common.settings: _*).
+  settings(libraryDependencies ++= Dependencies.hidD)
+
+
 
 /**
 * EXAMPLES
 */
+lazy val examples = project.in(file("examples/jvm")).
+  dependsOn(gdx_app_desktop).
+  settings(Common.appSettings: _*)
+
 lazy val examples_graphics = project.in(file("examples/jvm/graphics")).
   dependsOn(gdx_app_desktop).
   settings(Common.appSettings: _*)
@@ -93,5 +107,15 @@ lazy val testJS = test.js.dependsOn(coreJS)
 //
 lazy val soma = project.in(file("works/soma")).
   dependsOn(gdx_app_desktop, openni, portaudio, script).
+  settings(Common.appSettings: _*)
+
+lazy val becominglightVR = project.in(file("works/becominglightVR")).
+  settings(Common.appSettings: _*).
+  dependsOn(gdx_app_desktop, portaudio, openni, script, rift)
+
+
+
+lazy val dailyworlds = project.in(file("dailyworlds")).
+  dependsOn(gdx_app_desktop, gdx_graphics, openni, portaudio, script).
   settings(Common.appSettings: _*)
 
