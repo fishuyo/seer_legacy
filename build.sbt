@@ -1,9 +1,4 @@
 
-
-lazy val seer = project.in(file(".")). //SeerUnmanagedLibs.downloadTask).
-  aggregate(coreJVM)
-
-
 /**
 * Core Modules
 */
@@ -64,58 +59,4 @@ lazy val hid = project.in(file("modules/hid")).
   settings(libraryDependencies ++= Dependencies.hidD)
 
 
-
-/**
-* EXAMPLES
-*/
-lazy val examples = project.in(file("examples/jvm")).
-  dependsOn(gdx_app_desktop).
-  settings(Common.appSettings: _*)
-
-lazy val examples_graphics = project.in(file("examples/jvm/graphics")).
-  dependsOn(gdx_app_desktop).
-  settings(Common.appSettings: _*)
-
-lazy val examples_openni = project.in(file("examples/jvm/openni")).
-  dependsOn(gdx_app_desktop, openni).
-  settings(Common.appSettings: _*)
-
-lazy val examples_opencv = project.in(file("examples/jvm/opencv")).
-  dependsOn(gdx_app_desktop, opencv).
-  settings(Common.appSettings: _*)
-
-lazy val examples_video = project.in(file("examples/jvm/video")).
-  dependsOn(gdx_app_desktop, video).
-  settings(Common.appSettings: _*)
-
-/**
-* EXAMPLES scalaJS
-*/
-lazy val examples_js_particle = project.in(file("examples/js/particle")).
-  dependsOn(coreJS).
-  settings(Common.jsSettings: _*)
-
-/**
-* EXAMPLE crossProject both JVM and JS versions
-*/
-lazy val test = crossProject.in(file("examples/test")).
-  settings(Common.settings: _*)
-lazy val testJVM = test.jvm.dependsOn(coreJVM)
-lazy val testJS = test.js.dependsOn(coreJS)
-
-
-//
-lazy val soma = project.in(file("works/soma")).
-  dependsOn(gdx_app_desktop, openni, portaudio, script).
-  settings(Common.appSettings: _*)
-
-lazy val becominglightVR = project.in(file("works/becominglightVR")).
-  settings(Common.appSettings: _*).
-  dependsOn(gdx_app_desktop, portaudio, openni, script, rift)
-
-
-
-lazy val dailyworlds = project.in(file("dailyworlds")).
-  dependsOn(gdx_app_desktop, gdx_graphics, openni, portaudio, script).
-  settings(Common.appSettings: _*)
 
