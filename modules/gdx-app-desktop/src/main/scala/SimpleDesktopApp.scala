@@ -68,6 +68,7 @@ object DesktopApp {
 
     cfg.setTitle("seer")
     cfg.setWindowedMode(Window.w0,Window.h0)
+    cfg.useVsync(false); //for openvr?
     cfg.setBackBufferConfig(8,8,8,8, 16, 0, 4)
     // cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels)
     // cfg.useGL30 = true

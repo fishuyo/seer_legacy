@@ -46,8 +46,8 @@ object Common {
     //   "net.sf.proguard" % "proguard-base" % "4.11" % "provided"
     // ),
     fork in Compile := true,
-    fork in run := true,
-    javaOptions in run += "-XstartOnFirstThread"
+    fork in run := true
+    // javaOptions in run += "-XstartOnFirstThread"
     // unmanagedResourceDirectories in Compile += file("android/assets"),
     // desktopJarName := "seer-app",
     // Tasks.assembly

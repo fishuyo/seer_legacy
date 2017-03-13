@@ -122,7 +122,7 @@ class OpenVRNode(val vrProvider:OpenVRProvider) extends RenderNode {
       
       // framebuffers(eye).begin()
       renderer.render()
-      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0)
+      // glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0)
       // framebuffers(eye).end()
     }
     

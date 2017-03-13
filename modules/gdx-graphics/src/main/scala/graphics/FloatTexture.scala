@@ -3,7 +3,7 @@ package com.badlogic.gdx.graphics.glutils
 import java.nio.FloatBuffer
 
 class DynamicFloatTexture(w:Int,h:Int) extends FloatTextureData(w,h){
-	def getBuffer() = buffer
+	override def getBuffer() = buffer
 	def setBuffer(b:FloatBuffer) = buffer = b
 
 	def this(w:Int,h:Int,b:FloatBuffer){
