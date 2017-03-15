@@ -34,7 +34,7 @@ lazy val openvr = project.in(file("modules/openvr")).
   settings(libraryDependencies ++= Dependencies.openvrD)
 
 lazy val gdx_vr = project.in(file("modules/gdx-vr")).
-  dependsOn(coreJVM, gdx_graphics, gdx_app_desktop).
+  dependsOn(core, graphics, app).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.openvrD)
 
