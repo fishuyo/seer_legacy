@@ -57,7 +57,7 @@ class ScriptDirectoryLoaderActor extends Actor with ActorLogging {
       
     // case Load => loader.load()
     // case Reload => loader.reload()
-    // case Unload => loader.unload()
+    case Unload | "unload" => scripts.values.foreach { case a => a ! Unload }
 
     case x => log.warning("Received unknown message: {}", x)
   }
