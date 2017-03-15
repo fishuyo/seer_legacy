@@ -57,6 +57,7 @@ object ScriptManager {
   def load(path:String, reloadOnChange:Boolean=true) = {
     val f = manager ? Path(path,reloadOnChange)
     val actor = Await.result(f, 3 seconds).asInstanceOf[ActorRef]
+    actor ! Load
     actor
   }
   def loadCode(code:String) = {
@@ -139,16 +140,22 @@ class ScriptManagerActor extends Actor with ActorLogging {
       val name = file.getName
       if(file.isDirectory){
         // log.info(s"create ScriptDirectoryLoaderActor for $path")
-        val loader = context.actorOf( Props[ScriptDirectoryLoaderActor], name)
-        dirs(name) = loader
-        loader ! Path(path,reload)
-        sender ! loader
+        if(dirs.isDefinedAt(name)) sender ! scripts(name)
+        else {
+          val loader = context.actorOf( Props[ScriptDirectoryLoaderActor], name)
+          dirs(name) = loader
+          loader ! Path(path,reload)
+          sender ! loader
+        }
       }else if(file.isFile){
-        val loader = context.actorOf( ScriptLoaderActor.props, name)
-        scripts(name) = loader
-        loader ! Path(path,reload)
-        loader ! Load
-        sender ! loader
+        if(scripts.isDefinedAt(name)) sender ! scripts(name)
+        else{
+          val loader = context.actorOf( ScriptLoaderActor.props, name)
+          scripts(name) = loader
+          loader ! Path(path,reload)
+          // loader ! Load
+          sender ! loader
+        }
       } else {
         log.error("Invalid path..")
       }  
