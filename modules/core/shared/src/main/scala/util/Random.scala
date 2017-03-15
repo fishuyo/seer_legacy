@@ -3,6 +3,7 @@ package com.fishuyo.seer
 package util
 
 import types.Generator
+import spatial.Vec2
 import spatial.Vec3
 import spatial.Quat
 import graphics.RGB
@@ -44,6 +45,14 @@ object Random {
 		for(x <- float(lo.x,hi.x);
 				y <- float(lo.y,hi.y);
 				z <- float(lo.z,hi.z)) yield Vec3(x,y,z)
+	}
+
+	val vec2 = new Generator[Vec2]{
+		def apply() = Vec2(float(-1f,1f)(),float(-1f,1f)())
+	}
+	def vec2(lo:Vec2, hi:Vec2): Generator[Vec2] = {
+		for(x <- float(lo.x,hi.x);
+				y <- float(lo.y,hi.y)) yield Vec2(x,y)
 	}
 
 	def quat = new Generator[Quat]{

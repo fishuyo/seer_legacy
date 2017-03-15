@@ -42,13 +42,13 @@ class Keyboard extends InputAdapter {
   implicit val system = System()
   implicit val materializer = ActorMaterializer()
 
-  var _promise = Promise[Option[(Char,Char)]]()
-  def promise = _promise
+  // var _promise = Promise[Option[(Char,Char)]]()
+  // def promise = _promise
 
-  val keypress = Source.unfoldAsync('\u0000'){
-    case s => 
-      promise.future
-  }
+  // val keypress = Source.unfoldAsync('\u0000'){
+  //   case s => 
+  //     promise.future
+  // }
   // keypress.map { c => println(c); c }.runWith( Sink.ignore )
 
   val key = Var('\u0000')
@@ -67,7 +67,7 @@ class Keyboard extends InputAdapter {
     .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
     .mapMaterializedValue(bindKeyEvent)
 
-  keyStream.map { c => println(c); c }.runWith( Sink.ignore )
+  // keyStream.map { c => println(c); c }.runWith( Sink.ignore )
 
   def bindKeyEvent(a:ActorRef){
     this.listen {
@@ -108,9 +108,9 @@ class Keyboard extends InputAdapter {
     key() = k
     typedCallbacks.foreach((f) => f(k))
     pfuncs.foreach( (f) => f.orElse(nullfunc).apply(k) )
-    val p = promise
-    _promise = Promise[Option[(Char,Char)]]()
-    p.success(Some(k,k))
+    // val p = promise
+    // _promise = Promise[Option[(Char,Char)]]()
+    // p.success(Some(k,k))
     false
   }
   override def keyDown(k:Int) = {

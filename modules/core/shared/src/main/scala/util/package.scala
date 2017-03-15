@@ -7,8 +7,14 @@ import java.io.ByteArrayInputStream
 import java.io.ObjectOutputStream
 import java.io.ObjectInputStream
 
+import scala.{specialized => sp}
 
 package object util{
+
+  import spire.math._
+  import spire.algebra._
+  import spire.implicits._
+
 
 	def clamper[@specialized(Int, Double) T : Ordering](low: T, high: T)(value:T): T = {
 	  import Ordered._
@@ -45,9 +51,20 @@ package object util{
 	  tmp*(outhigh-outlow) + outlow
 	}
 
-	@inline def lerp(v1:Float, v2:Float, t:Float): Float = {
+  @inline def lerp(v1:Float, v2:Float, t:Float): Float = {
+    v1*(1f-t)+v2*t
+  }
+
+  @inline def lerp(v1:spatial.Vec3, v2:spatial.Vec3, t:Float): spatial.Vec3 = {
 	  v1*(1f-t)+v2*t
 	}
+
+  // @inline def lerp[T: Numeric](v1:T, v2:T, t:Float): T = {
+  //   v1*(1-t)+v2*t
+  // }
+  // @inline def lerp[@sp(Float,Double) T:Numeric](v1:T, v2:T, t:Float): T = {
+  //   v1*(1-t)+v2*t
+  // }
 
 	@inline def wrap(v:Float,l:Float,h:Float):Float = {
 		if( v >= h) v - h + l

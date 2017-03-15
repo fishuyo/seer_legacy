@@ -68,4 +68,8 @@ object Dependencies {
     "net.java.dev.jna" % "jna" % "3.5.0",
     "org.joml" % "joml" % "1.8.1"
   )
+
+  val hidD = Seq(
+    "org.hid4java" % "hid4java" % "0.4.0"
+  )
 }

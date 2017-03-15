@@ -3,7 +3,6 @@ package com.fishuyo.seer
 package graphics
 
 import spatial._
-import spatial._
 import util._
 
 

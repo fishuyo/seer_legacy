@@ -25,7 +25,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   implicit var name = "default"
   var active = true
 
-  var scene = graphics.Scene()
+  var scene = Scene //graphics.Scene()
   var camera = Camera
   var shader = Shader("basic")
   var node = RenderNode()
@@ -43,11 +43,11 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   }
 
   def load(){
-    scene += this
     Run.animate {
       // val c =  RenderGraph.compositor
       // node.>>(1)(c)
-      RenderGraph += node
+      scene += this
+      // RenderGraph += node
       // Schedule.over(xFadeTime seconds){ case t => c.xfade(t) }
     }
     Out.gain = Ramp(0f,1f,(44100 * audioXFadeTime).toInt )
@@ -58,7 +58,8 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
       // val c =  RenderGraph.compositor
       // node.>>(0)(c)
       // Schedule.after(xFadeTime seconds){ RenderGraph -= node; scene -= this }
-      RenderGraph -= node; scene -= this 
+      // RenderGraph -= node
+      scene -= this 
     }
     Out.gain = Ramp(Out.gain.value, 0f, (44100 * audioXFadeTime).toInt)
     Schedule.after(audioXFadeTime seconds){ 

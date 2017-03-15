@@ -2,6 +2,8 @@
 package com.fishuyo.seer
 package spatial
 
+import spire.algebra._
+
 object Vec3 {
 
   def apply() = new Vec3(0,0,0)
@@ -15,6 +17,56 @@ object Vec3 {
   def apply(x:Float,v:Vec2) = new Vec3(x,v.x,v.y)
 
   def unapply( v: Vec3): Some[(Float,Float,Float)] = Some((v.x,v.y,v.z))
+
+  // implicit object Vec3IsField extends spire.algebra.Field[Vec3] {
+  //      // Members declared in spire.algebra.AdditiveGroup
+  //   def negate(x:Vec3):Vec3 = -x
+
+  //   // Members declared in spire.algebra.AdditiveMonoid
+  //   def zero:Vec3 = Vec3(0)
+
+  //   // Members declared in spire.algebra.AdditiveSemigroup
+  //   def plus(x:Vec3,y:Vec3):Vec3 = x + y
+
+  //   // Members declared in spire.algebra.EuclideanRing
+  //   def gcd(a:Vec3,b:Vec3):Vec3 = a*b
+  //   def mod(a:Vec3,b:Vec3):Vec3 = a/b
+  //   def quot(a:Vec3,b:Vec3):Vec3 = a/b
+
+  //   // Members declared in spire.algebra.MultiplicativeGroup
+  //   def div(x:Vec3,y:Vec3):Vec3 = x/y
+
+  //   // Members declared in spire.algebra.MultiplicativeMonoid
+  //   def one:Vec3 = Vec3(1)
+
+  //   // Members declared in spire.algebra.MultiplicativeSemigroup
+  //   def times(x:Vec3,y:Vec3):Vec3 = x*y
+  // }
+
+  // implicit object Vec3IsNumeric extends spire.math.Numeric[Vec3] {
+  //      // Members declared in spire.algebra.AdditiveGroup
+  //   def negate(x:Vec3):Vec3 = -x
+
+  //   // Members declared in spire.algebra.AdditiveMonoid
+  //   def zero:Vec3 = Vec3(0)
+
+  //   // Members declared in spire.algebra.AdditiveSemigroup
+  //   def plus(x:Vec3,y:Vec3):Vec3 = x + y
+
+  //   // Members declared in spire.algebra.EuclideanRing
+  //   def gcd(a:Vec3,b:Vec3):Vec3 = a*b
+  //   def mod(a:Vec3,b:Vec3):Vec3 = a/b
+  //   def quot(a:Vec3,b:Vec3):Vec3 = a/b
+
+  //   // Members declared in spire.algebra.MultiplicativeGroup
+  //   def div(x:Vec3,y:Vec3):Vec3 = x/y
+
+  //   // Members declared in spire.algebra.MultiplicativeMonoid
+  //   def one:Vec3 = Vec3(1)
+
+  //   // Members declared in spire.algebra.MultiplicativeSemigroup
+  //   def times(x:Vec3,y:Vec3):Vec3 = x*y
+  // }
 
   implicit object Vec3Numeric extends scala.math.Numeric[Vec3] {
     def plus(x: Vec3, y: Vec3) = x+y
@@ -49,6 +101,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   //def *=(ss: Double) = { val s = ss.toFloat; x*=s; y*=s; z*=s } 
   def *=(s: Float) = { x*=s; y*=s; z*=s }
   def *=(v: Vec3) = { x*=v.x; y*=v.y; z*=v.z}
+  def /(v: Vec3 ) = Vec3(x/v.x, y/v.y, z/v.z)
   def /(s: Float ) = Vec3(x/s, y/s, z/s)
   def /=(s: Float ) = {x/=s; y/=s; z/=s }
   
@@ -105,7 +158,57 @@ object Vec2 {
 
   def unapply(v: Vec2): Some[(Float,Float)] = Some((v.x,v.y))
 
-  implicit object Vec3Numeric extends scala.math.Numeric[Vec2] {
+  // implicit object Vec2IsField extends spire.algebra.Field[Vec2] {
+  //      // Members declared in spire.algebra.AdditiveGroup
+  //   def negate(x:Vec2):Vec2 = -x
+
+  //   // Members declared in spire.algebra.AdditiveMonoid
+  //   def zero:Vec2 = Vec2(0)
+
+  //   // Members declared in spire.algebra.AdditiveSemigroup
+  //   def plus(x:Vec2,y:Vec2):Vec2 = x + y
+
+  //   // Members declared in spire.algebra.EuclideanRing
+  //   def gcd(a:Vec2,b:Vec2):Vec2 = a*b
+  //   def mod(a:Vec2,b:Vec2):Vec2 = a/b
+  //   def quot(a:Vec2,b:Vec2):Vec2 = a/b
+
+  //   // Members declared in spire.algebra.MultiplicativeGroup
+  //   def div(x:Vec2,y:Vec2):Vec2 = x/y
+
+  //   // Members declared in spire.algebra.MultiplicativeMonoid
+  //   def one:Vec2 = Vec2(1)
+
+  //   // Members declared in spire.algebra.MultiplicativeSemigroup
+  //   def times(x:Vec2,y:Vec2):Vec2 = x*y
+  // }
+  // implicit object Vec2IsNumeric extends spire.math.Numeric[Vec2] {
+  //      // Members declared in spire.algebra.AdditiveGroup
+  //   def negate(x:Vec2):Vec2 = -x
+
+  //   // Members declared in spire.algebra.AdditiveMonoid
+  //   def zero:Vec2 = Vec2(0)
+
+  //   // Members declared in spire.algebra.AdditiveSemigroup
+  //   def plus(x:Vec2,y:Vec2):Vec2 = x + y
+
+  //   // Members declared in spire.algebra.EuclideanRing
+  //   def gcd(a:Vec2,b:Vec2):Vec2 = a*b
+  //   def mod(a:Vec2,b:Vec2):Vec2 = a/b
+  //   def quot(a:Vec2,b:Vec2):Vec2 = a/b
+
+  //   // Members declared in spire.algebra.MultiplicativeGroup
+  //   def div(x:Vec2,y:Vec2):Vec2 = x/y
+
+  //   // Members declared in spire.algebra.MultiplicativeMonoid
+  //   def one:Vec2 = Vec2(1)
+
+  //   // Members declared in spire.algebra.MultiplicativeSemigroup
+  //   def times(x:Vec2,y:Vec2):Vec2 = x*y
+  //   def +:(x:Vec2) =
+  // }
+
+  implicit object Vec2Numeric extends scala.math.Numeric[Vec2] {
     def plus(x: Vec2, y: Vec2) = x+y
     def minus(x: Vec2, y: Vec2) = x-y
     def times(x: Vec2, y: Vec2) = x*y
@@ -135,13 +238,14 @@ class Vec2( var x: Float, var y: Float ) extends Serializable {
   def *(s: Float ) = Vec2(s*x, s*y)
   def *(v: Vec2 ) = Vec2(v.x*x, v.y*y)
   def *=(s: Float) = { x*=s; y*=s}
+  def /(v: Vec2 ) = Vec2(x/v.x, y/v.y)
   def /(s: Float ) = Vec2(x/s, y/s)
   
   def dot(v: Vec2) : Float = x*v.x + y*v.y
   def cross( v: Vec2) = x*v.y - y*v.x
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
-  def normalize() = this *= (1.0f / mag() ) //fix this
+  def normalize() = {this *= (1.0f / mag() ); this}
   def normalized() = this * (1.0f / mag() )
 
   def zero() = {x=0;y=0}

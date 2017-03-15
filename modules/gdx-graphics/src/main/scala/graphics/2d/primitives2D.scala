@@ -3,7 +3,6 @@ package com.fishuyo.seer
 package graphics
 
 import spatial._
-import spatial._
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics._
@@ -56,6 +55,23 @@ object Circle extends ModelGenerator {
     for(i <-(0 to nt)){
       val x = r * math.cos(i * theta)
       val y = r * math.sin(i * theta)
+      mesh.vertices += Vec3(x,y,0)
+    }
+    mesh
+  }
+}
+
+object Primitive2D {
+
+  def addCircle(mesh:Mesh, r:Float, n:Int) = {
+    mesh.primitive = Lines
+    val theta = 2*Pi/n
+    for(i <- 0 until n){
+      var x = r * math.cos(i * theta)
+      var y = r * math.sin(i * theta)
+      mesh.vertices += Vec3(x,y,0)
+      x = r * math.cos((i+1) * theta)
+      y = r * math.sin((i+1) * theta)
       mesh.vertices += Vec3(x,y,0)
     }
     mesh

@@ -401,8 +401,8 @@ object OpenNI {
 
   def listen(l:OpenNIListener){
     if(!connected){
-      initAll()
-      start()
+      // initAll()
+      // start()
       pointCloud = true
     }
     listeners += l
@@ -411,8 +411,8 @@ object OpenNI {
 
   def listen(p:PartialFunction[List[User],Unit])(implicit name:String){
     if(!connected){
-      initAll()
-      start()
+      // initAll()
+      // start()
       pointCloud = true
     }
     callbacks(name) = p
