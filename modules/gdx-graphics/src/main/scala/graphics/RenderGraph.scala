@@ -127,5 +127,8 @@ object RenderGraph {
 
   // def leaves() = {
   // }
+  def dispose(){
+    roots.foreach { case n => n.dispose() }
+  }
 }
 

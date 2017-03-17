@@ -78,6 +78,10 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
 
     unbindTarget()
   }
+
+  def dispose(){
+  
+  }
 }
 
 // class BasicNode extends RenderNode

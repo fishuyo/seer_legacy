@@ -62,12 +62,12 @@ object DefaultShaders {
       varying float v_fog;
 
       void main(){
-        if( u_hasColor == 0){
+        // if( u_hasColor == 0){
         //if( a_color.xyz == vec3(0,0,0)){
           v_color = u_color;
-        } else {
-          v_color = a_color*u_color;
-        }
+        // } else {
+          // v_color = a_color*u_color;
+        // }
 
         vec4 pos = u_modelViewMatrix * vec4(a_position,1);
         v_pos = vec3(pos) / pos.w;

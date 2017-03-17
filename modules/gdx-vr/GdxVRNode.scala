@@ -19,7 +19,7 @@ import com.badlogic.gdx.vr.VRContext.Eye;
 object GdxVRTest extends SeerApp {
   Window.w0 = 1280 //960 //780
   Window.h0 = 720  //540 //438
-  val models = for(i <- -3 to 3; j <- -3 to 3; k <- -3 to 3) yield {
+  val models = for(i <- -2 to 2; j <- -2 to 2; k <- -2 to 2) yield {
     val m = Cube().translate(i,j,k).scale(0.1)
     m.material.specular()
     m
@@ -32,7 +32,7 @@ object GdxVRTest extends SeerApp {
 
     // DesktopApp.toggleFullscreen
 
-    RenderGraph.clear
+    // RenderGraph.clear
     RenderGraph += new GdxVRNode
   }
 
@@ -133,6 +133,10 @@ class GdxVRNode extends RenderNode {
     // numFrames += 1
 
     // unbindTarget()
+  }
+
+  override def dispose(){
+    // context.dispose
   }
 
 
