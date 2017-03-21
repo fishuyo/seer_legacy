@@ -55,6 +55,11 @@ object Texture {
     t
   }
 
+  def apply(node:RenderNode) = {
+    val t = new RenderNodeTexture(node)
+    t
+  }
+
 }
 
 
@@ -193,6 +198,14 @@ class GdxTexture(val gdxTexture:GdxTex) extends Texture(0,0){
   override def bind(i:Int=0) = gdxTexture.bind(i)
   override def params() = {}
   override def update() = { }
+  // override def getGLHandle() = -1 //{}
+}
+
+class RenderNodeTexture(val node:RenderNode) extends Texture(0,0){
+
+  override def bind(i:Int=0) = node.buffer.get.getColorBufferTexture().bind(i)
+  override def params() = {}
+  override def update() = {}
   // override def getGLHandle() = -1 //{}
 }
 

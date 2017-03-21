@@ -129,7 +129,8 @@ class Branch {
       val w = b.euler - b.lEuler
       val ax = b.accel dot b.pose.quat.toX
       val ay = b.accel dot b.pose.quat.toY
-      var dw = Vec3(-ay, ax, 0)
+      val az = b.accel dot b.pose.quat.toZ
+      var dw = Vec3(-ay, ax, az)
       
       dw -= w * (b.damp / b.mass)
       dw -= b.euler * b.k
