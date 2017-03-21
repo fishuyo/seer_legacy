@@ -6,7 +6,7 @@ import spatial._
 import io._
 
 import com.badlogic.gdx.vr._
-import com.badlogic.gdx.vr.VRContext.Eye;
+import com.badlogic.gdx.vr.VRContext._ //Eye;
 // import com.badlogic.gdx.vr.VRContext.Space;
 // import com.badlogic.gdx.vr.VRContext.VRControllerButtons;
 // import com.badlogic.gdx.vr.VRContext.VRDevice;
@@ -33,7 +33,7 @@ object GdxVRTest extends SeerApp {
     // DesktopApp.toggleFullscreen
 
     // RenderGraph.clear
-    RenderGraph += new GdxVRNode
+    RenderGraph += GdxVRNode
   }
 
   override def draw(){
@@ -50,7 +50,7 @@ object GdxVRTest extends SeerApp {
 
 
 // object GdxVRNode extends GdxVRNode
-class GdxVRNode extends RenderNode {
+object GdxVRNode extends RenderNode with VRDeviceListener {
 
   val context = new VRContext()
 
@@ -65,8 +65,10 @@ class GdxVRNode extends RenderNode {
   // val navMove = Nav()
   // Keyboard.bindNav(nav0)
   // Keyboard.bindNav(navMove)
-
  
+  context.addListener(this)
+
+
   override def animate(dt:Float){
 
     // navMove.step(dt)
@@ -139,5 +141,60 @@ class GdxVRNode extends RenderNode {
     // context.dispose
   }
 
+
+  // VRDeviceListener methods
+  override def connected(device:VRContext#VRDevice) {
+    println(device + " connected");
+    // if (device.getType() == VRDeviceType.Controller && device.getModelInstance() != null)
+    //   modelInstances.add(device.getModelInstance());
+  }
+
+
+  override def disconnected(device:VRContext#VRDevice) {
+    println(device + " disconnected");
+    // if (device.getType() == VRDeviceType.Controller && device.getModelInstance() != null)
+    //   modelInstances.removeValue(device.getModelInstance(), true);
+  }
+
+
+  override def buttonPressed(device:VRContext#VRDevice, button:Int) {
+    println(device + " button pressed: " + button);
+
+    // If the trigger button on the first controller was
+    // pressed, setup teleporting
+    // mode.
+    if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+      // if (button == VRControllerButtons.SteamVR_Trigger)
+      //   isTeleporting = true;
+    }
+  }
+
+
+  override def buttonReleased(device:VRContext#VRDevice, button:Int) {
+    println(device + " button released: " + button);
+
+    // If the trigger button the first controller was released,
+    // teleport the player.
+    // if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+    //   if (button == VRControllerButtons.SteamVR_Trigger) {
+    //     if (intersectControllerXZPlane(context.getDeviceByType(VRDeviceType.Controller), tmp)) {
+    //       // Teleportation
+    //       // - Tracker space origin in world space is initially at [0,0,0]
+    //       // - When teleporting, we want to set the tracker space origin in world space to the
+    //       //   teleportation point
+    //       // - Then we need to offset the tracker space
+    //       //   origin in world space by the camera
+    //       //   x/z position so the camera is at the
+    //       //   teleportation point in world space
+    //       tmp2.set(context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
+    //       tmp2.y = 0;
+    //       tmp.sub(tmp2);
+
+    //       context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(tmp);
+    //     }
+    //     isTeleporting = false;
+    //   }
+    // }
+  }
 
 }
