@@ -72,6 +72,11 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
   var vel = 0f
   var controller:VRContext#VRDevice = null
 
+  def setWorldOffset(v:Vec3){
+    val o = new com.badlogic.gdx.math.Vector3(v.x,v.y,v.z)
+    context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(o);
+  }
+
   override def animate(dt:Float){
 
     // navMove.step(dt)
@@ -83,7 +88,8 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
       val dir = Vec3(d.x,d.y,d.z)
 
       val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
-      // var vel = 0f
+      Camera.nav.pos.set(p.x,p.y,p.z)
+
       if(forward) vel += 0.0007f
       else if(backward) vel -= 0.0007f
       else vel *= 0.96f
