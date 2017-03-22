@@ -41,8 +41,31 @@ object ActorSystemManager {
   }
 
   def default(system:String = "seer") = ActorSystem(system, ConfigFactory.load(config))
+  def artery(hn:String=Hostname(), port:Int=2552, system:String="seer") = ActorSystem(system, ConfigFactory.load(config_artery(hn,port)))
   def tcp(hn:String=Hostname(), port:Int=2552, system:String="seer") = ActorSystem(system, ConfigFactory.load(config_tcp(hn,port)))
   def udp(hn:String=Hostname(), port:Int=2552, system:String="seer") = ActorSystem(system, ConfigFactory.load(config_udp(hn,port)))
+
+
+
+  def config_artery(hostname:String=Hostname(), port:Int=2552) = ConfigFactory.parseString(s"""
+    akka {
+      actor {
+        provider = remote
+      }
+      remote {
+        artery {
+          enabled = on
+          canonical.hostname = "$hostname"
+          canonical.port = $port
+          advanced {
+            # Maximum serialized message size, including header data.
+            # maximum-frame-size = 256 KiB
+            maximum-frame-size = 10 MiB
+          }
+        }
+      }
+    }
+  """)
 
   def config_tcp(hostname:String=Hostname(), port:Int=2552) = ConfigFactory.parseString(s"""
     akka {
@@ -88,6 +111,15 @@ object ActorSystemManager {
         compression-scheme = "zlib"
         zlib-compression-level = 1
      }
+    }
+    akka.actor.serializers {
+      kryo = "com.twitter.chill.akka.AkkaSerializer"
+    }
+    akka.actor.serialization-bindings {
+      "scala.Product" = kryo
+      "scala.collection.mutable.ArrayBuffer" = kryo
+      "com.fishuyo.seer.graphics.MeshLike" = kryo
+      "com.fishuyo.seer.spatial.Vec3" = kryo
     }
   """)
 
