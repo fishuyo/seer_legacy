@@ -69,13 +69,45 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
 
   var forward = false
   var backward = false
+  var ray = false
   var vel = 0f
-  var controller:VRContext#VRDevice = null
+  var controllerL:VRContext#VRDevice = context.getControllerByRole(VRControllerRole.LeftHand)
+  var controllerR:VRContext#VRDevice = context.getControllerByRole(VRControllerRole.RightHand)
 
   def setWorldOffset(v:Vec3){
     val o = new com.badlogic.gdx.math.Vector3(v.x,v.y,v.z)
     context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(o);
   }
+
+  def getHeadPos() = {
+    val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
+    Vec3(p.x,p.y,p.z)
+  }
+  def getLeftPos() = {
+    val p = context.getControllerByRole(VRControllerRole.LeftHand).getPosition(Space.World)
+    Vec3(p.x,p.y,p.z)
+  }
+  def getRightPos() = {
+    val p = context.getControllerByRole(VRControllerRole.RightHand).getPosition(Space.World)
+    Vec3(p.x,p.y,p.z)
+  }
+  def getHeadDir() = {
+    val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getDirection(Space.World).nor
+    Vec3(p.x,p.y,p.z)
+  }
+  def getLeftDir() = {
+    val p = context.getControllerByRole(VRControllerRole.LeftHand).getDirection(Space.World).nor
+    Vec3(p.x,p.y,p.z)
+  }
+  def getRightDir() = {
+    val p = context.getControllerByRole(VRControllerRole.RightHand).getDirection(Space.World).nor
+    Vec3(p.x,p.y,p.z)
+  }
+  def getHeadRay() = Ray(getHeadPos(),getHeadDir())
+  def getLeftRay() = Ray(getLeftPos(),getLeftDir())
+  def getRightRay() = Ray(getRightPos(),getRightDir())
+  def getLeftTrigger() = forward
+  def getRightTrigger() = ray
 
   override def animate(dt:Float){
 
@@ -83,8 +115,8 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
     // nav0.step(dt)
     renderer.animate(dt)
 
-    if(controller != null){
-      val d = controller.getDirection(Space.World).nor()
+    if(controllerL != null){
+      val d = controllerL.getDirection(Space.World).nor()
       val dir = Vec3(d.x,d.y,d.z)
 
       val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
@@ -192,13 +224,21 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
     // If the trigger button on the first controller was
     // pressed, setup teleporting
     // mode.
-    if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+    // if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+    if (device == context.getControllerByRole(VRControllerRole.LeftHand)) {
       button match {
         case VRControllerButtons.SteamVR_Trigger => forward = true
         case VRControllerButtons.SteamVR_Touchpad => backward = true
         case _ => ()
       }
-      controller = device       
+      controllerL = device       
+    } else if (device == context.getControllerByRole(VRControllerRole.RightHand)) {
+      button match {
+        case VRControllerButtons.SteamVR_Trigger => ray = true
+        // case VRControllerButtons.SteamVR_Touchpad => backward = true
+        case _ => ()
+      }
+      controllerR = device       
     }
   }
 
@@ -206,13 +246,26 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
   override def buttonReleased(device:VRContext#VRDevice, button:Int) {
     println(device + " button released: " + button);
 
-    if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+    // if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+    //   button match {
+    //     case VRControllerButtons.SteamVR_Trigger => forward = false; 
+    //     case VRControllerButtons.SteamVR_Touchpad => backward = false; 
+    //     case _ => ()
+    //   }
+    // }  
+    if (device == context.getControllerByRole(VRControllerRole.LeftHand)) {
       button match {
-        case VRControllerButtons.SteamVR_Trigger => forward = false; 
-        case VRControllerButtons.SteamVR_Touchpad => backward = false; 
+        case VRControllerButtons.SteamVR_Trigger => forward = false
+        case VRControllerButtons.SteamVR_Touchpad => backward = false
         case _ => ()
       }
-    }  
+    } else if (device == context.getControllerByRole(VRControllerRole.RightHand)) {
+      button match {
+        case VRControllerButtons.SteamVR_Trigger => ray = false
+        // case VRControllerButtons.SteamVR_Touchpad => backward = true
+        case _ => ()
+      }
+    }
 
     // If the trigger button the first controller was released,
     // teleport the player.
