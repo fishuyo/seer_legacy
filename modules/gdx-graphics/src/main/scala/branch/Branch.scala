@@ -173,6 +173,7 @@ class Tree(pose:Pose = Pose(Vec3(),Quat.up)) {
     }
   }
 
+  def clear() = trunk.children.clear
 
   // def generate(depth:Int){
   //   trunk.foreach { 
