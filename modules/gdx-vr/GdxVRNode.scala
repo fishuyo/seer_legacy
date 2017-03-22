@@ -13,7 +13,6 @@ import com.badlogic.gdx.vr.VRContext._ //Eye;
 // import com.badlogic.gdx.vr.VRContext.VRDeviceListener;
 // import com.badlogic.gdx.vr.VRContext.VRDeviceType;
 
-
 // example SeerApp usage
 //
 object GdxVRTest extends SeerApp {
@@ -68,12 +67,36 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
  
   context.addListener(this)
 
+  var forward = false
+  var backward = false
+  var vel = 0f
+  var controller:VRContext#VRDevice = null
 
   override def animate(dt:Float){
 
     // navMove.step(dt)
     // nav0.step(dt)
     renderer.animate(dt)
+
+    if(controller != null){
+      val d = controller.getDirection(Space.World).nor()
+      val dir = Vec3(d.x,d.y,d.z)
+
+      val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
+      // var vel = 0f
+      if(forward) vel += 0.0007f
+      else if(backward) vel -= 0.0007f
+      else vel *= 0.96f
+
+      if(vel > 0.09f) vel = 0.09f
+      if(vel < -0.09f) vel = -0.09f
+
+      val np =  dir * vel //+ Vec3(p.x,p.y,p.z)
+      val o = new com.badlogic.gdx.math.Vector3(np.x,np.y,np.z)
+      // context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(o);
+      context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().add(o);
+    }
+
   }
 
   override def render(){
@@ -164,14 +187,26 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
     // pressed, setup teleporting
     // mode.
     if (device == context.getDeviceByType(VRDeviceType.Controller)) {
-      // if (button == VRControllerButtons.SteamVR_Trigger)
-      //   isTeleporting = true;
+      button match {
+        case VRControllerButtons.SteamVR_Trigger => forward = true
+        case VRControllerButtons.SteamVR_Touchpad => backward = true
+        case _ => ()
+      }
+      controller = device       
     }
   }
 
 
   override def buttonReleased(device:VRContext#VRDevice, button:Int) {
     println(device + " button released: " + button);
+
+    if (device == context.getDeviceByType(VRDeviceType.Controller)) {
+      button match {
+        case VRControllerButtons.SteamVR_Trigger => forward = false; 
+        case VRControllerButtons.SteamVR_Touchpad => backward = false; 
+        case _ => ()
+      }
+    }  
 
     // If the trigger button the first controller was released,
     // teleport the player.
