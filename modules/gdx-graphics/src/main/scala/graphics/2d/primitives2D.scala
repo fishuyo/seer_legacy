@@ -70,9 +70,11 @@ object Primitive2D {
       var x = r * math.cos(i * theta)
       var y = r * math.sin(i * theta)
       mesh.vertices += Vec3(x,y,0)
+      mesh.normals += Vec3(x,y,0)
       x = r * math.cos((i+1) * theta)
       y = r * math.sin((i+1) * theta)
       mesh.vertices += Vec3(x,y,0)
+      mesh.normals += Vec3(x,y,0)
     }
     mesh
   }
