@@ -79,33 +79,39 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
     context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(o);
   }
 
-  def getHeadPos() = {
-    val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
+  def getHeadPos(world:Boolean=true) = {
+    var p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
+    if(!world) p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker)
     Vec3(p.x,p.y,p.z)
   }
-  def getLeftPos() = {
-    val p = context.getControllerByRole(VRControllerRole.LeftHand).getPosition(Space.World)
+  def getLeftPos(world:Boolean=true) = {
+    var p = context.getControllerByRole(VRControllerRole.LeftHand).getPosition(Space.World)
+    if(!world) p = context.getControllerByRole(VRControllerRole.LeftHand).getPosition(Space.Tracker)
     Vec3(p.x,p.y,p.z)
   }
-  def getRightPos() = {
-    val p = context.getControllerByRole(VRControllerRole.RightHand).getPosition(Space.World)
+  def getRightPos(world:Boolean=true) = {
+    var p = context.getControllerByRole(VRControllerRole.RightHand).getPosition(Space.World)
+    if(!world) p = context.getControllerByRole(VRControllerRole.RightHand).getPosition(Space.Tracker)
     Vec3(p.x,p.y,p.z)
   }
-  def getHeadDir() = {
-    val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getDirection(Space.World).nor
+  def getHeadDir(world:Boolean=true) = {
+    var p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getDirection(Space.World).nor
+    if(!world) p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getDirection(Space.Tracker).nor
     Vec3(p.x,p.y,p.z)
   }
-  def getLeftDir() = {
-    val p = context.getControllerByRole(VRControllerRole.LeftHand).getDirection(Space.World).nor
+  def getLeftDir(world:Boolean=true) = {
+    var p = context.getControllerByRole(VRControllerRole.LeftHand).getDirection(Space.World).nor
+    if(!world) p = context.getControllerByRole(VRControllerRole.LeftHand).getDirection(Space.Tracker).nor
     Vec3(p.x,p.y,p.z)
   }
-  def getRightDir() = {
-    val p = context.getControllerByRole(VRControllerRole.RightHand).getDirection(Space.World).nor
+  def getRightDir(world:Boolean=true) = {
+    var p = context.getControllerByRole(VRControllerRole.RightHand).getDirection(Space.World).nor
+    if(!world) p = context.getControllerByRole(VRControllerRole.RightHand).getDirection(Space.Tracker).nor
     Vec3(p.x,p.y,p.z)
   }
-  def getHeadRay() = Ray(getHeadPos(),getHeadDir())
-  def getLeftRay() = Ray(getLeftPos(),getLeftDir())
-  def getRightRay() = Ray(getRightPos(),getRightDir())
+  def getHeadRay(world:Boolean=true) = Ray(getHeadPos(world),getHeadDir(world))
+  def getLeftRay(world:Boolean=true) = Ray(getLeftPos(world),getLeftDir(world))
+  def getRightRay(world:Boolean=true) = Ray(getRightPos(world),getRightDir(world))
   def getLeftTrigger() = forward
   def getRightTrigger() = ray
 
