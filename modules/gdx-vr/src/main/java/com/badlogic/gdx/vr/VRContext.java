@@ -1016,16 +1016,16 @@ public class VRContext implements Disposable {
 	
 	public interface VRDeviceListener {
 		/** A new {@link VRDevice} has connected **/		 
-		void connected(VRDevice device);
+		void connected(VRContext.VRDevice device);
 		
 		/** A {@link VRDevice} has disconnected **/
-		void disconnected(VRDevice device);			
+		void disconnected(VRContext.VRDevice device);			
 		
 		/** A button from {@link VRControllerButtons} was pressed on the {@link VRDevice} **/
-		void buttonPressed(VRDevice device, int button);
+		void buttonPressed(VRContext.VRDevice device, int button);
 		
 		/** A button from {@link VRControllerButtons} was released on the {@link VRDevice} **/
-		void buttonReleased(VRDevice device, int button);
+		void buttonReleased(VRContext.VRDevice device, int button);
 	}
 	
 	static void hmdMat4toMatrix4(HmdMatrix44 hdm, Matrix4 mat) {
