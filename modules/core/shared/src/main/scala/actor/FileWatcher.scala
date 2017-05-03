@@ -19,11 +19,12 @@ object Monitor {
   def apply(path:String, rec:Boolean=false)(f:Callback){
     //This will receive callbacks for just the one file
     monitorActor ! RegisterCallback(
-      ENTRY_MODIFY,
-      Some(SensitivityWatchEventModifier.HIGH), //None,
-      recursive = rec,
+      event = ENTRY_MODIFY,
+      modifier = Some(SensitivityWatchEventModifier.HIGH), //None,
       path = Paths.get(path),
-      f)
+      callback = f,
+      recursive = rec
+    )
   }
 
   def stop(path:String, rec:Boolean=false){

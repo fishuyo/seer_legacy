@@ -29,8 +29,8 @@ object Common {
       // "-target:jvm-1.6"
     ),
     cancelable in Global := true,
-    exportJars := true,
-    libraryDependencies ++= Dependencies.coreD
+    exportJars := true//,
+    // libraryDependencies ++= Dependencies.coreD
   )
 
   // lazy val desktop = commonSettings ++ Seq(
