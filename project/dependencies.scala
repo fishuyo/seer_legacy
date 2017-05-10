@@ -16,6 +16,7 @@ object Dependencies {
   val spire = "org.spire-math" %% "spire" % "0.13.0"
   val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
 
+  val ficus = "com.iheart" %% "ficus" % "1.4.0"
 
   // projects
   val coreD = Seq(
