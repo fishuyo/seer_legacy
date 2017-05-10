@@ -11,6 +11,10 @@ lazy val openni = project.in(file("modules/openni")).
   settings(Common.settings: _*)
   // settings(libraryDependencies ++= Dependencies.openniD)
 
+lazy val openni2 = project.in(file("modules/openni2")).
+  dependsOn(core).
+  settings(Common.settings: _*)
+
 lazy val opencv = project.in(file("modules/opencv")).
   dependsOn(core).
   settings(Common.settings: _*).
@@ -46,3 +50,8 @@ lazy val hid = project.in(file("modules/hid")).
   dependsOn(core).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.hidD)
+
+lazy val interface_server = project.in(file("modules/interface-server")).
+  dependsOn(core, hid, graphics).
+  settings(Common.settings: _*).
+  settings(libraryDependencies += Dependencies.ficus)

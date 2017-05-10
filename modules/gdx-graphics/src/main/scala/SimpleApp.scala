@@ -44,6 +44,16 @@ class SeerAppListener extends ApplicationListener {
   var timeStep = 1/60f
   var dtAccum = 0f
 
+  // val shutdownHook = new Thread() {
+  //   override def run(){
+  //     println("Shutdown Hook.")
+  //     Gdx.app.exit()
+  //     // System.exit(0)
+  //     // Runtime.getRuntime().halt(0);
+  //   }
+  // };
+  // Runtime.getRuntime().addShutdownHook(shutdownHook);
+
   // var paused = false
 
   def create(){
