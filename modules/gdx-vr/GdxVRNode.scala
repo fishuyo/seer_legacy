@@ -1,5 +1,6 @@
 
 package com.fishuyo.seer
+package vr
 
 import graphics._
 import spatial._
@@ -71,47 +72,19 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
   var backward = false
   var ray = false
   var vel = 0f
-  var controllerL:VRContext#VRDevice = context.getDeviceByType(VRDeviceType.Controller)
-  var controllerR:VRContext#VRDevice = context.getDeviceByType(VRDeviceType.Controller)
+  def controllerR = new Device(VRDeviceType.Controller,0) //:VRContext#VRDevice = controller(0)
+  def controllerL = new Device(VRDeviceType.Controller,1) //:VRContext#VRDevice = controller(1)
+  def hmd = new Device(VRDeviceType.HeadMountedDisplay,0) //:VRContext#VRDevice = controller(1)
+  // def controller(indx:Int) = {
+  //   val cs = context.getDevicesByType(VRDeviceType.Controller)
+  //   get(indx)
+  // }
 
   def setWorldOffset(v:Vec3){
     val o = new com.badlogic.gdx.math.Vector3(v.x,v.y,v.z)
     context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(o);
   }
 
-  def getHeadPos(world:Boolean=true) = {
-    var p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
-    if(!world) p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker)
-    Vec3(p.x,p.y,p.z)
-  }
-  def getLeftPos(world:Boolean=true) = {
-    var p = controllerL.getPosition(Space.World)
-    if(!world) p = controllerL.getPosition(Space.Tracker)
-    Vec3(p.x,p.y,p.z)
-  }
-  def getRightPos(world:Boolean=true) = {
-    var p = controllerR.getPosition(Space.World)
-    if(!world) p = controllerR.getPosition(Space.Tracker)
-    Vec3(p.x,p.y,p.z)
-  }
-  def getHeadDir(world:Boolean=true) = {
-    var p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getDirection(Space.World).nor
-    if(!world) p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getDirection(Space.Tracker).nor
-    Vec3(p.x,p.y,p.z)
-  }
-  def getLeftDir(world:Boolean=true) = {
-    var p = controllerL.getDirection(Space.World).nor
-    if(!world) p = controllerL.getDirection(Space.Tracker).nor
-    Vec3(p.x,p.y,p.z)
-  }
-  def getRightDir(world:Boolean=true) = {
-    var p = controllerR.getDirection(Space.World).nor
-    if(!world) p = controllerR.getDirection(Space.Tracker).nor
-    Vec3(p.x,p.y,p.z)
-  }
-  def getHeadRay(world:Boolean=true) = Ray(getHeadPos(world),getHeadDir(world))
-  def getLeftRay(world:Boolean=true) = Ray(getLeftPos(world),getLeftDir(world))
-  def getRightRay(world:Boolean=true) = Ray(getRightPos(world),getRightDir(world))
   def getLeftTrigger() = forward
   def getRightTrigger() = ray
 
@@ -121,15 +94,14 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
     // nav0.step(dt)
     renderer.animate(dt)
 
-    if(controllerL != null){
-      val d = controllerL.getDirection(Space.World).nor()
-      val dir = Vec3(d.x,d.y,d.z)
+    if(controllerL.device != null){
+      val dir = controllerL.dir
 
-      val p = context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.World)
+      val p = hmd.pos
       Camera.nav.pos.set(p.x,p.y,p.z)
 
-      if(forward) vel += 0.0007f
-      else if(backward) vel -= 0.0007f
+      if(controllerL.buttons("trigger")) vel += 0.0007f
+      else if(controllerL.buttons("touchpad")) vel -= 0.0007f
       else vel *= 0.96f
 
       if(vel > 0.09f) vel = 0.09f
@@ -145,24 +117,24 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
 
   override def render(){
    
-  	context.pollEvents()
-  	context.begin()
+    context.pollEvents()
+    context.begin()
 
-	context.beginEye(Eye.Left)
-	var cam = context.getEyeData(Eye.Left).camera
-	renderer.camera.combined.set(cam.combined)
-	renderer.camera.view.set(cam.view)
-	renderer.render()
-	context.endEye();
+    context.beginEye(Eye.Left)
+    var cam = context.getEyeData(Eye.Left).camera
+    renderer.camera.combined.set(cam.combined)
+    renderer.camera.view.set(cam.view)
+    renderer.render()
+    context.endEye()
 
-	context.beginEye(Eye.Right);
-	cam = context.getEyeData(Eye.Right).camera
-	renderer.camera.combined.set(cam.combined)
-	renderer.camera.view.set(cam.view)
-	renderer.render()
-	context.endEye();
+    context.beginEye(Eye.Right)
+    cam = context.getEyeData(Eye.Right).camera
+    renderer.camera.combined.set(cam.combined)
+    renderer.camera.view.set(cam.view)
+    renderer.render()
+    context.endEye()
 
-	context.end(); 
+    context.end()
 
 
 
@@ -233,18 +205,18 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
     if (device == context.getDeviceByType(VRDeviceType.Controller)) {
     // if (device == context.getControllerByRole(VRControllerRole.LeftHand)) {
       button match {
-        case VRControllerButtons.SteamVR_Trigger => forward = true
-        case VRControllerButtons.SteamVR_Touchpad => backward = true
-        case _ => ()
-      }
-      controllerL = device       
-    } else { //if (device == context.getControllerByRole(VRControllerRole.RightHand)) {
-      button match {
-        case VRControllerButtons.SteamVR_Trigger => ray = true
+        // case VRControllerButtons.SteamVR_Trigger => forward = true
         // case VRControllerButtons.SteamVR_Touchpad => backward = true
         case _ => ()
       }
-      controllerR = device       
+      // controllerL = device       
+    } else { //if (device == context.getControllerByRole(VRControllerRole.RightHand)) {
+      button match {
+        // case VRControllerButtons.SteamVR_Trigger => ray = true
+        // case VRControllerButtons.SteamVR_Touchpad => backward = true
+        case _ => ()
+      }
+      // controllerR = device       
     }
   }
 
@@ -252,51 +224,60 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
   override def buttonReleased(device:VRContext#VRDevice, button:Int) {
     println(device + " button released: " + button);
 
-    // if (device == context.getDeviceByType(VRDeviceType.Controller)) {
-    //   button match {
-    //     case VRControllerButtons.SteamVR_Trigger => forward = false; 
-    //     case VRControllerButtons.SteamVR_Touchpad => backward = false; 
-    //     case _ => ()
-    //   }
-    // }  
     if (device == context.getDeviceByType(VRDeviceType.Controller)) {
-
     // if (device == context.getControllerByRole(VRControllerRole.LeftHand)) {
       button match {
-        case VRControllerButtons.SteamVR_Trigger => forward = false
-        case VRControllerButtons.SteamVR_Touchpad => backward = false
+        // case VRControllerButtons.SteamVR_Trigger => forward = false
+        // case VRControllerButtons.SteamVR_Touchpad => backward = false
         case _ => ()
       }
     } else { //if (device == context.getControllerByRole(VRControllerRole.RightHand)) {
       button match {
-        case VRControllerButtons.SteamVR_Trigger => ray = false
+        // case VRControllerButtons.SteamVR_Trigger => ray = false
         // case VRControllerButtons.SteamVR_Touchpad => backward = true
         case _ => ()
       }
     }
 
-    // If the trigger button the first controller was released,
-    // teleport the player.
-    // if (device == context.getDeviceByType(VRDeviceType.Controller)) {
-    //   if (button == VRControllerButtons.SteamVR_Trigger) {
-    //     if (intersectControllerXZPlane(context.getDeviceByType(VRDeviceType.Controller), tmp)) {
-    //       // Teleportation
-    //       // - Tracker space origin in world space is initially at [0,0,0]
-    //       // - When teleporting, we want to set the tracker space origin in world space to the
-    //       //   teleportation point
-    //       // - Then we need to offset the tracker space
-    //       //   origin in world space by the camera
-    //       //   x/z position so the camera is at the
-    //       //   teleportation point in world space
-    //       tmp2.set(context.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
-    //       tmp2.y = 0;
-    //       tmp.sub(tmp2);
-
-    //       context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(tmp);
-    //     }
-    //     isTeleporting = false;
-    //   }
-    // }
+    
   }
+
+}
+
+
+class Device(val kind:VRDeviceType, val index:Int=0){
+
+  def context = GdxVRNode.context
+  def device = {
+    val ds = context.getDevicesByType(kind)
+    ds.get(indx)
+  }
+
+  def pos = {
+    var p = device.getPosition(Space.World)
+    Vec3(p.x,p.y,p.z)
+  }
+  def dir = {
+    var p = device.getDirection(Space.World).nor
+    Vec3(p.x,p.y,p.z)
+  }
+  def up = {
+    var p = device.getUp(Space.World).nor
+    Vec3(p.x,p.y,p.z)
+  }
+  def right = {
+    var p = device.getRight(Space.World).nor
+    Vec3(p.x,p.y,p.z)
+  }
+  def ray = Ray(pos,dir)
+
+  def axis(indx:Int=0) = Vec2(device.getAxisX(indx),device.getAxisY(indx))
+
+  def button(name:String) = name match {
+    case "trigger" => device.isButtonPressed(VRControllerButtons.SteamVR_Trigger)
+    case "toucpad" => device.isButtonPressed(VRControllerButtons.SteamVR_Touchpad)
+  }
+
+  def pulse(duration:Short) = device.triggerHapticPulse(duration)
 
 }
