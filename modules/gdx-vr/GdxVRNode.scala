@@ -75,6 +75,9 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
   def controllerR = new Device(VRDeviceType.Controller,0) //:VRContext#VRDevice = controller(0)
   def controllerL = new Device(VRDeviceType.Controller,1) //:VRContext#VRDevice = controller(1)
   def hmd = new Device(VRDeviceType.HeadMountedDisplay,0) //:VRContext#VRDevice = controller(1)
+  def controllerRReal = new Device(VRDeviceType.Controller,0,Space.Tracker) //:VRContext#VRDevice = controller(0)
+  def controllerLReal = new Device(VRDeviceType.Controller,1,Space.Tracker) //:VRContext#VRDevice = controller(1)
+  def hmdReal = new Device(VRDeviceType.HeadMountedDisplay,0,Space.Tracker) //:VRContext#VRDevice = controller(1)
   // def controller(indx:Int) = {
   //   val cs = context.getDevicesByType(VRDeviceType.Controller)
   //   get(indx)
@@ -100,8 +103,8 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
       val p = hmd.pos
       Camera.nav.pos.set(p.x,p.y,p.z)
 
-      if(controllerL.buttons("trigger")) vel += 0.0007f
-      else if(controllerL.buttons("touchpad")) vel -= 0.0007f
+      if(controllerL.button("trigger")) vel += 0.0007f
+      else if(controllerL.button("touchpad")) vel -= 0.0007f
       else vel *= 0.96f
 
       if(vel > 0.09f) vel = 0.09f
@@ -245,28 +248,29 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
 }
 
 
-class Device(val kind:VRDeviceType, val index:Int=0){
+class Device(val kind:VRDeviceType, val index:Int=0, val space:Space=Space.World){
 
   def context = GdxVRNode.context
   def device = {
     val ds = context.getDevicesByType(kind)
-    ds.get(indx)
+    if(index < ds.size) ds.get(index)
+    else null
   }
 
   def pos = {
-    var p = device.getPosition(Space.World)
+    var p = device.getPosition(space)
     Vec3(p.x,p.y,p.z)
   }
   def dir = {
-    var p = device.getDirection(Space.World).nor
+    var p = device.getDirection(space).nor
     Vec3(p.x,p.y,p.z)
   }
   def up = {
-    var p = device.getUp(Space.World).nor
+    var p = device.getUp(space).nor
     Vec3(p.x,p.y,p.z)
   }
   def right = {
-    var p = device.getRight(Space.World).nor
+    var p = device.getRight(space).nor
     Vec3(p.x,p.y,p.z)
   }
   def ray = Ray(pos,dir)
@@ -275,7 +279,8 @@ class Device(val kind:VRDeviceType, val index:Int=0){
 
   def button(name:String) = name match {
     case "trigger" => device.isButtonPressed(VRControllerButtons.SteamVR_Trigger)
-    case "toucpad" => device.isButtonPressed(VRControllerButtons.SteamVR_Touchpad)
+    case "touchpad" => device.isButtonPressed(VRControllerButtons.SteamVR_Touchpad)
+    case _ => false
   }
 
   def pulse(duration:Short) = device.triggerHapticPulse(duration)
