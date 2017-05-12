@@ -64,16 +64,16 @@ object OpenNI {
 
     NI.initialize
     NiTE.initialize
-    val devices = NI.enumerateDevices
+    val devices = NI.enumerateDevices.asScala.toList
     if (devices.size == 0) {
         println("OpenNI Error: No device is connected")
         this.shutdown()
         return;
-    }
+    } else println(s"OpenNI: ${devices.size} devices connected")
     
     device = Device.open(devices.get(0).getUri())
     depthStream = VideoStream.create(device, SensorType.DEPTH)
-    tracker = UserTracker.create()
+    tracker = UserTracker.create(device)
     tracker.addNewFrameListener(TrackerListener)
     initd = true
   }
@@ -90,6 +90,12 @@ object OpenNI {
     initd = false
   }
 
+}
+
+class Device(indx:Int){
+  var device:Device = _
+  var depthStream:VideoStream = _
+  var tracker:UserTracker = _
 }
 
 object TrackerListener extends UserTracker.NewFrameListener {

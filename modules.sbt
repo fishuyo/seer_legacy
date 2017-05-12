@@ -29,7 +29,7 @@ lazy val portaudio = project.in(file("modules/portaudio")).
   settings(Common.settings: _*)
 
 lazy val script = project.in(file("modules/script")).
-  dependsOn(core, graphics, openni).
+  dependsOn(core, graphics).
   settings(Common.settings: _*)
 
 lazy val openvr = project.in(file("modules/openvr")).
