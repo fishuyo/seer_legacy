@@ -73,7 +73,7 @@ object OpenNI {
     
     device = Device.open(devices(0).getUri())
     depthStream = VideoStream.create(device, SensorType.DEPTH)
-    tracker = UserTracker.create(device)
+    tracker = UserTracker.create //(device)
     tracker.addNewFrameListener(TrackerListener)
     initd = true
   }
@@ -131,9 +131,10 @@ object TrackerListener extends UserTracker.NewFrameListener {
             val j = skel.getJoint(Joint(s))
             if(j.getPositionConfidence > 0f){
               val p = j.getPosition
-              u.skeleton.updateJoint(s,Vec3(p.getX,p.getY,p.getZ))
+              u.skeleton.updateJoint(s,point3DtoVec3(p))
             }
           }
+          u.skeleton.updateBones
         case SkeletonState.NONE =>
         case _ =>
       }
@@ -188,6 +189,13 @@ object TrackerListener extends UserTracker.NewFrameListener {
   }
 
   def point3DtoVec3(p:org.openni.Point3D[java.lang.Float]) = {
+    var v:Vec3 = null
+    if(OpenNI.flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + OpenNI.offset
+    else v = Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + OpenNI.offset
+    if(OpenNI.mirror) v.x *= -1
+    v
+  }
+  def point3DtoVec3(p:com.primesense.nite.Point3D[java.lang.Float]) = {
     var v:Vec3 = null
     if(OpenNI.flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + OpenNI.offset
     else v = Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + OpenNI.offset
