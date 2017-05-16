@@ -71,7 +71,7 @@ object OpenNI {
         return;
     } else println(s"OpenNI: ${devices.size} devices connected")
     
-    device = Device.open(devices.get(0).getUri())
+    device = Device.open(devices(0).getUri())
     depthStream = VideoStream.create(device, SensorType.DEPTH)
     tracker = UserTracker.create(device)
     tracker.addNewFrameListener(TrackerListener)
@@ -92,11 +92,11 @@ object OpenNI {
 
 }
 
-class Device(indx:Int){
-  var device:Device = _
-  var depthStream:VideoStream = _
-  var tracker:UserTracker = _
-}
+// class Device(indx:Int){
+//   var device:Device = _
+//   var depthStream:VideoStream = _
+//   var tracker:UserTracker = _
+// }
 
 object TrackerListener extends UserTracker.NewFrameListener {
 
@@ -121,7 +121,23 @@ object TrackerListener extends UserTracker.NewFrameListener {
         u.tracking = true
       } else if (user.isLost){
         u.tracking = false
+      } //else if(user.isVisible)
+
+      val skel = user.getSkeleton()
+      skel.getState match { //if(skel != null){
+        case SkeletonState.CALIBRATING =>
+        case SkeletonState.TRACKED => 
+          Joint.strings.foreach{ case s => 
+            val j = skel.getJoint(Joint(s))
+            if(j.getPositionConfidence > 0f){
+              val p = j.getPosition
+              u.skeleton.updateJoint(s,Vec3(p.getX,p.getY,p.getZ))
+            }
+          }
+        case SkeletonState.NONE =>
+        case _ =>
       }
+
     }
 
     var depthFrame:VideoFrameRef = mLastFrame.getDepthFrame()

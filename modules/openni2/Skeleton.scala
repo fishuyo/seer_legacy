@@ -136,6 +136,12 @@ object Joint {
     case _ => TORSO
   }
 
+  val joints = List(HEAD,NECK,TORSO,
+      LEFT_SHOULDER,LEFT_ELBOW,LEFT_HAND,
+      RIGHT_SHOULDER,RIGHT_ELBOW,RIGHT_HAND,
+      LEFT_HIP,LEFT_KNEE,LEFT_FOOT,
+      RIGHT_HIP,RIGHT_KNEE,RIGHT_FOOT)
+  
   val strings = List("head","neck","torso",
       "l_shoulder","l_elbow","l_hand",
       "r_shoulder","r_elbow","r_hand",
