@@ -186,6 +186,52 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
     return q.normalize();
   }
 
+  def fromForwardUp(dir:Vec3, up:Vec3):Quat = { 
+    val v2 = up.cross(dir).normalize
+    val v3 = dir.cross(v2)
+    val Vec3(m00,m01,m02) = v2
+    val Vec3(m10,m11,m12) = v3
+    val Vec3(m20,m21,m22) = dir
+
+    val num8 = (m00 + m11) + m22
+    val q = Quat()
+    if(num8 > 0.0f){
+      var num = math.sqrt(num8 + 1)
+      q.w = num * 0.5
+      num = 0.5 / num
+      q.x = (m12 - m21) * num
+      q.y = (m20 - m02) * num
+      q.z = (m01 - m10) * num
+      return q
+    }
+
+    if((m00 >= m11) && (m00 >= m22)){
+      val num7 = math.sqrt(((1 + m00) - m11) - m22)
+      val num4 = 0.5 / num7
+      q.x = 0.5 * num7
+      q.y = (m01 + m10) * num4
+      q.z = (m02 + m20) * num4
+      q.w = (m12 - m21) * num4
+      return q
+    }
+    if(m11 > m22){
+      val num6 = math.sqrt(((1 + m11) - m00) - m22)
+      val num3 = 0.5 / num6
+      q.x = (m10 + m01) * num3
+      q.y = 0.5 * num6
+      q.z = (m21 + m12) * num3
+      q.w = (m20 - m02) * num3
+      return q
+    }
+    val num5 = math.sqrt(((1 + m22) - m00) - m11)
+    val num2 = 0.5 / num5
+    q.x = (m20 + m02) * num2
+    q.y = (m21 + m12) * num2
+    q.z = 0.5 * num5
+    q.w = (m01 - m10) * num2
+    return q
+  }
+
   def pow(v:Float):Quat = {
     val m = mag()
     if( m == 0f) return Quat()

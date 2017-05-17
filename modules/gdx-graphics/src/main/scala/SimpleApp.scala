@@ -95,6 +95,7 @@ class SeerAppListener extends ApplicationListener {
 
     val w = HdpiUtils.toBackBufferX(width)
     val h = HdpiUtils.toBackBufferY(height)
+    if( w == 0 || h == 0) return
     RenderGraph.resize(Viewport(w,h))
     // RenderGraph.resize(Viewport(width,height))
 
