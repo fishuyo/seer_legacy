@@ -64,16 +64,16 @@ object OpenNI {
 
     NI.initialize
     NiTE.initialize
-    val devices = NI.enumerateDevices
+    val devices = NI.enumerateDevices.asScala.toList
     if (devices.size == 0) {
         println("OpenNI Error: No device is connected")
         this.shutdown()
         return;
-    }
+    } else println(s"OpenNI: ${devices.size} devices connected")
     
-    device = Device.open(devices.get(0).getUri())
+    device = Device.open(devices(0).getUri())
     depthStream = VideoStream.create(device, SensorType.DEPTH)
-    tracker = UserTracker.create()
+    tracker = UserTracker.create //(device)
     tracker.addNewFrameListener(TrackerListener)
     initd = true
   }
@@ -91,6 +91,12 @@ object OpenNI {
   }
 
 }
+
+// class Device(indx:Int){
+//   var device:Device = _
+//   var depthStream:VideoStream = _
+//   var tracker:UserTracker = _
+// }
 
 object TrackerListener extends UserTracker.NewFrameListener {
 
@@ -115,7 +121,24 @@ object TrackerListener extends UserTracker.NewFrameListener {
         u.tracking = true
       } else if (user.isLost){
         u.tracking = false
+      } //else if(user.isVisible)
+
+      val skel = user.getSkeleton()
+      skel.getState match { //if(skel != null){
+        case SkeletonState.CALIBRATING =>
+        case SkeletonState.TRACKED => 
+          Joint.strings.foreach{ case s => 
+            val j = skel.getJoint(Joint(s))
+            if(j.getPositionConfidence > 0f){
+              val p = j.getPosition
+              u.skeleton.updateJoint(s,point3DtoVec3(p))
+            }
+          }
+          u.skeleton.updateBones
+        case SkeletonState.NONE =>
+        case _ =>
       }
+
     }
 
     var depthFrame:VideoFrameRef = mLastFrame.getDepthFrame()
@@ -166,6 +189,13 @@ object TrackerListener extends UserTracker.NewFrameListener {
   }
 
   def point3DtoVec3(p:org.openni.Point3D[java.lang.Float]) = {
+    var v:Vec3 = null
+    if(OpenNI.flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + OpenNI.offset
+    else v = Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + OpenNI.offset
+    if(OpenNI.mirror) v.x *= -1
+    v
+  }
+  def point3DtoVec3(p:com.primesense.nite.Point3D[java.lang.Float]) = {
     var v:Vec3 = null
     if(OpenNI.flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + OpenNI.offset
     else v = Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + OpenNI.offset

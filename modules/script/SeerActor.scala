@@ -6,7 +6,7 @@ import graphics._
 import audio._
 import io._
 import util._ 
-import openni._
+// import openni._
 
 import akka.actor._
 import akka.event.Logging
@@ -67,7 +67,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     }
     if(_keyboard.isDefined) _keyboard.get.remove
     if(_mouse.isDefined) _mouse.get.remove
-    if(_openni.isDefined) _openni.get.remove
+    // if(_openni.isDefined) _openni.get.remove
 
     // shader.stopMonitor() ??
   }
@@ -82,8 +82,8 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     // scene = Scene(name)
     // s
   // }
-  var _openni:Option[OpenNIListener] = None
-  def OpenNI = _openni.getOrElse({_openni = Some(new OpenNIListener()); _openni.get })
+  // var _openni:Option[OpenNIListener] = None
+  // def OpenNI = _openni.getOrElse({_openni = Some(new OpenNIListener()); _openni.get })
 
   def updateRenderer(){
     node.renderer.scene = scene
