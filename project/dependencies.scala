@@ -46,19 +46,19 @@ object Dependencies {
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % libgdxV excludeAll(
       ExclusionRule(organization = "org.lwjgl")
     ),
-    "com.badlogicgames.gdx" % "gdx-platform" % libgdxV classifier "natives-desktop",
-    "org.lwjgl" % "lwjgl" % lwjglV,
-    "org.lwjgl" % "lwjgl" % lwjglV classifier "natives-windows",
-    "org.lwjgl" % "lwjgl-glfw" % lwjglV,
-    "org.lwjgl" % "lwjgl-glfw" % lwjglV classifier "natives-windows",
-    "org.lwjgl" % "lwjgl-jemalloc" % lwjglV,
-    "org.lwjgl" % "lwjgl-jemalloc" % lwjglV classifier "natives-windows",
-    "org.lwjgl" % "lwjgl-opengl" % lwjglV,
-    "org.lwjgl" % "lwjgl-opengl" % lwjglV classifier "natives-windows",
-    "org.lwjgl" % "lwjgl-openal" % lwjglV,
-    "org.lwjgl" % "lwjgl-openal" % lwjglV classifier "natives-windows",
-    "org.lwjgl" % "lwjgl-openvr" % lwjglV,
-    "org.lwjgl" % "lwjgl-openvr" % lwjglV classifier "natives-windows"
+    "com.badlogicgames.gdx" % "gdx-platform" % libgdxV classifier "natives-desktop"//,
+    // "org.lwjgl" % "lwjgl" % lwjglV,
+    // "org.lwjgl" % "lwjgl" % lwjglV classifier "natives-windows",
+    // "org.lwjgl" % "lwjgl-glfw" % lwjglV,
+    // "org.lwjgl" % "lwjgl-glfw" % lwjglV classifier "natives-windows",
+    // "org.lwjgl" % "lwjgl-jemalloc" % lwjglV,
+    // "org.lwjgl" % "lwjgl-jemalloc" % lwjglV classifier "natives-windows",
+    // "org.lwjgl" % "lwjgl-opengl" % lwjglV,
+    // "org.lwjgl" % "lwjgl-opengl" % lwjglV classifier "natives-windows",
+    // "org.lwjgl" % "lwjgl-openal" % lwjglV,
+    // "org.lwjgl" % "lwjgl-openal" % lwjglV classifier "natives-windows",
+    // "org.lwjgl" % "lwjgl-openvr" % lwjglV,
+    // "org.lwjgl" % "lwjgl-openvr" % lwjglV classifier "natives-windows"
   )
 
   val opencvD = Seq(

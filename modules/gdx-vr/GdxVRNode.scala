@@ -101,7 +101,7 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
       val dir = controllerL.dir
 
       val p = hmd.pos
-      Camera.nav.pos.set(p.x,p.y,p.z)
+      // Camera.nav.pos.set(p.x,p.y,p.z)
 
       if(controllerL.button("trigger")) vel += 0.0007f
       else if(controllerL.button("touchpad")) vel -= 0.0007f
@@ -112,8 +112,7 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
 
       val np =  dir * vel //+ Vec3(p.x,p.y,p.z)
       val o = new com.badlogic.gdx.math.Vector3(np.x,np.y,np.z)
-      // context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().set(o);
-      context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().add(o);
+      // context.getTrackerSpaceOriginToWorldSpaceTranslationOffset().add(o);
     }
 
   }
@@ -251,11 +250,14 @@ object GdxVRNode extends RenderNode with VRDeviceListener {
 class Device(val kind:VRDeviceType, val index:Int=0, val space:Space=Space.World){
 
   def context = GdxVRNode.context
+
   def device = {
     val ds = context.getDevicesByType(kind)
     if(index < ds.size) ds.get(index)
     else null
   }
+
+  def connected = (device != null)
 
   def pos = {
     var p = device.getPosition(space)
