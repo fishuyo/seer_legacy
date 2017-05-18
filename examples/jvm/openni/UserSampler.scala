@@ -32,15 +32,15 @@ object UserSampler extends SeerApp {
 
   override def draw(){
     model.draw
+    val users = OpenNI.users.values.filter(_.tracking)
+    users.foreach { case u =>
+      u.skeleton.joints.values.foreach( Sphere().translate(_).scale(0.01).draw )
+    }
   }
 
   override def animate(dt:Float){
     // update users 
     val users = OpenNI.users.values.filter(_.tracking)
-    users.foreach { case user => 
-      // user.skeleton.updateJoints
-      // user.points.clear 
-    }
 
     try{
       // hack to put point data in user object for now
@@ -57,7 +57,7 @@ object UserSampler extends SeerApp {
       mesh.clear
 
       if( out.isEmpty ){
-        mesh.vertices ++= OpenNI.points //pointMesh.vertices
+        mesh.vertices ++= users.flatMap(_.points) //OpenNI.points //pointMesh.vertices
       } else {
         out.foreach{ case user =>
           // mesh.vertices ++= user.skeleton.joints.values
