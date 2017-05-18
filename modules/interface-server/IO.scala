@@ -2,6 +2,8 @@
 package com.fishuyo.seer
 package interface
 
+import hid._
+
 import com.typesafe.config._
 import net.ceedubs.ficus.Ficus._
 
@@ -23,9 +25,11 @@ object IO {
 }
 
 
-class IO(val name:String) {
+trait IO {
   val sources = HashMap[String,Source[Float,Future[akka.Done]]]()
   val sinks = HashMap[String,Sink[Float,Future[akka.Done]]]()
 
   def close(){}
 }
+
+class DeviceIO(product:String, id:Int) extends hid.Device(product,id) with IO 

@@ -33,7 +33,7 @@ object OSCServer {
       val sinks = conf.as[Map[String,Config]]("sinks")
       val mappings = conf.as[List[Config]]("mappings")
 
-      val app = new AppClient(name)
+      val app = new AppClient
       if(IO.ios.isDefinedAt(name)) IO(name).close
       IO(name) = app
 
@@ -65,7 +65,7 @@ object OSCServer {
 }
 
 
-class AppClient(name:String) extends IO(name) {
+class AppClient extends IO {
 
   val osc = new OSCSend
   // val sinks = HashMap[String,Sink[Float,Future[akka.Done]]]()
