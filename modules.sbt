@@ -42,7 +42,7 @@ lazy val rift = project.in(file("modules/rift")).
   settings(Common.settings: _*)
 
 lazy val hid = project.in(file("modules/hid")).
-  dependsOn(core).
+  dependsOn(core, graphics).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.hidD)
 
