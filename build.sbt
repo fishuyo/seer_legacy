@@ -8,14 +8,13 @@ lazy val core = crossProject.in(file("modules/core")).
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
-lazy val graphics = project.in(file("modules/graphics"))
 
-lazy val gdx_graphics = project.in(file("modules/gdx-backend/gdx-graphics")).
+lazy val gdx_graphics = project.in(file("modules/backends/gdx/gdx-graphics")).
   dependsOn(coreJVM).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.gdxD)
 
-lazy val gdx_app_desktop = project.in(file("modules/gdx-backend/gdx-app-desktop")).
+lazy val gdx_app_desktop = project.in(file("modules/backends/gdx/gdx-app-desktop")).
   dependsOn(gdx_graphics).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.gdxAppDesktopD)

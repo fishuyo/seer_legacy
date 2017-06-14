@@ -6,21 +6,21 @@ lazy val core = LocalProject("coreJVM")
 lazy val app = LocalProject("gdx_app_desktop")
 lazy val graphics = LocalProject("gdx_graphics")
 
-lazy val openni = project.in(file("modules/openni")).
+lazy val openni = project.in(file("modules/addons/openni")).
   dependsOn(core).
   settings(Common.settings: _*)
   // settings(libraryDependencies ++= Dependencies.openniD)
 
-lazy val openni2 = project.in(file("modules/openni2")).
+lazy val openni2 = project.in(file("modules/addons/openni2")).
   dependsOn(core).
   settings(Common.settings: _*)
 
-lazy val opencv = project.in(file("modules/opencv")).
+lazy val opencv = project.in(file("modules/addons/opencv")).
   dependsOn(core).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.opencvD)
 
-lazy val video = project.in(file("modules/video")).
+lazy val video = project.in(file("modules/addons/video")).
   dependsOn(core, app).
   settings(Common.settings: _*)
 
@@ -32,16 +32,16 @@ lazy val script = project.in(file("modules/script")).
   dependsOn(core, graphics).
   settings(Common.settings: _*)
 
-lazy val openvr = project.in(file("modules/openvr")).
+lazy val openvr = project.in(file("modules/addons/openvr")).
   dependsOn(core, graphics, app).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.openvrD)
 
-lazy val rift = project.in(file("modules/rift")).
+lazy val rift = project.in(file("modules/addons/rift")).
   dependsOn(core, graphics, app).
   settings(Common.settings: _*)
 
-lazy val hid = project.in(file("modules/hid")).
+lazy val hid = project.in(file("modules/addons/hid")).
   dependsOn(core, graphics).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.hidD)
