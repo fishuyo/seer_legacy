@@ -6,7 +6,7 @@ import spatial._
 
 import collection.mutable.ListBuffer
 
-abstract trait PickEventType
+sealed trait PickEventType
 case object Point extends PickEventType
 case object Pick extends PickEventType
 case object Drag extends PickEventType
@@ -20,53 +20,87 @@ case class Hit(val ray:Ray, val t:Option[Float]){
   def pos = ray(t.get)
 }
 
-object Pickable { 
-  def apply() = new Pickable
-}
-
-class Pickable(){ //val model:Model) {
+trait Pickable {
   val pose = Pose()
   val scale = Vec3(1)
-
-  val prevPose = Pose()
   var hover = false
   var selected = false
+
+  var containChildren = true
+
+  var parent:Option[_ <: Pickable] = None
+  val children:ListBuffer[_ <:Pickable] = ListBuffer[Pickable]()
+
+  def intersect(r:Ray):Option[Float]
+
+  def point(hit:Hit, child:Seq[Boolean]):Boolean = false
+  def pick(hit:Hit, child:Seq[Boolean]):Boolean = false
+  def drag(hit:Hit, child:Seq[Boolean]):Boolean = false
+  def unpick(hit:Hit, child:Seq[Boolean]):Boolean = false
+
+  def pickEvent(e:PickEvent):Boolean = {
+    val hit = Hit(e.ray, intersect(e.ray))
+    var childs = Seq[Boolean]()
+    
+    // depth first event propogation, so we can know to ignore events handled by children
+    if(hit.t.isDefined || !containChildren)
+      childs = children.map { _.pickEvent(PickEvent(e.event, transformRayLocal(e.ray))) }
+
+    // XXX events probably need to be handled differently, ie unpick should probably always propogate?
+    e.event match {
+      case Point => point(hit, childs)
+      case Pick => pick(hit, childs)
+      case Drag => drag(hit, childs)
+      case Unpick => unpick(hit, childs)
+    }
+  }
+
+  def transformRayLocal(r:Ray) = {
+    r
+  }
+}
+
+
+// object Pickable { 
+//   def apply() = new Pickable
+// }
+
+class PickableExample extends Pickable { //val model:Model) {
+  // val pose = Pose()
+  // val scale = Vec3(1)
+
+  val prevPose = Pose()
   var selectDist = 0f
   var selectOffset = Vec3()
 
-  var parent:Option[Pickable] = None
-  val children = ListBuffer[Pickable]()
+  // var parent:Option[Pickable] = None
+  // val children = ListBuffer[Pickable]()
 
-  def intersect(r:Ray) = {
+  override def intersect(r:Ray) = {
     r.intersectSphere(pose.pos, scale.x )
   }
 
-  def pickEvent(e:PickEvent){
-    val hit = Hit(e.ray, intersect(e.ray))
-      e.event match {
-        case Point => point(hit)
-        case Pick => pick(hit)
-        case Drag => drag(hit)
-        case Unpick => unpick(hit)
-      }
-  }
-
-  def point(hit:Hit){
+  override def point(hit:Hit, childs:Seq[Boolean]) = {
     if(hit.isDefined) hover = true
     else hover = false
+    hover
   }
-  def pick(hit:Hit){
+  override def pick(hit:Hit, childs:Seq[Boolean]) = {
     if(hit.isDefined){
       prevPose.set(pose)
       selectDist = hit.dist
       selectOffset = pose.pos - hit.pos
       selected = true
     } else selected = false
+    selected
   }
-  def drag(hit:Hit){
+  override def drag(hit:Hit, childs:Seq[Boolean]) = {
     if(selected) pose.pos.set( hit.ray(selectDist) + selectOffset )
+    selected
   }
-  def unpick(hit:Hit){
+  override def unpick(hit:Hit, childs:Seq[Boolean]) = {
     if(!hover) selected = false
+    false
   }
+
 }

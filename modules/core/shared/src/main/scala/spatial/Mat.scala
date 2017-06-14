@@ -1,8 +1,17 @@
 
-// package com.fishuyo.seer
-// package math
+package com.fishuyo.seer
+package spatial
 
 
-// class Mat {
+class Matrix(val n:Int) {
 
-// }
+  val data = new Array[Float](n*n)
+
+}
+
+
+
+class Matrix4 extends Matrix(4) {
+
+
+}
