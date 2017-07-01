@@ -55,8 +55,14 @@ trait Pickable {
     }
   }
 
-  def transformRayLocal(r:Ray) = {
-    r
+  def transformRayLocal(ray:Ray) = {
+    val model = Matrix.translation(pose.pos) * Mat4().fromQuat(pose.quat) * Matrix.scaling(scale)
+    val invertable = model.invert
+    val m = Mat4()
+    m.set(model)
+    val o = m.transform(ray.o, 1)
+    val d = m.transform(ray.d, 0)
+    Ray(o, d)
   }
 }
 

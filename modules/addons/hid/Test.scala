@@ -20,14 +20,27 @@ object Test extends App {
   // val joy = new PS3Controller(0)
   // val m = new Device("Razer Orochi",0)
   val joy = new JoyconR(0)
+  val joy2 = new JoyconL(0)
   // val m2 = new Device("Apple Optical USB Mouse",0)
-  joy.connect
-  val sources = joy.getSources
-  sources.foreach { case (n,s) =>
-    s.runForeach( (v) => osc.send(s"/joycon/$n", v))
+  joy.init = (d:Device) => {
+    val sources = joy.getSources
+    sources.foreach { case (n,s) =>
+      s.runForeach( (v) => osc.send(s"/joycon/$n", v))
+    }
+    sources("X").runForeach( (v) => println("X " + v))
   }
+  joy.connect
 
-  sources("X").runForeach( (v) => println("X " + v))
+  joy2.init = (d:Device) => {
+    val sources2 = joy2.getSources
+    sources2.foreach { case (n,s) =>
+      s.runForeach( (v) => osc.send(s"/joyconL/$n", v))
+    }
+    sources2("up").runForeach( (v) => println("up " + v))
+  }
+  joy2.connect
+
+
   // joy.sources("L1").runForeach( (v) => println("L1 " + v))
   // joy.sources("leftX").runForeach( (v) => println("leftX " + v))
   // joy.sources("accX").runForeach( (v) => println("accX " + v))

@@ -43,6 +43,7 @@ class Device(product:String, id:Int){
   var broadcastBytes: Source[Array[Byte],akka.NotUsed] = _
   // var sources: Map[String,Source[Float,akka.NotUsed]] = _
 
+  var init = (d:Device)=>{}
   // connect()
 
   def connect() = {
@@ -60,6 +61,7 @@ class Device(product:String, id:Int){
       broadcastBytes.runWith(Sink.ignore)
       // broadcastBytes.runForeach(msg => println(msg.mkString(" ")))
 
+      init(this)
       // println(elements)
 
       // make sources from elements
@@ -184,6 +186,31 @@ class JoyconR(id:Int) extends Device("Joy-Con (R)", id) {
     ButtonEx("stickDR", 3, 5),
     ButtonEx("stickD", 3, 6),
     ButtonEx("stickDL", 3, 7),
+    ButtonEx("stickC", 3, 8)
+  )
+}
+
+class JoyconL(id:Int) extends Device("Joy-Con (L)", id) {
+  elements = List(
+    Button("left", 1, 1),
+    Button("up", 1, 4),
+    Button("right", 1, 8),
+    Button("down", 1, 2),
+    Button("L", 2, 64),
+    Button("ZL", 2, 128),
+    Button("SL", 1, 16),
+    Button("SR", 1, 32),
+    Button("-", 2, 1),
+    Button("ss", 2, 32),
+    Button("stick", 2, 4),
+    ButtonEx("stickR", 3, 0),
+    ButtonEx("stickDR", 3, 1),
+    ButtonEx("stickD", 3, 2),
+    ButtonEx("stickDL", 3, 3),
+    ButtonEx("stickL", 3, 4),
+    ButtonEx("stickUL", 3, 5),
+    ButtonEx("stickU", 3, 6),
+    ButtonEx("stickUR", 3, 7),
     ButtonEx("stickC", 3, 8)
   )
 }

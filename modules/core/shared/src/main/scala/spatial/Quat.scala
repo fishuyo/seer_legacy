@@ -102,6 +102,75 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
     Vec3(el,az,bank)
   }
 
+  def fromMatrix(m:Mat4):Quat = fromMatrix(m.data)
+  def fromMatrix(m:Array[Float]) = {
+    val trace = m(0)+m(5)+m(10)
+    w = math.sqrt(1f + trace)*0.5f
+
+    if(trace > 0f) {
+      x = (m(9) - m(6))/(4f*w)
+      y = (m(2) - m(8))/(4f*w)
+      z = (m(4) - m(1))/(4f*w)
+    }
+    else {
+      if(m(0) > m(5) && m(0) > m(10)) {
+        // m(0) is greatest
+        x = math.sqrt(1f + m(0)-m(5)-m(10))*0.5f
+        w = (m(9) - m(6))/(4f*x)
+        y = (m(4) + m(1))/(4f*x)
+        z = (m(8) + m(2))/(4f*x)
+      }
+      else if(m(5) > m(0) && m(5) > m(10)) {
+        // m(1) is greatest
+        y = math.sqrt(1f + m(5)-m(0)-m(10))*0.5f
+        w = (m(2) - m(8))/(4f*y)
+        x = (m(4) + m(1))/(4f*y)
+        z = (m(9) + m(6))/(4f*y)
+      }
+      else { //if(m(10) > m(0) && m(10) > m(5)) {
+        // m(2) is greatest
+        z = math.sqrt(1f + m(10)-m(0)-m(5))*0.5f
+        w = (m(4) - m(1))/(4f*z)
+        x = (m(8) + m(2))/(4f*z)
+        y = (m(9) + m(6))/(4f*z)
+      }
+    }
+    this
+  }
+
+  def toCoordinateFrame(ux:Vec3, uy:Vec3, uz:Vec3) = {
+    val wx=2*w*x; val wy=2*w*y; val wz=2*w*z
+    val xx=2*x*x; val xy=2*x*y; val xz=2*x*z
+    val yy=2*y*y; val yz=2*y*z; val zz=2*z*z
+
+    ux.x = -zz - yy + 1
+    ux.y = wz + xy
+    ux.z = xz - wy
+
+    uy.x = xy - wz
+    uy.y = -zz - xx + 1
+    uy.z = wx + yz
+
+    uz.x = wy + xz
+    uz.y = yz - wx
+    uz.z = -yy - xx + 1
+
+    (ux,uy,uz)
+  }
+
+  def toMatrix(m:Mat4):Mat4 = { toMatrix(m.data); m }
+  def toMatrix(m:Array[Float]) = {
+    val ux,uy,uz = Vec3()
+    toCoordinateFrame(ux,uy,uz)
+
+    m( 0) = ux.x;  m( 4) = uy.x;  m( 8) = uz.x;  m(12) = 0;
+    m( 1) = ux.y;  m( 5) = uy.y;  m( 9) = uz.y;  m(13) = 0;
+    m( 2) = ux.z;  m( 6) = uy.z;  m(10) = uz.z;  m(14) = 0;
+    m( 3) = 0;    m( 7) = 0;    m(11) = 0;    m(15) = 1;
+    m
+  }
+
+
   // def toMatrix() = new Matrix4(new Quaternion(x,y,z,w))
   // def toQuaternion() = new Quaternion(x,y,z,w)
 
@@ -132,6 +201,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
     val quat = Quat(a*w+b*q.w, a*x+b*q.x, a*y+b*q.y, a*z+b*q.z)
     quat.normalize
   }
+
   def slerpTo(q:Quat, d:Float) = this.set( this.slerp(q,d))
   
   def rotate(v:Vec3) = {
