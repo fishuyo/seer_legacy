@@ -5,7 +5,7 @@ package hid
 
 class Dump(name:String){
 
-  val device = DeviceManager.getDevices(name).head
+  val device = DeviceManager.getHidDevices(name).head
   read()
 
   def read() = {

@@ -47,6 +47,6 @@ lazy val hid = project.in(file("modules/addons/hid")).
   settings(libraryDependencies ++= Dependencies.hidD)
 
 lazy val interface_server = project.in(file("modules/interface-server")).
-  dependsOn(core, hid, graphics).
-  settings(Common.settings: _*).
+  dependsOn(core, hid, graphics, app, script).
+  settings(Common.appSettings: _*).
   settings(libraryDependencies += Dependencies.ficus)

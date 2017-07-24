@@ -17,6 +17,7 @@ object Dependencies {
   val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
 
   val ficus = "com.iheart" %% "ficus" % "1.4.0"
+  val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
 
   // projects
   val coreD = Seq(
@@ -58,6 +59,6 @@ object Dependencies {
   )
 
   val hidD = Seq(
-    "org.hid4java" % "hid4java" % "0.4.0"
+    "org.hid4java" % "hid4java" % "0.5.0"
   )
 }
