@@ -120,6 +120,11 @@ trait ScriptLoader {
       // }
       val ret = compile()
       ret match{
+        case s:Script =>
+          unload
+          obj = ret
+          s.load()
+          loaded = true
         case s:SeerScript =>
           unload
           obj = ret
@@ -153,6 +158,10 @@ trait ScriptLoader {
   }
   def unload(){
     obj match {
+      case s:Script => 
+        s.unload()
+        obj = null
+        loaded = false
       case s:SeerScript =>
         s.unload()
         obj = null
