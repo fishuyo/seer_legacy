@@ -154,7 +154,7 @@ trait ScriptLoader {
         case obj => println(s"Unrecognized return value from script: $obj")
 
       }
-    } catch { case e:Exception => loaded = false; println(e.getMessage) }
+    } catch { case e:Exception => loaded = false; println("Exception in script: " +e.getMessage) }
   }
   def unload(){
     obj match {

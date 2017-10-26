@@ -6,6 +6,7 @@ object Common {
 
   // lazy val settings = plugins.JvmPlugin.projectSettings ++ Seq(
   lazy val settings = Seq(
+    organization := "com.fishuyo.seer",
     version := "0.1-SNAPSHOT",
     scalaVersion := "2.11.8",
     updateOptions := updateOptions.value.withCachedResolution(true),
@@ -29,8 +30,33 @@ object Common {
       // "-target:jvm-1.6"
     ),
     cancelable in Global := true,
-    exportJars := true//,
+    exportJars := true,
     // libraryDependencies ++= Dependencies.coreD
+    pomIncludeRepository := { _ => false },
+    licenses := Seq("BSD-style" -> url("http://www.opensource.org/licenses/bsd-license.php")),
+    homepage := Some(url("http://fishuyo.com/projects/seer")),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/fishuyo/seer"),
+        "scm:git@github.com:fishuyo/seer.git"
+      )
+    ),
+    developers := List(
+      Developer(
+        id    = "fishuyo",
+        name  = "Tim Wood",
+        email = "fishuyo@gmail.com",
+        url   = url("http://fishuyo.com")
+      )
+    ),
+    publishMavenStyle := true,
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value)
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    }
   )
 
   // lazy val desktop = commonSettings ++ Seq(

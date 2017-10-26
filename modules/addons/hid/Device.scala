@@ -16,15 +16,15 @@ import collection.mutable.HashMap
 
 import scala.language.dynamics
 
-abstract class DeviceElement
+sealed trait DeviceElement { def name:String }
 case class Button(name:String, pin:Int, value:Int) extends DeviceElement
 case class ButtonEx(name:String, pin:Int, value:Int) extends DeviceElement //exclusive value
 case class Analog(name:String, pin:Int) extends DeviceElement
 case class AnalogSigned(name:String, pin:Int) extends DeviceElement
 
-abstract class DeviceType
+sealed trait DeviceType
 case object Default extends DeviceType 
-abstract class Joystick extends DeviceType 
+sealed trait Joystick extends DeviceType 
 case object AnalogJoystick extends Joystick
 case object DualAnalogJoystick extends Joystick 
 
