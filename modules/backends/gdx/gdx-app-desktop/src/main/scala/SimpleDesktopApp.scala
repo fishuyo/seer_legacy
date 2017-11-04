@@ -74,8 +74,8 @@ object DesktopApp {
     // cfg.width = Window.w0
     // cfg.height = Window.h0
 
-    GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
-    println("GLFW Version: " + GLFW.glfwGetVersionString())
+    // GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+    // println("GLFW Version: " + GLFW.glfwGetVersionString())
 
     new Lwjgl3Application( app, cfg )
     // new LwjglApplication( app, cfg )

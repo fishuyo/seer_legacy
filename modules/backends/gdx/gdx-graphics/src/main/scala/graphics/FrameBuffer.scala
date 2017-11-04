@@ -23,6 +23,7 @@ import com.badlogic.gdx.Gdx.{gl20 => gl }
 trait RenderTarget {
 }
 
+// class FrameBuffer(builder:FrameBufferBuilder) extends GdxFrameBuffer(f,w,h,depth) with RenderTarget
 class FrameBuffer(var w:Int, var h:Int,f:Format,depth:Boolean) extends GdxFrameBuffer(f,w,h,depth) with RenderTarget
 
 object FrameBuffer {

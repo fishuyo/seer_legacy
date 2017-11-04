@@ -10,6 +10,7 @@ object Common {
     version := "0.1-SNAPSHOT",
     scalaVersion := "2.11.8",
     updateOptions := updateOptions.value.withCachedResolution(true),
+    // updateOptions := updateOptions.value.withLatestSnapshots(true),
     javacOptions ++= Seq(
       "-Xlint",
       "-encoding", "UTF-8"
@@ -75,6 +76,7 @@ object Common {
     fork in Compile := true,
     fork in run := true,
     javaOptions in run += "-XstartOnFirstThread"
+    // javaOptions in run += "-Dorg.lwjgl.util.Debug=true"
     // unmanagedResourceDirectories in Compile += file("android/assets"),
     // desktopJarName := "seer-app",
     // Tasks.assembly

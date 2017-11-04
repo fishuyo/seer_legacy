@@ -5,7 +5,7 @@ import sbt._
 object Dependencies {
   // versions
   val akkaV = "2.4.17" //"2.3.4" 
-  val libgdxV = "1.9.2"
+  val libgdxV = "1.9.8-SNAPSHOT"
 
   val chillV = "0.5.2" //"0.8.0" //"0.5.2"
 
