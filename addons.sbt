@@ -17,8 +17,8 @@ lazy val openni2 = project.in(file("modules/addons/openni2")).
 
 lazy val opencv = project.in(file("modules/addons/opencv")).
   dependsOn(core).
-  settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.opencvD)
+  settings(Common.settings: _*)
+  // settings(libraryDependencies ++= Dependencies.opencvD)
 
 lazy val video = project.in(file("modules/addons/video")).
   dependsOn(core, app).

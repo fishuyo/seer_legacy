@@ -3,7 +3,7 @@ package com.fishuyo.seer
 package cv
 
 import org.opencv.core._
-import org.opencv.highgui._
+import org.opencv.videoio._
 import org.opencv.imgproc._
 
 object OpenCV {
@@ -21,7 +21,7 @@ object Webcam {
 }
 class Webcam(device:Int) extends VideoCapture(device) {
 
-  def width() = this.get(Highgui.CV_CAP_PROP_FRAME_WIDTH).toInt
-  def height() = this.get(Highgui.CV_CAP_PROP_FRAME_HEIGHT).toInt
+  def width() = this.get(Videoio.CAP_PROP_FRAME_WIDTH).toInt
+  def height() = this.get(Videoio.CAP_PROP_FRAME_HEIGHT).toInt
 
 }

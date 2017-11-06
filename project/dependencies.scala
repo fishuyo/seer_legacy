@@ -47,11 +47,6 @@ object Dependencies {
     "com.badlogicgames.gdx" % "gdx-platform" % libgdxV classifier "natives-desktop"
   )
 
-  val opencvD = Seq(
-    "org.openpnp" % "opencv" % "3.2.0-1",
-    // "org.openpnp" % "opencv" % "2.4.13-0",
-    parsers
-  )
 
   val openvrD = Seq(
     "net.java.dev.jna" % "jna" % "3.5.0",
