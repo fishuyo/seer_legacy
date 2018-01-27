@@ -1,10 +1,17 @@
 
-/**
-* Addon Modules
-*/
 lazy val core = LocalProject("coreJVM")
 lazy val app = LocalProject("gdx_app_desktop")
 lazy val graphics = LocalProject("gdx_graphics")
+
+/**
+* Addon Modules
+*/
+
+/** Allows for livecoding via scala scripts */
+lazy val script = project.in(file("modules/addons/script")).
+  dependsOn(core, graphics).
+  settings(Common.settings: _*)
+
 
 lazy val openni = project.in(file("modules/addons/openni")).
   dependsOn(core).
@@ -24,14 +31,6 @@ lazy val video = project.in(file("modules/addons/video")).
   dependsOn(core, app).
   settings(Common.settings: _*)
 
-lazy val portaudio = project.in(file("modules/portaudio")).
-  dependsOn(core).
-  settings(Common.settings: _*)
-
-lazy val script = project.in(file("modules/script")).
-  dependsOn(core, graphics).
-  settings(Common.settings: _*)
-
 lazy val openvr = project.in(file("modules/addons/openvr")).
   dependsOn(core, graphics, app).
   settings(Common.settings: _*).
@@ -46,7 +45,7 @@ lazy val hid = project.in(file("modules/addons/hid")).
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.hidD)
 
-lazy val interface_server = project.in(file("modules/interface-server")).
-  dependsOn(core, hid, graphics, app, script).
-  settings(Common.appSettings: _*).
-  settings(libraryDependencies += Dependencies.ficus)
+
+lazy val gdx_box2d = project.in(file("modules/backends/gdx/gdx-box2d")).
+  dependsOn(core).
+  settings(Common.settings: _*)

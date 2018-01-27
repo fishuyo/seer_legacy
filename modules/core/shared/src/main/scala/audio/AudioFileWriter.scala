@@ -13,8 +13,6 @@ import de.sciss.synth.io._
 
 import collection.mutable.ArrayBuffer
 
-import com.badlogic.gdx.Gdx
-
 
 case class Open(path:String)
 case class Write(samples:Array[Array[Float]])
@@ -76,9 +74,10 @@ class AudioFileWriterActor extends Actor {
     try{
       val form = new java.text.SimpleDateFormat("yyyy-MM-dd-HH.mm.ss")
       val filename = form.format(new java.util.Date()) + ".wav" 
-      var path = "SeerData/audio/" + filename
-      Gdx.files.external("SeerData/audio").file().mkdirs()
-      file = Gdx.files.external(path).file()
+      file = new java.io.File(filename)
+      // var path = "SeerData/audio/" + filename
+      // Gdx.files.external("SeerData/audio").file().mkdirs()
+      // file = Gdx.files.external(path).file()
     } catch { case e:Exception => println("Error AudioFileWriter: failed to open default output file!")}
     file
   }

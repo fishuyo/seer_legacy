@@ -26,7 +26,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   var active = true
 
   var scene = Scene //graphics.Scene()
-  var camera = Camera
+  var camera:NavCamera = Camera
   var shader = Shader("basic")
   var node = RenderNode()
   var xFadeTime = 1f
