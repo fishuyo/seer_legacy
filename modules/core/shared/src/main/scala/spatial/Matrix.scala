@@ -26,8 +26,8 @@ object Matrix {
   }
 
   def rotation(angle:Double, dim1:Int, dim2:Int, n:Int=4) = {
-    val cs = math.cos(angle)
-    val sn = math.sin(angle)
+    val cs = math.cos(angle).toFloat
+    val sn = math.sin(angle).toFloat
     val m = identity(n)
     m(dim1,dim1) = cs
     m(dim1,dim2) = -sn

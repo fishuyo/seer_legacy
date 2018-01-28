@@ -175,7 +175,7 @@ class Box extends Model {
 object Tetrahedron extends ModelGenerator {
 
   override def generateMesh():Mesh = generateMesh(new Mesh())
-  def generateMesh( mesh:Mesh, l:Float = math.sqrt(1f/3) ):Mesh = {
+  def generateMesh( mesh:Mesh, l:Float = math.sqrt(1f/3).toFloat ):Mesh = {
     mesh.primitive = Triangles
     mesh.vertices += Vec3(l,l,l)
     mesh.vertices += Vec3(-l,l,-l)

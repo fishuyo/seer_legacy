@@ -1,8 +1,10 @@
 
 package com.fishuyo.seer
+package world
 package particle
 
 import graphics.Animatable
+import field.VecField3D
 
 import scala.collection.mutable.ListBuffer
 
@@ -12,7 +14,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 	var ttl = 20f
 	var particles = ListBuffer[Particle]()
 
-	var field:Option[spatial.VecField3D] = None
+	var field:Option[VecField3D] = None
 	var fieldAsForce = true
 	var xt = 0f
 

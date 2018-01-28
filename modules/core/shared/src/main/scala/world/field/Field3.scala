@@ -1,6 +1,9 @@
 
 package com.fishuyo.seer
-package spatial
+package world
+package field
+
+import spatial.Vec3
 
 import util._
 
@@ -74,9 +77,9 @@ object Field3 {
       var x = i - dt0 * v.x
       var y = j - dt0 * v.y
       var z = k - dt0 * v.z
-      if (x < 0.5) x = 0.5; if (x > f.nx + 0.5) x = f.nx + 0.5; val i0=x.toInt; val i1=i0+1;
-      if (y < 0.5) y = 0.5; if (y > f.ny + 0.5) y = f.ny + 0.5; val j0=y.toInt; val j1=j0+1;
-      if (z < 0.5) z = 0.5; if (z > f.nz + 0.5) z = f.nz + 0.5; val k0=z.toInt; val k1=k0+1;
+      if (x < 0.5) x = 0.5f; if (x > f.nx + 0.5) x = f.nx + 0.5f; val i0=x.toInt; val i1=i0+1;
+      if (y < 0.5) y = 0.5f; if (y > f.ny + 0.5) y = f.ny + 0.5f; val j0=y.toInt; val j1=j0+1;
+      if (z < 0.5) z = 0.5f; if (z > f.nz + 0.5) z = f.nz + 0.5f; val k0=z.toInt; val k1=k0+1;
       val dx = x-i0; val dy = y-j0; val dz = z-k0;
       val xy0 = lerp( lerp(f(i0,j0,k0), f(i1,j0,k0), dx), lerp(f(i0,j1,k0), f(i1,j1,k0), dx), dy)
       val xy1 = lerp( lerp(f(i0,j0,k1), f(i1,j0,k1), dx), lerp(f(i0,j1,k1), f(i1,j1,k1), dx), dy)
@@ -166,9 +169,9 @@ object VecField3 {
       var x = i - dt0 * v.x
       var y = j - dt0 * v.y
       var z = k - dt0 * v.z
-      if (x < 0.5) x = 0.5; if (x > f.nx + 0.5) x = f.nx + 0.5; val i0=x.toInt; val i1=i0+1;
-      if (y < 0.5) y = 0.5; if (y > f.ny + 0.5) y = f.ny + 0.5; val j0=y.toInt; val j1=j0+1;
-      if (z < 0.5) z = 0.5; if (z > f.nz + 0.5) z = f.nz + 0.5; val k0=z.toInt; val k1=k0+1;
+      if (x < 0.5) x = 0.5f; if (x > f.nx + 0.5) x = f.nx + 0.5f; val i0=x.toInt; val i1=i0+1;
+      if (y < 0.5) y = 0.5f; if (y > f.ny + 0.5) y = f.ny + 0.5f; val j0=y.toInt; val j1=j0+1;
+      if (z < 0.5) z = 0.5f; if (z > f.nz + 0.5) z = f.nz + 0.5f; val k0=z.toInt; val k1=k0+1;
       val dx = x-i0; val dy = y-j0; val dz = z-k0;
       val xy0 = lerp( lerp(f(i0,j0,k0), f(i1,j0,k0), dx), lerp(f(i0,j1,k0), f(i1,j1,k0), dx), dy)
       val xy1 = lerp( lerp(f(i0,j0,k1), f(i1,j0,k1), dx), lerp(f(i0,j1,k1), f(i1,j1,k1), dx), dy)

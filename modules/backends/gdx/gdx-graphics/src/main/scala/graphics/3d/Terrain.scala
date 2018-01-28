@@ -13,7 +13,7 @@ import util._
 object Terrain {
   def apply(tx:Int=65, ty:Int=65, scale:Float=67f) = new Terrain(tx,ty,scale)
 
-  def fractalize(m:Mesh, nx:Int, ny:Int, roughness:Float=0.15) = {
+  def fractalize(m:Mesh, nx:Int, ny:Int, roughness:Float=0.15f) = {
 
     divide(nx-1)
 
@@ -84,7 +84,7 @@ class Terrain(tx:Int, ty:Int, scale:Float) extends Animatable {
     // tmodel.material.color = RGBA(0.5,0.5,0.5,0.1)
     tmodels(idx).material.color = RGBA(1,1,1,1)
 
-    lmodels(idx) = Model(terrain).translate(scale*i,0.01,scale*j)
+    lmodels(idx) = Model(terrain).translate(scale*i,0.01f,scale*j)
     if(i != 0) lmodels(idx).scale(-1,1,1)
     if(j != 0) lmodels(idx).scale(1,1,-1)
     // lmodels(idx).translate(0,0.01,0)

@@ -16,7 +16,7 @@ object FFT {
 	var length = 2048
 	var rect = Array.fill(length)(1f)
 	var hann = Array.fill(length)(0f)
-	for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)))
+	for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)).toFloat)
 
 	var window = hann
 
@@ -27,7 +27,7 @@ object FFT {
 		fft = new FloatFFT_1D(length)
 		rect = Array.fill(length)(1f)
 		hann = Array.fill(length)(0f)
-		for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)))
+		for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)).toFloat)
 
 	}
 
@@ -98,7 +98,7 @@ class PhaseVocoder extends AudioSource {
 
 		// if(!convert) return win
 		var (phase, phaseDiff) = (0f,0f)
-		var expPhaseDiff = 2.0*math.Pi*hopFactor
+		var expPhaseDiff = (2.0*math.Pi*hopFactor).toFloat
 		var freqPerBin = 44100f / length
 
 		val out = new Array[Float](length+2)
@@ -119,10 +119,10 @@ class PhaseVocoder extends AudioSource {
 			}
 
 			//compute magnitude from real and imaginary components
-			out(2*i) = math.sqrt(re*re + im*im)
+			out(2*i) = math.sqrt(re*re + im*im).toFloat
 
 			// compute phase from real and imaginary components
-			phase = math.atan2(im,re)
+			phase = math.atan2(im,re).toFloat
 
 			// get phase difference
 			phaseDiff = phase - prevPhase(i)
@@ -134,8 +134,8 @@ class PhaseVocoder extends AudioSource {
 			phaseDiff = phaseDiff - (i*expPhaseDiff)
 
 			// unwrap phase difference
-			while(phaseDiff > math.Pi) phaseDiff -= 2.0*math.Pi
-			while (phaseDiff < -math.Pi) phaseDiff += 2.0*math.Pi
+			while(phaseDiff > math.Pi) phaseDiff -= 2.0f * math.Pi.toFloat
+			while (phaseDiff < -math.Pi) phaseDiff += 2.0f * math.Pi.toFloat
 
 			//Get deviation from bin frequency from the +/- Pi interval
 			phaseDiff = phaseDiff/expPhaseDiff  // 2.0*math.Pi*hopFactor
@@ -154,7 +154,7 @@ class PhaseVocoder extends AudioSource {
 
 		// if(!convert) return win
 		var (phase, phaseDiff) = (0f,0f)
-		var expPhaseDiff = 2.0*math.Pi*hopFactor
+		var expPhaseDiff = (2.0*math.Pi*hopFactor).toFloat
 		var freqPerBin = 44100f / length
 
 		val out = new Array[Float](length)
@@ -185,11 +185,11 @@ class PhaseVocoder extends AudioSource {
 
 			// get real and imag part
 			if( i < length/2){
-				out(2*i) = win(2*i)*math.cos(phase)
-				out(2*i+1) = win(2*i)*math.sin(phase)
+				out(2*i) = win(2*i)*math.cos(phase).toFloat
+				out(2*i+1) = win(2*i)*math.sin(phase).toFloat
 				// if( i == 0) println(s"bin 0 im: ${out(1)}, phasediff: $phase")
 			} else {
-				out(1) = win(2*i)*math.cos(phase)
+				out(1) = win(2*i)*math.cos(phase).toFloat
 				// println(s"bin l/2 im: ${win(2*i)*math.sin(phase)}, phasediff: $phase")
 			}
 		}

@@ -83,6 +83,8 @@ object Vec3 {
 }
 
 class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
+  implicit def toF( d: Double ) = d.toFloat
+
   //def ==(v:Vec3) = {x==v.x && y==v.y && z==v.z}
   def apply(i:Int) = i match { case 0 => x; case 1 => y; case 2 => z;}
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v; case 2 => z=v;}
@@ -95,15 +97,16 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   def -(v: Vec3) = Vec3( x-v.x, y-v.y, z-v.z )
   def -=(v: Vec3) = { x-=v.x; y-=v.y; z-=v.z }
   def unary_- = Vec3( -x, -y, -z ) 
-  //def *(ss: Double) = { val s = ss.toFloat; Vec3(s*x, s*y, s*z) }
   def *(s: Float ) = Vec3(s*x, s*y, s*z)
+  def *(s: Double ) = Vec3(s*x, s*y, s*z)
   def *(v: Vec3 ) = Vec3(v.x*x, v.y*y, v.z*z)
-  //def *=(ss: Double) = { val s = ss.toFloat; x*=s; y*=s; z*=s } 
   def *=(s: Float) = { x*=s; y*=s; z*=s }
+  def *=(s: Double) = { x*=s; y*=s; z*=s }
   def *=(v: Vec3) = { x*=v.x; y*=v.y; z*=v.z}
   def /(v: Vec3 ) = Vec3(x/v.x, y/v.y, z/v.z)
   def /(s: Float ) = Vec3(x/s, y/s, z/s)
   def /=(s: Float ) = {x/=s; y/=s; z/=s }
+  def /=(s: Double ) = {x/=s; y/=s; z/=s }
   
   def dot(v: Vec3) : Float = x*v.x + y*v.y + z*v.z
   def cross( v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
@@ -223,6 +226,8 @@ object Vec2 {
 }
 
 class Vec2( var x: Float, var y: Float ) extends Serializable {
+  implicit def toF( d: Double ) = d.toFloat
+
   //def ==(v:Vec2) = {x==v.x && y==v.y && z==v.z}
   def apply(i:Int) = i match { case 0 => x; case 1 => y}
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v}
@@ -236,10 +241,13 @@ class Vec2( var x: Float, var y: Float ) extends Serializable {
   def -=(v: Vec2) = { x-=v.x; y-=v.y }
   def unary_- = Vec2( -x, -y ) 
   def *(s: Float ) = Vec2(s*x, s*y)
+  def *(s: Double ) = Vec2(s*x, s*y)
   def *(v: Vec2 ) = Vec2(v.x*x, v.y*y)
   def *=(s: Float) = { x*=s; y*=s}
+  def *=(s: Double) = { x*=s; y*=s}
   def /(v: Vec2 ) = Vec2(x/v.x, y/v.y)
   def /(s: Float ) = Vec2(x/s, y/s)
+  def /(s: Double ) = Vec2(x/s, y/s)
   
   def dot(v: Vec2) : Float = x*v.x + y*v.y
   def cross( v: Vec2) = x*v.y - y*v.x

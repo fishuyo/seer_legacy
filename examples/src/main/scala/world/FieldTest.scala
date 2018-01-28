@@ -4,9 +4,11 @@ package examples.world
 
 import graphics._
 import spatial._
-import util._
-import particle._
 import io._
+import util._
+
+import world.field._
+import world.particle._
 
 import concurrent.duration._
 
@@ -108,7 +110,7 @@ class VFV(val w:Int, val h:Int, sx:Float=0.1f, sy:Float=0.1f) extends Animatable
   mesh.maxVertices = 2*w*h
   mesh.primitive = Lines
   var model = Model(mesh)
-  model.material.color.set(0.5,0.5,0.5,0.5)
+  model.material.color.set(0.5f,0.5f,0.5f,0.5f)
   var image = Image(w,h,1,4)
   var texture:Texture = _ 
   val quad = Plane()
@@ -143,7 +145,6 @@ class VFV(val w:Int, val h:Int, sx:Float=0.1f, sy:Float=0.1f) extends Animatable
 }
 
 class Emitter(var maxParticles:Int) extends Animatable {
-  import com.fishuyo.seer.particle._
 
   var ttl = 20f
   var particles = collection.mutable.ListBuffer[Particle]()
@@ -153,11 +154,11 @@ class Emitter(var maxParticles:Int) extends Animatable {
   mesh.primitive = Points
   val model = Model(mesh)
 
-  val sphere = Sphere().scale(0.005)
+  val sphere = Sphere().scale(0.005f)
   sphere.material.transparent = true
-  sphere.material.color.set(0.4,0.4,0.4,0.4)
+  sphere.material.color.set(0.4f,0.4f,0.4f,0.4f)
 
-  var field:Option[spatial.VecField2D] = None
+  var field:Option[VecField2D] = None
   var fieldAsForce = false
   var xt = 0f
 

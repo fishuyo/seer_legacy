@@ -1,5 +1,6 @@
 
 package com.fishuyo.seer
+package world
 package particle
 
 import spatial._
@@ -7,7 +8,7 @@ import graphics._
 
 import collection.mutable.ListBuffer
 
-class SpringString(val pos:Vec3, val numSegments:Int=4, val dist:Float=0.1, val stiff:Float=1.0 ) extends Animatable{
+class SpringString(val pos:Vec3, val numSegments:Int=4, val dist:Float=0.1f, val stiff:Float=1.0f ) extends Animatable{
 
   var damping = 20f
   

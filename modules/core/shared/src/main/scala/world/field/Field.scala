@@ -1,6 +1,9 @@
 
 package com.fishuyo.seer
-package spatial
+package world
+package field
+
+import spatial.Vec2
 
 import spire.syntax.cfor._
 
@@ -71,8 +74,8 @@ object Field2D {
       val v = vf(i,j)
       var x = i - dt0 * v.x
       var y = j - dt0 * v.y
-      if (x < 0.5) x = 0.5; if (x > f0.nx + 0.5) x = f0.nx + 0.5; val i0=x.toInt; val i1=i0+1;
-      if (y < 0.5) y = 0.5; if (y > f0.ny + 0.5) y = f0.ny + 0.5; val j0=y.toInt; val j1=j0+1;
+      if (x < 0.5) x = 0.5f; if (x > f0.nx + 0.5) x = f0.nx + 0.5f; val i0=x.toInt; val i1=i0+1;
+      if (y < 0.5) y = 0.5f; if (y > f0.ny + 0.5) y = f0.ny + 0.5f; val j0=y.toInt; val j1=j0+1;
       val s1 = x-i0; val s0 = 1-s1; val t1 = y-j0; val t0 = 1-t1;
       f(i,j) = s0 * (t0 * f0(i0,j0) + t1 * f0(i0,j1) ) + s1 * ( t0 * f0(i1,j0) + t1 * f0(i1,j1) )
     }
@@ -160,8 +163,8 @@ object VecField2D {
       val v = vf(i,j)
       var x = i - dt0 * v.x
       var y = j - dt0 * v.y
-      if (x < 0.5) x = 0.5; if (x > f0.nx + 0.5) x = f0.nx + 0.5; val i0=x.toInt; val i1=i0+1;
-      if (y < 0.5) y = 0.5; if (y > f0.ny + 0.5) y = f0.ny + 0.5; val j0=y.toInt; val j1=j0+1;
+      if (x < 0.5) x = 0.5f; if (x > f0.nx + 0.5) x = f0.nx + 0.5f; val i0=x.toInt; val i1=i0+1;
+      if (y < 0.5) y = 0.5f; if (y > f0.ny + 0.5) y = f0.ny + 0.5f; val j0=y.toInt; val j1=j0+1;
       val s1 = x-i0; val s0 = 1-s1; val t1 = y-j0; val t0 = 1-t1;
       f(i,j) = s0 * (t0 * f0(i0,j0) + t1 * f0(i0,j1) ) + s1 * ( t0 * f0(i1,j0) + t1 * f0(i1,j1) )
     }

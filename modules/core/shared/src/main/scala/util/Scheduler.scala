@@ -50,19 +50,21 @@ object Schedule {
 	val system = System()
 	import system.dispatcher
 
-
+@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def after(t:FiniteDuration)(f: =>Unit) = {
 		val e = System().scheduler.scheduleOnce(t)(f)
 		events += e
 		e
 	}
 
+@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def every(t:FiniteDuration)(f: =>Unit) = {
 		val e = System().scheduler.schedule(t,t)(f)
 		events += e
 		e
 	}
 
+@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def over(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
@@ -103,6 +105,7 @@ object Schedule {
 		e
 	}
 
+@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def cycle(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
@@ -121,6 +124,7 @@ object Schedule {
 		e
 	}
 
+@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def oscillate(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len

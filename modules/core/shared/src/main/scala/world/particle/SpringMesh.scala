@@ -1,5 +1,6 @@
 
 package com.fishuyo.seer
+package world
 package particle
 
 import graphics._

@@ -1,6 +1,7 @@
 
 
 package com.fishuyo.seer
+package world
 package particle
 
 import spatial._

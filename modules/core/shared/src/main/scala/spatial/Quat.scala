@@ -8,6 +8,8 @@ package com.fishuyo.seer
 package spatial
 
 object Quat {
+  implicit def toF( d: Double ) = d.toFloat
+  
   val eps = 0.0000001
   val acc_max = 1.000001
   val acc_min = 0.999999
@@ -26,7 +28,7 @@ object Quat {
 }
 
 class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializable {
-  // implicit def toF( d: Double ) = d.toFloat
+  implicit def toF( d: Double ) = d.toFloat
 
   def unary_- = Quat( -w, -x, -y, -z ) 
   def +(v: Quat) = Quat( w+v.w, x+v.x, y+v.y, z+v.z )

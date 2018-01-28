@@ -1,6 +1,10 @@
 
 package com.fishuyo.seer
-package spatial
+package world
+package field 
+
+import spatial.AABB
+import spatial.Vec3
 
 
 class VecField3D( var n:Int, cen:Vec3=Vec3(0), hsize:Float=1f)  extends AABB(cen,hsize) {
