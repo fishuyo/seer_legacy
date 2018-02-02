@@ -3,7 +3,7 @@
 */
 lazy val core = crossProject.in(file("modules/core")).
   settings(Common.settings: _*).
-  jvmSettings(libraryDependencies ++= Dependencies.coreD)
+  jvmSettings(libraryDependencies ++= Dependencies.corejvmD)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 

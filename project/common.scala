@@ -33,7 +33,6 @@ object Common {
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     cancelable in Global := true,
     exportJars := true,
-    // libraryDependencies ++= Dependencies.coreD
     pomIncludeRepository := { _ => false },
     licenses := Seq("BSD-style" -> url("http://www.opensource.org/licenses/bsd-license.php")),
     homepage := Some(url("http://fishuyo.com/projects/seer")),
