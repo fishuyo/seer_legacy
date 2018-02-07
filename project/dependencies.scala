@@ -5,6 +5,7 @@ object Dependencies {
   // versions
   val akkaVersion = "2.4.17"
   val libgdxVersion = "1.9.8-SNAPSHOT"
+  val lwjglVersion = "3.1.3"
   val chillVersion = "0.5.2" //"0.8.0"
 
   // libs
@@ -47,6 +48,8 @@ object Dependencies {
 
  /** Addon Dependencies */
   val openvrD = Seq(
+    "org.lwjgl" % "lwjgl-openvr" % lwjglVersion,
+    "org.lwjgl" % "lwjgl-openvr" % lwjglVersion classifier "natives-windows",
     "net.java.dev.jna" % "jna" % "3.5.0",
     "org.joml" % "joml" % "1.8.1"
   )

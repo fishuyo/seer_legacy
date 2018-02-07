@@ -56,7 +56,12 @@ lazy val hid = project.in(file("modules/addons/hid")).
   settings(libraryDependencies ++= Dependencies.hidD)
 
 
-/** libGdx box2d wrapper */
+/** libGdx extensions */
 lazy val gdx_box2d = project.in(file("modules/backends/gdx/gdx-box2d")).
   dependsOn(core).
   settings(Common.settings: _*)
+
+lazy val gdx_vr = project.in(file("modules/backends/gdx/gdx-vr")).
+  dependsOn(core, graphics, app).
+  settings(Common.settings: _*).
+  settings(libraryDependencies ++= Dependencies.openvrD)
