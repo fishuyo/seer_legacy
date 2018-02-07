@@ -30,8 +30,27 @@ object UnmanagedLibs {
   def getOpenNI2(dest:File){
     if(dest.exists) return
     val zipFile = downloadZip("openni2.zip")
+    val lib = file("lib")
     unzip(zipFile, dest, matchfile("org.openni.jar"))
     unzip(zipFile, dest, matchfile("com.primesense.nite.jar"))
+    unzip(zipFile, lib, matchfile("OpenNI.ini"))
+    unzip(zipFile, new File(lib,"NiTE2"), matchdir("openni2/NiTE2/"))
+    IO.write(new File(lib,"NiTE.ini"), s"""
+[General]
+DataDir=${new File(lib,"NiTE2").getAbsolutePath}
+
+[Log]
+; 0 - Verbose; 1 - Info; 2 - Warning; 3 - Error. Default - None
+Verbosity=3
+LogToConsole=0
+LogToFile=0
+    """)
+    val arch = sys.props.get("os.arch")
+    sys.props.get("os.name") match {
+      case Some(s) if s.contains("Mac") => unzip(zipFile, lib, matchdir("openni2/macos/"))
+      case Some(s) if s.contains("Win") && arch.get.contains("64") => unzip(zipFile, lib, matchdir("openni2/win64/"))
+      case _ => () 
+    }
     zipFile.delete
   }
 
@@ -105,7 +124,7 @@ object UnmanagedLibs {
   import java.util.zip.ZipInputStream
   import java.util.zip.ZipEntry
 
-  def matchfile(name:String):PartialFunction[ZipEntry,(ZipEntry,String)] = { case f if f.getName == name || f.getName.endsWith('/'+name) => println(s"hi $name"); (f,name) }
+  def matchfile(name:String):PartialFunction[ZipEntry,(ZipEntry,String)] = { case f if f.getName == name || f.getName.endsWith('/'+name) => (f,name) }
   def matchdir(name:String):PartialFunction[ZipEntry,(ZipEntry,String)] = { case f if f.getName.startsWith(name) => (f,f.getName.replace(name,"")) }
 
   def unzip(zipFile:File, dest:File, filter:PartialFunction[ZipEntry,(ZipEntry,String)]): Unit = {
@@ -115,7 +134,7 @@ object UnmanagedLibs {
     Stream.continually(zis.getNextEntry).takeWhile(_ != null).collect(filter).foreach {  case (file,path) =>
       if (!file.isDirectory) {
         val outPath = dest.toPath.resolve(path)
-        // println(s"${file.getName} $path")
+        println(s"${file.getName} $path")
         val outPathParent = outPath.getParent
         if (!outPathParent.toFile.exists()) {
           outPathParent.toFile.mkdirs()

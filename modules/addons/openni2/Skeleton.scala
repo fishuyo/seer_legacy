@@ -47,7 +47,7 @@ class Skeleton(val id:Int) {
     bones(b) = Bone()
   }
 
-  var velSmooth = 0.2
+  var velSmooth = 0.2f
 
   def setJoints(s:Skeleton){
     joints = s.joints.clone
