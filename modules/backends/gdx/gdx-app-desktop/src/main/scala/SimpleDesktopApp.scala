@@ -45,10 +45,11 @@ object DesktopApp {
     println("loading native libraries..")
     try {
       GdxNativesLoader.load()
-      util.Hack.unsafeAddDir("lib")
-      util.Hack.unsafeAddDir("../lib")
-      util.Hack.unsafeAddDir("../../lib")
-      util.Hack.unsafeAddDir("../../../lib")
+      // util.Hack.unsafeAddDir("lib")
+      // util.Hack.unsafeAddDir("../lib")
+      // util.Hack.unsafeAddDir("../../lib")
+      // util.Hack.unsafeAddDir("../../../lib")
+      // util.Hack.unsafeAddDir("../../../../lib")
       println("loaded.")
     } catch { case e:Exception => println(e) } 
     nativesLoaded = true

@@ -93,29 +93,29 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   def set(a:Float,b:Float,c:Float) = { x=a; y=b; z=c; }
   def set(v:(Float,Float,Float)) = { x=v._1; y=v._2; z=v._3 }
   def +(v: Vec3) = Vec3( x+v.x, y+v.y, z+v.z )
-  def +=(v: Vec3) = { x+=v.x; y+=v.y; z+=v.z }
+  def +=(v: Vec3) = { x+=v.x; y+=v.y; z+=v.z; this}
   def -(v: Vec3) = Vec3( x-v.x, y-v.y, z-v.z )
-  def -=(v: Vec3) = { x-=v.x; y-=v.y; z-=v.z }
+  def -=(v: Vec3) = { x-=v.x; y-=v.y; z-=v.z; this}
   def unary_- = Vec3( -x, -y, -z ) 
   def *(s: Float ) = Vec3(s*x, s*y, s*z)
   def *(s: Double ) = Vec3(s*x, s*y, s*z)
   def *(v: Vec3 ) = Vec3(v.x*x, v.y*y, v.z*z)
-  def *=(s: Float) = { x*=s; y*=s; z*=s }
-  def *=(s: Double) = { x*=s; y*=s; z*=s }
-  def *=(v: Vec3) = { x*=v.x; y*=v.y; z*=v.z}
+  def *=(s: Float) = { x*=s; y*=s; z*=s; this}
+  def *=(s: Double) = { x*=s; y*=s; z*=s; this}
+  def *=(v: Vec3) = { x*=v.x; y*=v.y; z*=v.z; this}
   def /(v: Vec3 ) = Vec3(x/v.x, y/v.y, z/v.z)
   def /(s: Float ) = Vec3(x/s, y/s, z/s)
-  def /=(s: Float ) = {x/=s; y/=s; z/=s }
-  def /=(s: Double ) = {x/=s; y/=s; z/=s }
+  def /=(s: Float ) = {x/=s; y/=s; z/=s; this}
+  def /=(s: Double ) = {x/=s; y/=s; z/=s; this}
   
   def dot(v: Vec3) : Float = x*v.x + y*v.y + z*v.z
-  def cross( v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
+  def cross(v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
   def normalize() = { this *= (1.0f / mag()); this } 
   def normalized() = this * (1.0f / mag() )
 
-  def zero() = {x=0;y=0;z=0}
+  def zero() = { x=0; y=0; z=0; this }
 
   def lerp( v:Vec3, d:Float ) = this + (v-this)*d
   def lerpTo( v:Vec3, d:Float) = this.set(this.lerp(v,d))

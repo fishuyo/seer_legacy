@@ -58,7 +58,7 @@ class Keyboard extends InputAdapter {
 
   var callbacks = Map[Char,List[()=>Unit]]()
   var typedCallbacks = List[(Char)=>Unit]()
-  val pfuncs = ListBuffer[PartialFunction[Char,Unit]]()
+  val downCallbacks = ListBuffer[PartialFunction[Char,Unit]]()
   val nullfunc:PartialFunction[Char,Unit] = { case _ => () }
 
   use()
@@ -79,7 +79,10 @@ class Keyboard extends InputAdapter {
   def use() = Inputs.add(this)
   def remove() = Inputs.remove(this)
 
-  def listen(f:PartialFunction[Char,Unit]) = pfuncs += f
+  def listen(f:PartialFunction[Char,Unit]) = downCallbacks += f
+  def onKeyDown(f:PartialFunction[Char,Unit]) = downCallbacks += f
+
+
 
   def bind(s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner){
     val k = s.charAt(0)
@@ -103,11 +106,12 @@ class Keyboard extends InputAdapter {
     typedCallbacks = f :: typedCallbacks
   }
 
+
   override def keyTyped(k:Char) = {
     key.Internal.value = '\u0000' // make rx propogate even if same key
     key() = k
     typedCallbacks.foreach((f) => f(k))
-    pfuncs.foreach( (f) => f.orElse(nullfunc).apply(k) )
+    downCallbacks.foreach(_.orElse(nullfunc).apply(k))
     // val p = promise
     // _promise = Promise[Option[(Char,Char)]]()
     // p.success(Some(k,k))

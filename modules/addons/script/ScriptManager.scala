@@ -47,6 +47,7 @@ object ScriptManager {
   imports += "com.fishuyo.seer.audio._"
   imports += "com.fishuyo.seer.io._"
   imports += "com.fishuyo.seer.util._"
+  imports += "com.fishuyo.seer.particle._"
   imports += "scala.concurrent.duration._"
   imports += "collection.mutable.ListBuffer"
   imports += "collection.mutable.ArrayBuffer"

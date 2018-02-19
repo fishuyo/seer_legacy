@@ -41,7 +41,11 @@ class Schedulable extends Cancellable with Animatable{
 	override def cancel() = { Scene.remove(this); cancelled = true; true}
 }
 
-object Schedule {
+
+object Schedule extends Schedule {
+	def apply() = new Schedule
+}
+class Schedule {
 	implicit def int2fd(i:Int):FiniteDuration = i.milliseconds
 	implicit def d2f(d:Double) = d.toFloat
 
@@ -58,8 +62,9 @@ object Schedule {
 	}
 
 @deprecated("use package com.fishuyo.seer.time", "Beep boop")
-	def every(t:FiniteDuration)(f: =>Unit) = {
-		val e = System().scheduler.schedule(t,t)(f)
+	def every(t:FiniteDuration,t0:FiniteDuration = -1.seconds)(f: =>Unit) = {
+		val wait = if(t0 == -1.seconds) t else t0
+		val e = System().scheduler.schedule(wait,t)(f)
 		events += e
 		e
 	}

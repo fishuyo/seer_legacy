@@ -60,27 +60,22 @@ object Common {
     }
   )
 
-  // lazy val desktop = commonSettings ++ Seq(
-  //   libraryDependencies ++= Seq(
-  //     // "com.badlogicgames.gdx" % "gdx-backend-lwjgl" % libgdxVersion.value,
-  //     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % libgdxVersion.value,
-  //     "com.badlogicgames.gdx" % "gdx-platform" % libgdxVersion.value classifier "natives-desktop"
-  //   )
-  //   // unmanagedResourceDirectories in Compile += file("android/assets"),
-  // )
-
   lazy val appSettings = settings ++ Seq(
     // libraryDependencies ++= Seq(
     //   "net.sf.proguard" % "proguard-base" % "4.11" % "provided"
     // ),
     fork in Compile := true,
-    fork in run := true,
-    javaOptions in run += "-XstartOnFirstThread"
+    fork in run := true
     // javaOptions in run += "-Dorg.lwjgl.util.Debug=true"
     // unmanagedResourceDirectories in Compile += file("android/assets"),
     // desktopJarName := "seer-app",
     // Tasks.assembly
-  )
+  ) ++ {
+    if(System.getProperty("os.name").contains("Mac")) Seq(
+      javaOptions in run += "-XstartOnFirstThread",
+      envVars := Map("DYLD_LIBRARY_PATH" -> file("lib").getAbsolutePath)
+    ) else Seq()
+  }
 
   lazy val jsSettings = Seq(
     version := "0.1-SNAPSHOT",

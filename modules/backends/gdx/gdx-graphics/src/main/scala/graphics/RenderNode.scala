@@ -48,19 +48,21 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
     inputs += node
   }
 
-  def outputTo(node:RenderNode){
+  def outputTo(node:RenderNode) = {
     createBuffer()
     outputs += node
     node.addInput(this)
+    node
   }
-  def >>(node:RenderNode){ outputTo(node) }
-  def >>(i:Int)(node:RenderNode){
+  def >>(node:RenderNode) = outputTo(node)
+  def >>(i:Int)(node:RenderNode) = {
     createBuffer()
     outputs += node
     if(node.inputs.length > i) node.inputs(i) = this
     else node.inputs += this //XXX this isn't right..
+    node
   }
-  def <<(node:RenderNode){ node.outputTo(this) }
+  def <<(node:RenderNode) = node.outputTo(this)
 
   def animate(dt:Float){
     renderer.animate(dt)

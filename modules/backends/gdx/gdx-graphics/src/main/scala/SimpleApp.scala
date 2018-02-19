@@ -72,7 +72,9 @@ class SeerAppListener extends ApplicationListener {
   def render(){
     // if(paused) return
     
-    val dt = Gdx.graphics.getDeltaTime()
+    var dt = Gdx.graphics.getDeltaTime()
+    if(dt < 0.016) Thread.sleep(((0.016-dt)*1000).toLong)
+
     Time.elapsedTime += dt
     if(fixedTimeStep){
       dtAccum += dt

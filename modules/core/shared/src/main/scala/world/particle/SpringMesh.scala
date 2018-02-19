@@ -98,7 +98,7 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) ext
         p.applyGravity()
         p.applyDamping(damping)
         p.step() // timeStep
-        p.collideGround(-1f, 0.999999f) 
+        // p.collideGround(-1f, 0.999999f) 
       })
 
     }

@@ -25,37 +25,13 @@ import akka.event.Logging
 import collection.JavaConverters._
 
 object OpenNI {
-
   var initd = false
-  var device:Device = _
-  var depthStream:VideoStream = _
-  var tracker:UserTracker = _
+  var device:Option[Device] = None
+  var depthStream:Option[VideoStream] = None
+  var rgbStream:Option[VideoStream] = None
+  var tracker:Option[UserTracker] = None
 
-  var flipCamera = false
-  var mirror = false
-  var offset = Vec3()
-
-  var pointCloud = true
-  var pointCloudDensity = 4
-  var rem = 0
-  var points = ArrayBuffer[Vec3]()
-  val pointBuffers = ArrayBuffer[ArrayBuffer[Vec3]]()
-  for( i <- 0 until 8){
-   pointBuffers += ArrayBuffer[Vec3]()
-  }
-
-  val skeletons = HashMap[Int,Skeleton]()
-  val users = HashMap[Int,User]()
-
-  def getSkeleton(id:Int) = skeletons.getOrElseUpdate(id, new Skeleton(id))
-  def getUser(id:Int) = users.getOrElseUpdate(id, new User(id))
-
-
-
-  /**
-    * initialize openni and nite libraries, open default devoce
-    */
-  def initAll() = init()
+  /** Initialize openni and nite libraries, open default device */
   def init(){
     if(initd){
       println("OpenNI Warn: already initialized.")
@@ -71,62 +47,119 @@ object OpenNI {
         return;
     } else println(s"OpenNI: ${devices.size} devices connected")
     
-    device = Device.open(devices(0).getUri())
-    depthStream = VideoStream.create(device, SensorType.DEPTH)
-    tracker = UserTracker.create //(device)
-    tracker.addNewFrameListener(TrackerListener)
+    device = Some(Device.open(devices(0).getUri()))
     initd = true
   }
 
-  /**
-    * Close openni and nite
-    */
+  def startDepth(){
+    if(!initd) return
+    if(depthStream.isEmpty){
+      depthStream = Some(VideoStream.create(device.get, SensorType.DEPTH))
+      depthStream.get.addNewFrameListener(FrameListener)
+      depthStream.get.start()
+    }
+  }
+
+  def startColor(){
+    if(!initd) return
+    if(rgbStream.isEmpty){
+      rgbStream = Some(VideoStream.create(device.get, SensorType.COLOR))
+      rgbStream.get.addNewFrameListener(FrameListener)
+      rgbStream.get.start()
+    }
+  }
+
+  def startTracking(){
+    if(!initd) return
+    if(depthStream.isEmpty) depthStream = Some(VideoStream.create(device.get, SensorType.DEPTH))
+    if(tracker.isEmpty){
+      tracker = Some(UserTracker.create) //(device)
+      tracker.get.addNewFrameListener(TrackerListener)
+    }
+  }
+
+  def setPointCloudThinning(factor:Int){
+    var v = factor
+    if(v < 1) v = 1
+    TrackerListener.pointCloudThinFactor = v
+  }
+
+  val frameCallbacks = ListBuffer[PartialFunction[Frame,Unit]]()
+  def onFrame(f:PartialFunction[Frame,Unit]) = frameCallbacks += f
+  
+  val userCallbacks = ListBuffer[PartialFunction[List[User],Unit]]()
+  def onUser(f:PartialFunction[List[User],Unit]) = userCallbacks += f
+
+  def clearCallbacks(){
+    frameCallbacks.clear
+    userCallbacks.clear
+  }
+
+  /** Close openni and nite */
   def shutdown(){
-    tracker.destroy
-    depthStream.destroy
-    device.close
-    NiTE.shutdown
-    NI.shutdown
-    initd = false
+    // tracker.destroy
+    // depthStream.destroy
+    // device.close
+    // NiTE.shutdown
+    // NI.shutdown
+    // initd = false
   }
 
 }
 
-// class Device(indx:Int){
-//   var device:Device = _
-//   var depthStream:VideoStream = _
-//   var tracker:UserTracker = _
-// }
+sealed trait Frame { def image:Image }
+case class DepthFrame(image:Image) extends Frame
+case class ColorFrame(image:Image) extends Frame
+
+object FrameListener extends VideoStream.NewFrameListener {
+  def onFrameReady(stream:VideoStream){
+    val frame = stream.readFrame()
+    val data = frame.getData().order(ByteOrder.LITTLE_ENDIAN)
+
+    frame.getVideoMode.getPixelFormat match {
+      case PixelFormat.RGB888 =>
+        val image = new Image(data, frame.getWidth, frame.getHeight, 3, 1)
+        OpenNI.frameCallbacks.foreach(_(ColorFrame(image)))
+
+      case _ =>
+        val image = new Image(data, frame.getWidth, frame.getHeight, 1, 2)
+        OpenNI.frameCallbacks.foreach(_(DepthFrame(image)))
+    }
+    frame.release()
+  }
+}
 
 object TrackerListener extends UserTracker.NewFrameListener {
+  var enablePointClouds = true //TODO handle this
+  var pointCloudThinFactor = 2
+  var rem = 0
+  val pointBuffers = HashMap[Int,ArrayBuffer[Vec3]]()
 
-  var mLastFrame:UserTrackerFrameRef = _
-
-  def onNewFrame(tracker:UserTracker){
-    try {
-    if (mLastFrame != null) {
-      mLastFrame.release()
-      mLastFrame = null
-    }
-        
-    mLastFrame = tracker.readFrame()
-        
-    // check if any new user detected start skeleton tracking
-    mLastFrame.getUsers().asScala.foreach { case user =>
+  def onNewFrame(tracker:UserTracker){          
+    val frame = tracker.readFrame()
+    
+    /** Get detected Users and Skeletons */
+    val users = frame.getUsers.asScala.map { case user =>
       val id = user.getId
-      val u = OpenNI.getUser(id)
+      val u = new User(id) //OpenNI.getUser(id)
 
       if (user.isNew){
         tracker.startSkeletonTracking(id)
         u.tracking = true
       } else if (user.isLost){
+        tracker.stopSkeletonTracking(id)
         u.tracking = false
-      } //else if(user.isVisible)
+      } else if(user.isVisible){
+        u.tracking = true
+      }
 
       val skel = user.getSkeleton()
-      skel.getState match { //if(skel != null){
+      if(skel != null) skel.getState match {
         case SkeletonState.CALIBRATING =>
+          u.skeleton.calibrating = true
         case SkeletonState.TRACKED => 
+          u.skeleton.tracking = true
+          u.skeleton.calibrating = false
           Joint.strings.foreach{ case s => 
             val j = skel.getJoint(Joint(s))
             if(j.getPositionConfidence > 0f){
@@ -138,75 +171,60 @@ object TrackerListener extends UserTracker.NewFrameListener {
         case SkeletonState.NONE =>
         case _ =>
       }
-
+      u
     }
 
-    var depthFrame:VideoFrameRef = mLastFrame.getDepthFrame()
-        
+    //TODO flag to enable this
+    /** Read Depth data and convert to point clouds for each user */
+    var depthFrame:VideoFrameRef = frame.getDepthFrame()
     if (depthFrame != null) {
       val w = depthFrame.getWidth
       val h = depthFrame.getHeight
       val depthData:ByteBuffer = depthFrame.getData().order(ByteOrder.LITTLE_ENDIAN)
-      val usersFrame:ByteBuffer = mLastFrame.getUserMap().getPixels().order(ByteOrder.LITTLE_ENDIAN)
-    
-      // make sure we have enough room
-      // if (mDepthPixels == null || mDepthPixels.length < depthFrame.getWidth() * depthFrame.getHeight()) {
-        // mDepthPixels = new int[depthFrame.getWidth() * depthFrame.getHeight()];
-      // }
-    
-      // calcHist(depthData)
-      // depthData.rewind()
+      val userMap:ByteBuffer = frame.getUserMap().getPixels().order(ByteOrder.LITTLE_ENDIAN)
 
-      // OpenNI.points = ArrayBuffer[Vec3]()
-      OpenNI.pointBuffers.foreach(_.clear)
+      pointBuffers.values.foreach(_.clear) // clear points from existing buffers
 
+      // traverse depthData converting to 3d points for each associated userId
       var pos = 0
       while(depthData.remaining() > 0) {
-        val userId = usersFrame.getShort()
-        val z = depthData.getShort()
+        val userId = userMap.getShort()
+        val buffer = pointBuffers.getOrElseUpdate(userId, ArrayBuffer[Vec3]())
         val y = pos / w
         val x = pos % w
+        val z = depthData.getShort()
 
-        if (z != 0 && userId > 0 && (x % OpenNI.pointCloudDensity == OpenNI.rem) && (y % OpenNI.pointCloudDensity == OpenNI.rem) ){
-          val p = CoordinateConverter.convertDepthToWorld(OpenNI.depthStream,x,y,z)
-          OpenNI.pointBuffers(userId) += point3DtoVec3(p) //Vec3(p.getX, p.getY, p.getZ)
+        if(z != 0 && userId > 0
+          && x % pointCloudThinFactor == rem
+          && y % pointCloudThinFactor == rem ){
+          val p = CoordinateConverter.convertDepthToWorld(OpenNI.depthStream.get, x, y, z)
+          buffer += point3DtoVec3(p)
         }
-
         pos += 1
       }
 
-      OpenNI.pointBuffers.zipWithIndex.foreach { case (b,i) =>
-        OpenNI.getUser(i).points = b.clone
-        // OpenNI.points ++= b.clone
-      } 
-      
-      depthFrame.release();
-      depthFrame = null;
+      // assign point buffers to user objects
+      users.foreach { case u =>
+        val points = pointBuffers.getOrElseUpdate(u.id, ArrayBuffer[Vec3]())
+        u.points ++= points
+      }
+      depthFrame.release()
     }
 
-    } catch { case e:Exception => e.printStackTrace(); }
+    frame.release
 
+    // Call user callback functions (even when users is empty)
+    OpenNI.userCallbacks.foreach(_(users.toList))    
   }
 
-  def point3DtoVec3(p:org.openni.Point3D[java.lang.Float]) = {
-    var v:Vec3 = null
-    if(OpenNI.flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + OpenNI.offset
-    else v = Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + OpenNI.offset
-    if(OpenNI.mirror) v.x *= -1
-    v
-  }
-  def point3DtoVec3(p:com.primesense.nite.Point3D[java.lang.Float]) = {
-    var v:Vec3 = null
-    if(OpenNI.flipCamera) v = Vec3(-p.getX(), p.getY(), p.getZ()) / 1000f + OpenNI.offset
-    else v = Vec3(p.getX(), p.getY(), -p.getZ()) / 1000f + OpenNI.offset
-    if(OpenNI.mirror) v.x *= -1
-    v
-  }
+  def point3DtoVec3(p:org.openni.Point3D[java.lang.Float]) = Vec3(-p.getX(),p.getY(),-p.getZ()) /= 1000f
+  def point3DtoVec3(p:com.primesense.nite.Point3D[java.lang.Float]) = Vec3(-p.getX(),p.getY(),-p.getZ()) /= 1000f
+}
 
-
+object Histogram {
   val histogram = new Array[Float](10000)
-  def calcHist(depth:ByteBuffer){
-    // reset
+
+  def calculateHistogram(depth:ByteBuffer){
     for (i <- 0 until histogram.length)
       histogram(i) = 0
         
@@ -221,15 +239,12 @@ object TrackerListener extends UserTracker.NewFrameListener {
       }
     }
         
-    for (i <- 1 until histogram.length){
+    for (i <- 1 until histogram.length)
       histogram(i) += histogram(i-1)
-    }
 
     if (points > 0){
-      for (i <- 1 until histogram.length){
+      for (i <- 1 until histogram.length)
         histogram(i) = 1.0f - (histogram(i) / points.toFloat)
-      }
     }
   }
-
 }

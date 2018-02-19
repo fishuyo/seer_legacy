@@ -1,5 +1,4 @@
 
-
 package com.fishuyo.seer 
 package openni
 
@@ -14,55 +13,25 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.ArrayBuffer
 
 
-object Skeleton{
-  def apply(id:Int) = new Skeleton(id)
-
-  def apply(s:Skeleton) = {
-    val copy = new Skeleton(s.id)
-    copy.calibrating = s.calibrating
-    copy.tracking = s.tracking
-    copy.droppedFrames = s.droppedFrames
-    copy.joints = s.joints.clone
-    copy.vel = s.vel.clone
-    copy.bones = s.bones.clone
-    copy
-  }
-}
-
-class Skeleton(val id:Int) {
+class Skeleton {
 
   var calibrating = false
   var tracking = false
-  var droppedFrames = 0
+  var velSmooth = 0.2f
 
-  var joints = HashMap[String,Vec3]()
-  var vel = HashMap[String,Vec3]()
+  val joints = HashMap[String,Vec3]()
+  val vel = HashMap[String,Vec3]()
+  val bones = HashMap[String,Bone]()
+
   for( j <- Joint.strings){
     joints(j) = Vec3()
     vel(j) = Vec3()
   }
-
-  var bones = HashMap[String,Bone]()
   for( b <- Bone.strings){
     bones(b) = Bone()
   }
 
-  var velSmooth = 0.2f
-
-  def setJoints(s:Skeleton){
-    joints = s.joints.clone
-    droppedFrames = 0
-  }
-
-  def updateJoints() = {
-    for( j <- Joint.strings){
-      // val pos = OpenNI.getJoint(id, j)
-      // updateJoint(j,pos)
-    }
-    droppedFrames = 0
-  }
-
-  def updateJoint(s:String,pos:Vec3){
+  def updateJoint(s:String, pos:Vec3){
     val oldpos = joints(s)
     vel(s) = vel(s).lerp(pos - oldpos, velSmooth)
     joints(s) = pos
@@ -70,8 +39,8 @@ class Skeleton(val id:Int) {
 
   def updateBones(){
     for( b <- Bone.strings){
-      val dst = joints(Bone.connections(b)._1)      
-      val src = joints(Bone.connections(b)._2)
+      val dst = joints(Bone.connections(b)(0))      
+      val src = joints(Bone.connections(b)(1))
 
       bones(b).pos.set(src)
       val dir = dst - src
@@ -84,26 +53,26 @@ class Skeleton(val id:Int) {
   def neck = joints("neck")
   def torso = joints("torso")
   // def waist = joints("waist")
-  // def l_collar = joints("l_collar")
-  def l_shoulder = joints("l_shoulder")
-  def l_elbow = joints("l_elbow")
-  // def l_wrist = joints("l_wrist")
-  def l_hand = joints("l_hand")
-  // def l_fingers = joints("l_fingers")
-  // def r_collar = joints("r_collar")
-  def r_shoulder = joints("r_shoulder")
-  def r_elbow = joints("r_elbow")
-  // def r_wrist = joints("r_wrist")
-  def r_hand = joints("r_hand")
-  // def r_fingers = joints("r_fingers")
-  def l_hip = joints("l_hip")
-  def l_knee = joints("l_knee")
-  // def l_ankle = joints("l_ankle")
-  def l_foot = joints("l_foot")
-  def r_hip = joints("r_hip")
-  def r_knee = joints("r_knee")
-  // def r_ankle = joints("r_ankle")
-  def r_foot = joints("r_foot")
+  // def leftCollar = joints("l_collar")
+  def leftShoulder = joints("l_shoulder")
+  def leftElbow = joints("l_elbow")
+  // def leftWrist = joints("l_wrist")
+  def leftHand = joints("l_hand")
+  // def leftFingers = joints("l_fingers")
+  // def rightCollar = joints("r_collar")
+  def rightShoulder = joints("r_shoulder")
+  def rightElbow = joints("r_elbow")
+  // def rightWrist = joints("r_wrist")
+  def rightHand = joints("r_hand")
+  // def rightFingers = joints("r_fingers")
+  def leftHip = joints("l_hip")
+  def leftKnee = joints("l_knee")
+  // def leftAnkle = joints("l_ankle")
+  def leftFoot = joints("l_foot")
+  def rightHip = joints("r_hip")
+  def rightKnee = joints("r_knee")
+  // def rightAnkle = joints("r_ankle")
+  def rightFoot = joints("r_foot")
 
 }
 
@@ -177,18 +146,18 @@ object Bone {
       "r_humerus", "r_radius", "r_femur", "r_tibia")
 
   val connections = Map(
-    "neck" -> ("head","neck"),
-    "clavicle" -> ("l_shoulder","r_shoulder"),
-    "pelvis" -> ("l_hip","r_hip"),
-    "spine" -> ("neck","torso"),
-    "l_humerus" -> ("l_elbow","l_shoulder"),
-    "l_radius" -> ("l_hand", "l_elbow"),
-    "l_femur" -> ("l_knee", "l_hip"),
-    "l_tibia" -> ("l_foot", "l_knee"),
-    "r_humerus" -> ("r_elbow","r_shoulder"),
-    "r_radius" -> ("r_hand", "r_elbow"),
-    "r_femur" -> ("r_knee", "r_hip"),
-    "r_tibia" -> ("r_foot", "r_knee")
+    "neck" -> Seq("head","neck"),
+    "clavicle" -> Seq("l_shoulder","r_shoulder"),
+    "pelvis" -> Seq("l_hip","r_hip"),
+    "spine" -> Seq("neck","torso"),
+    "l_humerus" -> Seq("l_elbow","l_shoulder"),
+    "l_radius" -> Seq("l_hand", "l_elbow"),
+    "l_femur" -> Seq("l_knee", "l_hip"),
+    "l_tibia" -> Seq("l_foot", "l_knee"),
+    "r_humerus" -> Seq("r_elbow","r_shoulder"),
+    "r_radius" -> Seq("r_hand", "r_elbow"),
+    "r_femur" -> Seq("r_knee", "r_hip"),
+    "r_tibia" -> Seq("r_foot", "r_knee")
     )
 }
 

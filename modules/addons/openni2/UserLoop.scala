@@ -2,7 +2,8 @@
 package com.fishuyo.seer
 package openni
 
-import collection.mutable.ListBuffer
+import collection.mutable.Buffer
+import collection.mutable.ArrayBuffer
 import collection.mutable.ArrayBuffer
 
 import com.twitter.chill.KryoInjection
@@ -11,11 +12,9 @@ import scala.util.Success
 class UserLoop {
 
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
-  var frames = new ArrayBuffer[ListBuffer[User]]()
+  var frames = new ArrayBuffer[Buffer[User]]()
   var frame = 0f
   var speed = 1f
-  var alpha = 0.3f
-  var beta = 1f-alpha
 
   def play(){ playing = true; }
   def togglePlay() = playing = !playing
@@ -43,26 +42,19 @@ class UserLoop {
     frames.clear
     } catch { case e:Exception => println(e.getMessage())}
 
-    frames = new ArrayBuffer[ListBuffer[User]]()
+    frames = new ArrayBuffer[Buffer[User]]()
     frame = 0f
   }
 
   def setSpeed(v:Float) = speed = v
-  def setAlpha(a:Float) = {alpha = a; beta = 1f-alpha}
-  def setAlphaBeta(a:Float,b:Float) = {alpha = a; beta = b }
 
-  def io(in:ListBuffer[User], out:ListBuffer[User]){
+  def io(in:Seq[User], out:Buffer[User]){
 
-    if( recording ){
-      frames += in
-    }
+    if(recording) frames += in.toBuffer
 
     if(playing){
-      if( reversing ){
-        frame -= speed
-      } else {
-        frame += speed
-      }
+      if(reversing) frame -= speed
+      else frame += speed
     }
     
     if(frame < 0f) frame = frames.length-1
@@ -77,7 +69,7 @@ class UserLoop {
         from = to
         to = tmp
       }
-      for( i<-(from.toInt until to.toInt)){
+      for(i <- (from.toInt until to.toInt)){
         var idx = i
         if(i < 0f) idx = frames.length + i
         else if(i > frames.length-1) idx = i - frames.length
@@ -87,7 +79,8 @@ class UserLoop {
           // in.foreach( _.alpha *= alpha )
           // frames(idx).foreach( _.alpha *= beta)
           // frames(idx) ++= in
-          frames(idx).append(in: _*)
+          frames(idx) ++= in
+          // frames(idx).append(in: _*)
         }
       }
     }
@@ -104,11 +97,11 @@ class UserLoop {
     val red = bis.read(buffer)
     println(s"read $red bytes of $aval")
 
-    var res:Option[ArrayBuffer[ListBuffer[User]]] = None
+    var res:Option[ArrayBuffer[Buffer[User]]] = None
     // var user:Option[User] = None
     val decode = KryoInjection.invert(buffer)
     decode match {
-      case Success(u:ArrayBuffer[ListBuffer[User]]) => res = Some(u.clone)
+      case Success(u:ArrayBuffer[Buffer[User]]) => res = Some(u.clone)
       case m => println("Invert failed!" + m + " " + m.getClass.getSimpleName)
     }
     if(res.isDefined) frames = res.get

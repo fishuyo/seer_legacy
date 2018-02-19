@@ -67,6 +67,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     }
     if(_keyboard.isDefined) _keyboard.get.remove
     if(_mouse.isDefined) _mouse.get.remove
+    if(_schedule.isDefined) _schedule.get.clear
     // if(_openni.isDefined) _openni.get.remove
 
     // shader.stopMonitor() ??
@@ -74,9 +75,11 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
 
   var _keyboard:Option[Keyboard] = None
   var _mouse:Option[Mouse] = None
+  var _schedule:Option[Schedule] = None
 
   def Keyboard = _keyboard.getOrElse({_keyboard = Some(io.Keyboard()); _keyboard.get })
   def Mouse = _mouse.getOrElse({_mouse = Some(io.Mouse()); _mouse.get })
+  def Schedule = _schedule.getOrElse({_schedule = Some(util.Schedule()); _schedule.get })
 
   // def Scene(name:String) = {
     // scene = Scene(name)
