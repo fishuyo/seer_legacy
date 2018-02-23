@@ -104,17 +104,11 @@ class Branch {
   }
 
   /** step growth */
-  def grow(dt:Float){
-    age += dt
-    // if(depth == 2) println(s"$length $maxLength")
-    length += 0.01f * dt
-    if(length > maxLength) length = maxLength
-    else if(length < minLength) length = minLength
-    if(dt > 0 && length > maxLength/4){
-      children.foreach(_.grow(dt))
-    } else if(dt < 0 && length < maxLength/4) {
-      children.foreach(_.grow(dt))
-    }
+  def grow(t:Float){
+    length = t * maxLength
+    var tt = 0.001f
+    if(t > 0.25f) tt = (t-0.25f)/0.75f
+    children.foreach(_.grow(tt))
   }
 
   def applyForce( f: Vec3 ) : Vec3 = {

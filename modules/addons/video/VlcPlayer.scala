@@ -34,6 +34,7 @@ class VlcPlayer(val uri:String) extends RenderCallback { self =>
   var (width, height) = (0, 0)
   var size = 0
   var loaded = false
+  var playing = true
 
   // Logger.setLevel(Logger.Level.Error)
   // NativeLog.setLevel(uk.co.caprica.vlcj.binding.internal.libvlc_log_level_e.ERROR)
@@ -80,7 +81,12 @@ class VlcPlayer(val uri:String) extends RenderCallback { self =>
   def setAudioChannel(channel:Int) = mediaPlayerComponent.getMediaPlayer().setAudioChannel(channel)
 
   def togglePlaying() = mediaPlayerComponent.getMediaPlayer().pause()
-  // def play(b:Boolean){ playing = b }
+  def play(b:Boolean){ 
+    if(playing != b){
+      mediaPlayerComponent.getMediaPlayer().setPause(!b)
+      playing = b
+    }
+  }
 
   def dispose(){
     mediaPlayerComponent.release()
