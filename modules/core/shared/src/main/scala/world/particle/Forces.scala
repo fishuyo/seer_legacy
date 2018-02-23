@@ -5,8 +5,8 @@ package particle
 
 
 class Attractor extends Particle {
-  var radius = 0.05f
-  var strength = 0.5f
+  var radius = 0.0f
+  var strength = 0.4f
   def apply(particles:Seq[Particle]){
     particles.foreach{ case p =>
 

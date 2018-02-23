@@ -25,18 +25,19 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   implicit var name = "default"
   var active = true
 
-  var scene = Scene //graphics.Scene()
-  var camera:NavCamera = Camera
-  var shader = Shader("basic")
-  var node = RenderNode()
-  var xFadeTime = 1f
-  updateRenderer()
+  var scene:Scene = Scene //graphics.Scene()
+  // var camera:NavCamera = Camera
+  // var shader = Shader("basic")
+  // var node = RenderNode()
+  // var xFadeTime = 1f
+  // updateRenderer()
 
   val Out = AudioScene()
   var audioXFadeTime = 1f
   Out += this
 
   def receive = {
+    case b:Boolean => active = b
     case "load" => load()
     case "unload" => unload()
     case Name(n) => name = n
@@ -88,12 +89,12 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   // var _openni:Option[OpenNIListener] = None
   // def OpenNI = _openni.getOrElse({_openni = Some(new OpenNIListener()); _openni.get })
 
-  def updateRenderer(){
-    node.renderer.scene = scene
-    node.renderer.camera = camera 
-    node.renderer.shader = shader 
-    node.renderer.active = active
-  }
+  // def updateRenderer(){
+  //   node.renderer.scene = scene
+  //   node.renderer.camera = camera 
+  //   node.renderer.shader = shader 
+  //   node.renderer.active = active
+  // }
 
 }
 
