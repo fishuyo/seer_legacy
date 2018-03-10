@@ -64,24 +64,24 @@ trait AudioInterface {
   // when recording, record input directly
   def recordThru(b:Boolean){ recordThru = b}
 
-  def toggleRecording() = {}
-  //   if( !recording ){
-  //     try{
-  //       val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
-  //       var path = "SeerData/audio/recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
-  //       // if( name != "") path = name
-  //       Gdx.files.external("SeerData/audio").file().mkdirs()
-  //       var file = Gdx.files.external(path).file()
-  //       outFile = AudioFile.openWrite(file, outSpec)
-  //       recording = true
-  //       println("recording started..")
-  //     } catch { case e:Exception => println(e) }
-  //   } else {
-  //     recording = false
-  //     outFile.close
-  //     println("recording stopped.")
-  //   }
-  // }
+  def toggleRecording() = {
+    if( !recording ){
+      try{
+        val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
+        var path = "recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
+        // if( name != "") path = name
+        // Gdx.files.external("SeerData/audio").file().mkdirs()
+        var file = new java.io.File(path) //Gdx.files.external(path).file()
+        outFile = AudioFile.openWrite(file, outSpec)
+        recording = true
+        println("recording started..")
+      } catch { case e:Exception => println(e) }
+    } else {
+      recording = false
+      outFile.close
+      println("recording stopped.")
+    }
+  }
 }
 
 

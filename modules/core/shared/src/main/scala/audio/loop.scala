@@ -449,14 +449,14 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
     }//end else if(playing)
   }
 
-  // def save( path:String ){
-  //   val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, 1, sampleRate.toDouble, None, 0)
-  //   var file = Gdx.files.external(path).file()
-  //   file.mkdirs()
-  //   val outFile = AudioFile.openWrite(file, outSpec)
-  //   outFile.write( Array(b.samples), 0, b.curSize )
-  //   outFile.close
-  // }
+  def save( path:String ){
+    val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, 1, sampleRate.toDouble, None, 0)
+    var file = new java.io.File(path) //Gdx.files.external(path).file()
+    file.mkdirs()
+    val outFile = AudioFile.openWrite(file, outSpec)
+    outFile.write( Array(b.samples), 0, b.curSize )
+    outFile.close
+  }
 
   def load(path:String){
     var file =  new java.io.File(path) // Gdx.files.external(path).file()
