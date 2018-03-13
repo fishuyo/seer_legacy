@@ -10,7 +10,7 @@ object UnmanagedLibs {
 
   val baseUrl = "http://fishuyo.com/seer"
   
-  def downloadZip(name:String) = {
+  def download(name:String) = {
     val zipFile = new File(name)
     println(s"Pulling $name")
     val url = new URL("%s/%s" format(baseUrl, name))
@@ -21,15 +21,24 @@ object UnmanagedLibs {
 
   def getGlulogic(dest:File){
     if(dest.exists) return
-    val zipFile = downloadZip("glulogic.zip")
+    val zipFile = download("glulogic.zip")
     unzip(zipFile, dest, matchfile("GlulogicMT.jar"))
     unzip(zipFile, file("lib"), matchfile("libGlulogicMT.dylib"))
     zipFile.delete
   }
 
+  def getLeap(dest:File){
+    if(dest.exists) return
+    val zipFile = download("leap.zip")
+    unzip(zipFile, dest, matchfile("LeapJava.jar"))
+    unzip(zipFile, file("lib"), matchfile("libLeap.dylib"))
+    unzip(zipFile, file("lib"), matchfile("libLeapJava.dylib"))
+    zipFile.delete
+  }
+
   def getOpenNI2(dest:File){
     if(dest.exists) return
-    val zipFile = downloadZip("openni2.zip")
+    val zipFile = download("openni2.zip")
     val lib = file("lib")
     unzip(zipFile, dest, matchfile("org.openni.jar"))
     unzip(zipFile, dest, matchfile("com.primesense.nite.jar"))
@@ -56,7 +65,7 @@ LogToFile=0
 
   def getJPA(dest:File){
     if(dest.exists) return
-    val zipFile = downloadZip("jpa.zip")
+    val zipFile = download("jpa.zip")
     unzip(zipFile, dest, matchfile("jpa-0.1-SNAPSHOT.jar"))
     val arch = sys.props.get("os.arch")
     sys.props.get("os.name") match {
@@ -72,7 +81,7 @@ LogToFile=0
 
   def getVRPN(dest:File){
     if(dest.exists) return
-    val zipFile = downloadZip("vrpn.zip")
+    val zipFile = download("vrpn.zip")
     unzip(zipFile, dest, matchfile("vrpn-07.33.jar"))
     unzip(zipFile, file("lib"), matchfile("libjava_vrpn.dylib"))
     zipFile.delete
