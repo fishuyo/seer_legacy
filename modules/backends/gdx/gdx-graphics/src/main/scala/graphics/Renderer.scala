@@ -58,7 +58,7 @@ class Renderer {
       
       shader.end()
 
-    } catch{ case e:Exception => println(e)
+    } catch{ case e:Exception => println(s"Renderer: $e")
       // println ("\n" + e.printStackTrace + "\n")
     }
 

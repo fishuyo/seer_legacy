@@ -55,7 +55,7 @@ class AnimateOnce[T](f: =>T) extends Animatable {
   override def animate(dt:Float){
     try{
     if(!ran){ ret=f; ran = true}
-    } catch{ case e:Exception => println(e)} finally{ Scene.remove(this) }
+    } catch{ case e:Exception => println(s"AnimateOnce: $e")} finally{ Scene.remove(this) }
   }
 }
 
