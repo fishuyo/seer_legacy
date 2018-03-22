@@ -71,12 +71,14 @@ object DesktopApp {
     cfg.setWindowedMode(Window.w0,Window.h0)
     cfg.setBackBufferConfig(8,8,8,8, 16, 0, 4)
     // cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels)
-    // cfg.useGL30 = true
+    // cfg.useOpenGL3(true,3,2)
     // cfg.width = Window.w0
     // cfg.height = Window.h0
 
-    // GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
-    // println("GLFW Version: " + GLFW.glfwGetVersionString())
+    GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+    // GLFW.glfwWindowHint(GLFW.GLFW_FOCUSED, GLFW.GLFW_FALSE)
+    // GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE)
+    println("GLFW Version: " + GLFW.glfwGetVersionString())
 
     new Lwjgl3Application( app, cfg )
     // new LwjglApplication( app, cfg )

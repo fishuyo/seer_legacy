@@ -63,8 +63,9 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
       scene -= this 
     }
     Out.gain = Ramp(Out.gain.value, 0f, (44100 * audioXFadeTime).toInt)
-    Schedule.after(audioXFadeTime seconds){ 
-      Audio().sources -= Out 
+    time.Schedule.after(audioXFadeTime seconds){ 
+      Out.sources.clear 
+      Audio().sources -= Out
     }
     if(_keyboard.isDefined) _keyboard.get.remove
     if(_mouse.isDefined) _mouse.get.remove

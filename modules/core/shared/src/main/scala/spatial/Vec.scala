@@ -116,6 +116,7 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   def normalized() = this * (1.0f / mag() )
 
   def zero() = { x=0; y=0; z=0; this }
+  def isZero() = {x == 0f && y == 0f && z == 0f}
 
   def lerp( v:Vec3, d:Float ) = this + (v-this)*d
   def lerpTo( v:Vec3, d:Float) = this.set(this.lerp(v,d))

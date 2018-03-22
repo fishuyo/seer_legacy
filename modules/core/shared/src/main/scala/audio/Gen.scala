@@ -178,6 +178,16 @@ class Ramp(var start:Float, var end:Float, var len:Int) extends Gen {
   var add = (end-start) / len
   value = start
 
+  def set(e:Float, l:Int) = {
+    start = value; end = e; len = l;
+    add = (end-start) / len
+  }
+  def reset(s:Float, e:Float, l:Int) = {
+    start = s; end = e; len = l;
+    add = (end-start) / len
+    value = start
+  }
+
   def apply() = {
     if(math.abs(value-end) >= math.abs(add)) value += add
     else value = end
