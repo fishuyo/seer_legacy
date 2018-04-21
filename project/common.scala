@@ -4,11 +4,13 @@ import Keys._
 
 object Common {
 
+  val scalaV = "2.12.5" //2.11.8"
+
   // lazy val settings = plugins.JvmPlugin.projectSettings ++ Seq(
   lazy val settings = Seq(
     organization := "com.fishuyo.seer",
     version := "0.1-SNAPSHOT",
-    scalaVersion := "2.11.8",
+    scalaVersion := scalaV,
     updateOptions := updateOptions.value.withCachedResolution(true),
     // updateOptions := updateOptions.value.withLatestSnapshots(true),
     javacOptions ++= Seq(
@@ -79,7 +81,7 @@ object Common {
 
   lazy val jsSettings = Seq(
     version := "0.1-SNAPSHOT",
-    scalaVersion := "2.11.8",
+    scalaVersion := scalaV,
     updateOptions := updateOptions.value.withCachedResolution(true)
   )
 

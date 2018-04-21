@@ -14,8 +14,10 @@ object Quat {
   val acc_max = 1.000001
   val acc_min = 0.999999
   def apply( w:Float, x:Float, y:Float, z:Float ) = new Quat(w,x,y,z)
+  def apply( w:Double, x:Double, y:Double, z:Double ) = new Quat(w,x,y,z)
   def apply(q:Quat) = new Quat(q.w,q.x,q.y,q.z)
   def apply(x:Float, y:Float, z:Float) = new Quat(1,0,0,0).fromEuler(x,y,z)
+  def apply(x:Double, y:Double, z:Double) = new Quat(1,0,0,0).fromEuler(x,y,z)
   def apply(euler:Vec3) = new Quat(1,0,0,0).fromEuler(euler)
   def apply() = new Quat(1,0,0,0)
 

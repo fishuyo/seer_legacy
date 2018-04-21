@@ -3,10 +3,10 @@ import sbt._
 
 object Dependencies {
   // versions
-  val akkaVersion = "2.5.11" //"2.4.17"
-  val libgdxVersion = "1.9.8-SNAPSHOT"
+  val akkaVersion = "2.5.12" //"2.4.17"
+  val libgdxVersion = "1.9.9-SNAPSHOT"
   val lwjglVersion = "3.1.3"
-  val chillVersion = "0.5.2" //"0.8.0"
+  val chillVersion = "0.9.2" //"0.5.2" //"0.8.0"
 
   // libs
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
@@ -14,7 +14,7 @@ object Dependencies {
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
   
   val spire = "org.spire-math" %% "spire" % "0.13.0"
-  val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
+  val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0"
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
 
@@ -27,10 +27,10 @@ object Dependencies {
     "com.twitter" %% "chill" % chillVersion,
     "com.twitter" %% "chill-bijection" % chillVersion,
     "com.twitter" %% "chill-akka" % chillVersion,
-    "de.sciss" %% "scalaaudiofile" % "1.4.3+",
-    "de.sciss" %% "scalaosc" % "1.1.+",
+    "de.sciss" %% "scalaaudiofile" % "1.4.7",
+    "de.sciss" %% "scalaosc" % "1.1.6",
     "net.sourceforge.jtransforms" %  "jtransforms" % "2.4.0",
-    "com.lihaoyi" %% "scalarx" % "0.3.1",
+    "com.lihaoyi" %% "scalarx" % "0.3.2",
     "com.beachape.filemanagement" %% "schwatcher" % "0.3.2"
   )
   val corejsD = Seq()

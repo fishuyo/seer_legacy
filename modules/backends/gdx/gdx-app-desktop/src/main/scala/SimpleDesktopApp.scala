@@ -75,7 +75,8 @@ object DesktopApp {
     // cfg.width = Window.w0
     // cfg.height = Window.h0
 
-    GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
+    cfg.setAutoIconify(false)
+    // GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
     // GLFW.glfwWindowHint(GLFW.GLFW_FOCUSED, GLFW.GLFW_FALSE)
     // GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE)
     println("GLFW Version: " + GLFW.glfwGetVersionString())

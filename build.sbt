@@ -9,7 +9,7 @@ lazy val coreJS = core.js
 
 
 /**
-* Gdx backend (graphics + audio)
+* Gdx backend
 */
 lazy val gdx_graphics = project.in(file("modules/backends/gdx/gdx-graphics")).
   dependsOn(coreJVM).

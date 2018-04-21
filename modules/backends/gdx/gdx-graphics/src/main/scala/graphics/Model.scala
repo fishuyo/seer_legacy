@@ -56,13 +56,17 @@ class Model extends Drawable { // with geometry.Pickable {
   def material(m:BasicMaterial){ material = m }
 
   def translate(x:Float,y:Float,z:Float):Model = translate(Vec3(x,y,z))
+  def translate(x:Double,y:Double,z:Double):Model = translate(Vec3(x,y,z))
   def translate(p:Vec3):Model = { pose.pos += p; this }
 
   def rotate(x:Float, y:Float, z:Float):Model = rotate(Quat(x,y,z))
+  def rotate(x:Double, y:Double, z:Double):Model = rotate(Quat(x,y,z))
   def rotate(q:Quat):Model = { pose.quat *= q; this }
 
   def scale(x:Float,y:Float,z:Float):Model = scale(Vec3(x,y,z))
+  def scale(x:Double,y:Double,z:Double):Model = scale(Vec3(x,y,z))
   def scale(s:Float):Model = { scale *= s; this}
+  def scale(s:Double):Model = { scale *= s; this}
   def scale(s:Vec3):Model = { scale *= s; this}
 
   def transform(p:Pose,s:Vec3=Vec3(1)) = {
