@@ -6,7 +6,7 @@ import types._
 import de.sciss.synth.io._
 
 
-class LoopBuffer( var maxSize:Int = 0) {
+class LoopBuffer( var maxSize:Int = 0) extends Gen {
   
   var samples = new Array[Float](maxSize)
   var curSize = 0
@@ -25,11 +25,12 @@ class LoopBuffer( var maxSize:Int = 0) {
   } 
 
   //append sample
-  def apply( s:Float ){
+  override def apply( s:Float ) = {
     if(curSize+1 > maxSize) resize(2*maxSize)
     curSize += 1
     samples(curSize) = s
     rMax += 1
+    s
   }
   //read one sample
   def apply() = {
@@ -38,7 +39,7 @@ class LoopBuffer( var maxSize:Int = 0) {
        times+=1;
     }
     val s = readSampleAt(rPos)
-    rPos += 1
+    rPos += speed
     s
   }
   //read one sample reverse
@@ -48,7 +49,7 @@ class LoopBuffer( var maxSize:Int = 0) {
        times+=1;
     }
     val s = readSampleAt(rPos)
-    rPos -= 1
+    rPos -= speed
     s
   }
   

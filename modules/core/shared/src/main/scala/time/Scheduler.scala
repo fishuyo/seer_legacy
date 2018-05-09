@@ -57,8 +57,9 @@ object Schedule {
     e
   }
 
-  def every(t:FiniteDuration)(f: =>Unit) = {
-    val e = System().scheduler.schedule(t,t)(f)
+  def every(t:FiniteDuration,t0:FiniteDuration = -1.seconds)(f: =>Unit) = {
+    val wait = if(t0 == -1.seconds) t else t0
+    val e = System().scheduler.schedule(wait,t)(f)
     events += e
     e
   }

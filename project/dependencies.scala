@@ -14,9 +14,11 @@ object Dependencies {
   val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
   
   val spire = "org.spire-math" %% "spire" % "0.13.0"
-  val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0"
+  // val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
+
+  val scodec = "org.scodec" %% "scodec-core" % "1.10.3"
 
   /** Core Dependencies */
   val corejvmD = Seq(
@@ -37,8 +39,8 @@ object Dependencies {
 
   /** libGDX backend dependencies */
   val gdxD = Seq(
-    "com.badlogicgames.gdx" % "gdx" % libgdxVersion,
-    parsers
+    "com.badlogicgames.gdx" % "gdx" % libgdxVersion
+    // parsers
   )
   val gdxAppDesktopD = Seq(
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % libgdxVersion,
