@@ -3,11 +3,13 @@ package com.fishuyo.seer
 package openni
 
 import collection.mutable.Buffer
-import collection.mutable.ArrayBuffer
+import collection.mutable.ListBuffer
 import collection.mutable.ArrayBuffer
 
 import com.twitter.chill.KryoInjection
 import scala.util.Success
+
+import Codecs._
 
 class UserLoop {
 
@@ -90,6 +92,35 @@ class UserLoop {
 
 
   def load(filename:String){
+    try{
+      val pc = Codecs.parseFile[UserLoopFile](filename)    
+      for(i <- 0 until pc.header.frameCount){
+        val u = pc.readFrame(i)
+        frames += ListBuffer(u) 
+      }
+    } catch { case e:Exception => println(e) }
+  }
+
+  def save(){
+    import java.io._
+    val form = new java.text.SimpleDateFormat("yyyy-MM-dd-HH.mm.ss")
+    val filename = form.format(new java.util.Date()) + ".bin" 
+
+    val ppf = frames.map(_.head.points.length).toVector
+    val iof = ppf.scanLeft(0){ case (a,v) => a + v*3 + 15*3 } //accumulate lengths for indices
+    val header = UserLoopHeader(0,0,false,true,frames.length,ppf,iof)
+    val points = frames.flatMap{ case us =>
+      us.head.points.flatMap{ case v => Vector(v.x,v.y,v.z)} ++
+      Joint.strings.flatMap{ case j => 
+        val v = us.head.skeleton.joints(j)
+        Vector(v.x,v.y,v.z)
+      }
+    }.toVector
+    val pc = UserLoopFile(header, points)
+    Codecs.writeFile(filename, pc)
+  }
+
+  def loadKryo(filename:String){
     import java.io._
     val bis = new BufferedInputStream(new FileInputStream(filename))
     val aval = bis.available
@@ -107,7 +138,8 @@ class UserLoop {
     if(res.isDefined) frames = res.get
     bis.close()
   }
-  def save(){
+
+  def saveKryo(){
     import java.io._
     val form = new java.text.SimpleDateFormat("yyyy-MM-dd-HH.mm.ss")
     val filename = form.format(new java.util.Date()) + ".bin" 

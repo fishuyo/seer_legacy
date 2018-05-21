@@ -60,7 +60,7 @@ object UserRecord extends SeerApp {
     case 'k' => speed /=2; loop.setSpeed(speed)
     case 'o' => loop.save()
     case 'l' => 
-      loop.load("2018-02-17-23.22.13.bin")
+      loop.load("2018-05-21-16.37.09.bin")
 
     case 'y' =>
       loop.frames.trimStart(loop.frame.toInt)
