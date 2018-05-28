@@ -1,9 +1,9 @@
 
-resolvers in ThisBuild ++= Seq(
-    "Xuggle Repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
-)
+// resolvers in ThisBuild ++= Seq(
+//     "Xuggle Repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
+// )
 
-libraryDependencies += "xuggle" % "xuggle-xuggler" % "5.4"
+// libraryDependencies += "xuggle" % "xuggle-xuggler" % "5.4"
 
 //libraryDependencies += "io.humble" % "humble-video-all" % "0.2.1"
 

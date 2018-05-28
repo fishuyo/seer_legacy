@@ -33,7 +33,8 @@ object Dependencies {
     "de.sciss" %% "scalaosc" % "1.1.6",
     "net.sourceforge.jtransforms" %  "jtransforms" % "2.4.0",
     "com.lihaoyi" %% "scalarx" % "0.3.2",
-    "com.beachape.filemanagement" %% "schwatcher" % "0.3.2"
+    "com.beachape.filemanagement" %% "schwatcher" % "0.3.2",
+    "javax.vecmath" % "vecmath" % "1.5.2"
   )
   val corejsD = Seq()
 
