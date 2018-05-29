@@ -32,6 +32,24 @@ object Branch {
     pose0 = Pose(pose)
     updateConstants()
   }
+
+  def apply(parent0:Branch, p:Pose, d:Vec3) = new Branch{
+    parent = parent0
+    pose.set(p)
+    lPose.set(p)
+    pose0.set(p)
+    if(parent != null){
+      relPose.set(parent.pose.inverse * pose)
+      depth = parent.depth + 1
+      maxLength = parent.maxLength
+      length = parent.length
+      thick = parent.thick * 0.99f
+    }
+
+    dir.set(d)
+    dir0.set(d)
+    updateConstants()
+  }
 }
 
 /**
@@ -45,6 +63,8 @@ class Branch {
   var pose0 = Pose()    // equilibrium pose (pose of no restoring force)
   var relPose = Pose()  // relative pose from parent
   var dir = Vec3()
+  var dir0 = Vec3()
+  var growCount = 0
   var age = 0f
   var depth = 0
   var length = 1f

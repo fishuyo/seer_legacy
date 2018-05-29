@@ -85,7 +85,13 @@ object Vec3 {
 class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   implicit def toF( d: Double ) = d.toFloat
 
-  //def ==(v:Vec3) = {x==v.x && y==v.y && z==v.z}
+  override def equals(other:Any) = other match {
+    case v:Vec3 => this == v
+    case _ => false
+  }
+  override def hashCode = 41*(41+x.hashCode) + 43*y.hashCode + z.hashCode
+
+  def ==(v:Vec3) = {x==v.x && y==v.y && z==v.z}
   def apply(i:Int) = i match { case 0 => x; case 1 => y; case 2 => z;}
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v; case 2 => z=v;}
   def set(v:Vec3) = { x=v.x; y=v.y; z=v.z }
@@ -231,7 +237,7 @@ object Vec2 {
 class Vec2( var x: Float, var y: Float ) extends Serializable {
   implicit def toF( d: Double ) = d.toFloat
 
-  //def ==(v:Vec2) = {x==v.x && y==v.y && z==v.z}
+  def ==(v:Vec2) = {x==v.x && y==v.y}
   def apply(i:Int) = i match { case 0 => x; case 1 => y}
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v}
   def set(v:Vec2) = { x=v.x; y=v.y }
