@@ -72,8 +72,8 @@ LogToFile=0
       case Some(s) if s.contains("Mac") => unzip(zipFile, dest, matchfile("jpa-macos-0.1-SNAPSHOT.jar"))
       case Some(s) if s.contains("Win") && arch.get.contains("64") => unzip(zipFile, dest, matchfile("jpa-win64-0.1-SNAPSHOT.jar"))
       case Some(s) if s.contains("Win") => unzip(zipFile, dest, matchfile("jpa-win32-0.1-SNAPSHOT.jar"))
-      case Some(s) if s.contains("nix") && arch.get.contains("64") => unzip(zipFile, dest, matchfile("jpa-linux64-0.1-SNAPSHOT.jar"))
-      case Some(s) if s.contains("nix") => unzip(zipFile, dest, matchfile("jpa-linux32-0.1-SNAPSHOT.jar"))
+      case Some(s) if s.contains("Linux") && arch.get.contains("64") => unzip(zipFile, dest, matchfile("jpa-linux64-0.1-SNAPSHOT.jar"))
+      case Some(s) if s.contains("Linux") => unzip(zipFile, dest, matchfile("jpa-linux32-0.1-SNAPSHOT.jar"))
       case _ => () 
     }
     zipFile.delete
