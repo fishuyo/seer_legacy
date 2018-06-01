@@ -11,6 +11,7 @@ import com.typesafe.config.ConfigFactory
 import collection.mutable.ListBuffer
 
 object System {
+  val remotes = ListBuffer[Address]()  
   var system:ActorSystem = _
   def apply() = {
     if(system == null) system = ActorSystemManager.default()
@@ -18,25 +19,14 @@ object System {
   }
   def update(s:ActorSystem) = system = s
 
-  def broadcast(msg:Any){
-    val sys = apply()
-    val ref = sys.actorSelection("/user/live.*")
-    ref ! msg
-  }
-  def send(name:String, msg:Any){
-    val sys = apply()
-    val ref = sys.actorSelection(s"/user/live.$name.*")
-    ref ! msg
-  }
-  def actor(name:String) = apply().actorSelection(s"/user/live.$name.*")
-  
-
-  def broadcastRemote(a:Address)(msg:Any){
-    apply().actorSelection(s"$a/user/live.*") ! msg
-  }
-  def sendRemote(a:Address)(name:String, msg:Any){
-    apply().actorSelection(s"$a/user/live.$name.*") ! msg
-  }
+  def broadcast(msg:Any) = apply().actorSelection("/user/live.*") ! msg
+  def send(name:String, msg:Any) = apply().actorSelection(s"/user/live.$name.*") ! msg
+  def broadcastRemote(a:Address)(msg:Any) = apply().actorSelection(s"$a/user/live.*") ! msg
+  def sendRemote(a:Address)(name:String, msg:Any) = apply().actorSelection(s"$a/user/live.$name.*") ! msg
+  def broadcastRemotes(as:Seq[Address])(msg:Any) = as.foreach{ case a => apply().actorSelection(s"$a/user/live.*") ! msg}
+  def sendRemotes(as:Seq[Address])(name:String, msg:Any) = as.foreach{ case a => apply().actorSelection(s"$a/user/live.$name.*") ! msg}
+  def broadcastAll(msg:Any) = remotes.foreach{ case a => apply().actorSelection(s"$a/user/live.*") ! msg }
+  def sendAll(name:String, msg:Any) = remotes.foreach{ case a => apply().actorSelection(s"$a/user/live.$name.*") ! msg }
 
 }
 
