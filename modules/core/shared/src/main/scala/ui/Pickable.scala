@@ -29,7 +29,7 @@ trait Pickable {
   var containChildren = true
 
   var parent:Option[_ <: Pickable] = None
-  val children:ListBuffer[_ <:Pickable] = ListBuffer[Pickable]()
+  val children:ListBuffer[_ <: Pickable] = ListBuffer[Pickable]()
 
   def intersect(r:Ray):Option[Float]
 
@@ -43,8 +43,10 @@ trait Pickable {
     var childs = Seq[Boolean]()
     
     // depth first event propogation, so we can know to ignore events handled by children
-    if(hit.t.isDefined || !containChildren)
-      childs = children.map { _.pickEvent(PickEvent(e.event, transformRayLocal(e.ray))) }
+    if(hit.t.isDefined || !containChildren){
+      val ray = transformRayLocal(e.ray)
+      childs = children.map { _.pickEvent(PickEvent(e.event, ray)) }
+    }
 
     // XXX events probably need to be handled differently, ie unpick should probably always propogate?
     e.event match {
@@ -59,7 +61,11 @@ trait Pickable {
     val model = Matrix.translation(pose.pos) * Mat4().fromQuat(pose.quat) * Matrix.scaling(scale)
     val invertable = model.invert
     val m = Mat4()
-    m.set(model)
+    invertable match {
+      case Some(mat) => m.set(mat)
+      case _ => m.set(model)
+    }
+    // m.set(model)
     val o = m.transform(ray.o, 1)
     val d = m.transform(ray.d, 0)
     Ray(o, d)

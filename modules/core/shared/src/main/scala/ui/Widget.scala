@@ -10,10 +10,14 @@ import spatial._
   * Pickable?
   */
 class Widget(var position:Vec2, var bounds:Vec2) extends Pickable {
+  var value:Any = 0f
 
+  pose.pos.set(Vec3(position,0))
+  scale.set(Vec3(bounds,1f))
   // var parent:Option[Widget] = None
   override val children = collection.mutable.ListBuffer[Widget]() 
 
+  var movable = true
   var name = ""
   var style = ""
   // var x,y,w,h = 0f  //Vecs?
@@ -31,22 +35,27 @@ class Widget(var position:Vec2, var bounds:Vec2) extends Pickable {
   var selectOffset = Vec2()
 
   override def point(hit:Hit, childs:Seq[Boolean]) = {
-    if(hit.t.isDefined) hover = true
+    if(hit.isDefined) hover = true
     else hover = false
-    false
+    hover
   }
-  override def pick(hit:Hit, childs:Seq[Boolean]) = {
+  override def pick(hit:Hit, childs:Seq[Boolean]):Boolean = {
+    if(childs.contains(true)) return false
     if(hit.isDefined){
       // prevPose.set(pose)
       selectDist = hit.dist
       selectOffset = position - hit.pos.xy
       selected = true
     } else selected = false
-    false
+    selected
   }
-  override def drag(hit:Hit, childs:Seq[Boolean]) = {
-    if(selected) position.set( hit.ray(selectDist).xy + selectOffset )
-    false
+  override def drag(hit:Hit, childs:Seq[Boolean]):Boolean = {
+    if(childs.contains(true)) return false
+    if(selected && movable) {
+      position.set( hit.ray(selectDist).xy + selectOffset )
+      pose.pos.set(Vec3(position,0))
+    }
+    true
   }
   override def unpick(hit:Hit, childs:Seq[Boolean]) = {
     selected = false
@@ -64,14 +73,17 @@ class QuadWidget(pos:Vec2, bnds:Vec2) extends Widget(pos,bnds)
 class FilledQuadWidget(pos:Vec2, bnds:Vec2) extends Widget(pos,bnds)
 
 class Slider(pos:Vec2, bnds:Vec2 = Vec2(0.33f,1f)) extends QuadWidget(pos,bnds) {
+  // movable = false
+  containChildren = false
   this += new FilledQuadWidget(Vec2(0f,0), Vec2(1f,0.1f)){
     override def drag(hit:Hit, childs:Seq[Boolean]) = {
       super.drag(hit,childs)
       position.x = 0f
       if(position.y < 0f) position.y = 0f
-      else if(position.y > 1f) position.y = 1f
-      println(position)
-      true
+      else if(position.y + bounds.y > 1f) position.y = 1f - bounds.y
+      value = position.y / (1f - bounds.y)
+      println(value)
+      selected
     }
   }
 }

@@ -212,14 +212,16 @@ class Matrix(val n:Int) {
   }
 
   def invert():Option[Matrix] = {
+    // println("this:\n" + this)
+
     // Get cofactor matrix, C
     val C = cofactorMatrix()
-    println(C)
+    // println("co:\n" + C)
 
     // Compute determinant
     var det = 0f
     for(i <- 0 until n) det += this(0,i) * C(0,i)
-    println(det)
+    // println("det:\n" + det)
     // Divide adjugate matrix, C^T, by determinant
     if(det != 0f){
       val m = (C.transpose() *= 1/det)
