@@ -18,7 +18,7 @@ import rx.async._
 import rx.async.Platform._
 import scala.concurrent.duration._
 
-case class Finger(id:Int, pos:Vec2, vel:Vec2, size:Float, angle:Float)
+case class Finger(id:Int, pos:Vec2, vel:Vec2, size:Float, angle:Float, state:String)
 
 class TrackpadState {
   var fingers = ListBuffer[Finger]()
@@ -101,7 +101,19 @@ class Trackpad extends Observer {
     val timestamp:Double = f.getTimestamp()
 
     // val ts = (timestamp * 1000000).toLong
-    val finger = Finger(id,Vec2(x,y),Vec2(dx,dy),fsize,angRad)
+    val st = fstate match {
+      // case FingerState.HOVER => "hover"
+      // case FingerState.TAP => "tap"
+      case FingerState.PRESSED => "down" //"pressed"
+      // case FingerState.PRESSING => "down" //"pressing"        
+      case FingerState.RELEASING => "up" //"releasing"          
+      // case FingerState.RELEASED => "released"
+      // case FingerState.UNKNOWN =>
+      // case FingerState.UNKNOWN_1 => 
+      case s => ""
+    }
+
+    val finger = Finger(id,Vec2(x,y),Vec2(dx,dy),fsize,angRad,st)
 
     var indx = state.fingers.indexWhere( _.id == id )
     // println(fstate + " " + indx)
@@ -110,7 +122,7 @@ class Trackpad extends Observer {
       if(indx == -1){
         state.fingers += finger
         indx = state.fingers.length - 1
-      }else state.fingers(indx) = finger 
+      }else state.fingers(indx) = finger.copy(state="drag") 
     } else if(fstate == FingerState.RELEASED){
       state.fingers = state.fingers.filterNot( _.id == id )  
     }

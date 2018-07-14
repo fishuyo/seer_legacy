@@ -135,6 +135,7 @@ class Model extends Drawable { // with geometry.Pickable {
     // }
     Renderer().setMaterialUniforms(material)
     Renderer().setMatrixUniforms()
+    Renderer().setEnvironmentUniforms()
 
     if( mesh.hasColors ) Renderer().shader.uniforms("u_hasColor") = 1
     else Renderer().shader.uniforms("u_hasColor") = 0

@@ -22,14 +22,16 @@ class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
     if( alt ) v *= 10f
     
     k match {
-      case Keys.SHIFT_LEFT => nav.vel.y = -v
+      // case Keys.SHIFT_LEFT => nav.vel.y = -v
+      case Keys.Z => nav.vel.y = -v
       case Keys.ALT_LEFT => alt = true
       case Keys.CONTROL_LEFT => ctrl = true
       case Keys.W => nav.vel.z = v
       case Keys.A => nav.vel.x = -v
       case Keys.S => nav.vel.z = -v
       case Keys.D => nav.vel.x = v
-      case Keys.SPACE => nav.vel.y = v
+      // case Keys.SPACE => nav.vel.y = v
+      case Keys.C => nav.vel.y = v
 
       case Keys.UP => nav.angVel.x = w
       case Keys.LEFT => nav.angVel.y = w
@@ -50,7 +52,8 @@ class KeyboardNavInput( var nav:Nav ) extends InputAdapter {
       case Keys.CONTROL_LEFT => ctrl = false
       case Keys.W | Keys.S => nav.vel.z = 0
       case Keys.A | Keys.D => nav.vel.x = 0
-      case Keys.SHIFT_LEFT | Keys.SPACE => nav.vel.y = 0
+      // case Keys.SHIFT_LEFT | Keys.SPACE => nav.vel.y = 0
+      case Keys.Z | Keys.C => nav.vel.y = 0
       case Keys.UP | Keys.DOWN => nav.angVel.x = 0
       case Keys.LEFT | Keys.RIGHT => nav.angVel.y = 0
       case Keys.Q | Keys.E => nav.angVel.z = 0

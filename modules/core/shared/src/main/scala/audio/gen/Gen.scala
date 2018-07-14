@@ -2,6 +2,8 @@
 package com.fishuyo.seer
 package audio
 
+import util._
+
 /**
   * Gen represents a floating point audio sample generator
   */
@@ -120,6 +122,26 @@ class Ramp(var start:Float, var end:Float, var len:Int) extends Gen {
   def apply() = {
     if(math.abs(value-end) >= math.abs(add)) value += add
     else value = end
+    value
+  }
+}
+
+class Counter(len:Int) extends Gen {
+  var pos = 0
+  def reset = pos = 0
+  override def apply() = {
+    value = pos / len.toFloat
+    pos += 1
+    if(pos == len) pos = len
+    value
+  }
+}
+
+class Curve(start:Float, end:Float, len:Int, f:Function[Float,Float]=Ease.quad) extends Counter(len){
+  override def apply() = {
+    val p = super.apply()
+    val v = f(p)
+    value = util.map(v,0f,1f,start,end)
     value
   }
 }

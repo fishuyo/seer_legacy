@@ -24,7 +24,7 @@ object UserRecord extends SeerApp {
 
   OpenNI.init
   OpenNI.startTracking
-  OpenNI.setPointCloudThinning(4)
+  OpenNI.setPointCloudThinning(2)
 
   OpenNI.onUser { case users =>
 
@@ -60,7 +60,7 @@ object UserRecord extends SeerApp {
     case 'k' => speed /=2; loop.setSpeed(speed)
     case 'o' => loop.save()
     case 'l' => 
-      loop.load("2018-05-21-16.37.09.bin")
+      loop.load("2018-05-21-20.46.19.bin")
 
     case 'y' =>
       loop.frames.trimStart(loop.frame.toInt)

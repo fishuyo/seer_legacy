@@ -13,8 +13,8 @@ class Environment {
 
   var backgroundColor = RGBA(0,0,0,1)
 
-  var fog = false
-  var fogColor = RGB.white
+  var fog = 0.135f
+  var fogColor = RGB.black
 
   var blend = false
   var depth = true
@@ -34,8 +34,8 @@ class Environment {
 
   def default(){
     backgroundColor = RGBA(0,0,0,1)
-    fog = false
-    fogColor = RGB.white
+    fog = 0.135f
+    fogColor = RGB.black
     blend = false
     depth = true
     lineWidth = 1f

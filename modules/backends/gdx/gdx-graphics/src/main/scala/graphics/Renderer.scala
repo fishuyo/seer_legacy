@@ -104,8 +104,7 @@ class Renderer {
     shader.uniforms("u_lightDiffuse") = e.lightDiffuse
     shader.uniforms("u_lightSpecular") = e.lightSpecular
     shader.uniforms("u_alpha") = e.alpha
-
-
+    // shader.uniforms("u_fog") = e.fog
   }
   
   def setMaterialUniforms(mat:Material){
