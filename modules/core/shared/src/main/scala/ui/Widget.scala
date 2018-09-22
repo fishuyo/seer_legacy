@@ -73,7 +73,7 @@ class QuadWidget(pos:Vec2, bnds:Vec2) extends Widget(pos,bnds)
 class FilledQuadWidget(pos:Vec2, bnds:Vec2) extends Widget(pos,bnds)
 
 class Slider(pos:Vec2, bnds:Vec2 = Vec2(0.33f,1f)) extends QuadWidget(pos,bnds) {
-  // movable = false
+  movable = false
   containChildren = false
   this += new FilledQuadWidget(Vec2(0f,0), Vec2(1f,0.1f)){
     override def drag(hit:Hit, childs:Seq[Boolean]) = {
@@ -86,4 +86,10 @@ class Slider(pos:Vec2, bnds:Vec2 = Vec2(0.33f,1f)) extends QuadWidget(pos,bnds) 
       selected
     }
   }
+
+  def getValue = children.head.value.asInstanceOf[Float]
+  def setValue(v:Float) = {
+    children.head.value = v
+    children.head.position.y = v * (1f-children.head.bounds.y)
+  } 
 }
