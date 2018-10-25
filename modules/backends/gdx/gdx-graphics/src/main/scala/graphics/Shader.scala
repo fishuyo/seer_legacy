@@ -150,7 +150,7 @@ class Shader {
     uniforms.foreach( (u) => {
       // try{
         // s.setUniformMatrix(u._1, u._2)
-        if( s.hasUniform(u._1) ){  // TODO use immutable && currentUniforms.getOrElse(u._1,null) != u._2 ){
+        if(s.hasUniform(u._1) ){  // TODO use immutable && currentUniforms.getOrElse(u._1,null) != u._2 ){
           u._2 match {
             // case Matrix(m) => s.setUniformMatrix(u._1,m)
             case m:Matrix4 => s.setUniformMatrix(u._1, m)
@@ -163,10 +163,20 @@ class Shader {
             case v:Vec2 => s.setUniformf(u._1, v.x, v.y)
             case v:Vec3 => s.setUniformf(u._1, v.x, v.y, v.z)
             case q:Quat => s.setUniformf(u._1, q.w, q.x, q.y, q.z)
+            case v:Array[Vec2] => 
+              val vs = v.flatMap((u:Vec2) => Array(u.x,u.y))              
+              s.setUniform2fv(u._1, vs, 0, vs.length)
 
             case _ => println("TODO: implement uniform type: " + u._1 + " " + u._2)
           }
           currentUniforms += u
+        }
+        u._2 match {
+          case v:Array[Vec2] => 
+            val vs = v.flatMap((u:Vec2) => Array(u.x,u.y))
+            s.setUniform2fv(u._1, vs, 0, vs.length)
+            currentUniforms += u
+          case _ => ()  
         }
       // } catch { case e:Exception => ()}
     })
