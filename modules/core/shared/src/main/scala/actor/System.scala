@@ -19,6 +19,8 @@ object System {
   }
   def update(s:ActorSystem) = system = s
 
+  def address = System().asInstanceOf[akka.actor.ExtendedActorSystem].provider.getDefaultAddress
+
   def broadcast(msg:Any) = apply().actorSelection("/user/live.*") ! msg
   def send(name:String, msg:Any) = apply().actorSelection(s"/user/live.$name.*") ! msg
   def broadcastRemote(a:Address)(msg:Any) = apply().actorSelection(s"$a/user/live.*") ! msg
@@ -59,6 +61,7 @@ object ActorSystemManager {
         }
         serialization-bindings {
           "java.io.Serializable" = kryo
+          "com.fishuyo.seer.spatial.Vec3" = kryo
           "com.fishuyo.seer.openni.User" = kryo
         }
       }
