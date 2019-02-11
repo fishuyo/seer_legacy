@@ -262,13 +262,18 @@ class Vec2( var x: Float, var y: Float ) extends Serializable {
   def cross( v: Vec2) = x*v.y - y*v.x
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
-  def normalize() = {this *= (1.0f / mag() ); this}
-  def normalized() = this * (1.0f / mag() )
+  def normalize() = { val m = mag(); if(m != 0f) this *= (1.0f / mag()); this }
+  def normalized() = { val m = mag(); if(m != 0f) this * (1.0f / mag()) else this }
 
   def zero() = {x=0;y=0}
 
   def lerp( v:Vec2, d:Float ) = this + (v-this)*d
   def lerpTo( v:Vec2, d:Float) = this.set(this.lerp(v,d))
+
+  def wrap(l:Vec2,h:Vec2) = {
+    x = util.wrap(x,l.x,h.x)
+    y = util.wrap(y,l.y,h.y)
+  }
 
   override def toString() = "[" + x + " " + y + "]"
 }

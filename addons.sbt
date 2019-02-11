@@ -20,8 +20,11 @@ lazy val apple_trackpad = project.in(file("modules/addons/apple-trackpad")).depe
 lazy val openni = project.in(file("modules/addons/openni")).dependsOn(core).settings(Common.settings: _*)
 lazy val openni2 = project.in(file("modules/addons/openni2")).dependsOn(core).settings(Common.settings: _*)
 lazy val openni2_examples = project.in(file("modules/addons/openni2/examples")).dependsOn(openni2, app).settings(Common.appSettings: _*)
-lazy val opencv = project.in(file("modules/addons/opencv")).dependsOn(core).settings(Common.settings: _*)
+
+// lazy val javacv = project.in(file("modules/addons/javacv"))
+// lazy val opencv = project.in(file("modules/addons/opencv")).dependsOn(core).settings(Common.settings: _*)
   // settings(libraryDependencies ++= Dependencies.opencvD)
+
 lazy val hid = project.in(file("modules/addons/hid")).dependsOn(core, graphics).settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.hidD)
 

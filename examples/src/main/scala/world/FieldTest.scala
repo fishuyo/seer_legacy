@@ -14,7 +14,7 @@ import concurrent.duration._
 
 object FieldTest extends SeerApp {
 
-  val fv = new FV(100,100)
+  val fv = new FV(100,100,0.02f,0.02f)
   val vfv = new VFV(100,100,0.02f,0.02f)
 
   val emitter = new Emitter(1000)
@@ -51,13 +51,17 @@ object FieldTest extends SeerApp {
       val m = Mouse.xy.now * fv.w
       val s = 0
       for(i <- -s to s; j <- -s to s){
-        fv.field(m.x.toInt+i,m.y.toInt+j) = 0.5f
+        // fv.field(m.x.toInt+i,m.y.toInt+j) = 0.5f
         // fv.field(50+i,2+j) = 1.0f
       }
 
       val ray = Camera.ray((Mouse.x.now * Window.width).toInt, ((1f-Mouse.y.now)*Window.height).toInt)
       ray.intersectQuad(Vec3(),10,10) match {
-        case Some(t) => val p = ray(t); vfv.field(p.xy) = Mouse.vel.now
+        case Some(t) => 
+          val p = ray(t)
+          vfv.field(p.xy) = Mouse.vel.now
+          fv.field(p.xy) = 0.5f
+
         case None => ()
       }
 
@@ -80,12 +84,13 @@ object FieldTest extends SeerApp {
   }
 }
 
-class FV(val w:Int, val h:Int) extends Animatable {
+class FV(val w:Int, val h:Int, sx:Float=0.1f, sy:Float=0.1f) extends Animatable {
 
-  var field = new Field2D(w,h)
+  var field = new Field2D(w,h,sx,sy)
   var image = Image(w,h,1,4)
   var texture:Texture = _ 
   val quad = Plane()
+  quad.scale.set(sx*w/2,sy*h/2,1f)
   quad.pose.pos.z = -0.01f
 
   override def init(){

@@ -136,6 +136,7 @@ object TrackerListener extends UserTracker.NewFrameListener {
   val pointBuffers = HashMap[Int,ArrayBuffer[Vec3]]()
 
   def onNewFrame(tracker:UserTracker){          
+    try{
     val frame = tracker.readFrame()
     
     /** Get detected Users and Skeletons */
@@ -164,7 +165,7 @@ object TrackerListener extends UserTracker.NewFrameListener {
             val j = skel.getJoint(Joint(s))
             if(j.getPositionConfidence > 0f){
               val p = j.getPosition
-              u.skeleton.updateJoint(s,point3DtoVec3(p))
+              u.skeleton.updateJoint(s, point3DtoVec3(p))
             }
           }
           u.skeleton.updateBones
@@ -185,6 +186,8 @@ object TrackerListener extends UserTracker.NewFrameListener {
 
       pointBuffers.values.foreach(_.clear) // clear points from existing buffers
 
+      val maskImage = Image(w,h,1,1) // image to hold user mask
+
       // traverse depthData converting to 3d points for each associated userId
       var pos = 0
       while(depthData.remaining() > 0) {
@@ -193,6 +196,8 @@ object TrackerListener extends UserTracker.NewFrameListener {
         val y = pos / w
         val x = pos % w
         val z = depthData.getShort()
+
+        maskImage.buffer.put((userId*128).toByte)
 
         if(z != 0 && userId > 0
           && x % pointCloudThinFactor == rem
@@ -203,10 +208,13 @@ object TrackerListener extends UserTracker.NewFrameListener {
         pos += 1
       }
 
+      maskImage.buffer.rewind 
+      
       // assign point buffers to user objects
       users.foreach { case u =>
         val points = pointBuffers.getOrElseUpdate(u.id, ArrayBuffer[Vec3]())
         u.points ++= points
+        u.mask = Some(maskImage)
       }
       depthFrame.release()
     }
@@ -215,6 +223,7 @@ object TrackerListener extends UserTracker.NewFrameListener {
 
     // Call user callback functions (even when users is empty)
     OpenNI.userCallbacks.foreach(_(users.toList))    
+    } catch{ case e:Exception => println(e) }
   }
 
   def point3DtoVec3(p:org.openni.Point3D[java.lang.Float]) = Vec3(-p.getX(),p.getY(),-p.getZ()) /= 1000f
