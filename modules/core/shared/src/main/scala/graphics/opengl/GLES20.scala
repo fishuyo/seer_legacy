@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************
 
-  Modified 2017
+  Modified 2019 fishuyo
 
  ******************************************************************************/
 
@@ -28,7 +28,7 @@ import java.nio.IntBuffer
 /** Interface wrapping all the methods of OpenGL ES 2.0
  * original @author mzechner */
 
-trait  GL20 {
+trait  GLES20 {
   val GL_ES_VERSION_2_0 = 1
   val GL_DEPTH_BUFFER_BIT = 0x00000100
   val GL_STENCIL_BUFFER_BIT = 0x00000400

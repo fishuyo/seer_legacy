@@ -1,4 +1,4 @@
-lazy val getLibs:TaskKey[Unit] = TaskKey[Unit]("Download unmanaged libs.")
+lazy val getLibs:TaskKey[Unit] = TaskKey[Unit]("download unmanaged libs.")
 
 libraryDependencies += Dependencies.scodec
 
@@ -7,4 +7,6 @@ getLibs := {
   UnmanagedLibs.getOpenNI2(dir)
 }
 
-compile in Compile <<= (compile in Compile).dependsOn(getLibs)
+// compile in Compile <<= (compile in Compile).dependsOn(getLibs)
+compile in Compile := ((compile in Compile).dependsOn(getLibs)).value
+// a := (a dependsOn b).value

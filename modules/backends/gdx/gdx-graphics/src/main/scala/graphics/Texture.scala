@@ -9,14 +9,6 @@ import com.badlogic.gdx.utils.BufferUtils
 
 import com.badlogic.gdx.files.FileHandle
 
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL30
-import com.badlogic.gdx.Gdx.{gl20 => gl }
-
-// import org.lwjgl.opengl.GL11
-// import org.lwjgl.opengl.GL12
-// import org.lwjgl.opengl.GL43
-
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.FloatBuffer
@@ -41,7 +33,7 @@ object Texture {
     t
 	}
 
-  def apply(w:Int,h:Int,format:Int=GL20.GL_RGBA) = {
+  def apply(w:Int,h:Int,format:Int=Graphics().gl.GL_RGBA) = {
     val t = new Texture(w,h)
     t.format = format
     t.allocate(w,h)
@@ -71,19 +63,19 @@ class Texture(var w:Int,var h:Int) {
   def byteBuffer = buffer.asInstanceOf[ByteBuffer]
 
   var handle = 0 //getGLHandle()
-  val target = GL20.GL_TEXTURE_2D
-  var iformat = GL20.GL_RGBA
-  var format = GL20.GL_RGBA
-  var dtype = GL20.GL_UNSIGNED_BYTE
+  val target = Graphics().gl.GL_TEXTURE_2D
+  var iformat = Graphics().gl.GL_RGBA
+  var format = Graphics().gl.GL_RGBA
+  var dtype = Graphics().gl.GL_UNSIGNED_BYTE
 
-  var filterMin = GL20.GL_NEAREST
-  var filterMag = GL20.GL_NEAREST
-  // var mWrapS = GL20.GL_CLAMP_TO_EDGE
-  // var mWrapT = GL20.GL_CLAMP_TO_EDGE
-  // var mWrapR = GL20.GL_CLAMP_TO_EDGE
-  var mWrapS = GL20.GL_REPEAT
-  var mWrapT = GL20.GL_REPEAT
-  var mWrapR = GL20.GL_REPEAT
+  var filterMin = Graphics().gl.GL_NEAREST
+  var filterMag = Graphics().gl.GL_NEAREST
+  // var mWrapS = Graphics().gl.GL_CLAMP_TO_EDGE
+  // var mWrapT = Graphics().gl.GL_CLAMP_TO_EDGE
+  // var mWrapR = Graphics().gl.GL_CLAMP_TO_EDGE
+  var mWrapS = Graphics().gl.GL_REPEAT
+  var mWrapT = Graphics().gl.GL_REPEAT
+  var mWrapR = Graphics().gl.GL_REPEAT
 
   // allocate(w,h)
   // params()
@@ -102,37 +94,37 @@ class Texture(var w:Int,var h:Int) {
 
   private def getGLHandle() = {
     val buf = BufferUtils.newIntBuffer(1)
-    Gdx.gl.glGenTextures(1,buf)
+    Graphics().gl.glGenTextures(1,buf)
     buf.get(0)
   }
 
   def bind(i:Int=0){
-    Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0+i)
-    Gdx.gl.glEnable(target)
-    Gdx.gl.glBindTexture(target, handle)    
+    Graphics().gl.glActiveTexture(Graphics().gl.GL_TEXTURE0+i)
+    Graphics().gl.glEnable(target)
+    Graphics().gl.glBindTexture(target, handle)    
   }
 
   def params(){
     bind()
-    // Gdx.gl.glBindTexture(target, handle);
-    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_MAG_FILTER, filterMag)
-    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_MIN_FILTER, filterMin)
-    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_WRAP_S, mWrapS);
-    Gdx.gl.glTexParameterf(target, GL20.GL_TEXTURE_WRAP_T, mWrapT);
-    Gdx.gl.glTexParameterf(target, GL30.GL_TEXTURE_WRAP_R, mWrapR);
-    if (filterMin != GL20.GL_LINEAR && filterMin != GL20.GL_NEAREST) {
-      Gdx.gl.glTexParameteri(target, GL20.GL_GENERATE_MIPMAP, GL20.GL_TRUE); // automatic mipmap
+    // Graphics().gl.glBindTexture(target, handle);
+    Graphics().gl.glTexParameterf(target, Graphics().gl.GL_TEXTURE_MAG_FILTER, filterMag)
+    Graphics().gl.glTexParameterf(target, Graphics().gl.GL_TEXTURE_MIN_FILTER, filterMin)
+    Graphics().gl.glTexParameterf(target, Graphics().gl.GL_TEXTURE_WRAP_S, mWrapS);
+    Graphics().gl.glTexParameterf(target, Graphics().gl.GL_TEXTURE_WRAP_T, mWrapT);
+    Graphics().gl.glTexParameterf(target, Graphics().gl.GL_TEXTURE_WRAP_R, mWrapR);
+    if (filterMin != Graphics().gl.GL_LINEAR && filterMin != Graphics().gl.GL_NEAREST) {
+      Graphics().gl.glTexParameteri(target, Graphics().gl.GL_GENERATE_MIPMAP, Graphics().gl.GL_TRUE); // automatic mipmap
     }
-    // Gdx.gl.glBindTexture(target, 0);
+    // Graphics().gl.glBindTexture(target, 0);
   }
 
   def update(){
     buffer.rewind
     bind()
-    // Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
-    Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,buffer)
-    Gdx.gl.glGenerateMipmap(GL20.GL_TEXTURE_2D);
-    // println(Gdx.gl.glGetError())
+    // Graphics().gl.glPixelStorei(Graphics().gl.GL_UNPACK_ALIGNMENT, 1);
+    Graphics().gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,buffer)
+    Graphics().gl.glGenerateMipmap(Graphics().gl.GL_TEXTURE_2D);
+    // println(Graphics().gl.glGetError())
   }
 
   def dispose(){
@@ -141,7 +133,7 @@ class Texture(var w:Int,var h:Int) {
       buffer.put(0, handle);
       buffer.position(0);
       buffer.limit(1);
-      Gdx.gl.glDeleteTextures(1, buffer);
+      Graphics().gl.glDeleteTextures(1, buffer);
       handle = 0;
     }
   }
@@ -149,8 +141,8 @@ class Texture(var w:Int,var h:Int) {
 
 class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
   // buffer = BufferUtils.newFloatBuffer( 4*w*h )
-  iformat = GL30.GL_RGBA32F //GL20.GL_RGBA
-  dtype = GL20.GL_FLOAT
+  iformat = Graphics().gl.GL_RGBA32F //Graphics().gl.GL_RGBA
+  dtype = Graphics().gl.GL_FLOAT
 
   allocate(w,h)
   init()
@@ -167,16 +159,16 @@ class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
 class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
 
   image.channels match {
-    case 1 => format = GL20.GL_LUMINANCE
-    case 2 => format = GL20.GL_LUMINANCE_ALPHA
-    case 3 => format = GL20.GL_RGB
-    case 4 => format = GL20.GL_RGBA
+    case 1 => format = Graphics().gl.GL_LUMINANCE
+    case 2 => format = Graphics().gl.GL_LUMINANCE_ALPHA
+    case 3 => format = Graphics().gl.GL_RGB
+    case 4 => format = Graphics().gl.GL_RGBA
     case _ => ()
   }
   image.bytesPerChannel match {
-    case 1 => dtype = GL20.GL_UNSIGNED_BYTE
-    case 2 => dtype = GL20.GL_SHORT //GL20.GL_UNSIGNED_SHORT
-    case 4 => dtype = GL20.GL_FLOAT //GL20.GL_UNSIGNED_INT
+    case 1 => dtype = Graphics().gl.GL_UNSIGNED_BYTE
+    case 2 => dtype = Graphics().gl.GL_SHORT //Graphics().gl.GL_UNSIGNED_SHORT
+    case 4 => dtype = Graphics().gl.GL_FLOAT //Graphics().gl.GL_UNSIGNED_INT
     case _ => ()
   }
 
@@ -184,11 +176,11 @@ class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
 
   override def update(){
     bind()
-    // Gdx.gl.glPixelStorei(GL20.GL_UNPACK_ALIGNMENT, 1);
+    // Graphics().gl.glPixelStorei(Graphics().gl.GL_UNPACK_ALIGNMENT, 1);
     image.buffer.rewind
-    Gdx.gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,image.buffer)
-    Gdx.gl.glGenerateMipmap(GL20.GL_TEXTURE_2D);
-    // println(Gdx.gl.glGetError())
+    Graphics().gl.glTexImage2D(target,0,iformat,w,h,0,format,dtype,image.buffer)
+    Graphics().gl.glGenerateMipmap(Graphics().gl.GL_TEXTURE_2D);
+    // println(Graphics().gl.glGetError())
   }
 }
 

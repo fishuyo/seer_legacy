@@ -2,36 +2,12 @@
 package com.fishuyo.seer
 package graphics
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20
-import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Vector3
+class GraphicsImpl extends Graphics {
 
-object GLImmediate {
-  val renderer = new ImmediateModeRenderer20(true,true,2)
-}
-
-trait GLThis {
-  def gli = GLImmediate.renderer
-  def gl = Gdx.gl
-  // def GL20 = Gdx.GL20
-  // def gl11 = Gdx.gl11
-  def gl20 = Gdx.gl20
-  def gl30 = Gdx.gl30
-}
-
-object Graphics {
-
-	def draw(d:Drawable){
-		d.draw()
-	}
-
-  def run(f:()=>Any){
-
-  }
+  val gl:GLES30 = new GLES30Impl //.asInstanceOf[GLES30]
 
 }
+
 
 
 object Run{

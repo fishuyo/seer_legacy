@@ -2,8 +2,6 @@
 package com.fishuyo.seer
 package graphics
 
-// import com.badlogic.gdx.graphics.{Texture => GdxTexture}
-import com.badlogic.gdx.Gdx
 
 trait Material
 

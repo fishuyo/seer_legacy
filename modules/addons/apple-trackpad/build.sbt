@@ -1,8 +1,10 @@
-lazy val getLibs:TaskKey[Unit] = TaskKey[Unit]("Download unmanaged libs.")
+lazy val getLibs:TaskKey[Unit] = TaskKey[Unit]("download unmanaged libs.")
 
 getLibs := {
   val dir = baseDirectory.value / "lib"
   UnmanagedLibs.getGlulogic(dir)
 }
 
-compile in Compile <<= (compile in Compile).dependsOn(getLibs)
+// compile in Compile <<= (compile in Compile).dependsOn(getLibs)
+compile in Compile := ((compile in Compile).dependsOn(getLibs)).value
+

@@ -5,12 +5,14 @@ package graphics
 
 object Graphics {
   var interface:Option[Graphics] = None
-  def apply() = interface.get //OrElse({ interface = Some(new NullAudioInterface()); interface.get })
+  def apply() = interface.get
+  def update(g:Graphics) = interface = Some(g)
 }
 
 
-trait Graphics extends GL30 {
+trait Graphics {
 
+  def gl:GLES30
 
 
 

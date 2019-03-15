@@ -21,7 +21,7 @@ package com.fishuyo.seer.graphics
 import java.nio.Buffer
 
 /** OpenGL ES 3.0 */
-trait GL30 extends GL20 {
+trait GLES30 extends GLES20 {
   val GL_READ_BUFFER = 0x0C02
   val GL_UNPACK_ROW_LENGTH = 0x0CF2
   val GL_UNPACK_SKIP_ROWS = 0x0CF3

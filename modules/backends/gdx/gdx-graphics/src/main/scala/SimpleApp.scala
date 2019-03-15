@@ -58,7 +58,7 @@ class SeerAppListener extends ApplicationListener {
 
   def create(){
     // println("App create.")
-
+    Graphics() = new GraphicsImpl
     Gdx.input.setInputProcessor( Inputs )
 
     Keyboard.bindCamera()
