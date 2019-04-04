@@ -25,7 +25,7 @@ class User(val id:Int){
   val skeleton = new Skeleton
   val points = ArrayBuffer[Vec3]()
 
-  // val mask = Image(OpenNI.w,OpenNI.h,1,1)
+  var mask:Option[Image] = None
   // val maskBufferSafe = mask.buffer.duplicate
 
   def head = skeleton.joints("head")

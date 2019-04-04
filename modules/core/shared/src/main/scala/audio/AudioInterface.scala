@@ -21,7 +21,7 @@ class NullAudioInterface extends AudioInterface {
 }
 
 trait AudioInterface {
-  var bufferSize = 256
+  var bufferSize = 2048 //256
   var sampleRate = 44100
 
   var channelsIn = 1

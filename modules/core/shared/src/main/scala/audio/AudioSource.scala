@@ -69,6 +69,7 @@ class AudioScene extends AudioSource {
   override def audioIO( io:AudioIOBuffer){
     buffer.reset
     buffer.zero
+    for(i <- 0 until buffer.bufferSize) buffer.inputSamples(0)(i) = io.inputSamples(0)(i)
     sources.foreach { case s => s.audioIO(buffer); buffer.reset }
     buffer *= gain
     io += buffer

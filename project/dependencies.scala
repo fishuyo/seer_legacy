@@ -61,4 +61,9 @@ object Dependencies {
   val hidD = Seq(
     "org.hid4java" % "hid4java" % "0.5.0"
   )
+
+  val javacv = Seq(
+    "org.bytedeco" % "javacv" % "1.4.4",
+    "org.bytedeco" % "javacv-platform" % "1.4.4"
+  )
 }

@@ -13,12 +13,12 @@ import edu.emory.mathcs.jtransforms.fft._
 
 
 object FFT {
-	var length = 2048
+	var length = Audio().bufferSize
 	var rect = Array.fill(length)(1f)
 	var hann = Array.fill(length)(0f)
 	for(i<-(0 until length)) hann(i) = 0.5f*(1f-math.cos(2.0*math.Pi*i/(length-1.0)).toFloat)
 
-	var window = hann
+	def window = hann
 
 	var fft = new FloatFFT_1D(length)
 
@@ -42,7 +42,7 @@ class PhaseVocoder extends AudioSource {
 
 	var length = FFT.length
 	var hopFactor = 1f/4f
-	var hopSize = (length*hopFactor).toInt
+	def hopSize = (length*hopFactor).toInt
 	var numWindows = 0
 	var spectrumData:Array[Array[Float]] = null
 	var prevBuffer = new Array[Float](length)
@@ -76,7 +76,7 @@ class PhaseVocoder extends AudioSource {
 	def setSamples(buffer:Array[Float], size:Int){
 		val samples = buffer.take(size)
 		numWindows = samples.length / hopSize		
-		println( s"Analyzing ${samples.length} samples($hopSize) $numWindows windows")				
+		// println( s"Analyzing ${samples.length} samples($hopSize) $numWindows windows")				
 
 		// use sliding window over sample data
 		spectrumData = samples.sliding(length,hopSize).map( s => {
@@ -90,7 +90,7 @@ class PhaseVocoder extends AudioSource {
 
 		numWindows = spectrumData.length
 		maxWin = numWindows
-		println(s"spectrumData.length: ${spectrumData.length}")
+		// println(s"spectrumData.length: ${spectrumData.length}")
 		update = true
 	}
 

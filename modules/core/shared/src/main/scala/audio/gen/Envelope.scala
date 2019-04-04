@@ -57,15 +57,18 @@ class Envelope(val segments:Int) extends Gen {
 
 class ADSR extends Envelope(4){
 
-  def attack(dur:Float, amp:Float=1f){
+  def attack(dur:Float, amp:Float=1f) = {
     lengths(0) = dur
     values(1) = amp
+    this
   }
-  def decay(dur:Float, amp:Float=0.8f){
+  
+  def decay(dur:Float, amp:Float=0.8f) = {
     lengths(1) = dur 
     values(2) = amp
     values(3) = amp
+    this
   }
-  def sustain(dur:Float) = lengths(2) = dur
-  def release(dur:Float) = lengths(3) = dur
+  def sustain(dur:Float) = { lengths(2) = dur; this }
+  def release(dur:Float) = { lengths(3) = dur; this }
 }
