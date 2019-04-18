@@ -107,6 +107,16 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) ext
     particles.zipWithIndex.foreach( (p) => {
     	mesh.vertices(p._2) = p._1.position
     })
+
+    // update indices if torn
+    if(mesh.primitive == Lines){
+      val ts = springs.zipWithIndex.filter(_._1.torn).flatMap{ case (s,i) => Seq(2*i,2*i+1)}
+      springs = springs.filterNot(_.torn)
+      ts.reverseMap { case i => 
+        mesh.wireIndices.remove(i)
+      }
+    }
+
     if(updateNormals) mesh.recalculateNormals
     mesh.update
   }

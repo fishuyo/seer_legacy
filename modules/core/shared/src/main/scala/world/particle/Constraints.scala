@@ -9,7 +9,9 @@ import spatial._
  trait Constraint{
  	var active=true
  	def setActive(b:Boolean) = active = b
-	def solve();
+	def solve()
+	def p:KinematicState
+	def q:KinematicState
 }
 
 object AbsoluteConstraint{
@@ -91,7 +93,7 @@ class LinearSpringConstraint(val p:Particle, val q:Particle, var length:Float, s
 // }
 
 class RotationalSpringConstraint(val p:Stick, var zeroQuat:Quat=Quat(), k:Float=0.1f) extends Constraint {
-
+	val q  = Particle(Vec3())
   var torn = false
   def isTorn() = torn
 
