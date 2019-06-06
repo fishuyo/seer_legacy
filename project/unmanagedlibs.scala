@@ -5,7 +5,7 @@ import Keys._
 import Process._
 import java.io.File
 import java.net.URL
-import scala.sys.process._
+// import scala.sys.process._
 
 object UnmanagedLibs {
 
@@ -16,7 +16,7 @@ object UnmanagedLibs {
     println(s"Pulling $name")
     val url = new URL("%s/%s" format(baseUrl, name)).toString
     // IO.download(url, zipFile)
-    s"curl $url -o ${zipFile.getAbsolutePath}".!
+    Process(s"curl $url -o ${zipFile.getAbsolutePath}").!
     println(s"Downloaded $name")
     zipFile
   }

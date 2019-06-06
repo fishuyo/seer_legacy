@@ -20,8 +20,11 @@ class NullAudioInterface extends AudioInterface {
   println( "Warning: No AudioInterface initialized.")
 }
 
+case class AudioConfig(bufferSize:Int, sampleRate:Int, channelsIn:Int, channelsOut:Int)
+
 trait AudioInterface {
-  var bufferSize = 256 //2048 //256
+
+  var bufferSize = 512 //2048 //256
   var sampleRate = 44100
 
   var channelsIn = 1

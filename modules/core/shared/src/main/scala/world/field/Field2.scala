@@ -12,18 +12,19 @@ import spire.syntax.cfor._
   * A Field represents data grids in n-dimensional space. 
   * Individual cells can be accesed as well as interpolation between cells through lookup at a position in space.
   */
-object Field2D {
+object Field2 {
 
-  val scratchMap = collection.mutable.HashMap[(Int,Int),Field2D]()
-  def scratch(f:Field2D) = scratchMap.getOrElseUpdate((f.nx,f.ny), Field2D(f.nx,f.ny,f.dx,f.dy))
+  val scratchMap = collection.mutable.HashMap[(Int,Int),Field2]()
+  def scratch(f:Field2) = scratchMap.getOrElseUpdate((f.nx,f.ny), Field2(f.nx,f.ny,f.dx,f.dy))
+  def scratch(nx:Int,ny:Int,dx:Float,dy:Float) = scratchMap.getOrElseUpdate((nx,ny), Field2(nx,ny,dx,dy))
 
-  def apply(nx:Int, ny:Int, dx:Float=1f, dy:Float=1f) = new Field2D(nx,ny,dx,dy)
+  def apply(nx:Int, ny:Int, dx:Float=1f, dy:Float=1f) = new Field2(nx,ny,dx,dy)
+  def apply(n:Vec2, size:Vec2) = new Field2(n.x.toInt,n.y.toInt,size.x,size.y)
 
-  def setBoundary(f:Field2D) = {
-  // void setBoundary ( int N, int b, flo at * x )
-    for ( i <- 1 until f.ny - 1 ) {
-      f(0 ,i) = f(1,i);
-      f(f.nx-1,i) = f(f.nx-2,i);
+  def setBoundary(f:Field2) = {
+    for ( j <- 1 until f.ny - 1 ) {
+      f(0,j) = f(1,j);
+      f(f.nx-1,j) = f(f.nx-2,j);
     }
     for ( i <- 1 until f.nx - 1 ) {
       f(i,0 ) = f(i,1);
@@ -35,7 +36,7 @@ object Field2D {
     f(f.nx-1,f.ny-1) = 0.5f*(f(f.nx-1,f.ny-2)+f(f.nx-2,f.ny-1 ));
   }
 
-  def diffuse(f:Field2D) = {
+  def diffuse(f:Field2) = {
     val a = f.dt * f.alphaA / (f.dx*f.dy)
     val tmp = scratch(f)
     
@@ -48,13 +49,13 @@ object Field2D {
     f
   }
 
-  def diffuseSolve(f0:Field2D, dt:Float, itr:Int=20) = {
+  def diffuseSolve(f0:Field2, dt:Float, itr:Int=20) = {
     val diff = 0.75f
     val a = dt * diff //* f0.nx * f0.ny
     linearSolve(f0, a, 1f/(1f+4f*a), itr)
   }
 
-  def linearSolve(f0:Field2D, a:Float, a2:Float, itr:Int) = {
+  def linearSolve(f0:Field2, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
     cfor(0)(_ < itr, _ + 1){ k =>
@@ -68,16 +69,17 @@ object Field2D {
     f0
   }
 
-  def advect(f0:Field2D, vf:VecField2D, dt:Float) = {
+  def advect(f0:Field2, vf:VecField2, dt:Float) = {
     val f = scratch(f0)
-    val dt0 = dt*f0.nx //N;
+    val dt0x = dt*(f0.nx-2)
+    val dt0y = dt*(f0.ny-2)
 
     for (j <- ( 1 until f.ny-1 ); i <- ( 1 until f.nx-1 )){
       val v = vf(i,j)
-      var x = i - dt0 * v.x
-      var y = j - dt0 * v.y
-      if (x < 0.5) x = 0.5f; if (x > f0.nx + 0.5) x = f0.nx + 0.5f; val i0=x.toInt; val i1=i0+1;
-      if (y < 0.5) y = 0.5f; if (y > f0.ny + 0.5) y = f0.ny + 0.5f; val j0=y.toInt; val j1=j0+1;
+      var x = i - dt0x * v.x
+      var y = j - dt0y * v.y
+      if (x < 0.5) x = 0.5f; if (x > f0.nx-2 + 0.5) x = f0.nx-2 + 0.5f; val i0=x.toInt; val i1=i0+1;
+      if (y < 0.5) y = 0.5f; if (y > f0.ny-2 + 0.5) y = f0.ny-2 + 0.5f; val j0=y.toInt; val j1=j0+1;
       val s1 = x-i0; val s0 = 1-s1; val t1 = y-j0; val t0 = 1-t1;
       f(i,j) = s0 * (t0 * f0(i0,j0) + t1 * f0(i0,j1) ) + s1 * ( t0 * f0(i1,j0) + t1 * f0(i1,j1) )
     }
@@ -88,7 +90,7 @@ object Field2D {
 
 }
 
-class Field2D(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
+class Field2(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
   val data = new Array[Float](nx*ny)
 
   var alphaA = .75f
@@ -101,11 +103,11 @@ class Field2D(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
 
   def update(v:Vec2, value:Float):Unit = {
     val cen = Vec2()
-    val halfsize = nx*dx / 2  //XXX
+    val s = Vec2(nx*dx / 2, ny*dy / 2)
 
-    if( v.x < -halfsize || v.x > halfsize || v.y > halfsize || v.y < -halfsize) return
-    val nv = ((v-cen) + Vec2(halfsize)) * (nx-1) / (2*halfsize)
-    //println( "vecfield3d get: " + nv )
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y) return
+    val nv = ((v-cen) + s) * (Vec2(nx-1,ny-1) / (s*2))
+
     if( nv.x >= nx-1 ) nv.x = nx - 1.001f
     if( nv.y >= ny-1 ) nv.y = ny - 1.001f
     update(nv.x.toInt, nv.y.toInt, value)
@@ -115,19 +117,20 @@ class Field2D(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
   }
 
 
-  def set(f:Field2D) = Array.copy(f.data,0,data,0,data.length)
+  def set(f:Field2) = Array.copy(f.data,0,data,0,data.length)
 }
 
 
-object VecField2D {
+object VecField2 {
   implicit def f2v(f:Float) = Vec2(f)  // XXX
 
-  val scratchMap = collection.mutable.HashMap[(Int,Int),VecField2D]()
-  def scratch(f:VecField2D) = scratchMap.getOrElseUpdate((f.nx,f.ny), VecField2D(f.nx,f.ny,f.dx,f.dy))
+  val scratchMap = collection.mutable.HashMap[(Int,Int),VecField2]()
+  def scratch(f:VecField2) = scratchMap.getOrElseUpdate((f.nx,f.ny), VecField2(f.nx,f.ny,f.dx,f.dy))
 
-  def apply(nx:Int, ny:Int, dx:Float=0.1f, dy:Float=0.1f) = new VecField2D(nx,ny,dx,dy)
+  def apply(nx:Int, ny:Int, dx:Float=0.1f, dy:Float=0.1f) = new VecField2(nx,ny,dx,dy)
+  def apply(n:Vec2, size:Vec2) = new VecField2(n.x.toInt,n.y.toInt,size.x,size.y)
 
-  def setBoundary(f:VecField2D) = {
+  def setBoundary(f:VecField2) = {
 
     for ( i <- 1 until f.ny-1 ) {
       f(0 ,i).x = -f(1,i).x
@@ -141,13 +144,13 @@ object VecField2D {
       f(i,f.ny-1).x = f(i,f.ny-2).x
       f(i,f.ny-1).y = -f(i,f.ny-2).y
     }
-    f(0,0) = 0.5f*(f(1,0)+f(0,1));
-    f(0,f.ny-1) = 0.5f*(f(1,f.ny-1)+f(0,f.ny-2));
-    f(f.nx-1,0) = 0.5f*(f(f.nx-2,0)+f(f.nx-1,1));
-    f(f.nx-1,f.ny-1) = 0.5f*(f(f.nx-1,f.ny-2)+f(f.nx-2,f.ny-1 ));
+    f(0,0) = -0.5f*(f(1,0)+f(0,1));
+    f(0,f.ny-1) = -0.5f*(f(1,f.ny-1)+f(0,f.ny-2));
+    f(f.nx-1,0) = -0.5f*(f(f.nx-2,0)+f(f.nx-1,1));
+    f(f.nx-1,f.ny-1) = -0.5f*(f(f.nx-1,f.ny-2)+f(f.nx-2,f.ny-1 ));
   }
 
-  def diffuse(f:VecField2D) = {
+  def diffuse(f:VecField2) = {
     val a = f.dt * f.alphaA / (f.dx*f.dy)
     val tmp = scratch(f)
     
@@ -160,13 +163,13 @@ object VecField2D {
     f
   }
 
-  def diffuseSolve(f0:VecField2D, dt:Float, itr:Int=20) = {
+  def diffuseSolve(f0:VecField2, dt:Float, itr:Int=20) = {
     val diff = 0.75f
     val a = dt * diff //* f0.nx * f0.ny
     linearSolve(f0, a, 1f/(1f+4f*a), itr)
   }
 
-  def linearSolve(f0:VecField2D, a:Float, a2:Float, itr:Int) = {
+  def linearSolve(f0:VecField2, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
     cfor(0)(_ < itr, _ + 1){ k =>
@@ -180,7 +183,7 @@ object VecField2D {
     f0
   }
 
-  def advect(f0:VecField2D, vf:VecField2D, dt:Float) = {
+  def advect(f0:VecField2, vf:VecField2, dt:Float) = {
     val f = scratch(f0)
     val dt0x = dt*(f0.nx-2)
     val dt0y = dt*(f0.ny-2)
@@ -199,34 +202,33 @@ object VecField2D {
     f0
   }
 
-  def project(vf:VecField2D) = {
-  // void project ( int N, float * u, float * v, float * p, float * div )
-    val f = scratch(vf) // (p,div) ?
+  def project(f0:VecField2) = {
+    val p = Field2.scratch(f0.nx,f0.ny,f0.dx,f0.dy)
+    val div = Field2.scratch(f0.nx,f0.ny,f0.dx,f0.dy)
 
-    val h = 1f/vf.nx;
-    for (j <- ( 1 until f.ny-1 ); i <- ( 1 until f.nx-1 )){
-      // div(i,j) = -0.5*h*(u(i+1,j)-u(i-1,j)+v(i,j+1)-v(i,j-1));
-      val div = -0.5f * h * ( vf(i+1,j).x - vf(i-1,j).x + vf(i,j+1).y - vf(i,j-1).y );
-      f(i,j) = Vec2(0,div)
+    val h = 1f/f0.nx; //XXX
+    for (j <- ( 1 until f0.ny-1 ); i <- ( 1 until f0.nx-1 )){
+      val d = -0.5f * h * ( f0(i+1,j).x - f0(i-1,j).x + f0(i,j+1).y - f0(i,j-1).y );
+      div(i,j) = d
+      p(i,j) = 0f
     }
-    setBoundary(f)
+    Field2.setBoundary(div); Field2.setBoundary(p)
     for (k <- 0 until 20 ){
-      for (j <- ( 1 until f.ny-1 ); i <- ( 1 until f.nx-1 )){
-        f(i,j).x = ( f(i,j).y + f(i-1,j).x + f(i+1,j).x + f(i,j-1).x + f(i,j+1).x ) / 4f;
+      for (j <- ( 1 until f0.ny-1 ); i <- ( 1 until f0.nx-1 )){
+        p(i,j) = ( div(i,j) + p(i-1,j) + p(i+1,j) + p(i,j-1) + p(i,j+1) ) / 4f;
       }
-      setBoundary(f);
+      Field2.setBoundary(p);
     }
-    for (j <- ( 1 until f.ny-1 ); i <- ( 1 until f.nx-1 )){
-      vf(i,j).x -= 0.5f * ( f(i+1,j).x - f(i-1,j).x ) / h;
-      vf(i,j).y -= 0.5f * ( f(i,j+1).x - f(i,j-1).x ) / h;
+    for (j <- ( 1 until f0.ny-1 ); i <- ( 1 until f0.nx-1 )){
+      f0(i,j).x -= 0.5f * ( p(i+1,j) - p(i-1,j) ) / h;
+      f0(i,j).y -= 0.5f * ( p(i,j+1) - p(i,j-1) ) / h;
     }
-    setBoundary(f);
-    // f.set( vf )
-    vf
+    setBoundary(f0);
+    f0
   }
 }
 
-class VecField2D(val nx:Int, val ny:Int, val dx:Float=0.1f, val dy:Float=0.1f){
+class VecField2(val nx:Int, val ny:Int, val dx:Float=0.1f, val dy:Float=0.1f){
   val data:Array[Vec2] = Array.fill(nx*ny)(Vec2())
 
   var alphaA = .75f
@@ -275,7 +277,7 @@ class VecField2D(val nx:Int, val ny:Int, val dx:Float=0.1f, val dy:Float=0.1f){
   }
 
 
-  def set(f:VecField2D) = Array.copy(f.data,0,data,0,data.length)
+  def set(f:VecField2) = Array.copy(f.data,0,data,0,data.length)
 
   def getCenter(x:Int,y:Int):Vec2 = {
     Vec2(x*dx,y*dy) + Vec2(dx,dy)*0.5f
@@ -287,7 +289,7 @@ class VecField2D(val nx:Int, val ny:Int, val dx:Float=0.1f, val dy:Float=0.1f){
 
     if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y) return (0,0)
     val nv = ((v-cen) + s) * (Vec2(nx-1,ny-1) / (s*2))
-    //println( "vecfield3d get: " + nv )
+
     if( nv.x >= nx-1 ) nv.x = nx - 1.001f
     if( nv.y >= ny-1 ) nv.y = ny - 1.001f
     (nv.x.floor.toInt, nv.y.floor.toInt)

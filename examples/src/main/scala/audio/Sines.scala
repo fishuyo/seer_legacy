@@ -11,7 +11,7 @@ import concurrent.duration._
 object Sines extends SeerApp {
 
   // initialize and use PortAudio audio backend
-  PortAudio.init
+  JackAudio.init
 
   // start the audio actor
   Audio().start

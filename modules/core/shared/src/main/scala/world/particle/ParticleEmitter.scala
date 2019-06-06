@@ -4,7 +4,7 @@ package world
 package particle
 
 import graphics.Animatable
-import field.VecField3D
+import field.VecField3
 
 import scala.collection.mutable.ListBuffer
 
@@ -14,7 +14,7 @@ class ParticleEmitter(var maxParticles:Int) extends Animatable {
 	var ttl = 20f
 	var particles = ListBuffer[Particle]()
 
-	var field:Option[VecField3D] = None
+	var field:Option[VecField3] = None
 	var fieldAsForce = true
 	var xt = 0f
 

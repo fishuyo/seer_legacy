@@ -27,4 +27,5 @@ class SeerScript extends Animatable with AudioSource {
     Scene.remove(this)
     Audio().sources -= this
   }
+  def preUnload(){}
 }

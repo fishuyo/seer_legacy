@@ -67,7 +67,8 @@ object Common {
     //   "net.sf.proguard" % "proguard-base" % "4.11" % "provided"
     // ),
     fork in Compile := true,
-    fork in run := true
+    fork in run := true //,
+    // javaOptions in run += "-Xcheck:jni"
     // javaOptions in run += "-Dorg.lwjgl.util.Debug=true"
     // unmanagedResourceDirectories in Compile += file("android/assets"),
     // desktopJarName := "seer-app",

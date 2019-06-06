@@ -113,11 +113,11 @@ trait ScriptLoader {
   // }
   def reload(){
     try{
-      // obj match {
-      //   case s:SeerScript => s.preUnload()
-      //   case a:ActorRef => a ! "preunload" //akka.actor.PoisonPill
-      //   case _ => ()
-      // }
+      obj match {
+        case s:SeerScript => s.preUnload()
+        case a:ActorRef => a ! "preunload" //akka.actor.PoisonPill
+        case _ => ()
+      }
       val ret = compile()
       ret match{
         case s:Script =>

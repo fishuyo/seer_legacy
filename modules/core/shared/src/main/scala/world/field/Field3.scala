@@ -19,19 +19,48 @@ object Field3 {
   val scratchMap = collection.mutable.HashMap[Field3,Field3]()
   def scratch(f:Field3) = scratchMap.getOrElseUpdate(f, new Field3(f.nx,f.ny,f.nz,f.dx,f.dy,f.dz))
 
+  def apply(nx:Int, ny:Int, nz:Int, dx:Float=1f, dy:Float=1f, dz:Float=1f) = new Field3(nx,ny,nz,dx,dy,dz)
+  def apply(n:Vec3, size:Vec3) = new Field3(n.x.toInt,n.y.toInt,n.z.toInt,size.x,size.y,size.z)
 
-  def setBoundary(f:Field3, b:Int) = {
-  // void setBoundary ( int N, int b, flo at * x )
-    // for ( i <- 1 until f.nx ) {
-    //   f(0 ,i) = if(b==1) -f(1,i) else f(1,i);
-    //   f(f.nx-2,i) = if(b==1) -f(f.nx-1,i) else f(f.nx-1,i);
-    //   f(i,0 ) = if(b==2) -f(i,1) else f(i,1);
-    //   f(i,f.nx-2) = if(b==2) -f(i,f.nx-1) else f(i,f.nx-1);
-    // }
-    // f(0 ,0 ) = 0.5f*(f(1,0 )+f(0 ,1));
-    // f(0 ,f.nx-2) = 0.5f*(f(1,f.nx-2)+f(0 ,f.nx-1 ));
-    // f(f.nx-2,0 ) = 0.5f*(f(f.nx-1,0 )+f(f.nx-2,1));
-    // f(f.nx-2,f.nx-2) = 0.5f*(f(f.nx-1,f.nx-2)+f(f.nx-2,f.nx-1 ));
+  def setBoundary(f:Field3) = {
+    for( i <- 1 until f.nx - 1; j <- 1 until f.ny -1 ){
+      f(i,j,0) = f(i,j,1);
+      f(i,j,f.nz-1) = f(i,j,f.nz-2);
+    }
+    for( j <- 1 until f.ny - 1; k <- 1 until f.nz -1 ){
+      f(0,j,k) = f(1,j,k);
+      f(f.nx-1,j,k) = f(f.nz-2,j,k);
+    }
+    for( k <- 1 until f.nz - 1; i <- 1 until f.nx -1 ){
+      f(i,0,k) = f(i,0,k);
+      f(i,f.ny-1,k) = f(i,f.ny-2,k);
+    }
+    for ( i <- 1 until f.nx - 1 ) {
+      f(i,0,0) = (f(i,1,0)+f(i,0,1)) / 2.0f;
+      f(i,f.ny-1,0) = (f(i,f.ny-2,0)+f(i,f.ny-1,1)) / 2.0f;
+      f(i,f.ny-1,f.nz-1) = (f(i,f.ny-2,f.nz-1)+f(i,f.ny-1,f.nz-2)) / 2.0f;
+      f(i,0,f.nz-1) = (f(i,1,f.nz-1)+f(i,0,f.nz-2)) / 2.0f;
+    }
+    for ( j <- 1 until f.ny - 1 ) {
+      f(0,j,0) = (f(1,j,0)+f(0,j,1)) / 2.0f;
+      f(f.nx-1,j,0) = (f(f.nx-2,j,0)+f(f.nx-1,j,1)) / 2.0f;
+      f(f.nx-1,j,f.nz-1) = (f(f.nx-2,j,f.nz-1)+f(f.nx-1,j,f.nz-2)) / 2.0f;
+      f(0,j,f.nz-1) = (f(1,j,f.nz-1)+f(0,j,f.nz-2)) / 2.0f;
+    }
+    for ( k <- 1 until f.nz - 1 ) {
+      f(0,0,k) = (f(1,0,k)+f(0,1,k)) / 2.0f;
+      f(f.nx-1,0,k) = (f(f.nx-2,0,k)+f(f.nx-1,1,k)) / 2.0f;
+      f(f.nx-1,f.ny-1,k) = (f(f.nx-2,f.ny-1,k)+f(f.nx-1,f.ny-2,k)) / 2.0f;
+      f(0,f.ny-1,k) = (f(1,f.ny-1,k)+f(0,f.ny-2,k)) / 2.0f;
+    }
+    f(0,0,0) = 0.333333f*(f(1,0,0)+f(0,1,0)+f(0,0,1));
+    f(f.nx-1,0,0) = 0.333333f*(f(f.nx-2,0,0)+f(0,1,0)+f(0,0,1));
+    f(0,f.ny-1,0) = 0.333333f*(f(1,f.ny-1,0)+f(0,f.ny-2,0)+f(0,f.ny-1,1));
+    f(0,0,f.nz-1) = 0.333333f*(f(1,0,f.nz-1)+f(0,1,f.nz-1)+f(0,0,f.nz-2));
+    f(f.nx-1,f.ny-1,0) = 0.333333f*(f(f.nx-2,f.ny-1,0)+f(f.nx-1,f.ny-2,0)+f(f.nx-1,f.ny-1,1));
+    f(0,f.ny-1,f.nz-1) = 0.333333f*(f(1,f.ny-1,f.nz-1)+f(0,f.ny-2,f.nz-1)+f(0,f.ny-1,f.nz-2));
+    f(f.nx-1,0,f.nz-1) = 0.333333f*(f(f.nx-2,0,f.nz-1)+f(f.nx-1,1,f.nz-1)+f(f.nx-1,0,f.nz-2));
+    f(f.nx-1,f.ny-1,f.nz-1) = 0.333333f*(f(f.nx-2,f.ny-1,f.nz-1)+f(f.nx-1,f.ny-2,f.nz-1)+f(f.nx-1,f.ny-1,f.nz-2));
   }
 
   def diffuse(f:Field3) = {
@@ -47,13 +76,13 @@ object Field3 {
     f
   }
 
-  def diffuseSolve(f0:Field3, dt:Float, b:Int=0, itr:Int=20) = {
+  def diffuseSolve(f0:Field3, dt:Float, itr:Int=20) = {
     val diff = 0.75f
     val a = dt * diff //* f0.nx * f0.ny
-    linearSolve(f0, a, 1f/(1f+6f*a), b, itr)
+    linearSolve(f0, a, 1f/(1f+6f*a), itr)
   }
 
-  def linearSolve(f0:Field3, a:Float, a2:Float, b:Int, itr:Int) = {
+  def linearSolve(f0:Field3, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
     cfor(0)(_ < itr, _ + 1){ i =>
@@ -62,7 +91,7 @@ object Field3 {
       cfor(1)(_ < f0.nx-1, _ + 1){ x => //i <- 1 until f0.nx-1;
         f(x,y,z) = ( f0(x,y,z) + a*( f(x-1,y,z) + f(x+1,y,z) + f(x,y-1,z) + f(x,y+1,z) + f(x,y,z+1) + f(x,y,z-1) ) ) * a2;
       }}}
-      setBoundary(f,b);
+      setBoundary(f);
     }
     f0.set( f )
     f0
@@ -85,8 +114,8 @@ object Field3 {
       val xy1 = lerp( lerp(f(i0,j0,k1), f(i1,j0,k1), dx), lerp(f(i0,j1,k1), f(i1,j1,k1), dx), dy)
       next(i,j,k) = lerp(xy0, xy1, dz) //s0 * (t0 * f(i0,j0) + t1 * f(i0,j1) ) + s1 * ( t0 * f(i1,j0) + t1 * f(i1,j1) )
     }
-    setBoundary (next, 0);
-    f.set( next )
+    setBoundary(next);
+    f.set(next)
     f
   }
 
@@ -101,7 +130,51 @@ class Field3(val nx:Int, val ny:Int, val nz:Int, val dx:Float=1f, val dy:Float=1
   var dt = .15f //.02f
 
   def apply(x:Int, y:Int, z:Int) = data(z*ny*nx + y*nx + x)
+  
+  // interpolate 
+  def apply( v:Vec3 ):Float = {
+    val cen = Vec3()
+    val s = Vec3(nx*dx,ny*dy,nz*dz) / 2
+
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y || v.z < -s.z || v.z > s.z) return 0f
+    val nv = ((v-cen) + s) * (Vec3(nx-1,ny-1,nz-1) / (s*2))
+    //println( "vecfield3d get: " + nv )
+    if( nv.x >= nx-1 ) nv.x = nx - 1.001f
+    if( nv.y >= ny-1 ) nv.y = ny - 1.001f
+    if( nv.z >= nz-1 ) nv.z = nz - 1.001f
+    apply(nv.x,nv.y,nv.z)
+  }
+
+  def apply(x:Float, y:Float, z:Float):Float = {
+    val x1 = x.floor.toInt; val dx = x - x1
+    val y1 = y.floor.toInt; val dy = y - y1
+    val z1 = z.floor.toInt; val dz = z - z1
+    val xy1 = lerp(this(x1,y1,z1), this(x1+1,y1,z1), dx )
+    val xy2 = lerp(this(x1,y1+1,z1), this(x1+1,y1+1,z1), dx )
+    val xy3 = lerp(this(x1,y1,z1+1), this(x1+1,y1,z1+1), dx )
+    val xy4 = lerp(this(x1,y1+1,z1+1), this(x1+1,y1+1,z1+1), dx )
+    val xyz1 = lerp(xy1,xy2,dy)
+    val xyz2 = lerp(xy3,xy3,dy)
+    lerp(xyz1, xyz2, dz)
+  } 
+
   def update(x:Int, y:Int, z:Int, value:Float) = data(z*ny*nx + y*nx + x) = value
+  def update(v:Vec3, value:Float):Unit = {
+    val cen = Vec3()
+    val s = Vec3(nx*dx, ny*dy, nz*dz) / 2
+
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y) return
+    val nv = ((v-cen) + s) * (Vec3(nx-1,ny-1,nz-1) / (s*2))
+
+    if( nv.x >= nx-1 ) nv.x = nx - 1.001f
+    if( nv.y >= ny-1 ) nv.y = ny - 1.001f
+    if( nv.z >= nz-1 ) nv.z = nz - 1.001f
+    update(nv.x.toInt, nv.y.toInt, nv.z.toInt, value)
+    update(nv.x.toInt+1, nv.y.toInt, nv.z.toInt, value)
+    update(nv.x.toInt, nv.y.toInt+1, nv.z.toInt, value)
+    update(nv.x.toInt, nv.y.toInt, nv.z.toInt+1, value)
+  }
+
   def set(f:Field3) = Array.copy(f.data,0,data,0,data.length)
 }
 
@@ -112,18 +185,48 @@ object VecField3 {
   val scratchMap = collection.mutable.HashMap[VecField3,VecField3]()
   def scratch(f:VecField3) = scratchMap.getOrElseUpdate(f, new VecField3(f.nx,f.ny,f.nz,f.dx,f.dy,f.dz))
 
-  def setBoundary(f:VecField3, b:Int) = {
-  // void setBoundary ( int N, int b, flo at * x )
-    // for ( i <- 1 until f.nx ) {
-    //   f(0 ,i).x = (if(b==1) -f(1,i).x else f(1,i).x)
-    //   f(f.nx-2,i).x = (if(b==1) -f(f.nx-1,i).x else f(f.nx-1,i).x)
-    //   f(i,0).y = (if(b==1) -f(i,1).y else f(i,1).y)
-    //   f(i,f.nx-2).y = (if(b==1) -f(i,f.nx-1).y else f(i,f.nx-1).y)
-    // }
-    // f(0 ,0) = 0.5f*(f(1,0 )+f(0 ,1));
-    // f(0 ,f.nx-2) = 0.5f*(f(1,f.nx-2)+f(0 ,f.nx-1 ));
-    // f(f.nx-2,0 ) = 0.5f*(f(f.nx-1,0 )+f(f.nx-2,1));
-    // f(f.nx-2,f.nx-2) = 0.5f*(f(f.nx-1,f.nx-2)+f(f.nx-2,f.nx-1 ));
+  def apply(nx:Int, ny:Int, nz:Int, dx:Float=1f, dy:Float=1f, dz:Float=1f) = new VecField3(nx,ny,nz,dx,dy,dz)
+  def apply(n:Vec3, size:Vec3) = new VecField3(n.x.toInt,n.y.toInt,n.z.toInt,size.x,size.y,size.z)
+
+  def setBoundary(f:VecField3) = {
+    for( i <- 1 until f.nx - 1; j <- 1 until f.ny -1 ){
+      f(i,j,0) = f(i,j,1) * Vec3(1,1,-1);
+      f(i,j,f.nz-1) = f(i,j,f.nz-2) * Vec3(1,1,-1);
+    }
+    for( j <- 1 until f.ny - 1; k <- 1 until f.nz -1 ){
+      f(0,j,k) = f(1,j,k) * Vec3(-1,1,1);
+      f(f.nx-1,j,k) = f(f.nz-2,j,k) * Vec3(-1,1,1);
+    }
+    for( k <- 1 until f.nz - 1; i <- 1 until f.nx -1 ){
+      f(i,0,k) = f(i,0,k) * Vec3(1,-1,1);
+      f(i,f.ny-1,k) = f(i,f.ny-2,k) * Vec3(1,-1,1);
+    }
+    for ( i <- 1 until f.nx - 1 ) {
+      f(i,0,0) = (f(i,1,0)+f(i,0,1)) * Vec3(0.5f,-0.5f,-0.5f);
+      f(i,f.ny-1,0) = (f(i,f.ny-2,0)+f(i,f.ny-1,1)) * Vec3(0.5f,-0.5f,-0.5f);
+      f(i,f.ny-1,f.nz-1) = (f(i,f.ny-2,f.nz-1)+f(i,f.ny-1,f.nz-2)) * Vec3(0.5f,-0.5f,-0.5f);
+      f(i,0,f.nz-1) = (f(i,1,f.nz-1)+f(i,0,f.nz-2)) * Vec3(0.5f,-0.5f,-0.5f);
+    }
+    for ( j <- 1 until f.ny - 1 ) {
+      f(0,j,0) = (f(1,j,0)+f(0,j,1)) * Vec3(-0.5f,0.5f,-0.5f);
+      f(f.nx-1,j,0) = (f(f.nx-2,j,0)+f(f.nx-1,j,1)) * Vec3(-0.5f,0.5f,-0.5f);
+      f(f.nx-1,j,f.nz-1) = (f(f.nx-2,j,f.nz-1)+f(f.nx-1,j,f.nz-2)) * Vec3(-0.5f,0.5f,-0.5f);
+      f(0,j,f.nz-1) = (f(1,j,f.nz-1)+f(0,j,f.nz-2)) * Vec3(-0.5f,0.5f,-0.5f);
+    }
+    for ( k <- 1 until f.nz - 1 ) {
+      f(0,0,k) = (f(1,0,k)+f(0,1,k)) * Vec3(-0.5f,-0.5f,0.5f);
+      f(f.nx-1,0,k) = (f(f.nx-2,0,k)+f(f.nx-1,1,k)) * Vec3(-0.5f,-0.5f,0.5f);
+      f(f.nx-1,f.ny-1,k) = (f(f.nx-2,f.ny-1,k)+f(f.nx-1,f.ny-2,k)) * Vec3(-0.5f,-0.5f,0.5f);
+      f(0,f.ny-1,k) = (f(1,f.ny-1,k)+f(0,f.ny-2,k)) * Vec3(-0.5f,-0.5f,0.5f);
+    }
+    f(0,0,0) = -0.333333f*(f(1,0,0)+f(0,1,0)+f(0,0,1));
+    f(f.nx-1,0,0) = -0.333333f*(f(f.nx-2,0,0)+f(0,1,0)+f(0,0,1));
+    f(0,f.ny-1,0) = -0.333333f*(f(1,f.ny-1,0)+f(0,f.ny-2,0)+f(0,f.ny-1,1));
+    f(0,0,f.nz-1) = -0.333333f*(f(1,0,f.nz-1)+f(0,1,f.nz-1)+f(0,0,f.nz-2));
+    f(f.nx-1,f.ny-1,0) = -0.333333f*(f(f.nx-2,f.ny-1,0)+f(f.nx-1,f.ny-2,0)+f(f.nx-1,f.ny-1,1));
+    f(0,f.ny-1,f.nz-1) = -0.333333f*(f(1,f.ny-1,f.nz-1)+f(0,f.ny-2,f.nz-1)+f(0,f.ny-1,f.nz-2));
+    f(f.nx-1,0,f.nz-1) = -0.333333f*(f(f.nx-2,0,f.nz-1)+f(f.nx-1,1,f.nz-1)+f(f.nx-1,0,f.nz-2));
+    f(f.nx-1,f.ny-1,f.nz-1) = -0.333333f*(f(f.nx-2,f.ny-1,f.nz-1)+f(f.nx-1,f.ny-2,f.nz-1)+f(f.nx-1,f.ny-1,f.nz-2));
   }
 
   def diffuse(f:VecField3) = {
@@ -139,13 +242,13 @@ object VecField3 {
     f
   }
 
-  def diffuseSolve(f0:VecField3, dt:Float, b:Int=0, itr:Int=20) = {
+  def diffuseSolve(f0:VecField3, dt:Float, itr:Int=20) = {
     val diff = 0.75f
     val a = dt * diff //* f0.nx * f0.ny
-    linearSolve(f0, a, 1f/(1f+6f*a), b, itr)
+    linearSolve(f0, a, 1f/(1f+6f*a), itr)
   }
 
-  def linearSolve(f0:VecField3, a:Float, a2:Float, b:Int, itr:Int) = {
+  def linearSolve(f0:VecField3, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
     cfor(0)(_ < itr, _ + 1){ i =>
@@ -154,33 +257,35 @@ object VecField3 {
       cfor(1)(_ < f0.nx-1, _ + 1){ x => //i <- 1 until f0.nx-1;
         f(x,y,z) = ( f0(x,y,z) + a*( f(x-1,y,z) + f(x+1,y,z) + f(x,y-1,z) + f(x,y+1,z) + f(x,y,z+1) + f(x,y,z-1) ) ) * a2;
       }}}
-      setBoundary(f,b);
+      setBoundary(f);
     }
     f0.set( f )
     f0
   }
 
-  def advect(f:VecField3, vf:VecField3, dt:Float, b:Int) = {
-    val next = scratch(f)
-    val dt0 = dt*f.nx //N;
+  def advect(f0:VecField3, vf:VecField3, dt:Float) = {
+    val f = scratch(f0)
+    val dt0x = dt*(f0.nx-2)
+    val dt0y = dt*(f0.ny-2)
+    val dt0z = dt*(f0.nz-2)
     for (k <- 1 until f.nz-1; j <- 1 until f.ny-1; i <- 1 until f.nx-1 ){
     try {
       val v = vf(i,j,k)
-      var x = i - dt0 * v.x
-      var y = j - dt0 * v.y
-      var z = k - dt0 * v.z
-      if (x < 0.5) x = 0.5f; if (x > f.nx + 0.5) x = f.nx + 0.5f; val i0=x.toInt; val i1=i0+1;
-      if (y < 0.5) y = 0.5f; if (y > f.ny + 0.5) y = f.ny + 0.5f; val j0=y.toInt; val j1=j0+1;
-      if (z < 0.5) z = 0.5f; if (z > f.nz + 0.5) z = f.nz + 0.5f; val k0=z.toInt; val k1=k0+1;
+      var x = i - dt0x * v.x
+      var y = j - dt0y * v.y
+      var z = k - dt0z * v.z
+      if (x < 0.5) x = 0.5f; if (x > f.nx-2 + 0.5) x = f.nx-2 + 0.5f; val i0=x.toInt; val i1=i0+1;
+      if (y < 0.5) y = 0.5f; if (y > f.ny-2 + 0.5) y = f.ny-2 + 0.5f; val j0=y.toInt; val j1=j0+1;
+      if (z < 0.5) z = 0.5f; if (z > f.nz-2 + 0.5) z = f.nz-2 + 0.5f; val k0=z.toInt; val k1=k0+1;
       val dx = x-i0; val dy = y-j0; val dz = z-k0;
-      val xy0 = lerp( lerp(f(i0,j0,k0), f(i1,j0,k0), dx), lerp(f(i0,j1,k0), f(i1,j1,k0), dx), dy)
-      val xy1 = lerp( lerp(f(i0,j0,k1), f(i1,j0,k1), dx), lerp(f(i0,j1,k1), f(i1,j1,k1), dx), dy)
-      next(i,j,k) = lerp(xy0, xy1, dz) //s0 * (t0 * f(i0,j0) + t1 * f(i0,j1) ) + s1 * ( t0 * f(i1,j0) + t1 * f(i1,j1) )
+      val xy0 = lerp( lerp(f0(i0,j0,k0), f0(i1,j0,k0), dx), lerp(f0(i0,j1,k0), f0(i1,j1,k0), dx), dy)
+      val xy1 = lerp( lerp(f0(i0,j0,k1), f0(i1,j0,k1), dx), lerp(f0(i0,j1,k1), f0(i1,j1,k1), dx), dy)
+      f(i,j,k) = lerp(xy0, xy1, dz) //s0 * (t0 * f(i0,j0) + t1 * f(i0,j1) ) + s1 * ( t0 * f(i1,j0) + t1 * f(i1,j1) )
     } catch { case e:Exception => println(s"$i $j $k"); println(e)}
     }
-    setBoundary (next, b);
-    f.set( next )
-    f
+    setBoundary (f);
+    f0.set( f )
+    f0
   }
 
   def project(vf:VecField3) = {
@@ -223,10 +328,10 @@ class VecField3(val nx:Int, val ny:Int, val nz:Int, val dx:Float=0.1f, val dy:Fl
   // interpolate 
   def apply( v:Vec3 ):Vec3 = {
     val cen = Vec3()
-    val halfsize = nx*dx / 2  //XXX
+    val s = Vec3(nx*dx,ny*dy,nz*dz) / 2
 
-    if( v.x < -halfsize || v.x > halfsize || v.y > halfsize || v.y < -halfsize || v.z < -halfsize || v.z > halfsize) return Vec3(0)
-    val nv = ((v-cen) + Vec3(halfsize)) * (nx-1) / (2*halfsize)
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y || v.z < -s.z || v.z > s.z) return Vec3(0)
+    val nv = ((v-cen) + s) * (Vec3(nx-1,ny-1,nz-1) / (s*2))
     //println( "vecfield3d get: " + nv )
     if( nv.x >= nx-1 ) nv.x = nx - 1.001f
     if( nv.y >= ny-1 ) nv.y = ny - 1.001f
@@ -251,15 +356,15 @@ class VecField3(val nx:Int, val ny:Int, val nz:Int, val dx:Float=0.1f, val dy:Fl
 
   def update(v:Vec3, value:Vec3):Unit = {
     val cen = Vec3()
-    val halfsize = nx*dx / 2  //XXX
+    val s = Vec3(nx*dx,ny*dy,nz*dz) / 2
 
-    if( v.x < -halfsize || v.x > halfsize || v.y > halfsize || v.y < -halfsize || v.z < -halfsize || v.z > halfsize) return
-    val nv = ((v-cen) + Vec3(halfsize)) * (nx-1) / (2*halfsize)
-    //println( "vecfield3d get: " + nv )
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y || v.z < -s.z || v.z > s.z) return Vec3(0)
+    val nv = ((v-cen) + s) * (Vec3(nx-1,ny-1,nz-1) / (s*2))
+
     if( nv.x >= nx-1 ) nv.x = nx - 1.001f
     if( nv.y >= ny-1 ) nv.y = ny - 1.001f
-    if( nv.z >= nz-1 ) nv.y = nz - 1.001f
-    update(nv.x.round, nv.y.round, nv.z.round, value)
+    if( nv.z >= nz-1 ) nv.z = nz - 1.001f
+    update(nv.x.toInt, nv.y.toInt, nv.z.toInt, value)
     // update(nv.x.toInt, nv.y.toInt, value)
     // update(nv.x.toInt+1, nv.y.toInt, value)
     // update(nv.x.toInt, nv.y.toInt+1, value)
@@ -271,5 +376,18 @@ class VecField3(val nx:Int, val ny:Int, val nz:Int, val dx:Float=0.1f, val dy:Fl
 
   def getCenter(x:Int,y:Int,z:Int):Vec3 = {
     Vec3(x*dx,y*dy,z*dz) + Vec3(dx,dy,dz)*0.5f
+  }
+
+  def getClosestCell(v:Vec3):(Int,Int,Int) = {
+    val cen = Vec3()
+    val s = Vec3(nx*dx / 2, ny*dy / 2, nz*dz / 2)
+
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y || v.z < -s.z || v.z > s.z) return (0,0,0)
+    val nv = ((v-cen) + s) * (Vec3(nx-1,ny-1,nz-1) / (s*2))
+
+    if( nv.x >= nx-1 ) nv.x = nx - 1.001f
+    if( nv.y >= ny-1 ) nv.y = ny - 1.001f
+    if( nv.z >= nz-1 ) nv.z = nz - 1.001f
+    (nv.x.floor.toInt, nv.y.floor.toInt, nv.z.floor.toInt)
   }
 }

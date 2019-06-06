@@ -28,10 +28,14 @@ lazy val portaudio = project.in(file("modules/backends/portaudio")).
   dependsOn(coreJVM).
   settings(Common.settings: _*)
 
+lazy val jackaudio = project.in(file("modules/backends/jackaudio")).
+  dependsOn(coreJVM).
+  settings(Common.settings: _*)
+
 
 /**
 * Examples
 */
 lazy val examples = project.in(file("examples")).
-  dependsOn(gdx_app_desktop, portaudio).
+  dependsOn(gdx_app_desktop, portaudio, jackaudio).
   settings(Common.appSettings :_*)

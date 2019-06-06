@@ -24,6 +24,7 @@ object Dependencies {
   val corejvmD = Seq(
     //"com.lihaoyi" % "ammonite-repl" % "0.4.8" cross CrossVersion.full,
     //"com.lihaoyi" % "ammonite-sshd" % "0.4.8" cross CrossVersion.full,
+    "org.scalameta" %% "scalameta" % "4.1.0",
     akkaActor, akkaRemote, akkaStream,
     "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
     spire,

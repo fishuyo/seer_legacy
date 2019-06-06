@@ -40,6 +40,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     case b:Boolean => active = b
     case "load" => load()
     case "unload" => unload()
+    case "preunload" => preunload()
     case Name(n) => name = n
   }
 
@@ -74,6 +75,8 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
 
     // shader.stopMonitor() ??
   }
+
+  def preunload(){}
 
   var _keyboard:Option[Keyboard] = None
   var _mouse:Option[Mouse] = None
