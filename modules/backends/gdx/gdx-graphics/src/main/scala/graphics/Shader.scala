@@ -14,8 +14,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.files.FileHandle;
 
-// import monido._
-
 
 object Shader {
 
@@ -25,55 +23,55 @@ object Shader {
     loadedShaders.get(name) match {
       case Some(s) => return s
       case None => 
-        if(!loadedShaders.contains("basic")) Shader.load("basic",DefaultShaders.basic)
+        if(!loadedShaders.contains("basic")) Shader.loadCode("basic",DefaultShaders.basic)
         return loadedShaders("basic")
     }
   }
 
 
-  def load(name:String, path:String) = {
-    val s = new Shader
-    s.vertFile = Some(File(path+".vert"))
-    s.fragFile = Some(File(path+".frag"))
-    loadedShaders(name) = s
-    s
+  def load(name:String, path:String):Shader = {
+    loadFiles(name, path+".vert", path+".frag")
   }
-  def loadFiles(name:String, pathV:String, pathF:String) = {
-    val s = new Shader
-    s.vertFile = Some(File(pathV))
-    s.fragFile = Some(File(pathF))
-    loadedShaders(name) = s
-    s
+
+  def loadFiles(name:String, pathV:String, pathF:String):Shader = {
+    loadedShaders.get(name) match {
+      case Some(s) => s.setFiles(pathV, pathF); s
+      case None =>
+        val s = new Shader
+        s.setFiles(pathV, pathF)
+        loadedShaders(name) = s
+        s  
+    }
   }
-  def load(name:String, v:String, f:String) = {
-    val s = new Shader
-    s.vertCode = v
-    s.fragCode = f
-    loadedShaders(name) = s
-    s
+
+  def loadCode(name:String, v:String, f:String):Shader = {
+    loadedShaders.get(name) match {
+      case Some(s) => s.setCode(v, f); s
+      case None =>
+        val s = new Shader
+        s.setCode(v, f)
+        loadedShaders(name) = s
+        s  
+    }
   }
-  def load(name:String, code:(String,String)) = {
-    val s = new Shader
-    s.name = name
-    s.vertCode = code._1
-    s.fragCode = code._2
-    loadedShaders(name) = s
-    s
+
+  def loadCode(name:String, code:(String,String)):Shader = {
+    loadCode(name, code._1, code._2)
   }
 
 }
 
 class Shader {
 
-  var name = ""
+  // var name = ""
   var loaded = false
-  var reloadFiles = false
+  var isDirty = false
   var monitoring = false
 
   var program:Option[ShaderProgram] = None
 
-  var vertCode:String = null
-  var fragCode:String = null
+  var vertCode:Option[String] = None
+  var fragCode:Option[String] = None
 
   var vertFile:Option[FileHandle] = None
   var fragFile:Option[FileHandle] = None
@@ -82,61 +80,51 @@ class Shader {
   var currentUniforms = new HashMap[String,Any]()
 
   def load(){
-    var s:ShaderProgram=null
+    var s:ShaderProgram = null
+    isDirty = false
 
     if(vertFile.isDefined && fragFile.isDefined)
       s = new ShaderProgram(vertFile.get, fragFile.get)
-    else
-      s = new ShaderProgram(vertCode, fragCode)
+    else if(vertCode.isDefined && fragCode.isDefined)
+      s = new ShaderProgram(vertCode.get, fragCode.get)
+    else return
 
     currentUniforms = new HashMap[String,Any]()
 
-    if( s.isCompiled() ){
+    if(s.isCompiled()){
       program = Some(s)
       loaded = true
     }else{
-      println( s.getLog() )
-    }
-  }
-  //load new shader program from file
-  def load(n:String, v:FileHandle, f:FileHandle) = {
-
-    val s = new ShaderProgram(v, f)
-    currentUniforms = new HashMap[String,Any]()
-
-    if( s.isCompiled() ){
-      name = n
-      program = Some(s)
-      vertFile = Some(v)
-      fragFile = Some(f)
-      loaded = true
-    }else{
-      println( s.getLog() )
+      println(s.getLog())
     }
   }
 
-  //load new shader program directly
-  def load(n:String, v:String, f:String) = {
-
-    val s = new ShaderProgram(v, f)
-    currentUniforms = new HashMap[String,Any]()
-
-    vertCode = v
-    fragCode = f
-
-    if( s.isCompiled() ){
-      name = n
-      program = Some(s)
-      loaded = true
-    }else{
-      println( s.getLog() )
+  def setFiles(vertPath:String, fragPath:String, create:Boolean = true) = {
+    vertFile = Some(File(vertPath))
+    fragFile = Some(File(fragPath))
+    if(create){
+      if(!vertFile.get.exists){
+        vertFile.get.file.createNewFile
+        new java.io.PrintWriter(vertFile.get.file) { write(DefaultShaders.empty._1); close() }
+      }
+      if(!fragFile.get.exists){
+        fragFile.get.file.createNewFile
+        new java.io.PrintWriter(fragFile.get.file) { write(DefaultShaders.empty._2); close() }
+      }
     }
+    isDirty = true
   }
 
-  def reload() = reloadFiles = true
+  def setCode(v:String, f:String){
+    vertCode = Some(v)
+    fragCode = Some(f)
+    isDirty = true
+  }
+
+  def dirty() = isDirty = true
 
   def apply() = {
-    if(program.isEmpty || reloadFiles) load()
+    if(program.isEmpty || isDirty) load()
     program.get
   }
 
@@ -183,21 +171,21 @@ class Shader {
     uniforms.clear()
   }
 
-  def update() = {
-    if( vertFile.isDefined && fragFile.isDefined && reloadFiles ){
-      load(name,vertFile.get,fragFile.get) 
-      reloadFiles = false
-    }
-  }
+  // def update() = {
+  //   if( vertFile.isDefined && fragFile.isDefined && isDirty ){
+  //     load(name,vertFile.get,fragFile.get) 
+  //     isDirty = false
+  //   }
+  // }
 
-  // reload shader when files modified
+  // dirty shader when files modified
   def monitor():Shader = {
     if(monitoring) return this
     if( vertFile.isEmpty || fragFile.isEmpty ) return this
     val that = this;
     try{
-      Monitor( vertFile.get.path() ){ (p) => {that.reload; println(s"reloading file ${that.vertFile.get.path()}") }}
-      Monitor( fragFile.get.path() ){ (p) => {that.reload; println(s"reloading file ${that.fragFile.get.path()}") }}
+      Monitor( vertFile.get.path() ){ (p) => {that.dirty; println(s"reloading file ${that.vertFile.get.path()}") }}
+      Monitor( fragFile.get.path() ){ (p) => {that.dirty; println(s"reloading file ${that.fragFile.get.path()}") }}
     } catch { case e:Exception => println(e) }
     monitoring = true
     this

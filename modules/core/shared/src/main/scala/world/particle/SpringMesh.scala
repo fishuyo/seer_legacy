@@ -13,6 +13,7 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) ext
 
 	var timeStep = .015f
   var damping = 20f 
+  var gravity = Vec3(0)
   var particles = ArrayBuffer[Particle]()
   var springs = ArrayBuffer[LinearSpringConstraint]()
   var pins = ArrayBuffer[AbsoluteConstraint]()
@@ -95,7 +96,7 @@ class SpringMesh(val mesh:MeshLike, val stiff:Float=1f, val tear:Float = 0f) ext
       }
 
       particles.foreach( (p) => {
-        p.applyGravity()
+        p.applyForce(gravity)
         p.applyDamping(damping)
         p.step() // timeStep
         // p.collideGround(-1f, 0.999999f) 

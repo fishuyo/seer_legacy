@@ -20,8 +20,9 @@ object JackAudio extends AudioInterface {
 
   val callback = new JackProcessCallback {
   	def process(client:JackClient, nframes:Int) = {
-
-      inPorts(0).getFloatBuffer.get(in(0))
+      
+      try{ inPorts(0).getFloatBuffer.get(in(0)) }
+      catch{ case e:Exception => ()}
   //       paIn.getFloatBuffer.get(in(0))
 
       // zero output buffers
@@ -64,8 +65,8 @@ object JackAudio extends AudioInterface {
 
     client.setProcessCallback(callback)    
 
-    inPorts = (0 until channelsIn).map { case i => client.registerPort(s"in$i", JackPortType.AUDIO, JackPortFlags.JackPortIsInput)}.toArray
-    outPorts = (0 until channelsOut).map { case i => client.registerPort(s"out$i", JackPortType.AUDIO, JackPortFlags.JackPortIsOutput)}.toArray
+    inPorts = (1 to channelsIn).map { case i => client.registerPort(s"in$i", JackPortType.AUDIO, JackPortFlags.JackPortIsInput)}.toArray
+    outPorts = (1 to channelsOut).map { case i => client.registerPort(s"out$i", JackPortType.AUDIO, JackPortFlags.JackPortIsOutput)}.toArray
 
     client.activate()
 
@@ -76,9 +77,11 @@ object JackAudio extends AudioInterface {
 
     hwIns.zip(inPorts).foreach { case (src,dst) =>
       jack.connect(client, src, dst.getName)
+      println(s"JACK: connecting $src to ${dst.getName}")
     }
     outPorts.zip(hwOuts).foreach { case (src,dst) =>
       jack.connect(client, src.getName, dst)
+      println(s"JACK: connecting ${src.getName} to $dst")
     }
 
     super.init

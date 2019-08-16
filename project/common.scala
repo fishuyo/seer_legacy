@@ -4,7 +4,7 @@ import Keys._
 
 object Common {
 
-  val scalaV = "2.12.5" //2.11.8"
+  val scalaV = "2.12.8" //2.11.8"
 
   // lazy val settings = plugins.JvmPlugin.projectSettings ++ Seq(
   lazy val settings = Seq(
@@ -34,6 +34,7 @@ object Common {
     ),
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     cancelable in Global := true,
+    
     exportJars := true,
     pomIncludeRepository := { _ => false },
     licenses := Seq("BSD-style" -> url("http://www.opensource.org/licenses/bsd-license.php")),

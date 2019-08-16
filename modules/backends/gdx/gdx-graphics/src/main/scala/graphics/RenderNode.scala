@@ -54,6 +54,7 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
     node.addInput(this)
     node
   }
+  def to(node:RenderNode) = outputTo(node)
   def >>(node:RenderNode) = outputTo(node)
   def >>(i:Int)(node:RenderNode) = {
     createBuffer()
@@ -91,7 +92,7 @@ object ScreenNode extends ScreenNode
 class ScreenNode extends RenderNode {
   // clear = false
   renderer.scene.push(Plane())
-  renderer.shader = Shader.load("texture",DefaultShaders.texture)
+  renderer.shader = Shader.loadCode("texture",DefaultShaders.texture)
 }
 
 /**
@@ -108,7 +109,7 @@ class TextureNode(var texture:Texture) extends RenderNode {
 class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends RenderNode {
   var mode = 0
   renderer.scene.push(Plane())
-  renderer.shader = Shader.load("composite",DefaultShaders.composite)
+  renderer.shader = Shader.loadCode("composite",DefaultShaders.composite)
   override def render(){
     renderer.shader.uniforms("u_blend0") = blend0
     renderer.shader.uniforms("u_blend1") = blend1
@@ -123,7 +124,7 @@ class Composite3Node(var blend0:Float=0.33f, var blend1:Float=0.33f, var blend2:
   var mode = 0
 
   renderer.scene.push(Plane())
-  renderer.shader = Shader.load("composite3", DefaultShaders.composite._1,
+  renderer.shader = Shader.loadCode("composite3", DefaultShaders.composite._1,
     """
       #ifdef GL_ES
        precision mediump float;
@@ -242,7 +243,7 @@ class ColorizeNode extends RenderNode {
 
   renderer.scene.push(Plane())
 
-  renderer.shader = Shader.load("colorize",
+  renderer.shader = Shader.loadCode("colorize",
     """
     attribute vec4 a_position;
     attribute vec4 a_normal;
@@ -329,7 +330,7 @@ class BlurNode extends RenderNode {
 
   renderer.scene.push(Plane())
 
-  renderer.shader = Shader.load("blur",
+  renderer.shader = Shader.loadCode("blur",
     """
     attribute vec4 a_position;
     attribute vec4 a_normal;

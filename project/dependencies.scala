@@ -6,7 +6,7 @@ object Dependencies {
   val akkaVersion = "2.5.12" //"2.4.17"
   val libgdxVersion = "1.9.9-SNAPSHOT"
   val lwjglVersion = "3.1.3"
-  val chillVersion = "0.9.2" //"0.5.2" //"0.8.0"
+  val chillVersion = "0.9.3" //"0.9.2" //"0.5.2" //"0.8.0"
 
   // libs
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion

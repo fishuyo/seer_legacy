@@ -40,6 +40,7 @@ object ScriptLoaderActor {
   case object Load
   case object Reload
   case object Unload
+  case object Status
 
   // def props = propsEval
   def props = propsToolbox
@@ -66,6 +67,9 @@ class ScriptLoaderActor(val loader:ScriptLoader) extends Actor with ActorLogging
       log.info("reloading..");
       loader.reload()
     case Unload | "unload" => loader.unload()
+    case Status => 
+      // if(loader.errors.isEmpty) loader.checkErrors()
+      // sender ! loader.errors
 
     case x => log.warning("Received unknown message: {}", x)
   }
@@ -79,8 +83,8 @@ trait ScriptLoader {
   var loaded = false
   var code=""
   var path:Option[String] = None
-  var file:Option[File] = None
   var obj:AnyRef = null
+  var errors:Seq[(Int,String)] = Seq()
 
   def setPath(s:String) = path = Some(s)
   def setCode(s:String) = code = s
@@ -90,27 +94,6 @@ trait ScriptLoader {
     importString + code
   }
 
-  // def load(){ //just using reload only
-  //   try{
-  //     obj = compile()
-  //     // println(s"load $obj")
-  //     obj match {
-  //       case s:SeerScript =>
-  //         s.load()
-  //         loaded = true
-  //       case a:ActorRef =>
-  //         a ! "load"
-  //         loaded = true
-  //       case l:List[ActorRef] =>
-  //         l.foreach{ case a => a ! "load" }
-  //         loaded = true
-  //       case c:Class[_]  =>
-  //         val name = c.getSimpleName
-  //         println( s"got class: $name")
-  //       case obj => println(s"Unrecognized return value from script: $obj")
-  //     }
-  //   } catch { case e:Exception => loaded = false; println(e.getMessage) } 
-  // }
   def reload(){
     try{
       obj match {
@@ -118,6 +101,7 @@ trait ScriptLoader {
         case a:ActorRef => a ! "preunload" //akka.actor.PoisonPill
         case _ => ()
       }
+      errors = Seq()
       val ret = compile()
       ret match{
         case s:Script =>
@@ -154,7 +138,14 @@ trait ScriptLoader {
         case obj => println(s"Unrecognized return value from script: $obj")
 
       }
-    } catch { case e:Exception => loaded = false; println("Exception in script: " +e.getMessage) }
+    } catch { case e:Exception => 
+      loaded = false
+      println("Exception in script: " + e.getMessage)
+      // e.printStackTrace 
+      val frame = e.getStackTrace.find{ e => e.getMethodName.contains("load") }.get
+      errors = Seq((frame.getLineNumber, "RuntimeError: " + e.toString))
+      // unload
+    }
   }
   def unload(){
     obj match {
@@ -181,6 +172,7 @@ trait ScriptLoader {
     }
   }
 
+  def checkErrors(){}
   def compile():AnyRef
 }
 
@@ -195,7 +187,23 @@ class ToolboxScriptLoader extends ScriptLoader {
     val tree = toolbox.parse(source)
     val script = toolbox.eval(tree).asInstanceOf[AnyRef]
     script
-  } 
+  }
+  
+  override def checkErrors() = {
+    if(toolbox.frontEnd.hasErrors){
+      val errs = toolbox.frontEnd.infos.map { case info =>
+        val line = info.pos.line
+        val msg = s"""
+          ${info.msg}
+          ${info.pos.lineContent}
+          ${info.pos.lineCaret} 
+        """
+        (line,msg)
+      }.toSeq
+      errors = errs
+    } else errors = Seq()
+  }
+
 }
 
 /**

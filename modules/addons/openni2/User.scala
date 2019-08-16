@@ -19,7 +19,7 @@ object User{
   // }
 }
 
-class User(val id:Int){
+class User(val id:Int) {
 
   var tracking = false
   val skeleton = new Skeleton

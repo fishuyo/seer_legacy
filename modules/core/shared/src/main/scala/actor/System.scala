@@ -58,6 +58,7 @@ object ActorSystemManager {
         $kryo
         serializers {
           kryo = "com.romix.akka.serialization.kryo.KryoSerializer"
+          #kryo = "com.twitter.chill.akka.AkkaSerializer"
         }
         serialization-bindings {
           "java.io.Serializable" = kryo

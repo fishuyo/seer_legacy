@@ -4,6 +4,7 @@ package world
 package field
 
 import spatial.Vec2
+import util._
 
 import spire.syntax.cfor._
 
@@ -99,6 +100,28 @@ class Field2(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
   var dt = .15f //.02f
 
   def apply(x:Int, y:Int) = data(y*nx + x)
+
+  // interpolate 
+  def apply( v:Vec2 ):Float = {
+    val cen = Vec2()
+    val s = Vec2(nx*dx / 2, ny*dy / 2)
+
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y) return 0f
+    val nv = ((v-cen) + s) * (Vec2(nx-1,ny-1) / (s*2))
+
+    if( nv.x >= nx-1 ) nv.x = nx - 1.001f
+    if( nv.y >= ny-1 ) nv.y = ny - 1.001f
+    apply(nv.x,nv.y)
+  }
+
+  def apply(x:Float, y:Float):Float = {
+    val x1 = x.floor.toInt; val dx = x - x1
+    val y1 = y.floor.toInt; val dy = y - y1
+    var vx1 = lerp(this(x1,y1), this(x1+1,y1), dx )
+    var vx2 = lerp(this(x1,y1+1), this(x1+1,y1+1), dx )
+    lerp(vx1, vx2, dy)
+  } 
+
   def update(x:Int, y:Int, value:Float) = data(y*nx + x) = value
 
   def update(v:Vec2, value:Float):Unit = {
@@ -118,6 +141,22 @@ class Field2(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
 
 
   def set(f:Field2) = Array.copy(f.data,0,data,0,data.length)
+
+  def getCenter(x:Int,y:Int):Vec2 = {
+    Vec2(x*dx,y*dy) + Vec2(dx,dy)*0.5f
+  }
+
+  def getClosestCell(v:Vec2):(Int,Int) = {
+    val cen = Vec2()
+    val s = Vec2(nx*dx / 2, ny*dy / 2)
+
+    if( v.x < -s.x || v.x > s.x || v.y > s.y || v.y < -s.y) return (0,0)
+    val nv = ((v-cen) + s) * (Vec2(nx-1,ny-1) / (s*2))
+
+    if( nv.x >= nx-1 ) nv.x = nx - 1.001f
+    if( nv.y >= ny-1 ) nv.y = ny - 1.001f
+    (nv.x.floor.toInt, nv.y.floor.toInt)
+  }
 }
 
 

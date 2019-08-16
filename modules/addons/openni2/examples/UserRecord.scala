@@ -49,7 +49,7 @@ object UserRecord extends SeerApp {
   }
 
   var speed = 1f
-  // implicit val ctx = rx.Ctx.Owner.Unsafe
+
   Keyboard.onKeyDown {
     case 'r' => loop.toggleRecord()
     case 't' => loop.togglePlay()

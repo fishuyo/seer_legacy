@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 object RootNode extends RenderNode {
   renderer.scene = Scene
   renderer.camera = Camera
-  renderer.shader = Shader.load("basic",DefaultShaders.basic)
+  renderer.shader = Shader.loadCode("basic",DefaultShaders.basic)
 
   override def reset(){
     // reset root node state

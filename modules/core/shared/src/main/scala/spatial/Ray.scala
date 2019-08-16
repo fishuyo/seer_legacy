@@ -7,6 +7,8 @@ object Ray{
 
 class Ray( val o: Vec3, val d: Vec3 ){
 
+  d.normalize
+
 	def apply( t: Float ) : Vec3 = o + d*t
 
 

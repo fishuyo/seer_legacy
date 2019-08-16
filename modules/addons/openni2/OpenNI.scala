@@ -214,7 +214,7 @@ object TrackerListener extends UserTracker.NewFrameListener {
       users.foreach { case u =>
         val points = pointBuffers.getOrElseUpdate(u.id, ArrayBuffer[Vec3]())
         u.points ++= points
-        u.mask = Some(maskImage)
+        // u.mask = Some(maskImage)
       }
       depthFrame.release()
     }

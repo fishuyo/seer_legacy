@@ -41,6 +41,27 @@ object DefaultShaders {
 
   import ShaderSegments._
 
+  val empty = (
+    """
+      attribute vec4 a_position;
+
+      uniform mat4 u_projectionViewMatrix;
+
+      void main(){        
+        gl_Position = u_projectionViewMatrix * a_position;
+      }
+    """,
+    """
+      #ifdef GL_ES
+       precision mediump float;
+      #endif
+
+      void main(){
+        gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+      }
+    """
+  )
+  
   val basic = (
     // Vertex Shader
     attributes("all") +

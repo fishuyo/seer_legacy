@@ -44,6 +44,12 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     case Name(n) => name = n
   }
 
+  def shader(name:String){
+    val s = Shader(name)
+    Renderer().shader = s
+    s.begin
+  }
+
   def load(){
     Run.animate {
       // val c =  RenderGraph.compositor
