@@ -51,6 +51,12 @@ object PerspectiveCamera { def apply() = new PerspectiveCamera }
 class PerspectiveCamera extends GdxPCam(67f, Window.a0, 1f) with NavCamera {
   near = .01f
   def setFOV(f:Float) = fieldOfView = f
+  def setFOVx(f:Float) = {
+    // val fovy = f * viewportHeight / viewportWidth
+    val fovy = 2*math.atan(math.tan(f*Pi/180f/2)*viewportHeight/viewportWidth) * 180f / Pi
+    fieldOfView = fovy.toFloat
+    // println(s"fovy: $fovy")
+  }
 }
 
 object OrthographicCamera { def apply(w:Float,h:Float) = new OrthographicCamera(w,h) }

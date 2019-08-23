@@ -32,6 +32,7 @@ object ScriptManager {
   import ScriptLoaderActor._
 
   case class Create(name:String="")
+  case object Reset
 
   val toolbox = currentMirror.mkToolBox() 
   val manager = System().actorOf( Props[ScriptManagerActor], name="ScriptManager" )
@@ -68,6 +69,9 @@ object ScriptManager {
     actor ! Load
     actor
   }
+
+  def reset = manager ! Reset
+  def reset(address:Address) = System().actorSelection(address + "/user/ScriptManager") ! Reset
 
   def remote(address:Address)(path:String, reloadOnChange:Boolean=true){
     val remoteManager = System().actorSelection(address + "/user/ScriptManager")
@@ -127,6 +131,10 @@ class ScriptManagerActor extends Actor with ActorLogging {
     }
 
   def receive = {
+    case Reset =>
+      scripts.values.foreach { case a => a ! "unload"}
+      dirs.values.foreach { case a => a ! "unload"}
+
     case Create(n) => 
       var name = n
       if(n.isEmpty) name += "script"+scripts.size
