@@ -10,7 +10,7 @@ class LoopBuffer( var maxSize:Int = 0) extends Gen {
   
   var samples = new Array[Float](maxSize)
   var curSize = 0
-  var (rPos, wPos) = (0f,0)
+  var (rPos, wPos) = (0.0,0)
   var (rMin, rMax) = (0,0) //read limiters
   var times = 0
   var speed = 1f
@@ -70,17 +70,17 @@ class LoopBuffer( var maxSize:Int = 0) extends Gen {
     curSize += numSamples;
   }
 
-  def readSampleAt(s:Float) = {
+  def readSampleAt(s:Double):Float = {
     val i = s.toInt
     val i2 = if( i == rMax-1) 0 else i+1
-    val f = s - i
+    val f = (s - i).toFloat
     samples(i)*(1f-f) + samples(i2)*f
   }
 
-  def addSampleAt(s:Float,v:Float) = {
+  def addSampleAt(s:Double,v:Float) = {
     val i = s.toInt
     val i2 = if( i == rMax-1) 0 else i+1
-    val f = s - i
+    val f = (s - i).toFloat
     samples(i) += v*(1f-f)
     samples(i2) += v*f
   }
@@ -166,7 +166,7 @@ class LoopBuffer( var maxSize:Int = 0) extends Gen {
     }
   }
   
-  def addFrom( from:Array[Float], numSamples:Int, off:Float=0f, inOff:Int=0 ){
+  def addFrom( from:Array[Float], numSamples:Int, off:Double=0.0, inOff:Int=0 ){
     
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMin
@@ -202,7 +202,7 @@ class LoopBuffer( var maxSize:Int = 0) extends Gen {
     //   }
     // }
   }
-  def addFromR( from:Array[Float], numSamples:Int, off:Float, inOff:Int=0 ){
+  def addFromR( from:Array[Float], numSamples:Int, off:Double, inOff:Int=0 ){
 
     var offset = off
     if( offset < rMin || offset >= rMax) offset = rMax-1;
@@ -242,7 +242,7 @@ class LoopBuffer( var maxSize:Int = 0) extends Gen {
     // }
   }
   
-  def applyGain( gain:Float, numSamples:Int, offset:Float ){
+  def applyGain( gain:Float, numSamples:Int, offset:Double ){
     var num = numSamples//*speed
     var off = offset
     if( offset < rMin ) off = rMin
@@ -293,7 +293,7 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
   var (gain, pan, decay, rms) = (1f,0.5f,0.5f,0f)
   var (recording,playing,stacking,reversing,undoing) = (false,false,false,false,false)
   var startStack, startRecord = false
-  var slPos = new RingBuffer[Float](10000)
+  var slPos = new RingBuffer[Double](10000)
 
   var recOut = false
   var iobuffer = new Array[Float](Audio().bufferSize)
@@ -374,7 +374,7 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
     val numOut = io.channelsOut
     val count = io.bufferSize
 
-    var lPos = 0f
+    var lPos = 0.0
     val l = (1f - pan )
     val r = pan
     
