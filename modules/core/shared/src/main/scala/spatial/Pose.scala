@@ -55,12 +55,14 @@ class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ) extends Serializ
     if(amt == 1f) quat = rot * quat
     else quat = rot.pow(amt) * quat
   }
-  // def toMatrix() = {
-  // 	val m = quat.toMatrix
-  // 	m.`val`(12) = pos.x
-  // 	m.`val`(13) = pos.y
-  // 	m.`val`(14) = pos.z
-  // 	m
-  // }
+
+  def toMatrix() = {
+  	val m = Mat4()
+    quat.toMatrix(m)
+  	m(12) = pos.x
+  	m(13) = pos.y
+  	m(14) = pos.z
+  	m
+  }
 }
 
