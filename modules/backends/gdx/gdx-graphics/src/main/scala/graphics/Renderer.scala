@@ -7,6 +7,8 @@ import spatial.Vec3
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 // import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.utils.viewport._
+
 
 /**
   * Compainion object holding current renderer
@@ -32,6 +34,9 @@ class Renderer {
   var clear = true
   var depth = true
   var resize = true
+
+  var vp:Option[ScreenViewport] = None
+  var viewportf = (v:ScreenViewport) => {}
   
   var material:BasicMaterial = new BasicMaterial
   
@@ -40,6 +45,8 @@ class Renderer {
 
     try{
       Renderer() = this
+
+      vp.foreach(viewportf(_))
 
       if(clear) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
       else Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT)
@@ -68,7 +75,7 @@ class Renderer {
     if(!resize) return
     viewport = vp
     if(camera.viewportHeight == 1f){
-      camera.viewportWidth = vp.aspect
+      // camera.viewportWidth = vp.aspect
     }else{
       camera match {
         case ortho:OrthographicCamera =>
