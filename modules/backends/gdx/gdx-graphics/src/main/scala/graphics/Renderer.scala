@@ -37,6 +37,8 @@ class Renderer {
 
   var vp:Option[ScreenViewport] = None
   var viewportf = (v:ScreenViewport) => {}
+  var pre = () => {}
+  var post = () => {}
   
   var material:BasicMaterial = new BasicMaterial
   
@@ -45,11 +47,13 @@ class Renderer {
 
     try{
       Renderer() = this
-
-      vp.foreach(viewportf(_))
+      
+      pre()
 
       if(clear) Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
       else Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT)
+
+      vp.foreach(viewportf(_))
       
       shader.begin() 
 
@@ -64,6 +68,8 @@ class Renderer {
       scene.draw()
       
       shader.end()
+
+      post()
 
     } catch{ case e:Exception => println(s"Renderer: $e")
       // println ("\n" + e.printStackTrace + "\n")

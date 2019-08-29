@@ -46,7 +46,7 @@ class GLES20Impl extends GLES20 {
 
   def glDepthRangef (zNear:Float, zFar:Float):Unit = {}
 
-  def glDisable (cap:Int):Unit = {}
+  def glDisable (cap:Int):Unit = Gdx.gl.glDisable(cap)
 
   def glDrawArrays (mode:Int, first:Int, count:Int):Unit = {}
 
@@ -80,7 +80,7 @@ class GLES20Impl extends GLES20 {
 
   def glReadPixels (x:Int, y:Int, width:Int, height:Int, format:Int, `type`:Int, pixels:Buffer):Unit = {}
 
-  def glScissor (x:Int, y:Int, width:Int, height:Int):Unit = {}
+  def glScissor (x:Int, y:Int, width:Int, height:Int):Unit = Gdx.gl.glScissor(x,y,width,height)
 
   def glStencilFunc (func:Int, ref:Int, mask:Int):Unit = {}
 
