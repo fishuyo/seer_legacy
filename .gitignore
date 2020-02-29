@@ -1,21 +1,11 @@
-sbt-launch.jar
-*.hide
-*.mp4
-*.mov
-*.xyz
-*.obj
-*.bin
-*.log
-
 lib/
 libs/
 target/
-src_managed/
-project/boot/
-project/plugins/project
 
-res/
-assets/
-
-.idea*
+.vscode/
+.bloop/
+.metals/
+project/metals.sbt
+.scalafmt.conf
+.DS_Store
 
