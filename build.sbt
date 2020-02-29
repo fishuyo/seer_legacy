@@ -1,41 +1,47 @@
-/**
-* Core Modules
-*/
-lazy val core = crossProject.in(file("modules/core")).
-  settings(Common.settings: _*).
-  jvmSettings(libraryDependencies ++= Dependencies.corejvmD)
-lazy val coreJVM = core.jvm
-lazy val coreJS = core.js
-
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 /**
-* Gdx backend
-*/
-lazy val gdx_graphics = project.in(file("modules/backends/gdx/gdx-graphics")).
-  dependsOn(coreJVM).
-  settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.gdxD)
-
-lazy val gdx_app_desktop = project.in(file("modules/backends/gdx/gdx-app-desktop")).
-  dependsOn(gdx_graphics).
-  settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.gdxAppDesktopD)
+  * Core Modules
+  */
+lazy val core = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core"))
+  .settings(Settings.common: _*)
+  .jvmSettings(libraryDependencies ++= Dependencies.core)
 
 /**
-* Audio backends
-*/
-lazy val portaudio = project.in(file("modules/backends/portaudio")).
-  dependsOn(coreJVM).
-  settings(Common.settings: _*)
+  * Gdx backend
+  */
+lazy val gdx_graphics = project
+  .in(file("modules/backends/gdx/gdx-graphics"))
+  .dependsOn(core.jvm)
+  .settings(Settings.common: _*)
+  .settings(libraryDependencies ++= Dependencies.gdx)
 
-lazy val jackaudio = project.in(file("modules/backends/jackaudio")).
-  dependsOn(coreJVM).
-  settings(Common.settings: _*)
-
+lazy val gdx_app_desktop = project
+  .in(file("modules/backends/gdx/gdx-app-desktop"))
+  .dependsOn(gdx_graphics)
+  .settings(Settings.common: _*)
+  .settings(libraryDependencies ++= Dependencies.gdxAppDesktop)
 
 /**
-* Examples
-*/
-lazy val examples = project.in(file("examples")).
-  dependsOn(gdx_app_desktop, portaudio, jackaudio).
-  settings(Common.appSettings :_*)
+  * Audio backends
+  */
+lazy val portaudio = project
+  .in(file("modules/backends/portaudio"))
+  .dependsOn(core.jvm)
+  .settings(Settings.common: _*)
+
+lazy val jackaudio = project
+  .in(file("modules/backends/jackaudio"))
+  .dependsOn(core.jvm)
+  .settings(Settings.common: _*)
+
+/**
+  * Examples
+  */
+lazy val examples = project
+  .in(file("examples"))
+  .dependsOn(gdx_app_desktop, portaudio, jackaudio)
+  .settings(Settings.app: _*)

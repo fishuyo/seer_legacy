@@ -1,65 +1,69 @@
-
 import sbt._
 
 object Dependencies {
-  // versions
-  val akkaVersion = "2.5.12" //"2.4.17"
-  val libgdxVersion = "1.9.9-SNAPSHOT"
-  val lwjglVersion = "3.1.3"
-  val chillVersion = "0.9.3" //"0.9.2" //"0.5.2" //"0.8.0"
+  object versions {
+    val akka = "2.5.12" //"2.4.17"
+    val gdx = "1.9.10" //-SNAPSHOT"
+    val lwjgl = "3.1.3"
+    val chill = "0.9.3" //"0.9.2" //"0.5.2" //"0.8.0"
+  }
 
-  // libs
-  val akkaActor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
-  val akkaRemote = "com.typesafe.akka" %% "akka-remote" % akkaVersion
-  val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
-  
+  object akka {
+    val actor = "com.typesafe.akka" %% "akka-actor" % versions.akka
+    val remote = "com.typesafe.akka" %% "akka-remote" % versions.akka
+    val stream = "com.typesafe.akka" %% "akka-stream" % versions.akka
+  }
+
+  object twitter {
+    val chill = "com.twitter" %% "chill" % versions.chill
+    val chillBijection = "com.twitter" %% "chill-bijection" % versions.chill
+    val chillAkka = "com.twitter" %% "chill-akka" % versions.chill
+  }
+
   val spire = "org.spire-math" %% "spire" % "0.13.0"
-  // val parsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
 
   val scodec = "org.scodec" %% "scodec-core" % "1.10.3"
 
   /** Core Dependencies */
-  val corejvmD = Seq(
-    //"com.lihaoyi" % "ammonite-repl" % "0.4.8" cross CrossVersion.full,
-    //"com.lihaoyi" % "ammonite-sshd" % "0.4.8" cross CrossVersion.full,
-    "org.scalameta" %% "scalameta" % "4.1.0",
-    akkaActor, akkaRemote, akkaStream,
+  val core = Seq(
+    // "org.scalameta" %% "scalameta" % "4.1.0",
+    akka.actor,
+    akka.remote,
+    // akka.stream,
     "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
     spire,
-    "com.twitter" %% "chill" % chillVersion,
-    "com.twitter" %% "chill-bijection" % chillVersion,
-    "com.twitter" %% "chill-akka" % chillVersion,
+    twitter.chill,
+    twitter.chillBijection,
+    twitter.chillAkka,
     "de.sciss" %% "scalaaudiofile" % "1.4.7",
     "de.sciss" %% "scalaosc" % "1.1.6",
-    "net.sourceforge.jtransforms" %  "jtransforms" % "2.4.0",
+    "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
     "com.lihaoyi" %% "scalarx" % "0.3.2",
     "com.beachape.filemanagement" %% "schwatcher" % "0.3.2",
     "javax.vecmath" % "vecmath" % "1.5.2"
   )
-  val corejsD = Seq()
 
   /** libGDX backend dependencies */
-  val gdxD = Seq(
-    "com.badlogicgames.gdx" % "gdx" % libgdxVersion
+  val gdx = Seq(
+    "com.badlogicgames.gdx" % "gdx" % versions.gdx
     // parsers
   )
   val gdxAppDesktopD = Seq(
-    "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % libgdxVersion,
-    "com.badlogicgames.gdx" % "gdx-platform" % libgdxVersion classifier "natives-desktop"
+    "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % versions.gdx,
+    "com.badlogicgames.gdx" % "gdx-platform" % versions.gdx classifier "natives-desktop"
   )
 
-
- /** Addon Dependencies */
-  val openvrD = Seq(
-    "org.lwjgl" % "lwjgl-openvr" % lwjglVersion,
-    "org.lwjgl" % "lwjgl-openvr" % lwjglVersion classifier "natives-windows",
+  /** Addon Dependencies */
+  val openvr = Seq(
+    "org.lwjgl" % "lwjgl-openvr" % versions.lwjgl,
+    "org.lwjgl" % "lwjgl-openvr" % versions.lwjgl classifier "natives-windows",
     "net.java.dev.jna" % "jna" % "3.5.0",
     "org.joml" % "joml" % "1.8.1"
   )
 
-  val hidD = Seq(
+  val hid = Seq(
     "org.hid4java" % "hid4java" % "0.5.0"
   )
 

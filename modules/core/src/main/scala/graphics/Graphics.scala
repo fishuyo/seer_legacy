@@ -11,10 +11,5 @@ object Graphics {
 
 
 trait Graphics {
-
   def gl:GLES30
-
-
-
-
 }
