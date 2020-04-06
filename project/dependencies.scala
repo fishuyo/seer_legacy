@@ -50,7 +50,7 @@ object Dependencies {
     "com.badlogicgames.gdx" % "gdx" % versions.gdx
     // parsers
   )
-  val gdxAppDesktopD = Seq(
+  val gdxAppDesktop = Seq(
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % versions.gdx,
     "com.badlogicgames.gdx" % "gdx-platform" % versions.gdx classifier "natives-desktop"
   )

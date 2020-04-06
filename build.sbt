@@ -1,7 +1,7 @@
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 /**
-  * Core Modules
+  * Core Module
   */
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .withoutSuffixFor(JVMPlatform)
@@ -29,19 +29,20 @@ lazy val gdx_app_desktop = project
   * Audio backends
   */
 lazy val portaudio = project
-  .in(file("modules/backends/portaudio"))
+  .in(file("modules/backends/audio/portaudio"))
   .dependsOn(core.jvm)
   .settings(Settings.common: _*)
 
 lazy val jackaudio = project
-  .in(file("modules/backends/jackaudio"))
+  .in(file("modules/backends/audio/jackaudio"))
   .dependsOn(core.jvm)
   .settings(Settings.common: _*)
 
 /**
   * Examples
   */
+lazy val script = ProjectRef(file("modules/addons/script"),"script")
 lazy val examples = project
   .in(file("examples"))
-  .dependsOn(gdx_app_desktop, portaudio, jackaudio)
+  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script)
   .settings(Settings.app: _*)

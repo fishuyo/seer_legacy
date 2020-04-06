@@ -61,7 +61,7 @@ object Settings {
     }
   )
 
-  lazy val appSettings = settings ++ Seq(
+  lazy val app = common ++ Seq(
     // libraryDependencies ++= Seq(
     //   "net.sf.proguard" % "proguard-base" % "4.11" % "provided"
     // ),

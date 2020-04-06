@@ -2,7 +2,7 @@ lazy val getLibs:TaskKey[Unit] = TaskKey[Unit]("download unmanaged libs.")
 
 getLibs := {
   val dir = baseDirectory.value / "lib"
-  UnmanagedLibs.getVRPN(dir)
+  Utilities.getJPA(dir)
 }
 
 // compile in Compile <<= (compile in Compile).dependsOn(getLibs)
