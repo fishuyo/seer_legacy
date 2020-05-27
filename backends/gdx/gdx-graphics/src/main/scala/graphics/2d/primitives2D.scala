@@ -5,7 +5,7 @@ package graphics
 import spatial._
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 object Plane extends ModelGenerator {
@@ -13,12 +13,12 @@ object Plane extends ModelGenerator {
   def generateMesh(w:Float=2f,h:Float=2f,nx:Int=2,ny:Int=2,normal:Quat=Quat()):Mesh = generateMesh(new Mesh(),w,h,nx,ny,normal)
   def generateMesh(mesh:Mesh, w:Float,h:Float,nx:Int,ny:Int,normal:Quat):Mesh = {
 
-    implicit def int2short(i:Int) = i.toShort
+    implicit def int2short(i:Int):Short = i.toShort
 
     mesh.primitive = Triangles
     val dx = w / (nx-1).toFloat
     val dy = h / (ny-1).toFloat
-    val bl = normal.toX() * -w/2f + normal.toY * -h/2f
+    val bl = normal.toX() * -w/2f + normal.toY() * -h/2f
     val vx = normal.toX() * dx
     val vy = normal.toY() * dy
     for(y <-(0 until ny); x <-(0 until nx)){

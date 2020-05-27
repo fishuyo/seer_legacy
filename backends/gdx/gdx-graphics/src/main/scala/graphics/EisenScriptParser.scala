@@ -12,6 +12,8 @@ import scala.util.parsing.combinator.lexical._
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Queue
 
+import scala.language.postfixOps
+
 // import com.badlogic.gdx.Gdx
 // import com.badlogic.gdx.graphics._
 
@@ -81,13 +83,13 @@ class EisenLexer extends StdLexical {
 
 object EisenScriptParser extends StandardTokenParsers {
 
-	override val lexical:EisenLexer = new EisenLexer()
+  override val lexical:EisenLexer = new EisenLexer()
  
   lexical.delimiters ++= List("{","}","(", ")",",","*","=")
- 	lexical.reserved += ("var","set","rule","md","maxdepth","w","weight",
- 											"x","y","z","rx","ry","rz","s","scale",
- 											"hue","h","sat","brightness","b","value","v","alpha","a","color",
- 											"box","sphere","grid","cylinder")
+   lexical.reserved += ("var","set","rule","md","maxdepth","w","weight",
+                       "x","y","z","rx","ry","rz","s","scale",
+                       "hue","h","sat","brightness","b","value","v","alpha","a","color",
+                       "box","sphere","grid","cylinder")
  
   // grammar starts here
   def program = line*
@@ -106,14 +108,14 @@ object EisenScriptParser extends StandardTokenParsers {
     case _~name~mods~_~list~_ => RuleDef(name,mods.getOrElse(List()),list)
   }
   def ruleMod = (("md"|"maxdepth") ~ numericLit ^^ { case _~v => MaxDepth(v.toInt)}
-  							 |("w"|"weight") ~ numericLit ^^ { case _~v => Weight(v.toFloat)})
+                 |("w"|"weight") ~ numericLit ^^ { case _~v => Weight(v.toFloat)})
   def ruleBody = (action | comment)*
 
   // Action
   def action = (texpr*) ~ call ^^ { case ts~ca => Action(ts,ca)}
   
   def texpr = ( numericLit ~ "*" ~ tlist ^^ { case t~_~list => TransformExpr(Literal(t.toInt), list)}
- 						| ident ~ "*" ~ tlist ^^ { case id~_~list => TransformExpr(Ident(id), list)}
+             | ident ~ "*" ~ tlist ^^ { case id~_~list => TransformExpr(Ident(id), list)}
             | tlist ^^ { case list => TransformExpr(Literal(1), list)} )
 
   def tlist = "{" ~ (transformation*) ~ "}" ^^ { case _~list~_ => list }
@@ -126,11 +128,11 @@ object EisenScriptParser extends StandardTokenParsers {
     | "ry"~expr ^^ { case _~e => YRot(e)  }
     | "rz"~expr ^^ { case _~e => ZRot(e)  }
     | ("s"|"scale")~expr~expr~expr ^^ { case _~x~y~z => Scale3(x,y,z) }
-  	| ("s"|"scale")~expr ^^ { case _~e => Scale(e) }
+    | ("s"|"scale")~expr ^^ { case _~e => Scale(e) }
     | ("h"|"hue")~expr ^^ { case _~e => Hue(e) }
     | ("sat")~expr ^^ { case _~e => Sat(e) }
-  	| ("b"|"brightness")~expr ^^ { case _~e => Bright(e) }
-  	| ("a"|"alpha")~expr ^^ { case _~e => Alpha(e) }
+    | ("b"|"brightness")~expr ^^ { case _~e => Bright(e) }
+    | ("a"|"alpha")~expr ^^ { case _~e => Alpha(e) }
   )
 
   def call = ( rulecall | box | sphere | grid | cylinder )
@@ -147,98 +149,98 @@ object EisenScriptParser extends StandardTokenParsers {
 
   def apply( script: String ) = {
 
-  	//val input = Source.fromFile("input.talk").getLines.reduceLeft[String](_ + '\n' + _)
-  	val tokens = new lexical.Scanner(script)
+    //val input = Source.fromFile("input.talk").getLines.reduceLeft[String](_ + '\n' + _)
+    val tokens = new lexical.Scanner(script)
  
-  	val result = phrase(program)(tokens)
+    val result = phrase(program)(tokens)
 
-		result match {
-		  case Success(tree, _) => new ModelInterpreter(tree)
-		 
-		  case e: NoSuccess => {
-		    Console.err.println(e)
-		    null
-		  }
-		}
+    result match {
+      case Success(tree, _) => new ModelInterpreter(tree)
+     
+      case e: NoSuccess => {
+        Console.err.println(e)
+        null
+      }
+    }
 
   }
 }
 
 
 class ModelInterpreter(val tree: List[ASTNode]) {
-	
-	type SymTab = Map[String,String]
-	type Rule = (SymTab,List[Action])
+  
+  type SymTab = Map[String,String]
+  type Rule = (SymTab,List[Action])
 
-	var env = Map[String,String]()
-	var gst = Map[String,Float]()
+  var env = Map[String,String]()
+  var gst = Map[String,Float]()
 
-	var actionQueue = Queue[(Model,Action)]()
-	var initialActions = List[Action]()
-	var rules = Map[String,(ListBuffer[Rule],ListBuffer[Float])]()
-	var ruleDepth = collection.mutable.Map[String,Int]()
+  var actionQueue = Queue[(Model,Action)]()
+  var initialActions = List[Action]()
+  var rules = Map[String,(ListBuffer[Rule],ListBuffer[Float])]()
+  var ruleDepth = collection.mutable.Map[String,Int]()
 
-	var model = new Model()
-	var node = model
+  var model = new Model()
+  var node = model
 
-	var primCount = 0
-	var depth = 0
-	env = env + ("maxdepth"->"500")
-	env = env + ("maxobjects"->"2000")
+  var primCount = 0
+  var depth = 0
+  env = env + ("maxdepth"->"500")
+  env = env + ("maxobjects"->"2000")
 
-	var seed = Random.int().toLong
+  var seed = Random.int().toLong
 
-	this(tree)
+  this(tree)
 
-	def apply(tree: List[ASTNode]):ModelInterpreter = {
+  def apply(tree: List[ASTNode]):ModelInterpreter = {
 
-		tree.foreach {
-			case VarDecl(n,v) => gst = gst + (n->v)
+    tree.foreach {
+      case VarDecl(n,v) => gst = gst + (n->v)
       case SetEnv(k,v) => env = env + (k->v)
-			case (a:Action) => initialActions = initialActions :+ a
-			
-			case RuleDef(name,mods,list) => {
-				val lst = Map[String,String]()
-				var weight = 1f
+      case (a:Action) => initialActions = initialActions :+ a
+      
+      case RuleDef(name,mods,list) => {
+        val lst = Map[String,String]()
+        var weight = 1f
 
-				mods.foreach{
-					case Weight(w) => weight = w
-					case MaxDepth(d) => ()
-				}
+        mods.foreach{
+          case Weight(w) => weight = w
+          case MaxDepth(d) => ()
+        }
 
-				val rule = list.foldLeft((lst,List[Action]()))( (r:(SymTab,List[Action]),s:Statement) => {
-					s match {
-						// case Set(k,v) => (r._1 + (k->v), r._2) 
-						case a:Action => (r._1, r._2 :+ a)
-					}
-				})
+        val rule = list.foldLeft((lst,List[Action]()))( (r:(SymTab,List[Action]),s:Statement) => {
+          s match {
+            // case Set(k,v) => (r._1 + (k->v), r._2) 
+            case a:Action => (r._1, r._2 :+ a)
+          }
+        })
 
-				if(rules.isDefinedAt(name)){
-					rules(name)._1 += rule
-					rules(name)._2 += weight
-				} else rules = rules + (name -> (ListBuffer(rule),ListBuffer(weight)))
+        if(rules.isDefinedAt(name)){
+          rules(name)._1 += rule
+          rules(name)._2 += weight
+        } else rules = rules + (name -> (ListBuffer(rule),ListBuffer(weight)))
 
-				// ruleDepth(name) = 0
-			}
-			case _ => ()
+        // ruleDepth(name) = 0
+      }
+      case _ => ()
 
-		}
-		this
-	}
+    }
+    this
+  }
 
 
-	def applyRule(name:String, n:Model){
-		val rule = Random.decide(rules(name)._1, rules(name)._2)()
-		val depth = ruleDepth.getOrElse(name,0)
-		ruleDepth(name) = depth+1
-		// if( depth >= env("maxdepth").toInt ) return
-		// rule._2.foreach( applyAction(_).foreach(n.addChild(_)) )
-		rule._2.foreach( (a) => actionQueue.enqueue((n,a)) )
+  def applyRule(name:String, n:Model): Unit ={
+    val rule = Random.decide(rules(name)._1.toSeq, rules(name)._2.toSeq)()
+    val depth = ruleDepth.getOrElse(name,0)
+    ruleDepth(name) = depth+1
+    // if( depth >= env("maxdepth").toInt ) return
+    // rule._2.foreach( applyAction(_).foreach(n.addChild(_)) )
+    rule._2.foreach( (a) => actionQueue.enqueue((n,a)) )
 
-		// ruleDepth(name) = depth
-	}
+    // ruleDepth(name) = depth
+  }
 
-	def applyAction(pair:(Model,Action)) = pair match {
+  def applyAction(pair:(Model,Action)) = pair match {
     case (mdl, Action(transformExprs, call)) => 
 
       // aggregate nested transform loops right to left
@@ -275,29 +277,29 @@ class ModelInterpreter(val tree: List[ASTNode]) {
 
       res.foreach( mdl.addChild(_))
       res
-	}
-	def applyPrimitive(p:Call, n:Model){
-		if( primCount > env("maxobjects").toInt ) return
-		n.material = Material(model.material)
-		p match {
-			case RuleCall(r) => applyRule(r,n)
+  }
+  def applyPrimitive(p:Call, n:Model): Unit ={
+    if( primCount > env("maxobjects").toInt ) return
+    n.material = Material(model.material)
+    p match {
+      case RuleCall(r) => applyRule(r,n)
       case DrawBox() => n.mesh = Cube().mesh; primCount += 1
       case DrawGrid() => n.mesh = Cube().mesh; primCount += 1 //XXX
       case DrawSphere() => n.mesh = Sphere().mesh; primCount += 1
       case DrawCylinder() => n.mesh = Cylinder().mesh; primCount += 1
 
-			// case Draw(m) => n.mesh = m; /*n.addPrimitive( d )*/; primCount += 1
-			// case Dont() => ()
-		}
-	}
+      // case Draw(m) => n.mesh = m; /*n.addPrimitive( d )*/; primCount += 1
+      // case Dont() => ()
+    }
+  }
 
-	def mergeTransformList(ts:List[Transform]) = {
+  def mergeTransformList(ts:List[Transform]) = {
     val p = Pose()
     val rot = Vec3(0)
     val s = Vec3(1)
     val c = HSV(0,1,1)
-		ts.foreach( (t) => {
-			t match {
+    ts.foreach( (t) => {
+      t match {
         case XMove(e) => p.pos.x += eval(e)
         case YMove(e) => p.pos.y += eval(e)
         case ZMove(e) => p.pos.z += eval(e)
@@ -310,39 +312,39 @@ class ModelInterpreter(val tree: List[ASTNode]) {
         case Sat(e) => c.s *= eval(e)
         case Bright(e) => c.v *= eval(e)
         case Alpha(e) => () //c.a *= eval(e)
-			}
-		})
+      }
+    })
     p.quat = Quat().fromEuler(rot)
     (p,s,c)
-	}
+  }
 
   def eval(e:Expr):Float = e match {
     case Literal(v) => v
     case Ident(v) => gst(v)
   }
 
-	def set(s:String,v:Float) = gst = gst + (s->v)
+  def set(s:String,v:Float) = gst = gst + (s->v)
 
-	def buildModel(m:Model=Model()) = {
-		Random.seed(seed)
-		ruleDepth.clear
-		primCount = 0
+  def buildModel(m:Model=Model()) = {
+    Random.seed(seed)
+    ruleDepth.clear
+    primCount = 0
 
-		model = m
-		actionQueue = Queue[(Model,Action)]()
-		// initialActions.foreach( (a) => applyAction(a).foreach(model.addChild(_)) )
-		initialActions.foreach( (a) => actionQueue.enqueue((model,a)) )
-		var iterations = 0
-		while( !actionQueue.isEmpty && iterations < env("maxdepth").toInt ){
-			val actions = actionQueue.toList
-			actionQueue.clear
+    model = m
+    actionQueue = Queue[(Model,Action)]()
+    // initialActions.foreach( (a) => applyAction(a).foreach(model.addChild(_)) )
+    initialActions.foreach( (a) => actionQueue.enqueue((model,a)) )
+    var iterations = 0
+    while( !actionQueue.isEmpty && iterations < env("maxdepth").toInt ){
+      val actions = actionQueue.toList
+      actionQueue.clear
 
-			actions.foreach( applyAction(_) )
+      actions.foreach( applyAction(_) )
 
-			iterations += 1
-		}
-		model.applyColorTransform
-	}
+      iterations += 1
+    }
+    model.applyColorTransform()
+  }
 
 
 }

@@ -32,12 +32,12 @@ class Scene {
   //val pickable = new ListBuffer[GLPickable]
   //val lights = new ListBuffer[GLLight]
 
-  def +=(o:Any){ push(o) }
+  def +=(o:Any): Unit ={ push(o) }
   def push(o:Any) = o match {
     case d:Animatable => animatable += d; drawable += d
     case d:Drawable => drawable += d
   } 
-  def -=(o:Any){ remove(o) }
+  def -=(o:Any): Unit ={ remove(o) }
   def remove(o:Any) = o match {
     case d:Animatable => animatable -= d; drawable -= d
     case d:Drawable => drawable -= d

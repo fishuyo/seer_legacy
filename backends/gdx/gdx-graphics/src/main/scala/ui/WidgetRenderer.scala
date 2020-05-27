@@ -27,23 +27,23 @@ object WidgetRenderer {
   val quadFilled = Model(qf)
 
 
-  def draw(w:Widget){
-    MatrixStack.push
+  def draw(w:Widget): Unit ={
+    MatrixStack.push()
     MatrixStack.translate(Vec3(w.position,0))
     MatrixStack.scale(Vec3(w.bounds,1))
     w match {
       case q:QuadWidget =>
         if(q.hover) quad.material.color.set(1,0,0,1)
         else quad.material.color.set(1,1,1,1)
-        quad.draw //.translate(Vec3(w.position,0)).scale(Vec3(w.bounds,1)).draw
+        quad.draw() //.translate(Vec3(w.position,0)).scale(Vec3(w.bounds,1)).draw
       case q:FilledQuadWidget => 
         if(q.hover) quadFilled.material.color.set(1,0,0,1)
         else quadFilled.material.color.set(1,1,1,1)
-        quadFilled.draw //translate(Vec3(w.position,0)).scale(Vec3(w.bounds,1)).draw
+        quadFilled.draw() //translate(Vec3(w.position,0)).scale(Vec3(w.bounds,1)).draw
       case _ =>
     }
-    w.children.foreach(draw(_))
-    MatrixStack.pop
+    w.wchildren.foreach(draw(_))
+    MatrixStack.pop()
   }
 
 

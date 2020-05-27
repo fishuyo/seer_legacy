@@ -7,7 +7,7 @@ import spatial._
 import scala.collection.mutable.Queue
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 /* 
@@ -70,7 +70,7 @@ class AudioDisplay(val size:Int) extends Drawable {
   var left = 0
   var right = 0
 
-  def setSamplesSimple(s:Array[Float], l:Int=0, r:Int=0){
+  def setSamplesSimple(s:Array[Float], l:Int=0, r:Int=0): Unit ={
     samples = s
     left = l
     right = if(r == 0) s.size-1 else r-1
@@ -88,7 +88,7 @@ class AudioDisplay(val size:Int) extends Drawable {
     dirty = true
   }
 
-  def setSamples(s:Array[Float], l:Int=0, r:Int=0){
+  def setSamples(s:Array[Float], l:Int=0, r:Int=0): Unit ={
     samples = s
     left = l
     right = if(r == 0) s.size-1 else r-1
@@ -144,7 +144,7 @@ class AudioDisplay(val size:Int) extends Drawable {
     dirty = true
   }
 
-  def setCursor(i:Int,sample:Int){
+  def setCursor(i:Int,sample:Int): Unit ={
     val x = (sample - left).toFloat / (right-left).toFloat - .5f
     cursorMesh.vertices(2*i).x = x
     cursorMesh.vertices(2*i).y = 0.5f
@@ -155,13 +155,13 @@ class AudioDisplay(val size:Int) extends Drawable {
     cursorDirty = true
   }
 
-  override def draw(){ 
+  override def draw(): Unit ={ 
     if( dirty ){
-      mesh.update
+      mesh.update()
       dirty = false
     }
     if( cursorDirty ){
-      cursorMesh.update
+      cursorMesh.update()
       cursorDirty = false
     }
 
@@ -176,9 +176,9 @@ class AudioDisplay(val size:Int) extends Drawable {
     Renderer().shader.setUniforms()
 
     // Renderer().setMatrices()
-    mesh.draw //render(Renderer().shader(), primitive, 0, renderSize)
+    mesh.draw() //render(Renderer().shader(), primitive, 0, renderSize)
     // Renderer().setColor(cursorColor)
-    cursorMesh.draw //render(Renderer().shader(), GL20.GL_LINES)
+    cursorMesh.draw() //render(Renderer().shader(), GL20.GL_LINES)
     MatrixStack.pop()
   }
 

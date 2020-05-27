@@ -34,7 +34,7 @@ class AudioFileWriterActor extends Actor {
     case "close" => close()
   }
 
-  def open(path:String){
+  def open(path:String): Unit ={
     if( outFile.isEmpty ){
       var file:File = null
       if(path == "") file = openDefaultFile()
@@ -63,7 +63,7 @@ class AudioFileWriterActor extends Actor {
   //   }
   // }
 
-  def close(){
+  def close(): Unit ={
     outFile.foreach( _.close )
     outFile = None
     println("Audio recording stopped.")

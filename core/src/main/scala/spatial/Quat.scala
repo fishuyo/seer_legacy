@@ -7,17 +7,19 @@
 package com.fishuyo.seer
 package spatial
 
+import scala.language.implicitConversions
+
 object Quat {
-  implicit def toF( d: Double ) = d.toFloat
+  implicit def toF( d: Double ):Float = d.toFloat
   
   val eps = 0.0000001
   val acc_max = 1.000001
   val acc_min = 0.999999
   def apply( w:Float, x:Float, y:Float, z:Float ) = new Quat(w,x,y,z)
-  def apply( w:Double, x:Double, y:Double, z:Double ) = new Quat(w,x,y,z)
+  // def apply( w:Double, x:Double, y:Double, z:Double ) = new Quat(w,x,y,z)
   def apply(q:Quat) = new Quat(q.w,q.x,q.y,q.z)
   def apply(x:Float, y:Float, z:Float) = new Quat(1,0,0,0).fromEuler(x,y,z)
-  def apply(x:Double, y:Double, z:Double) = new Quat(1,0,0,0).fromEuler(x,y,z)
+  // def apply(x:Double, y:Double, z:Double) = new Quat(1,0,0,0).fromEuler(x,y,z)
   def apply(euler:Vec3) = new Quat(1,0,0,0).fromEuler(euler)
   def apply() = new Quat(1,0,0,0)
 
@@ -30,7 +32,7 @@ object Quat {
 }
 
 class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializable {
-  implicit def toF( d: Double ) = d.toFloat
+  implicit def toF( d: Double ):Float = d.toFloat
 
   def unary_- = Quat( -w, -x, -y, -z ) 
   def +(v: Quat) = Quat( w+v.w, x+v.x, y+v.y, z+v.z )
@@ -59,9 +61,9 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
   }
 
   def conj = Quat( w, -x,-y,-z )
-  def sgn = Quat(w,x,y,z).normalize
+  def sgn = Quat(w,x,y,z).normalize()
   def inverse = sgn.conj
-  def recip = conj / magSq   
+  def recip = conj / magSq()   
 
   def zero() = {w=0;x=0;y=0;z=0;this}
   def setIdentity() = {w=1;x=0;y=0;z=0;this}
@@ -109,7 +111,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
   def fromMatrix(m:Mat4):Quat = fromMatrix(m.data)
   def fromMatrix(m:Array[Float]) = {
     val trace = m(0)+m(5)+m(10)
-    w = math.sqrt(1f + trace)*0.5f
+    w = math.sqrt(1f + trace).toFloat*0.5f
 
     if(trace > 0f) {
       x = (m(9) - m(6))/(4f*w)
@@ -119,21 +121,21 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
     else {
       if(m(0) > m(5) && m(0) > m(10)) {
         // m(0) is greatest
-        x = math.sqrt(1f + m(0)-m(5)-m(10))*0.5f
+        x = math.sqrt(1f + m(0)-m(5)-m(10)).toFloat*0.5f
         w = (m(9) - m(6))/(4f*x)
         y = (m(4) + m(1))/(4f*x)
         z = (m(8) + m(2))/(4f*x)
       }
       else if(m(5) > m(0) && m(5) > m(10)) {
         // m(1) is greatest
-        y = math.sqrt(1f + m(5)-m(0)-m(10))*0.5f
+        y = math.sqrt(1f + m(5)-m(0)-m(10)).toFloat*0.5f
         w = (m(2) - m(8))/(4f*y)
         x = (m(4) + m(1))/(4f*y)
         z = (m(9) + m(6))/(4f*y)
       }
       else { //if(m(10) > m(0) && m(10) > m(5)) {
         // m(2) is greatest
-        z = math.sqrt(1f + m(10)-m(0)-m(5))*0.5f
+        z = math.sqrt(1f + m(10)-m(0)-m(5)).toFloat * 0.5f
         w = (m(4) - m(1))/(4f*z)
         x = (m(8) + m(2))/(4f*z)
         y = (m(9) + m(6))/(4f*z)
@@ -203,7 +205,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
     }
 
     val quat = Quat(a*w+b*q.w, a*x+b*q.x, a*y+b*q.y, a*z+b*q.z)
-    quat.normalize
+    quat.normalize()
   }
 
   def slerpTo(q:Quat, d:Float) = this.set( this.slerp(q,d))
@@ -261,7 +263,7 @@ class Quat(var w:Float, var x:Float, var y:Float, var z:Float ) extends Serializ
   }
 
   def fromForwardUp(dir:Vec3, up:Vec3):Quat = { 
-    val v2 = up.cross(dir).normalize
+    val v2 = up.cross(dir).normalize()
     val v3 = dir.cross(v2)
     val Vec3(m00,m01,m02) = v2
     val Vec3(m10,m11,m12) = v3

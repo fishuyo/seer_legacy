@@ -22,7 +22,7 @@ object PortAudio extends AudioInterface {
   // val ioBuffer = new AudioIOBuffer(channelsIn,channelsOut,bufferSize,in,out)
 
   var callback = new PaCallback {
-  	def paCallback(paIn:PaBuffer, paOut:PaBuffer, nframes:Int){
+    def paCallback(paIn:PaBuffer, paOut:PaBuffer, nframes:Int) = {
 
         paIn.getFloatBuffer.get(in(0))
 
@@ -31,8 +31,8 @@ object PortAudio extends AudioInterface {
           for( i <- (0 until bufferSize)) out(c)(i) = 0f
 
         // call audio callbacks
-        ioBuffer.reset
-        sources.foreach{ case s=> s.audioIO( ioBuffer ); ioBuffer.reset } //in,out,channelsOut,bufferSize) )
+        ioBuffer.reset()
+        sources.foreach{ case s=> s.audioIO( ioBuffer ); ioBuffer.reset() } //in,out,channelsOut,bufferSize) )
 
         // if playThru set add input to output
         if( playThru ) AudioPass.audioIO( ioBuffer ) //in,out,channelsOut,bufferSize)
@@ -54,16 +54,16 @@ object PortAudio extends AudioInterface {
           outFile.write(out,0,bufferSize)
         }
 
-  	}
+    }
   }
 
-  override def init(){
-  	try{ JPA.initialize() }
+  override def init() = {
+    try{ JPA.initialize() }
     catch { case e:Exception => println(e) }
     
-  	JPA.setCallback( callback )
-  	JPA.openDefaultStream(channelsIn, channelsOut, PaSampleFormat.paFloat32, sampleRate, bufferSize)
-    super.init
+    JPA.setCallback( callback )
+    JPA.openDefaultStream(channelsIn, channelsOut, PaSampleFormat.paFloat32, sampleRate, bufferSize)
+    super.init()
   }
 
   override def start() = JPA.startStream 

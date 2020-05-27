@@ -59,12 +59,22 @@ object Field2 {
   def linearSolve(f0:Field2, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
-    cfor(0)(_ < itr, _ + 1){ k =>
-      cfor(1)(_ < f0.ny-1, _ + 1){ j => //     j <- 1 until f0.ny-1 ) {
-      cfor(1)(_ < f0.nx-1, _ + 1){ i => //i <- 1 until f0.nx-1;
-        f(i,j) = ( f0(i,j) + a*( f(i-1,j) + f(i+1,j) + f(i,j-1) + f(i,j+1) ) ) * a2;
-      }}
+    var k = 0
+    while(k < itr){
+    // cfor(0)(_ < itr, _ + 1){ k =>
+      var j = 1
+      while(j < f0.ny-1){
+      // cfor(1)(_ < f0.ny-1, _ + 1){ j => //     j <- 1 until f0.ny-1 ) {
+        var i = 1
+        while(i<f0.nx-1){
+        // cfor(1)(_ < f0.nx-1, _ + 1){ i => //i <- 1 until f0.nx-1;
+          f(i,j) = ( f0(i,j) + a*( f(i-1,j) + f(i+1,j) + f(i,j-1) + f(i,j+1) ) ) * a2;
+          i += 1
+        }
+        j += 1
+      }
       setBoundary(f);
+      k += 1
     }
     f0.set( f )
     f0
@@ -161,7 +171,7 @@ class Field2(val nx:Int, val ny:Int, val dx:Float=1f, val dy:Float=1f){
 
 
 object VecField2 {
-  implicit def f2v(f:Float) = Vec2(f)  // XXX
+  implicit def f2v(f:Float):Vec2 = Vec2(f)  // XXX
 
   val scratchMap = collection.mutable.HashMap[(Int,Int),VecField2]()
   def scratch(f:VecField2) = scratchMap.getOrElseUpdate((f.nx,f.ny), VecField2(f.nx,f.ny,f.dx,f.dy))
@@ -211,12 +221,22 @@ object VecField2 {
   def linearSolve(f0:VecField2, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
-    cfor(0)(_ < itr, _ + 1){ k =>
-      cfor(1)(_ < f0.ny-1, _ + 1){ j => //     j <- 1 until f0.ny-1 ) {
-      cfor(1)(_ < f0.nx-1, _ + 1){ i => //i <- 1 until f0.nx-1;
-        f(i,j) = ( f0(i,j) + a*( f(i-1,j) + f(i+1,j) + f(i,j-1) + f(i,j+1) ) ) * a2;
-      }}
+    var k = 0
+    while(k < itr){
+    // cfor(0)(_ < itr, _ + 1){ k =>
+      var j = 1
+      while(j < f0.ny-1){
+      // cfor(1)(_ < f0.ny-1, _ + 1){ j => //     j <- 1 until f0.ny-1 ) {
+        var i = 1
+        while(i<f0.nx-1){
+        // cfor(1)(_ < f0.nx-1, _ + 1){ i => //i <- 1 until f0.nx-1;
+          f(i,j) = ( f0(i,j) + a*( f(i-1,j) + f(i+1,j) + f(i,j-1) + f(i,j+1) ) ) * a2;
+          i += 1
+        }
+        j += 1
+      }
       setBoundary(f);
+      k += 1
     }
     f0.set( f )
     f0
@@ -234,7 +254,7 @@ object VecField2 {
       if (x < 0.5) x = 0.5f; if (x > f0.nx-2 + 0.5) x = f0.nx-2 + 0.5f; val i0=x.toInt; val i1=i0+1;
       if (y < 0.5) y = 0.5f; if (y > f0.ny-2 + 0.5) y = f0.ny-2 + 0.5f; val j0=y.toInt; val j1=j0+1;
       val s1 = x-i0; val s0 = 1-s1; val t1 = y-j0; val t0 = 1-t1;
-      f(i,j) = s0 * (t0 * f0(i0,j0) + t1 * f0(i0,j1) ) + s1 * ( t0 * f0(i1,j0) + t1 * f0(i1,j1) )
+      f(i,j) = (f0(i0,j0)*t0 + f0(i0,j1)*t1 )*s0 + ( f0(i1,j0)*t0 + f0(i1,j1)*t1 )*s1
     }
     setBoundary(f)
     f0.set( f )

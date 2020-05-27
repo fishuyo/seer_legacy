@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Queue
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 import com.badlogic.gdx.graphics.g3d.loader._
@@ -186,7 +186,7 @@ object Tetrahedron extends ModelGenerator {
     mesh.wireIndices ++= List(0,2,2,1,1,0, 0,3,1,3,2,3)
 
     // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
-    mesh.recalculateNormals
+    mesh.recalculateNormals()
     mesh
   }
 }
@@ -212,7 +212,7 @@ object Octahedron extends ModelGenerator {
     // mesh.wireIndices ++= List(0,2,2,1,1,0, 0,3,1,3,2,3)
 
     // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
-    mesh.recalculateNormals
+    mesh.recalculateNormals()
     mesh
   }
 }
@@ -243,7 +243,7 @@ object Dodecahedron extends ModelGenerator {
     )
 
     // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
-    mesh.recalculateNormals
+    mesh.recalculateNormals()
     mesh
   }
 }
@@ -291,7 +291,7 @@ object Icosahedron extends ModelGenerator {
     )
 
     // mesh.vertices.foreach( (v) => mesh.normals += v.normalized )
-    mesh.recalculateNormals
+    mesh.recalculateNormals()
     mesh
   }
 }
@@ -405,7 +405,7 @@ class Trace3D( var size:Int ) extends Drawable {
     dirty = true
   }
 
-  def setColors(c1:Vec3,c2:Vec3){
+  def setColors(c1:Vec3,c2:Vec3): Unit ={
     for( i<-(0 until size)){
       val c = c2.lerp(c1, i/size.toFloat)
       mesh.colors(i) = RGBA(c,1f)
@@ -413,18 +413,18 @@ class Trace3D( var size:Int ) extends Drawable {
     dirty = true  
   }
 
-  override def init(){
-    mesh.init
+  override def init(): Unit ={
+    mesh.init()
   }
-  override def draw(){ 
+  override def draw(): Unit ={ 
     if( dirty ){
-      mesh.update
+      mesh.update()
       dirty = false
     }
     // if(smooth){
       // Gdx.gl.glEnable(GL20.GL_LINE_SMOOTH)
     // }
-    val thick = map(vel.mag, 0f,0.01f,0f,6f)
+    val thick = map(vel.mag(), 0f,0.01f,0f,6f)
     Gdx.gl.glLineWidth(thickness)
     model.draw()
   }

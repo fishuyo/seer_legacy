@@ -4,12 +4,12 @@ package graphics
 
 trait Drawable {
   var initialized = false
-	def init(){}
-  def draw(){}
-  def step(dt: Float){}
+  def init(): Unit ={}
+  def draw(): Unit ={}
+  def step(dt: Float): Unit ={}
   
   @deprecated("use step instead", "")
-  def animate(dt: Float){}
+  def animate(dt: Float): Unit ={}
 }
 
 @deprecated("use Drawable", "")

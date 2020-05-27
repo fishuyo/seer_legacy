@@ -15,7 +15,7 @@ class Osc(var f:Gen) extends Gen{
     phase
   }
   override def apply(in:Float) = { 
-    f = in
+    f.value = in
     apply()
   }
 }
@@ -24,7 +24,7 @@ class Osc(var f:Gen) extends Gen{
   * sin wave oscillator
   */
 object Sine { def apply(f:Float=440f, a:Float=1f) = new Sine(f,a) }
-class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
+class Sine(f:Float=440f, var a:Float=1f) extends Osc(Var(f)) {
   override def apply() = {
     super.apply()
     value = math.sin(phase * 2*math.Pi).toFloat * a

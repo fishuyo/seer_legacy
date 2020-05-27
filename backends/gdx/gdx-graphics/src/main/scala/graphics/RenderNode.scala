@@ -19,7 +19,7 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
 
   var buffer:Option[FrameBuffer] = None
 
-  def createBuffer(){
+  def createBuffer(): Unit ={
     if(buffer.isEmpty) buffer = Some(FrameBuffer(renderer.viewport.w.toInt, renderer.viewport.h.toInt))
   }
 
@@ -28,14 +28,14 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
   def bindTarget() = if( buffer.isDefined ) buffer.get.begin()
   def unbindTarget() = if( buffer.isDefined ) buffer.get.end(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight())
 
-  def reset(){
+  def reset(): Unit ={
     if(buffer.isDefined) buffer.get.dispose
     buffer = None
     outputs.clear
     inputs.clear
   }
 
-  def resize(vp:Viewport){
+  def resize(vp:Viewport): Unit ={
     renderer.resize(vp)
 
     if(buffer.isDefined){
@@ -44,7 +44,7 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
     }
   }
 
-  def addInput(node:RenderNode){
+  def addInput(node:RenderNode): Unit ={
     inputs += node
   }
 
@@ -65,11 +65,11 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
   }
   def <<(node:RenderNode) = node.outputTo(this)
 
-  def animate(dt:Float){
+  def animate(dt:Float): Unit ={
     renderer.animate(dt)
   }
 
-  def render(){
+  def render(): Unit ={
     bindTarget()
 
     inputs.zipWithIndex.foreach { case(input,idx) => 
@@ -100,7 +100,7 @@ class ScreenNode extends RenderNode {
   */
 class TextureNode(var texture:Texture) extends RenderNode {
   override def bindBuffer(i:Int) = texture.bind(i)  
-  override def render(){}
+  override def render(): Unit ={}
 }
 
 /**
@@ -110,14 +110,14 @@ class CompositeNode(var blend0:Float=0.5f, var blend1:Float=0.5f) extends Render
   var mode = 0
   renderer.scene.push(Plane())
   renderer.shader = Shader.loadCode("composite",DefaultShaders.composite)
-  override def render(){
+  override def render(): Unit ={
     renderer.shader.uniforms("u_blend0") = blend0
     renderer.shader.uniforms("u_blend1") = blend1
     renderer.shader.uniforms("u_mode") = mode
     super.render()
   }
-  def xfade(a:Float){ blend0 = 1.0f-a; blend1 = a}
-  def setBlend(a:Float,b:Float){ blend0 = a; blend1 = b}
+  def xfade(a:Float): Unit ={ blend0 = 1.0f-a; blend1 = a}
+  def setBlend(a:Float,b:Float): Unit ={ blend0 = a; blend1 = b}
 }
 
 class Composite3Node(var blend0:Float=0.33f, var blend1:Float=0.33f, var blend2:Float=0.33f) extends RenderNode {
@@ -157,7 +157,7 @@ class Composite3Node(var blend0:Float=0.33f, var blend1:Float=0.33f, var blend2:
       }
     """
   )
-  override def render(){
+  override def render(): Unit ={
     renderer.shader.uniforms("u_blend0") = blend0
     renderer.shader.uniforms("u_blend1") = blend1
     renderer.shader.uniforms("u_blend2") = blend2
@@ -190,7 +190,7 @@ class BackBufferNode extends RenderNode {
 
   renderer.scene.push(Plane())
 
-  override def createBuffer(){
+  override def createBuffer(): Unit ={
     if(buffer1.isEmpty){ 
       buffer1 = Some(new FloatFrameBuffer(renderer.viewport.w.toInt, renderer.viewport.h.toInt))
       buffer2 = Some(new FloatFrameBuffer(renderer.viewport.w.toInt, renderer.viewport.h.toInt))
@@ -200,18 +200,18 @@ class BackBufferNode extends RenderNode {
     if( isTarget2 ) buffer1.get.getColorBufferTexture().bind(i)
     else buffer2.get.getColorBufferTexture().bind(i)
   }
-  override def resize(vp:Viewport){
+  override def resize(vp:Viewport): Unit ={
     renderer.resize(vp)
   
     if(buffer1.isDefined){
-      buffer1.get.dispose
+      buffer1.get.dispose()
       buffer1 = Some(new FloatFrameBuffer(vp.w.toInt,vp.h.toInt))
-      buffer2.get.dispose
+      buffer2.get.dispose()
       buffer2 = Some(new FloatFrameBuffer(vp.w.toInt,vp.h.toInt))
     }
   }
 
-  override def bindTarget(){
+  override def bindTarget(): Unit ={
     if( buffer1.isDefined ){
       
       if(isTarget2) buffer2.get.begin()
@@ -223,7 +223,7 @@ class BackBufferNode extends RenderNode {
       // nodes.foreach(_.render()) //hacky
     }
   }
-  override def unbindTarget(){
+  override def unbindTarget(): Unit ={
     if(isTarget2) buffer2.get.end()
     else buffer1.get.end()
     isTarget2 = !isTarget2
@@ -312,7 +312,7 @@ class ColorizeNode extends RenderNode {
     """
   )
   
-  override def render(){
+  override def render(): Unit ={
     renderer.shader.uniforms("color1") = color1
     renderer.shader.uniforms("color2") = color2
     renderer.shader.uniforms("color3") = color3
@@ -404,7 +404,7 @@ class BlurNode extends RenderNode {
     """
   )
   
-  override def render(){
+  override def render(): Unit ={
     renderer.shader.uniforms("blurSize") = size
     renderer.shader.uniforms("intensity") = intensity
     super.render()

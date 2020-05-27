@@ -8,6 +8,7 @@ import spatial._
 import util._
 
 import concurrent.duration._
+import scala.language.postfixOps
 
 object EaseTest extends SeerApp { 
 
@@ -19,7 +20,7 @@ object EaseTest extends SeerApp {
   Schedule.oscillate(2 seconds){ case t =>
     // in/out
     for(i <- 0 until 8){
-      val d = i match {
+      val d:Float = i match {
         case 0 => t
         case 1 => Ease.quad(t)
         case 2 => Ease.cubic(t)
@@ -29,11 +30,11 @@ object EaseTest extends SeerApp {
         case 6 => Ease.sine(t)
         case 7 => Ease.circ(t)
       }
-      models(i).pose.pos.set(2*d - 1, -1 + i*0.25, 0)
+      models(i).pose.pos.set(2f*d - 1, -1 + i*0.25f, 0)
     }
     // in
     for(i <- 0 until 8){
-      val d = i match {
+      val d:Float = i match {
         case 0 => t
         case 1 => Ease.quadIn(t)
         case 2 => Ease.cubicIn(t)
@@ -43,11 +44,11 @@ object EaseTest extends SeerApp {
         case 6 => Ease.sineIn(t)
         case 7 => Ease.circIn(t)
       }
-      modelsIn(i).pose.pos.set(2*d - 1, 3 + i*0.25, 0)
+      modelsIn(i).pose.pos.set(2f*d - 1, 3 + i*0.25f, 0)
     }
     //out
     for(i <- 0 until 8){
-      val d = i match {
+      val d:Float = i match {
         case 0 => t
         case 1 => Ease.quadOut(t)
         case 2 => Ease.cubicOut(t)
@@ -57,18 +58,18 @@ object EaseTest extends SeerApp {
         case 6 => Ease.sineOut(t)
         case 7 => Ease.circOut(t)
       }
-      modelsOut(i).pose.pos.set(2*d - 1, 7 + i*0.25, 0)
+      modelsOut(i).pose.pos.set(2f*d - 1, 7 + i*0.25f, 0)
     }
   }
 
-  override def draw(){
+  override def draw(): Unit ={
     // call each shapes' draw method
     models.foreach( _.draw() )
     modelsIn.foreach( _.draw() )
     modelsOut.foreach( _.draw() )
   }
 
-  override def animate(dt:Float){
+  override def animate(dt:Float): Unit ={
   }
 
 }

@@ -23,32 +23,32 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 	var turn = Vec3(0); var nudge = Vec3(0)
 	var mUR = Vec3(0); var mUU = Vec3(0); var mUF = Vec3(0)
 
-	def view(eu:(Float,Float,Float)){ view(Quat().fromEuler(eu)) }
-	def view(q:Quat){ quat = q; updateDirVectors() }
+	def view(eu:(Float,Float,Float)): Unit ={ view(Quat().fromEuler(eu)) }
+	def view(q:Quat): Unit ={ quat = q; updateDirVectors() }
 
 	def velPose() = new Pose( velS, Quat().fromEuler(angVelS) )
 
 	def stop() = {
-		vel.zero; velS.zero;
-		worldVel.zero; worldVelS.zero;
-		angVel.zero; angVelS.zero;
-		turn.zero; nudge.zero;
+		vel.zero(); velS.zero();
+		worldVel.zero(); worldVelS.zero();
+		angVel.zero(); angVelS.zero();
+		turn.zero(); nudge.zero();
 		updateDirVectors()
 	}
 
 	def moveToOrigin() = {
-		quat.setIdentity; pos.zero
-		stop
+		quat.setIdentity(); pos.zero()
+		stop()
 	}
 
 	// def lookAt( p: Vec3, amt:Float=1f) = {
 
 	// }
 	def goTo( p:Vec3, amt:Float=1f) = {
-		val dir = (p - pos).normalize
+		val dir = (p - pos).normalize()
 	}
 
-	def updateDirVectors() = { quat = quat.normalize; mUR = ur(); mUU = uu(); mUF = uf() }
+	def updateDirVectors() = { quat = quat.normalize(); mUR = ur(); mUU = uu(); mUF = uf() }
 
 	def step( dt:Float ) = {
 		var s = scale * dt
@@ -59,7 +59,7 @@ class Nav( p:Vec3=Vec3(0) ) extends Pose(p) {
 		angVelS = angVelS.lerp( angVel*dt + turn, amt )
 		worldVelS = worldVelS.lerp( worldVel*s, amt )
 
-		nudge.zero; turn.zero
+		nudge.zero(); turn.zero()
 
 		//rotate
 		quat *= Quat().fromEuler(angVelS)

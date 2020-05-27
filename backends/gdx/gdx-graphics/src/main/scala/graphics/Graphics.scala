@@ -18,7 +18,7 @@ class DrawOnce[T](f: =>T) extends Drawable{
   var ret:T = null.asInstanceOf[T]
   var ran = false
   Scene.push(this)
-  override def draw(){
+  override def draw(): Unit ={
     try{
     if(!ran){ ret=f; ran = true}
     } catch{ case e:Exception => println(e)} finally{ Scene.drawable -= this }
@@ -28,7 +28,7 @@ class AnimateOnce[T](f: =>T) extends Animatable {
   var ret:T = null.asInstanceOf[T]
   var ran = false
   Scene.push(this)
-  override def animate(dt:Float){
+  override def animate(dt:Float): Unit ={
     try{
     if(!ran){ ret=f; ran = true}
     } catch{ case e:Exception => println(s"AnimateOnce: $e")} finally{ Scene.remove(this) }

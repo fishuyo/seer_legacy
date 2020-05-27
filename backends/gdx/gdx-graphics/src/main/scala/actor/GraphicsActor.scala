@@ -21,7 +21,7 @@ class GraphicsActor extends Actor with ActorLogging {
   override def preStart() = {
     log.debug("Graphics actor Starting")
   }
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Graphics actor Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
   }

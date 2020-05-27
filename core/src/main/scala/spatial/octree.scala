@@ -31,8 +31,8 @@ class Octree[T]( val parent:Octree[T], c:Vec3, hsize:Float) extends AABB(c,hsize
     minSize = parent.minSize
   }
 
-  def clear(){
-    if(children != null) children.foreach{ case c => if(c != null) c.clear }
+  def clear(): Unit ={
+    if(children != null) children.foreach{ case c => if(c != null) c.clear() }
     values.clear
   }
 
@@ -106,7 +106,7 @@ class Octree[T]( val parent:Octree[T], c:Vec3, hsize:Float) extends AABB(c,hsize
   
     if( this.intersectsSphere( c, r ) ){
       if( numChildren == 0 ){
-        results = values.filter { case (p:Vec3,v) => (c-p).magSq <= r*r }
+        results = values.filter { case (p:Vec3,v) => (c-p).magSq() <= r*r }
         //println( "leaf points: " + results.size )
       }else if( numChildren > 0 ) {
         //println("depth numchildren: " + depth + " " + numChildren )
@@ -123,7 +123,7 @@ class Octree[T]( val parent:Octree[T], c:Vec3, hsize:Float) extends AABB(c,hsize
     results
   }
 
-  def foreach(f:(Vec3,T) => Unit){
+  def foreach(f:(Vec3,T) => Unit): Unit ={
     if( numChildren == 0 ){
       values.foreach{ case (v,t) => f(v,t) }
     }else if( numChildren > 0 ) {

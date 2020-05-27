@@ -17,7 +17,7 @@ object Terrain {
 
     divide(nx-1)
 
-    def divide(size:Int){
+    def divide(size:Int): Unit ={
       val half = size/2
       var scale = roughness * size
       if(half < 1) return
@@ -37,7 +37,7 @@ object Terrain {
       nx*y + x
     }
 
-    def square(x:Int, y:Int, size:Int, offset:Float){
+    def square(x:Int, y:Int, size:Int, offset:Float): Unit ={
       val avg = Vec3()
       avg += m.vertices(indx(x-size, y-size))
       avg += m.vertices(indx(x+size, y-size))
@@ -49,7 +49,7 @@ object Terrain {
       // m.vertices(y*nx+x) = avg * offset
     }
 
-    def diamond(x:Int, y:Int, size:Int, offset:Float){
+    def diamond(x:Int, y:Int, size:Int, offset:Float): Unit ={
       val avg = Vec3()
       avg += m.vertices(indx(x, y-size))
       avg += m.vertices(indx(x+size, y))
@@ -95,14 +95,14 @@ class Terrain(tx:Int, ty:Int, scale:Float) extends Animatable {
     idx += 1
   }
 
-  override def animate(dt:Float){ Camera.nav.pos.wrap(Vec3(-scale),Vec3(scale)) }
+  override def animate(dt:Float): Unit ={ Camera.nav.pos.wrap(Vec3(-scale),Vec3(scale)) }
  
-  override def draw(){
+  override def draw(): Unit ={
 
     if(dirty){
       dirty = false
-      terrain.recalculateNormals
-      terrain.update
+      terrain.recalculateNormals()
+      terrain.update()
     }
 
     // GL11.glHint(GL11.GL_POINT_SMOOTH_HINT, GL11.GL_NICEST);
@@ -116,7 +116,7 @@ class Terrain(tx:Int, ty:Int, scale:Float) extends Animatable {
 
     // terrain.primitive = Triangles
     // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL)
-    tmodels.foreach(_.draw)
+    tmodels.foreach(_.draw())
 
     // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE)
     // lmodels.foreach(_.draw)

@@ -56,7 +56,7 @@ object Random {
 	}
 
 	def quat = new Generator[Quat]{
-		def apply() = Quat(float(-1f,1f)(),float(-1f,1f)(),float(-1f,1f)(),float(-1,1)()).normalize
+		def apply() = Quat(float(-1f,1f)(),float(-1f,1f)(),float(-1f,1f)(),float(-1,1)()).normalize()
 	}
 
 	def rgb = new Generator[RGB]{

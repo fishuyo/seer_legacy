@@ -5,10 +5,9 @@ import spatial._
 import spatial._
 
 
-import scala.collection.immutable.Stack
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 
@@ -37,8 +36,8 @@ object Model {
 }
 
 class Model extends Drawable { // with geometry.Pickable {
-	var pose = Pose()
-	var scale = Vec3(1)
+  var pose = Pose()
+  var scale = Vec3(1)
   var color = RGBA(1,1,1,1)
   var colorTransform = HSV(0,1,1)
 
@@ -53,25 +52,25 @@ class Model extends Drawable { // with geometry.Pickable {
 
   var worldTransform = new Matrix4
 
-  def material(m:BasicMaterial){ material = m }
+  def material(m:BasicMaterial): Unit ={ material = m }
 
   def translate(x:Float,y:Float,z:Float):Model = translate(Vec3(x,y,z))
-  def translate(x:Double,y:Double,z:Double):Model = translate(Vec3(x,y,z))
+  // def translate(x:Double,y:Double,z:Double):Model = translate(Vec3(x,y,z))
   def translate(p:Vec3):Model = { pose.pos += p; this }
 
   def rotate(x:Float, y:Float, z:Float):Model = rotate(Quat(x,y,z))
-  def rotate(x:Double, y:Double, z:Double):Model = rotate(Quat(x,y,z))
+  // def rotate(x:Double, y:Double, z:Double):Model = rotate(Quat(x,y,z))
   def rotate(q:Quat):Model = { pose.quat *= q; this }
 
   def scale(x:Float,y:Float,z:Float):Model = scale(Vec3(x,y,z))
-  def scale(x:Double,y:Double,z:Double):Model = scale(Vec3(x,y,z))
+  // def scale(x:Double,y:Double,z:Double):Model = scale(Vec3(x,y,z))
   def scale(s:Float):Model = { scale *= s; this}
-  def scale(s:Double):Model = { scale *= s; this}
+  // def scale(s:Double):Model = { scale *= s; this}
   def scale(s:Vec3):Model = { scale *= s; this}
 
   def transform(p:Pose,s:Vec3=Vec3(1)) = {
-  	pose *= p
-  	scale *= s 
+    pose *= p
+    scale *= s 
     // val m = new Model(p,s)
     // children = children :+ m
     this
@@ -91,13 +90,13 @@ class Model extends Drawable { // with geometry.Pickable {
     m
   }
 
-  def foreach[T](f:(Model)=>T){
+  def foreach[T](f:(Model)=>T): Unit ={
     f(this)
     children.foreach( _.foreach(f))
   }
   def getLeaves():Vector[Model] = {
     if( children.length == 0) Vector(this)
-    else children.flatMap( _.getLeaves )
+    else children.flatMap( _.getLeaves() )
   }
 
   def applyColorTransform():Model = {
@@ -111,7 +110,7 @@ class Model extends Drawable { // with geometry.Pickable {
     this
   }
 
-  def updateWorldTransform(){
+  def updateWorldTransform(): Unit ={
     MatrixStack.push()
     MatrixStack.transform(pose,scale)
     worldTransform.set(MatrixStack.model)
@@ -119,7 +118,7 @@ class Model extends Drawable { // with geometry.Pickable {
     MatrixStack.pop()
   }
 
-  override def draw(){
+  override def draw(): Unit ={
     if(!material.visible) return
     
     MatrixStack.push()
@@ -182,14 +181,14 @@ class Model extends Drawable { // with geometry.Pickable {
 
       for( i <- 0 to npoints){
         val phase = i.toFloat / npoints * 2 * Pi
-        val x = r*math.cos(phase)
-        val y = r*math.sin(phase)
+        val x = r*math.cos(phase).toFloat
+        val y = r*math.sin(phase).toFloat
         val off1 = pose.ur()*x*s.x + pose.uf()*y*s.y
         val off2 = child.pose.ur()*x*sc.x + child.pose.uu()*y*sc.y
         m.vertices += p + off1
-        m.normals += off1.normalized
+        m.normals += off1.normalized()
         m.vertices += pc + off2
-        m.normals += off2.normalized
+        m.normals += off2.normalized()
       }
       child.makeMesh(m,r,npoints)
     })

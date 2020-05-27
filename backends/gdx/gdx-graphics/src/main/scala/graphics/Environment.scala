@@ -32,7 +32,7 @@ class Environment {
   var srcBlend = GL20.GL_ONE
   var dstBlend = GL20.GL_ONE
 
-  def default(){
+  def default(): Unit ={
     backgroundColor = RGBA(0,0,0,1)
     fog = 0.135f
     fogColor = RGB.black
@@ -48,12 +48,12 @@ class Environment {
     dstBlend = GL20.GL_ONE
   }
 
-  def blendFunc(src:Int, dst:Int){
+  def blendFunc(src:Int, dst:Int): Unit ={
     srcBlend = src
     dstBlend = dst
   }
 
-  def setGLState(){
+  def setGLState(): Unit ={
     Gdx.gl.glClearColor(backgroundColor.r,backgroundColor.g,backgroundColor.b,backgroundColor.a)
     // Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 

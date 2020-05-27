@@ -49,10 +49,10 @@ class BasicMaterial extends Material {
 	var lightingMix = 0f
 	var shininess = 0
 
-	def loadTexture(path:String){
+	def loadTexture(path:String): Unit ={
 		loadTexture(Texture(path))
 	}
-	def loadTexture(t:Texture){
+	def loadTexture(t:Texture): Unit ={
 		texture = Some(t)
 		textureMix = 1f
 	}

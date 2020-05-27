@@ -23,7 +23,7 @@ class Schedulable extends Cancellable with Animatable{
 
 	Scene.push(this)
 
-	def updateDuration(d:FiniteDuration){
+	def updateDuration(d:FiniteDuration): Unit ={
 		if(d == 0.seconds) return
 		val tt = d*percent
 		if(tt.isFinite){
@@ -32,9 +32,9 @@ class Schedulable extends Cancellable with Animatable{
 		}
 	}
 
-	var onFinish:()=> Unit = null
-	def andThen(f: => Unit){
-		onFinish = f _
+	var onFinish:()=>Unit = null
+	def andThen(f:()=>Unit): Unit ={
+		onFinish = f
 	}
 
 	override def isCancelled = cancelled
@@ -47,21 +47,21 @@ object Schedule extends Schedule {
 }
 class Schedule {
 	implicit def int2fd(i:Int):FiniteDuration = i.milliseconds
-	implicit def d2f(d:Double) = d.toFloat
+	implicit def d2f(d:Double):Float = d.toFloat
 
 	val events = ListBuffer[Cancellable]()
 
 	val system = System()
 	import system.dispatcher
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+	@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def after(t:FiniteDuration)(f: =>Unit) = {
 		val e = System().scheduler.scheduleOnce(t)(f)
 		events += e
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+	@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def every(t:FiniteDuration,t0:FiniteDuration = -1.seconds)(f: =>Unit) = {
 		val wait = if(t0 == -1.seconds) t else t0
 		val e = System().scheduler.schedule(wait,t)(f)
@@ -69,11 +69,11 @@ class Schedule {
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+	@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def over(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
-			override def animate(dt:Float){
+			override def animate(dt:Float): Unit ={
 				if(paused) return
 				t += (speed * dt.toDouble).seconds
 				if(t > duration){
@@ -110,11 +110,11 @@ class Schedule {
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+	@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def cycle(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
-			override def animate(dt:Float){
+			override def animate(dt:Float): Unit ={
 				if(paused) return
 				t += (speed * dt.toDouble).seconds
 				if(t > duration){
@@ -129,11 +129,11 @@ class Schedule {
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+	@deprecated("use package com.fishuyo.seer.time", "Beep boop")
 	def oscillate(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
-			override def animate(dt:Float){
+			override def animate(dt:Float): Unit ={
 				if(paused) return
 				t += (speed * dt.toDouble).seconds
 				if(t > duration){
@@ -152,7 +152,7 @@ class Schedule {
 		e
 	}
 
-	def clear(){events.foreach(_.cancel); events.clear}
+	def clear(): Unit ={events.foreach(_.cancel); events.clear}
 }
 
 

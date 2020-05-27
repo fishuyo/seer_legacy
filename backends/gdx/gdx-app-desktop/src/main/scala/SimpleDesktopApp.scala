@@ -40,7 +40,7 @@ object DesktopApp {
   var restoring = false
 
   // load gdx libs and other common natives
-  def loadLibs(){
+  def loadLibs():Unit = {
     if (nativesLoaded) return
     println("loading native libraries..")
     try {
@@ -86,7 +86,7 @@ object DesktopApp {
     // new JglfwApplication( app, cfg )
   }
 
-  def setFullscreen(){
+  def setFullscreen() = {
     val mode = Gdx.graphics.getDisplayMode()
     // println(mode)
     // Gdx.graphics.setDisplayMode( mode )
@@ -94,7 +94,7 @@ object DesktopApp {
     fullscreen = true
   }
 
-  def toggleFullscreen(){
+  def toggleFullscreen() = {
 
       if( fullscreen ){
         Gdx.graphics.setWindowedMode( Window.w0, Window.h0)
@@ -135,7 +135,7 @@ object FullscreenKey extends InputAdapter {
   override def keyDown(k:Int) = {
     
     k match {
-      case Keys.ESCAPE => DesktopApp.toggleFullscreen
+      case Keys.ESCAPE => DesktopApp.toggleFullscreen()
       case Keys.F1 => 
         // Audio().toggleRecording()
       case _ => false

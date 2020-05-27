@@ -17,13 +17,13 @@ class Schedulable extends Cancellable with Animatable{
   var cancelled = false
   var duration = 0 millis
   var t = 0 millis
-  var percent = 0.0
-  var speed = 1.0
+  var percent = 0.0f
+  var speed = 1.0f
   var paused = false
 
   Scene.push(this)
 
-  def updateDuration(d:FiniteDuration){
+  def updateDuration(d:FiniteDuration): Unit ={
     if(d == 0.seconds) return
     val tt = d*percent
     if(tt.isFinite){
@@ -33,8 +33,8 @@ class Schedulable extends Cancellable with Animatable{
   }
 
   var onFinish:()=> Unit = null
-  def andThen(f: => Unit){
-    onFinish = f _
+  def andThen(f:() => Unit): Unit ={
+    onFinish = f
   }
 
   override def isCancelled = cancelled
@@ -43,7 +43,7 @@ class Schedulable extends Cancellable with Animatable{
 
 object Schedule {
   implicit def int2fd(i:Int):FiniteDuration = i.milliseconds
-  implicit def d2f(d:Double) = d.toFloat
+  implicit def d2f(d:Double):Float = d.toFloat
 
   val events = ListBuffer[Cancellable]()
 
@@ -67,7 +67,7 @@ object Schedule {
   def over(len:FiniteDuration)(f:(Float)=>Unit) = {
     val e = new Schedulable {
       duration = len
-      override def animate(dt:Float){
+      override def animate(dt:Float): Unit ={
         if(paused) return
         t += (speed * dt.toDouble).seconds
         if(t > duration){
@@ -107,7 +107,7 @@ object Schedule {
   def cycle(len:FiniteDuration)(f:(Float)=>Unit) = {
     val e = new Schedulable {
       duration = len
-      override def animate(dt:Float){
+      override def animate(dt:Float): Unit ={
         if(paused) return
         t += (speed * dt.toDouble).seconds
         if(t > duration){
@@ -125,7 +125,7 @@ object Schedule {
   def oscillate(len:FiniteDuration)(f:(Float)=>Unit) = {
     val e = new Schedulable {
       duration = len
-      override def animate(dt:Float){
+      override def animate(dt:Float): Unit ={
         if(paused) return
         t += (speed * dt.toDouble).seconds
         if(t > duration){
@@ -144,7 +144,7 @@ object Schedule {
     e
   }
 
-  def clear(){events.foreach(_.cancel); events.clear}
+  def clear(): Unit ={events.foreach(_.cancel); events.clear}
 }
 
 

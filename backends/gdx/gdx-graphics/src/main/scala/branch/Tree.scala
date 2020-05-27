@@ -18,7 +18,7 @@ class Tree(pose:Pose = Pose(Vec3(),Quat.up)) {
   var trunk = Branch(null,pose)
   // trunk.length = 1f
 
-  def generate(depth:Int)(f:PartialFunction[Branch,Unit]){
+  def generate(depth:Int)(f:PartialFunction[Branch,Unit]): Unit ={
     trunk.visitPre {
       case b if b.depth == depth => ()
       case b => f(b)
@@ -43,7 +43,7 @@ class Tree(pose:Pose = Pose(Vec3(),Quat.up)) {
   //   }
   // }
 
-  def lineMesh(mesh:Mesh){
+  def lineMesh(mesh:Mesh): Unit ={
     mesh.primitive = Lines 
     trunk.foreach { case b => 
       b.children.foreach { case c =>
@@ -53,17 +53,17 @@ class Tree(pose:Pose = Pose(Vec3(),Quat.up)) {
     }
   }
 
-  def draw(model:Model){
+  def draw(model:Model): Unit ={
     // trunk.foreach { case b =>
     // trunk.visitPost { case b =>
     trunk.visitPre { case b =>
       model.pose = b.pose
       model.scale.set(b.length*b.thick,b.length*b.thick,b.length) 
-      model.draw
+      model.draw()
     }
   }
 
 
-  def print(){ trunk.foreach{ case b => println(b.pose.pos) } }
+  def print(): Unit ={ trunk.foreach{ case b => println(b.pose.pos) } }
 
 }

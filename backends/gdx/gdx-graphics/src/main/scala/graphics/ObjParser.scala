@@ -11,25 +11,27 @@ import scala.collection.mutable.ListBuffer
 import com.badlogic.gdx.Gdx
 // import com.badlogic.gdx.graphics._
 
+import scala.language.postfixOps
+
 object Obj {
-	def apply(file:String) = Model(ObjParser(file))
+  def apply(file:String) = Model(ObjParser(file))
 }
 
 object ObjParser extends JavaTokenParsers {
 
-	// implicit def s2f(s:String) = s.toFloat
+  // implicit def s2f(s:String) = s.toFloat
 
-	abstract class Statement
-	case class Vertex(v:Vec3) extends Statement
-	case class Normal(n:Vec3) extends Statement
-	case class Face(u:String,v:String,w:String) extends Statement
-	case class TexCoord(u:Vec2) extends Statement
-	case class Empty() extends Statement
+  abstract class Statement
+  case class Vertex(v:Vec3) extends Statement
+  case class Normal(n:Vec3) extends Statement
+  case class Face(u:String,v:String,w:String) extends Statement
+  case class TexCoord(u:Vec2) extends Statement
+  case class Empty() extends Statement
  
- 	def FP = floatingPointNumber
- 	def WN = wholeNumber
+   def FP = floatingPointNumber
+   def WN = wholeNumber
 
- 	// protected override val whiteSpace = """(\s|#.*|(?m)/\*(\*(?!/)|[^*])*\*/)+""".r
+   // protected override val whiteSpace = """(\s|#.*|(?m)/\*(\*(?!/)|[^*])*\*/)+""".r
 
   def comment = """#.*""".r ^^ { case c => Empty() }
   def v = "v"~>FP~FP~FP ^^ { case x~y~z => Vertex(Vec3(x.toFloat,y.toFloat,z.toFloat)) }  
@@ -48,7 +50,7 @@ object ObjParser extends JavaTokenParsers {
   def file : Parser[List[Statement]] = statement*
 
 
-  def parseLine( line: String ){
+  def parseLine( line: String ): Unit ={
     println ( parse( statement, line ))
   }
 
@@ -57,10 +59,10 @@ object ObjParser extends JavaTokenParsers {
     val mesh = new Mesh()
     val file = Source.fromFile( filename )
 
-    def addFace(u:Int,v:Int,w:Int){
-    	val l = List(u,v,w).map( (i) => (i - 1) )//.toShort )
-    	mesh.indices ++= l
-    	mesh.wireIndices ++= l.combinations(2).flatten
+    def addFace(u:Int,v:Int,w:Int): Unit ={
+      val l = List(u,v,w).map( (i) => (i - 1) )//.toShort )
+      mesh.indices ++= l
+      mesh.wireIndices ++= l.combinations(2).flatten
     }
 
     file.getLines.foreach( (l) => {
@@ -76,9 +78,9 @@ object ObjParser extends JavaTokenParsers {
     })
     file.close
 
-		if( normalize ) mesh.normalize
+    if( normalize ) mesh.normalize()
 
-		mesh
+    mesh
   }
 }
 

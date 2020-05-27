@@ -13,9 +13,9 @@ trait Gen extends AudioSource {
   var value = 0f
 
   def apply():Float
-	def apply(in:Float):Float = apply()
+  def apply(in:Float):Float = apply()
 
-	override def audioIO( io:AudioIOBuffer ){ 
+  override def audioIO( io:AudioIOBuffer ): Unit ={ 
     while(io()){
       val s = self()
       for( c <- 0 until io.channelsOut)
@@ -59,7 +59,7 @@ trait Gen extends AudioSource {
     case _ => new Gen{ def apply() = g(self.apply()) }
   }
 
-  def >>(scene:AudioScene){
+  def >>(scene:AudioScene): Unit ={
     scene += self
   }
 
@@ -147,7 +147,7 @@ class Curve(start:Float, end:Float, len:Int, f:Function[Float,Float]=Ease.quad) 
 }
 
 
-class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen {
+class Delay(var delay:Gen=Var(100f), var c:Gen=Var(0.9f), maxDelay:Int=44100) extends Gen {
   val ring = new types.LoopBuffer[Float](maxDelay)
 
   override def apply(in:Float) = {
@@ -157,16 +157,16 @@ class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen 
     ring() = s //in + s * c()
     s 
   }
-  def apply = apply(0f)
+  def apply():Float = apply(0f)
 } 
 
 
-class StereoPanner(in:Gen, var pan:Gen = 0.5f) extends Gen {
+class StereoPanner(in:Gen, var pan:Gen = Var(0.5f)) extends Gen {
   override def apply() = {
     in()
   }
 
-  override def audioIO( io:AudioIOBuffer ){ 
+  override def audioIO( io:AudioIOBuffer ): Unit ={ 
     while(io()){
       val s = apply()
       val p = pan()

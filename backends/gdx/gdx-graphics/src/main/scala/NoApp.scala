@@ -37,7 +37,7 @@ class NoAppListener extends ApplicationListener {
   var dtAccum = 0f
   var paused = false
 
-  def create(){
+  def create(): Unit ={
     println("App create.")
 
     Gdx.input.setInputProcessor( input )
@@ -50,7 +50,7 @@ class NoAppListener extends ApplicationListener {
     // RootNode.renderer.scene.init()
   }
 
-  def render(){
+  def render(): Unit ={
     // if(paused) return
     
     // val dt = Gdx.graphics.getDeltaTime()
@@ -72,7 +72,7 @@ class NoAppListener extends ApplicationListener {
 
   }
 
-  def resize(width: Int, height:Int){
+  def resize(width: Int, height:Int): Unit ={
     println(s"App resize: $width $height")
     Gdx.gl.glViewport(0, 0, width, height)
 
@@ -83,18 +83,18 @@ class NoAppListener extends ApplicationListener {
     aspect = width * 1f / height
     // camera.viewportWidth = aspect
   }
-  def pause(){
+  def pause(): Unit ={
     println("App pause.")
 
     //audio ! Stop
     // paused = true
   }
-  def resume(){
+  def resume(): Unit ={
     println("App resume.")
     //audio ! Play
     // paused = false
   }
-  def dispose(){
+  def dispose(): Unit ={
     println("App dispose.")
     // audio.stop
     Thread.sleep(100)

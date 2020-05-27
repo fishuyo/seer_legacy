@@ -85,13 +85,27 @@ object Field3 {
   def linearSolve(f0:Field3, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
-    cfor(0)(_ < itr, _ + 1){ i =>
-      cfor(1)(_ < f0.nz-1, _ + 1){ z => //     j <- 1 until f0.ny-1 ) {
-      cfor(1)(_ < f0.ny-1, _ + 1){ y => //     j <- 1 until f0.ny-1 ) {
-      cfor(1)(_ < f0.nx-1, _ + 1){ x => //i <- 1 until f0.nx-1;
-        f(x,y,z) = ( f0(x,y,z) + a*( f(x-1,y,z) + f(x+1,y,z) + f(x,y-1,z) + f(x,y+1,z) + f(x,y,z+1) + f(x,y,z-1) ) ) * a2;
-      }}}
+    var i = 0
+    while(i < itr){
+    // cfor(0)(_ < itr, _ + 1){ i =>
+      var z = 1
+      while(z < f0.nz-1){
+      // cfor(1)(_ < f0.nz-1, _ + 1){ z => //     j <- 1 until f0.ny-1 ) {
+        var y = 1
+        while( y < f0.ny-1){
+        // cfor(1)(_ < f0.ny-1, _ + 1){ y => //     j <- 1 until f0.ny-1 ) {
+          var x = 1
+          while(x < f0.nx-1){
+          // cfor(1)(_ < f0.nx-1, _ + 1){ x => //i <- 1 until f0.nx-1;
+            f(x,y,z) = ( f0(x,y,z) + a*( f(x-1,y,z) + f(x+1,y,z) + f(x,y-1,z) + f(x,y+1,z) + f(x,y,z+1) + f(x,y,z-1) ) ) * a2;
+            x += 1
+          }
+          y +=1
+        }
+        z += 1
+      }
       setBoundary(f);
+      i += 1
     }
     f0.set( f )
     f0
@@ -180,7 +194,7 @@ class Field3(val nx:Int, val ny:Int, val nz:Int, val dx:Float=1f, val dy:Float=1
 
 
 object VecField3 {
-  implicit def f2v(f:Float) = Vec3(f)  // XXX
+  implicit def f2v(f:Float):Vec3 = Vec3(f)  // XXX
 
   val scratchMap = collection.mutable.HashMap[VecField3,VecField3]()
   def scratch(f:VecField3) = scratchMap.getOrElseUpdate(f, new VecField3(f.nx,f.ny,f.nz,f.dx,f.dy,f.dz))
@@ -251,13 +265,27 @@ object VecField3 {
   def linearSolve(f0:VecField3, a:Float, a2:Float, itr:Int) = {
     val f = scratch(f0)
 
-    cfor(0)(_ < itr, _ + 1){ i =>
-      cfor(1)(_ < f0.nz-1, _ + 1){ z => //     j <- 1 until f0.ny-1 ) {
-      cfor(1)(_ < f0.ny-1, _ + 1){ y => //     j <- 1 until f0.ny-1 ) {
-      cfor(1)(_ < f0.nx-1, _ + 1){ x => //i <- 1 until f0.nx-1;
-        f(x,y,z) = ( f0(x,y,z) + a*( f(x-1,y,z) + f(x+1,y,z) + f(x,y-1,z) + f(x,y+1,z) + f(x,y,z+1) + f(x,y,z-1) ) ) * a2;
-      }}}
+    var i = 0
+    while(i < itr){
+    // cfor(0)(_ < itr, _ + 1){ i =>
+      var z = 1
+      while(z < f0.nz-1){
+      // cfor(1)(_ < f0.nz-1, _ + 1){ z => //     j <- 1 until f0.ny-1 ) {
+        var y = 1
+        while( y < f0.ny-1){
+        // cfor(1)(_ < f0.ny-1, _ + 1){ y => //     j <- 1 until f0.ny-1 ) {
+          var x = 1
+          while(x < f0.nx-1){
+          // cfor(1)(_ < f0.nx-1, _ + 1){ x => //i <- 1 until f0.nx-1;
+            f(x,y,z) = ( f0(x,y,z) + a*( f(x-1,y,z) + f(x+1,y,z) + f(x,y-1,z) + f(x,y+1,z) + f(x,y,z+1) + f(x,y,z-1) ) ) * a2;
+            x += 1
+          }
+          y +=1
+        }
+        z += 1
+      }
       setBoundary(f);
+      i += 1
     }
     f0.set( f )
     f0

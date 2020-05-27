@@ -83,13 +83,13 @@ class Branch {
 
   var dna = ""
 
-  def updateConstants(){
+  def updateConstants(): Unit ={
     mass = 1.0f //+ thick*thick*length * 100f
     k = 10.0f  //+ thick*thick*thick / (length*length*length) * 10f
   }
 
   /** run a function on branch and all children breadth first */
-  def foreach(f:PartialFunction[Branch,Unit]){
+  def foreach(f:PartialFunction[Branch,Unit]): Unit ={
     var branches = ListBuffer[Branch]()
     branches += this
     while(!branches.isEmpty){
@@ -100,7 +100,7 @@ class Branch {
     }
   }  
   /** run a function on branch and all children depth first */
-  def visitPre(f:PartialFunction[Branch,Unit]){
+  def visitPre(f:PartialFunction[Branch,Unit]): Unit ={
     var branches = Stack[Branch]()
     branches.push(this)
     while(!branches.isEmpty){
@@ -110,8 +110,8 @@ class Branch {
     }
   }
   /** run a function on branch and all children depth first */
-  def visitPost(f:PartialFunction[Branch,Unit]){
-    @tailrec def visit(branches:List[Branch], eval:List[Branch]){
+  def visitPost(f:PartialFunction[Branch,Unit]): Unit ={
+    @tailrec def visit(branches:List[Branch], eval:List[Branch]): Unit ={
       branches match {
         case b :: bs => visit(b.children ++: bs, b :: eval)
         case Nil => eval match {
@@ -124,7 +124,7 @@ class Branch {
   }
 
   /** step growth */
-  def grow(t:Float){
+  def grow(t:Float): Unit ={
     length = t * maxLength
     var tt = 0.001f
     if(t > 0.25f) tt = (t-0.25f)/0.75f
@@ -138,13 +138,13 @@ class Branch {
   }
 
   /** step physics sim */
-  def step(dt:Float){
+  def step(dt:Float): Unit ={
     visitPost { case b => 
       // euler = (pose0.quat.inverse * pose.quat).toEulerVec()
       val w = b.euler - b.lEuler
-      val ax = b.accel dot b.pose.quat.toX
-      val ay = b.accel dot b.pose.quat.toY
-      val az = b.accel dot b.pose.quat.toZ
+      val ax = b.accel dot b.pose.quat.toX()
+      val ay = b.accel dot b.pose.quat.toY()
+      val az = b.accel dot b.pose.quat.toZ()
       var dw = Vec3(-ay, ax, az)
       
       dw -= w * (b.damp / b.mass)
@@ -154,14 +154,14 @@ class Branch {
 
       b.pose.quat = b.pose0.quat * Quat().fromEuler(b.euler.x,b.euler.y,b.euler.z)
 
-      b.accel.zero
+      b.accel.zero()
     }
   }
 
   /** make sure branches stay connected after physics step */
-  def solve(){
+  def solve(): Unit ={
     visitPre { case b =>
-      val pos = b.pose.pos + b.pose.quat.toZ * b.length
+      val pos = b.pose.pos + b.pose.quat.toZ() * b.length
       b.children.foreach { case c =>
         c.pose.pos.set(pos)
         c.pose0.quat = b.pose.quat * c.relPose.quat

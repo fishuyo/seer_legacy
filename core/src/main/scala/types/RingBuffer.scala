@@ -15,9 +15,9 @@ class RingBuffer[A: scala.reflect.ClassTag](val maxSize: Int) extends Seq[A] {
   var count_ = 0
 
   def length = count_
-  override def size = count_
+  // def size = count_
 
-  def clear() {
+  def clear(): Unit = {
     read = 0
     write = 0
     count_ = 0
@@ -34,7 +34,7 @@ class RingBuffer[A: scala.reflect.ClassTag](val maxSize: Int) extends Seq[A] {
   /**
    * Overwrites an element with a new value
    */
-  def update(i: Int, elem: A) {
+  def update(i: Int, elem: A): Unit = {
     if (i >= count_) throw new IndexOutOfBoundsException(i.toString)
     else array((read + i) % maxSize) = elem
   }
@@ -43,7 +43,7 @@ class RingBuffer[A: scala.reflect.ClassTag](val maxSize: Int) extends Seq[A] {
    * Adds an element, possibly overwriting the oldest elements in the buffer
    * if the buffer is at capacity.
    */
-  def +=(elem: A) {
+  def +=(elem: A): Unit = {
     array(write) = elem
     write = (write + 1) % maxSize
     if (count_ == maxSize) read = (read + 1) % maxSize
@@ -56,7 +56,7 @@ class RingBuffer[A: scala.reflect.ClassTag](val maxSize: Int) extends Seq[A] {
    * buffer can hold, then only the last maxSize elements will end up in
    * the buffer.
    */
-  def ++=(iter: Iterable[A]) {
+  def ++=(iter: Iterable[A]): Unit = {
     for (elem <- iter) this += elem
   }
 
@@ -109,7 +109,7 @@ class RingBuffer[A: scala.reflect.ClassTag](val maxSize: Int) extends Seq[A] {
 
 class LoopBuffer[A: scala.reflect.ClassTag](override val maxSize:Int) extends RingBuffer[A](maxSize){
 
-	private var pos = 0
+  private var pos = 0
 
   def apply(): A = {
     if (pos >= read+count_) pos = 0
@@ -119,15 +119,18 @@ class LoopBuffer[A: scala.reflect.ClassTag](override val maxSize:Int) extends Ri
     ret
   }
 
-  def update(elem: A) {
+  def update(elem: A): Unit = {
     array(write) = elem
     write = (write + 1) % count_
   }
 
   override def take(n:Int) = {
-  	val buf = ArrayBuffer[A]()
-  	for(i <- 0 until n) buf += this()
-  	buf
+    val buf = ArrayBuffer[A]()
+    for(i <- 0 until n){
+      i
+      buf += this()
+    }
+    buf.toSeq
   }
 
 }

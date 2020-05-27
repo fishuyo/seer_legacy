@@ -16,7 +16,7 @@ import com.badlogic.gdx.math.Matrix4
 
 trait NavCamera extends GdxCamera {
   var nav = new Nav()
-  def step( dt:Float ){
+  def step( dt:Float ): Unit ={
     nav.step(dt)
     position.set(nav.pos.x, nav.pos.y, nav.pos.z)
     direction.set(nav.mUF.x, nav.mUF.y, nav.mUF.z)
@@ -33,8 +33,8 @@ trait NavCamera extends GdxCamera {
 
 class ManualCamera extends GdxCamera with NavCamera {
   val tmp = new com.badlogic.gdx.math.Vector3()
-  override def update(){ update(true) }
-  override def update(updateFrustum:Boolean){
+  override def update(): Unit ={ update(true) }
+  override def update(updateFrustum:Boolean): Unit ={
     view.setToLookAt(position, tmp.set(position).add(direction), up);
     combined.set(projection);
     Matrix4.mul(combined.`val`, view.`val`);

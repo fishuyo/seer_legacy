@@ -22,14 +22,14 @@ object GenerateTexture extends SeerApp {
   //   image.buffer.put((util.Random.float()*255).toByte)
   // }
 
-  override def init(){
+  override def init(): Unit ={
     texture = Texture(image)
     quad.material = Material.basic
     quad.material.loadTexture(texture)
   }
 
-  override def draw(){
-    quad.draw
+  override def draw(): Unit ={
+    quad.draw()
   }
 
 

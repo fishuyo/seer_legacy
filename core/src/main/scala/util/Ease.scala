@@ -60,12 +60,12 @@
       }
     }
 
-    @inline def sineIn(t:Float) = -math.cos(t * math.Pi/2) + 1
-    @inline def sineOut(t:Float) = math.sin(t * math.Pi/2)
-    @inline def sine(t:Float) = -0.5f * (math.cos(t * math.Pi) - 1)
+    @inline def sineIn(t:Float) = -math.cos(t * math.Pi/2).toFloat + 1
+    @inline def sineOut(t:Float) = math.sin(t * math.Pi/2).toFloat
+    @inline def sine(t:Float) = -0.5f * (math.cos(t * math.Pi) - 1).toFloat
 
-    @inline def circIn(t:Float) = -(math.sqrt(1 - t*t) - 1)
-    @inline def circOut(t:Float) = math.sqrt(1 - (t-1)*(t-1))
+    @inline def circIn(t:Float) = -(math.sqrt(1 - t*t) - 1).toFloat
+    @inline def circOut(t:Float) = math.sqrt(1 - (t-1)*(t-1)).toFloat
     @inline def circ(t:Float) = {
       var d = 2*t
       if (d < 1) 0.5f * circIn(d)

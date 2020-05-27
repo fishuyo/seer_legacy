@@ -29,7 +29,7 @@ object Keyboard extends Keyboard {
   def bindCamera() = Inputs += cameraNavInput
   def unbindCamera() = Inputs -= cameraNavInput
 
-  def bindCamera(c:NavCamera){
+  def bindCamera(c:NavCamera): Unit ={
     unbindCamera()
     cameraNavInput.nav = c.nav
     bindCamera()
@@ -39,8 +39,8 @@ object Keyboard extends Keyboard {
 
 class Keyboard extends InputAdapter {
 
-  implicit val system = System()
-  implicit val materializer = ActorMaterializer()
+  // implicit val system = System()
+  // implicit val materializer = ActorMaterializer()
 
   // var _promise = Promise[Option[(Char,Char)]]()
   // def promise = _promise
@@ -51,10 +51,10 @@ class Keyboard extends InputAdapter {
   // }
   // keypress.map { c => println(c); c }.runWith( Sink.ignore )
 
-  val key = Var('\u0000')
-  val up = Var('\u0000')
-  val down = Var('\u0000')
-  var observing = List[Obs]()
+  // val key = Var('\u0000')
+  // val up = Var('\u0000')
+  // val down = Var('\u0000')
+  // var observing = List[Obs]()
 
   var callbacks = Map[Char,List[()=>Unit]]()
   var typedCallbacks = List[(Char)=>Unit]()
@@ -63,19 +63,20 @@ class Keyboard extends InputAdapter {
 
   use()
 
-  val keyStream = Source
-    .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
-    .mapMaterializedValue(bindKeyEvent)
+  // val keyStream = Source
+  //   .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
+  //   .mapMaterializedValue(bindKeyEvent)
 
   // keyStream.map { c => println(c); c }.runWith( Sink.ignore )
 
-  def bindKeyEvent(a:ActorRef){
-    this.listen {
-      case c => a ! c
-    }
-  }
+  // def bindKeyEvent(a:ActorRef): Unit ={
+  //   this.listen {
+  //     case c => a ! c
+  //   }
+  // }
 
-  def clear() = { observing.foreach( _.kill() ); observing = List(); typedCallbacks = List[(Char)=>Unit]()}
+  // def clear() = { observing.foreach( _.kill() ); observing = List(); typedCallbacks = List[(Char)=>Unit]()}
+  def clear() = { typedCallbacks = List[(Char)=>Unit]()}
   def use() = Inputs.add(this)
   def remove() = Inputs.remove(this)
 
@@ -84,32 +85,32 @@ class Keyboard extends InputAdapter {
 
 
 
-  def bind(s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner){
-    val k = s.charAt(0)
-    observing = key.trigger {
-      // println(key.now)
-      if( key.now == k ) try{ 
-        f()
-      }catch{ case e:Exception => println(e) }
-    } :: observing
-  }
+  // def bind(s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner): Unit ={
+  //   val k = s.charAt(0)
+  //   observing = key.trigger {
+  //     // println(key.now)
+  //     if( key.now == k ) try{ 
+  //       f()
+  //     }catch{ case e:Exception => println(e) }
+  //   } :: observing
+  // }
 
-  def bindDown( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
-    val k = s.charAt(0)
-    observing = down.trigger { if( down.now == k ) f() } :: observing
-  }
-  def bindUp( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
-    val k = s.charAt(0)
-    observing = up.trigger { if( up.now == k ) f() } :: observing
-  }
-  def bindTyped(f:(Char=>Unit)){
-    typedCallbacks = f :: typedCallbacks
-  }
+  // def bindDown( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
+  //   val k = s.charAt(0)
+  //   observing = down.trigger { if( down.now == k ) f() } :: observing
+  // }
+  // def bindUp( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
+  //   val k = s.charAt(0)
+  //   observing = up.trigger { if( up.now == k ) f() } :: observing
+  // }
+  // def bindTyped(f:(Char=>Unit)): Unit ={
+  //   typedCallbacks = f :: typedCallbacks
+  // }
 
 
   override def keyTyped(k:Char) = {
-    key.Internal.value = '\u0000' // make rx propogate even if same key
-    key() = k
+    // key.Internal.value = '\u0000' // make rx propogate even if same key
+    // key() = k
     typedCallbacks.foreach((f) => f(k))
     downCallbacks.foreach(_.orElse(nullfunc).apply(k))
     // val p = promise
@@ -121,13 +122,13 @@ class Keyboard extends InputAdapter {
     var c = '\u0000'
     if(k >= Keys.A && k <= Keys.Z) c = (k+68).toChar
     else if(k >= Keys.NUM_0 && k <= Keys.NUM_9) c = (k+41).toChar
-    down() = c
+    // down() = c
     false
   }
   override def keyUp(k:Int) = {
     val c = (k+68).toChar
-    up() = c
-    down() = '\u0000'
+    // up() = c
+    // down() = '\u0000'
     false
   }
 }

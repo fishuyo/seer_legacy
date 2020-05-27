@@ -36,7 +36,7 @@ object GdxAudio extends AudioInterface {
 
   // def push(o:AudioSource) = actor ! Source(o)
 
-  override def init(){
+  override def init(): Unit ={
     actor = System().actorOf(Props( new GdxAudioActor()), name = "audio-main")
     println("this is probably outdated and broken..")
     super.init()
@@ -73,8 +73,8 @@ class GdxAudioActor extends Actor {
   val ioBuffer = new AudioIOBuffer(channelsIn, channelsOut, bufferSize, in, out)
 
 
-  override def preStart(){}
-  override def preRestart(reason: Throwable,message: Option[Any]){println("restarting Audio actor!")}
+  override def preStart(): Unit ={}
+  override def preRestart(reason: Throwable,message: Option[Any]): Unit ={println("restarting Audio actor!")}
 
   def receive = {
     case "connect" => 
@@ -93,7 +93,7 @@ class GdxAudioActor extends Actor {
     case Execute(f) => f();
   }
 
-  def processLoop(){
+  def processLoop(): Unit ={
     if( running ){
 
       // val out = GdxAudio.out
@@ -112,8 +112,8 @@ class GdxAudioActor extends Actor {
         out(c)(i) = 0f
 
       // call audio callbacks
-      ioBuffer.reset
-      GdxAudio.sources.foreach{ case s => s.audioIO(ioBuffer); ioBuffer.reset }
+      ioBuffer.reset()
+      GdxAudio.sources.foreach{ case s => s.audioIO(ioBuffer); ioBuffer.reset() }
 
       // if playThru set add input to output
       if( GdxAudio.playThru ) AudioPass.audioIO( ioBuffer )
@@ -137,7 +137,7 @@ class GdxAudioActor extends Actor {
     }
   }
 
-  def toggleRecord(path:String){
+  def toggleRecord(path:String): Unit ={
     if( !recording ){
       writer = System().actorOf(Props( new AudioFileWriterActor()))
       writer ! Open(path)
@@ -166,7 +166,7 @@ class GdxAudioActor extends Actor {
     // }
   }
 
-  def dispose(){
+  def dispose(): Unit ={
     running = false
     // if( recording ) outFile.close()
     record.dispose

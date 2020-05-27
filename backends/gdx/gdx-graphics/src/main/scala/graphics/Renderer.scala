@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 // import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.viewport._
+import graphics.Viewport
 
 
 /**
@@ -42,7 +43,7 @@ class Renderer {
   
   var material:BasicMaterial = new BasicMaterial
   
-  def render(){
+  def render(): Unit ={
     if(!active) return
 
     try{
@@ -77,7 +78,7 @@ class Renderer {
 
   }
 
-  def resize(vp:Viewport){
+  def resize(vp:Viewport): Unit ={
     if(!resize) return
     viewport = vp
     if(camera.viewportHeight == 1f){
@@ -94,13 +95,13 @@ class Renderer {
     }
   }
 
-  def animate(dt:Float){
+  def animate(dt:Float): Unit ={
     if(!active) return
     scene.animate(dt)
     camera.step(dt)
   }
 
-  def setMatrixUniforms(){
+  def setMatrixUniforms(): Unit ={
     MatrixStack(camera)
     shader.uniforms("u_projectionViewMatrix") = MatrixStack.projectionModelViewMatrix() 
     shader.uniforms("u_modelViewMatrix") = MatrixStack.modelViewMatrix() 
@@ -110,7 +111,7 @@ class Renderer {
     shader.uniforms("u_cameraPosition") = camera.nav.pos
   }
 
-  def setEnvironmentUniforms(){
+  def setEnvironmentUniforms(): Unit ={
     val e = environment
     shader.uniforms("u_lightPosition") = e.lightPosition
     shader.uniforms("u_lightAmbient") = e.lightAmbient
@@ -120,7 +121,7 @@ class Renderer {
     // shader.uniforms("u_fog") = e.fog
   }
   
-  def setMaterialUniforms(mat:Material){
+  def setMaterialUniforms(mat:Material): Unit ={
     
     mat match {
       // case m:ShaderMaterial => setBasicMaterial(m);

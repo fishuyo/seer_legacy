@@ -5,11 +5,13 @@ object Settings {
 
   val seerV = "0.1-SNAPSHOT"
   val scalaV = "2.12.10"
+  val dottyV = "0.24.0-RC1"
+
 
   lazy val common = Seq(
     organization := "com.fishuyo.seer",
     version := seerV,
-    scalaVersion := scalaV,
+    scalaVersion := dottyV, //scalaV,
     updateOptions := updateOptions.value.withCachedResolution(true),
     // updateOptions := updateOptions.value.withLatestSnapshots(true),
     javacOptions ++= Seq(
@@ -18,12 +20,13 @@ object Settings {
     ),
     scalacOptions ++= Seq(
       "-Xlint",
-      "-Ywarn-dead-code",
-      "-Ywarn-numeric-widen",
-      "-Ywarn-unused",
-      "-unchecked",
-      "-deprecation",
-      "-feature",
+      "-language:implicitConversions",
+      // "-Ywarn-dead-code",
+      // "-Ywarn-numeric-widen",
+      // "-Ywarn-unused",
+      // "-unchecked",
+      // "-deprecation",
+      // "-feature",
       "-encoding",
       "UTF-8"
     ),

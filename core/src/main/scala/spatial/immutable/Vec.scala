@@ -13,18 +13,18 @@ object Vec3 {
 
   def unapply( v: Vec3): Some[(Float,Float,Float)] = Some((v.x,v.y,v.z))
 
-  implicit object Vec3Numeric extends math.Numeric[Vec3] {
-    def plus(x: Vec3, y: Vec3) = x+y
-    def minus(x: Vec3, y: Vec3) = x-y
-    def times(x: Vec3, y: Vec3) = x*y
-    def negate(x: Vec3): Vec3 = -x
-    def fromInt(x: Int) = Vec3(x)
-    def toInt(x: Vec3) = x.mag().toInt
-    def toLong(x: Vec3) = x.mag().toLong
-    def toFloat(x: Vec3) = x.mag()
-    def toDouble(x: Vec3) = x.mag().toDouble
-    def compare(x:Vec3,y:Vec3) = (x.mag() - y.mag()).toInt
-  }
+  // implicit object Vec3Numeric extends math.Numeric[Vec3] {
+  //   def plus(x: Vec3, y: Vec3) = x+y
+  //   def minus(x: Vec3, y: Vec3) = x-y
+  //   def times(x: Vec3, y: Vec3) = x*y
+  //   def negate(x: Vec3): Vec3 = -x
+  //   def fromInt(x: Int) = Vec3(x)
+  //   def toInt(x: Vec3) = x.mag().toInt
+  //   def toLong(x: Vec3) = x.mag().toLong
+  //   def toFloat(x: Vec3) = x.mag()
+  //   def toDouble(x: Vec3) = x.mag().toDouble
+  //   def compare(x:Vec3,y:Vec3) = (x.mag() - y.mag()).toInt
+  // }
 }
 
 class Vec3( val x: Float, val y: Float, val z: Float ){
@@ -66,18 +66,18 @@ object Vec2 {
 
   def unapply(v: Vec2): Some[(Float,Float)] = Some((v.x,v.y))
 
-  implicit object Vec3Numeric extends math.Numeric[Vec2] {
-    def plus(x: Vec2, y: Vec2) = x+y
-    def minus(x: Vec2, y: Vec2) = x-y
-    def times(x: Vec2, y: Vec2) = x*y
-    def negate(x: Vec2): Vec2 = -x
-    def fromInt(x: Int) = Vec2(x)
-    def toInt(x: Vec2) = x.mag().toInt
-    def toLong(x: Vec2) = x.mag().toLong
-    def toFloat(x: Vec2) = x.mag()
-    def toDouble(x: Vec2) = x.mag().toDouble
-    def compare(x:Vec2,y:Vec2) = (x.mag() - y.mag()).toInt
-  }
+  // implicit object Vec3Numeric extends math.Numeric[Vec2] {
+  //   def plus(x: Vec2, y: Vec2) = x+y
+  //   def minus(x: Vec2, y: Vec2) = x-y
+  //   def times(x: Vec2, y: Vec2) = x*y
+  //   def negate(x: Vec2): Vec2 = -x
+  //   def fromInt(x: Int) = Vec2(x)
+  //   def toInt(x: Vec2) = x.mag().toInt
+  //   def toLong(x: Vec2) = x.mag().toLong
+  //   def toFloat(x: Vec2) = x.mag()
+  //   def toDouble(x: Vec2) = x.mag().toDouble
+  //   def compare(x:Vec2,y:Vec2) = (x.mag() - y.mag()).toInt
+  // }
 }
 
 class Vec2( val x: Float, val y: Float ){

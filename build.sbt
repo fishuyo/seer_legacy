@@ -8,7 +8,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(Settings.common: _*)
-  .jvmSettings(libraryDependencies ++= Dependencies.core)
+  .jvmSettings(libraryDependencies ++= Dependencies.core.map(_.withDottyCompat(Settings.dottyV)))
+  .jvmSettings(libraryDependencies += "ch.epfl.lamp" % "dotty-staging_0.24" % Settings.dottyV)
 
 /**
   * Gdx backend
@@ -17,13 +18,13 @@ lazy val gdx_graphics = project
   .in(file("backends/gdx/gdx-graphics"))
   .dependsOn(core.jvm)
   .settings(Settings.common: _*)
-  .settings(libraryDependencies ++= Dependencies.gdx)
+  .settings(libraryDependencies ++= Dependencies.gdx.map(_.withDottyCompat(Settings.dottyV)))
 
 lazy val gdx_app_desktop = project
   .in(file("backends/gdx/gdx-app-desktop"))
   .dependsOn(gdx_graphics)
   .settings(Settings.common: _*)
-  .settings(libraryDependencies ++= Dependencies.gdxAppDesktop)
+  .settings(libraryDependencies ++= Dependencies.gdxAppDesktop.map(_.withDottyCompat(Settings.dottyV)))
 
 /**
   * Audio backends

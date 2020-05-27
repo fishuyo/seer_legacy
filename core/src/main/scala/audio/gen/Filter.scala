@@ -15,7 +15,7 @@ case object HighShelf extends FilterType
 
 
 class Biquad(var freq:Float, var res:Float=1f, var mode:FilterType=LowPass) extends Gen {
-  val frqToRad = 2f*math.Pi/Audio().sampleRate
+  val frqToRad = (2f*math.Pi/Audio().sampleRate).toFloat
 
   var a0,a1,a2 = 0f
   var b0,b1,b2 = 0f
@@ -123,5 +123,5 @@ class Biquad(var freq:Float, var res:Float=1f, var mode:FilterType=LowPass) exte
     d1 = i0
     o0
   }
-  def apply = apply(0f)
+  def apply():Float = apply(0f)
 }

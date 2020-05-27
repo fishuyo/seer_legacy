@@ -7,14 +7,15 @@ import audio._
 import util._
 
 import concurrent.duration._
+import scala.language.postfixOps
 
 object Sines extends SeerApp {
 
   // initialize and use PortAudio audio backend
-  PortAudio.init
+  PortAudio.init()
 
   // start the audio actor
-  Audio().start
+  Audio().start()
 
   var i = 0
 

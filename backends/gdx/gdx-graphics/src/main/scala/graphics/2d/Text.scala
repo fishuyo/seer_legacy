@@ -29,36 +29,36 @@ import com.badlogic.gdx.math.Matrix4
 
 object Text {
 
-	var texture:GdxTex = null
-	var font:BitmapFont = null
-	var smoothing = 1f/16f
-	var sb:SpriteBatch = null
+  var texture:GdxTex = null
+  var font:BitmapFont = null
+  var smoothing = 1f/16f
+  var sb:SpriteBatch = null
   var s:Shader = null
   var camera = Camera //new OrthographicCamera(800,800)
   var scale = 0.01f
 
-	def setSmoothing(v:Float){ smoothing = v }
+  def setSmoothing(v:Float): Unit ={ smoothing = v }
 
-	def loadFont(path:String="../res/fonts/arial"){
-		texture = new GdxTex(Gdx.files.internal(path + ".png"), true); // true enables mipmaps
-		texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear); // linear filtering in nearest mipmap image
-		font = new BitmapFont(Gdx.files.internal(path + ".fnt"), new TextureRegion(texture), false);
-		sb = new SpriteBatch
+  def loadFont(path:String="../res/fonts/arial"): Unit ={
+    texture = new GdxTex(Gdx.files.internal(path + ".png"), true); // true enables mipmaps
+    texture.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear); // linear filtering in nearest mipmap image
+    font = new BitmapFont(Gdx.files.internal(path + ".fnt"), new TextureRegion(texture), false);
+    sb = new SpriteBatch
     s = Shader.load(DefaultShaders.text._1,DefaultShaders.text._2)
-	}
+  }
 
-  def begin(){
+  def begin(): Unit ={
     sb.begin()
     sb.setShader(s());
   }
-  def end(){
+  def end(): Unit ={
     // sb.setShader(null);
     sb.end()
   }
-	def render(text:String, pos:Vec3){
-		if(font == null) return
-		// val s = Shader.shader.get.program.get
-		MatrixStack.push()
+  def render(text:String, pos:Vec3): Unit ={
+    if(font == null) return
+    // val s = Shader.shader.get.program.get
+    MatrixStack.push()
 
     // MatrixStack.rotate(quat)
     MatrixStack.scale(scale)
@@ -67,10 +67,10 @@ object Text {
     font.draw(sb, text, pos.x*0.01f/scale, pos.y*0.01f/scale);
     // font.draw(sb, text, x, y);
 
-		MatrixStack(camera)
-		s().setUniformMatrix("u_projTrans", MatrixStack.projectionModelViewMatrix())
-		s().setUniformf("smoothing", smoothing)
-		MatrixStack.pop()
-	}
+    MatrixStack(camera)
+    s().setUniformMatrix("u_projTrans", MatrixStack.projectionModelViewMatrix())
+    s().setUniformf("smoothing", smoothing)
+    MatrixStack.pop()
+  }
 }
 

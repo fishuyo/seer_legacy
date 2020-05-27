@@ -45,13 +45,13 @@ class AudioIOBuffer(
   }
 
 
-  override def clone() = new AudioIOBuffer(channelsIn,channelsOut,bufferSize, inputSamples.map(_.clone), outputSamples.map(_.clone))
+  def copy() = new AudioIOBuffer(channelsIn,channelsOut,bufferSize, inputSamples.map(_.clone), outputSamples.map(_.clone))
   
 
 }
 
 trait AudioSource {
-  def audioIO( io:AudioIOBuffer ){}
+  def audioIO( io:AudioIOBuffer ) = {}
   // def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){}
 }
 
@@ -60,24 +60,24 @@ object AudioScene {
 }
 class AudioScene extends AudioSource {
   val sources = ListBuffer[AudioSource]()
-  var gain:Gen = 1f
-  var buffer = Audio().ioBuffer.clone
+  var gain:Gen = Var(1f)
+  var buffer:AudioIOBuffer = Audio().ioBuffer.copy()
 
   def +=(s:AudioSource) = sources += s
   def -=(s:AudioSource) = sources -= s
 
-  override def audioIO( io:AudioIOBuffer){
-    buffer.reset
-    buffer.zero
+  override def audioIO( io:AudioIOBuffer) = {
+    buffer.reset()
+    buffer.zero()
     for(i <- 0 until buffer.bufferSize) buffer.inputSamples(0)(i) = io.inputSamples(0)(i)
-    sources.foreach { case s => s.audioIO(buffer); buffer.reset }
+    sources.foreach { case s => s.audioIO(buffer); buffer.reset() }
     buffer *= gain
     io += buffer
   }
 }
 
 object AudioPass extends AudioSource {
-  override def audioIO( io:AudioIOBuffer ){
+  override def audioIO( io:AudioIOBuffer ) = {
     while( io() ){
       val s = io.in(0)
       io.outSum(0)(s)
@@ -93,12 +93,12 @@ object AudioPassInputLatencyCorrection extends AudioSource {
   var latency = 0.06f
   var offset = 0
 
-  def resetLatency(f:Float){
+  def resetLatency(f:Float): Unit ={
     latency = f
     offset = (Audio().sampleRate * latency).toInt
   }
 
-  override def audioIO( io:AudioIOBuffer ){
+  override def audioIO( io:AudioIOBuffer ): Unit ={
     while( io() ){
       b(0) += io.out(0)
       b(1) += io.out(1)

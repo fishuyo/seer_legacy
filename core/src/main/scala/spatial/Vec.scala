@@ -4,6 +4,8 @@ package spatial
 
 import spire.algebra._
 
+import scala.language.implicitConversions
+
 object Vec3 {
 
   def apply() = new Vec3(0,0,0)
@@ -79,11 +81,12 @@ object Vec3 {
     def toFloat(x: Vec3) = x.mag()
     def toDouble(x: Vec3) = x.mag().toDouble
     def compare(x:Vec3,y:Vec3) = (x.mag() - y.mag()).toInt
+    def parseString(str:String): Option[Vec3] = None
   }
 }
 
 class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
-  implicit def toF( d: Double ) = d.toFloat
+  implicit def toF( d: Double ):Float = d.toFloat
 
   override def equals(other:Any) = other match {
     case v:Vec3 => this == v
@@ -96,9 +99,9 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   def update(i:Int,v:Float) = i match { case 0 => x=v; case 1 => y=v; case 2 => z=v;}
   def set(v:Vec3) = { x=v.x; y=v.y; z=v.z }
   def set(v:Float) = { x=v; y=v; z=v }
-  def set(v:Double) = { x=v; y=v; z=v }
+  // def set(v:Double) = { x=v; y=v; z=v }
   def set(a:Float,b:Float,c:Float) = { x=a; y=b; z=c; }
-  def set(a:Double,b:Double,c:Double) = { x=a; y=b; z=c; }
+  // def set(a:Double,b:Double,c:Double) = { x=a; y=b; z=c; }
   def set(v:(Float,Float,Float)) = { x=v._1; y=v._2; z=v._3 }
   def +(v: Vec3) = Vec3( x+v.x, y+v.y, z+v.z )
   def +=(v: Vec3) = { x+=v.x; y+=v.y; z+=v.z; this}
@@ -106,15 +109,15 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   def -=(v: Vec3) = { x-=v.x; y-=v.y; z-=v.z; this}
   def unary_- = Vec3( -x, -y, -z ) 
   def *(s: Float ) = Vec3(s*x, s*y, s*z)
-  def *(s: Double ) = Vec3(s*x, s*y, s*z)
+  // def *(s: Double ) = Vec3(s*x, s*y, s*z)
   def *(v: Vec3 ) = Vec3(v.x*x, v.y*y, v.z*z)
   def *=(s: Float) = { x*=s; y*=s; z*=s; this}
-  def *=(s: Double) = { x*=s; y*=s; z*=s; this}
+  // def *=(s: Double) = { x*=s; y*=s; z*=s; this}
   def *=(v: Vec3) = { x*=v.x; y*=v.y; z*=v.z; this}
   def /(v: Vec3 ) = Vec3(x/v.x, y/v.y, z/v.z)
   def /(s: Float ) = Vec3(x/s, y/s, z/s)
-  def /=(s: Float ) = {x/=s; y/=s; z/=s; this}
-  def /=(s: Double ) = {x/=s; y/=s; z/=s; this}
+  def /=(s: Float ) = {x=x/s; y=y/s; z=z/s; this}
+  // def /=(s: Double ) = {x=x/s; y=y/s; z=z/s; this}
   
   def dot(v: Vec3) : Float = x*v.x + y*v.y + z*v.z
   def cross(v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
@@ -220,22 +223,22 @@ object Vec2 {
   //   def +:(x:Vec2) =
   // }
 
-  implicit object Vec2Numeric extends scala.math.Numeric[Vec2] {
-    def plus(x: Vec2, y: Vec2) = x+y
-    def minus(x: Vec2, y: Vec2) = x-y
-    def times(x: Vec2, y: Vec2) = x*y
-    def negate(x: Vec2): Vec2 = -x
-    def fromInt(x: Int) = Vec2(x)
-    def toInt(x: Vec2) = x.mag().toInt
-    def toLong(x: Vec2) = x.mag().toLong
-    def toFloat(x: Vec2) = x.mag()
-    def toDouble(x: Vec2) = x.mag().toDouble
-    def compare(x:Vec2,y:Vec2) = (x.mag() - y.mag()).toInt
-  }
+  // implicit object Vec2Numeric extends scala.math.Numeric[Vec2] {
+  //   def plus(x: Vec2, y: Vec2) = x+y
+  //   def minus(x: Vec2, y: Vec2) = x-y
+  //   def times(x: Vec2, y: Vec2) = x*y
+  //   def negate(x: Vec2): Vec2 = -x
+  //   def fromInt(x: Int) = Vec2(x)
+  //   def toInt(x: Vec2) = x.mag().toInt
+  //   def toLong(x: Vec2) = x.mag().toLong
+  //   def toFloat(x: Vec2) = x.mag()
+  //   def toDouble(x: Vec2) = x.mag().toDouble
+  //   def compare(x:Vec2,y:Vec2) = (x.mag() - y.mag()).toInt
+  // }
 }
 
 class Vec2( var x: Float, var y: Float ) extends Serializable {
-  implicit def toF( d: Double ) = d.toFloat
+  implicit def toF( d: Double ):Float = d.toFloat
 
   def ==(v:Vec2) = {x==v.x && y==v.y}
   def apply(i:Int) = i match { case 0 => x; case 1 => y}
@@ -250,13 +253,13 @@ class Vec2( var x: Float, var y: Float ) extends Serializable {
   def -=(v: Vec2) = { x-=v.x; y-=v.y }
   def unary_- = Vec2( -x, -y ) 
   def *(s: Float ) = Vec2(s*x, s*y)
-  def *(s: Double ) = Vec2(s*x, s*y)
+  // def *(s: Double ) = Vec2(s*x, s*y)
   def *(v: Vec2 ) = Vec2(v.x*x, v.y*y)
   def *=(s: Float) = { x*=s; y*=s}
-  def *=(s: Double) = { x*=s; y*=s}
+  // def *=(s: Double) = { x*=s; y*=s}
   def /(v: Vec2 ) = Vec2(x/v.x, y/v.y)
   def /(s: Float ) = Vec2(x/s, y/s)
-  def /(s: Double ) = Vec2(x/s, y/s)
+  // def /(s: Double ) = Vec2(x/s, y/s)
   
   def dot(v: Vec2) : Float = x*v.x + y*v.y
   def cross( v: Vec2) = x*v.y - y*v.x

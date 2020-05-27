@@ -79,7 +79,7 @@ class Shader {
   val uniforms = new HashMap[String,Any]()
   var currentUniforms = new HashMap[String,Any]()
 
-  def load(){
+  def load(): Unit ={
     var s:ShaderProgram = null
     isDirty = false
 
@@ -115,7 +115,7 @@ class Shader {
     isDirty = true
   }
 
-  def setCode(v:String, f:String){
+  def setCode(v:String, f:String): Unit ={
     vertCode = Some(v)
     fragCode = Some(f)
     isDirty = true
@@ -131,7 +131,7 @@ class Shader {
   def begin() = this().begin()
   def end() = this().end()
 
-  def setUniforms(){
+  def setUniforms(): Unit ={
     if( program.isEmpty) return
     val s = program.get
 
@@ -179,23 +179,23 @@ class Shader {
   // }
 
   // dirty shader when files modified
-  def monitor():Shader = {
-    if(monitoring) return this
-    if( vertFile.isEmpty || fragFile.isEmpty ) return this
-    val that = this;
-    try{
-      Monitor( vertFile.get.path() ){ (p) => {that.dirty; println(s"reloading file ${that.vertFile.get.path()}") }}
-      Monitor( fragFile.get.path() ){ (p) => {that.dirty; println(s"reloading file ${that.fragFile.get.path()}") }}
-    } catch { case e:Exception => println(e) }
-    monitoring = true
-    this
-  }
+  // def monitor():Shader = {
+  //   if(monitoring) return this
+  //   if( vertFile.isEmpty || fragFile.isEmpty ) return this
+  //   val that = this;
+  //   try{
+  //     Monitor( vertFile.get.path() ){ (p) => {that.dirty; println(s"reloading file ${that.vertFile.get.path()}") }}
+  //     Monitor( fragFile.get.path() ){ (p) => {that.dirty; println(s"reloading file ${that.fragFile.get.path()}") }}
+  //   } catch { case e:Exception => println(e) }
+  //   monitoring = true
+  //   this
+  // }
 
-  def stopMonitor(){
-    if(!monitoring) return
-    Monitor.stop(vertFile.get.path())
-    Monitor.stop(fragFile.get.path())
-    monitoring = false
-  } 
+  // def stopMonitor(): Unit ={
+  //   if(!monitoring) return
+  //   Monitor.stop(vertFile.get.path())
+  //   Monitor.stop(fragFile.get.path())
+  //   monitoring = false
+  // } 
 }
 

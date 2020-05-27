@@ -56,7 +56,7 @@ class SeerAppListener extends ApplicationListener {
 
   // var paused = false
 
-  def create(){
+  def create(): Unit ={
     // println("App create.")
     Graphics() = new GraphicsImpl
     Gdx.input.setInputProcessor( Inputs )
@@ -65,11 +65,11 @@ class SeerAppListener extends ApplicationListener {
 
     Camera.nav.pos.z = 2f
 
-    RenderGraph.reset
+    RenderGraph.reset()
     RootNode.renderer.scene.init()
   }
 
-  def render(){
+  def render(): Unit ={
     // if(paused) return
     
     var dt = Gdx.graphics.getDeltaTime()
@@ -91,7 +91,7 @@ class SeerAppListener extends ApplicationListener {
     RenderGraph.render()
   }
 
-  def resize(width: Int, height:Int){
+  def resize(width: Int, height:Int): Unit ={
     println(s"App resize: $width $height")
     // Gdx.gl.glViewport(0, 0, width, height)
 
@@ -106,13 +106,13 @@ class SeerAppListener extends ApplicationListener {
     // aspect = width * 1f / height
     // camera.viewportWidth = aspect
   }
-  def pause(){
+  def pause(): Unit ={
     println("App pause.")
   }
-  def resume(){
+  def resume(): Unit ={
     println("App resume.")
   }
-  def dispose(){
+  def dispose(): Unit ={
     println("App dispose.")
     System.exit(0)
   }

@@ -103,41 +103,41 @@ class FloatFrameBuffer(var w:Int,var h:Int,depth:Boolean=true) extends RenderTar
 		throw new IllegalStateException("frame buffer couldn't be constructed: unknown error " + result);
 	}
 
-	def setupTexture(){
+	def setupTexture(): Unit ={
 		colorTexture = new FloatTexture(w,h)
 		colorTexture.bind(0)
-		colorTexture.update
-		colorTexture.params
+		colorTexture.update()
+		colorTexture.params()
 	}
 
 	def getColorBufferTexture() = colorTexture
 
-	def bind(){
+	def bind(): Unit ={
 		Gdx.graphics.getGL20().glBindFramebuffer(GL20.GL_FRAMEBUFFER, framebufferHandle);
 	}
-	def unbind(){
+	def unbind(): Unit ={
 		Gdx.graphics.getGL20().glBindFramebuffer(GL20.GL_FRAMEBUFFER, 0);
 	}
-	def begin(){
+	def begin(): Unit ={
 		bind()
 		setFrameBufferViewport()
 	}
 
-	def setFrameBufferViewport(){
+	def setFrameBufferViewport(): Unit ={
 		Gdx.graphics.getGL20().glViewport(0, 0, colorTexture.w, colorTexture.h);
 	}
 
-	def end(){
+	def end(): Unit ={
 		unbind();
 		setDefaultFrameBufferViewport();
 	}
 
-	def setDefaultFrameBufferViewport(){
+	def setDefaultFrameBufferViewport(): Unit ={
 		// Gdx.graphics.getGL20().glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.graphics.getGL20().glViewport(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight());
 	}
 
-	def dispose(){
+	def dispose(): Unit ={
 		val handle = BufferUtils.newIntBuffer(1);
 
 		colorTexture.dispose();

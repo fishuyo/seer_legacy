@@ -20,11 +20,11 @@ object RootNode extends RenderNode {
   renderer.camera = Camera
   renderer.shader = Shader.loadCode("basic",DefaultShaders.basic)
 
-  override def reset(){
+  override def reset(): Unit ={
     // reset root node state
     // renderer.shader = Shader.load(DefaultShaders.basic)
     renderer.environment.default()
-    renderer.scene.clear
+    renderer.scene.clear()
     super.reset()
   }
 }
@@ -41,7 +41,7 @@ object Become {
 }
 class Become(node:RenderNode) {
 
-  def setup(){
+  def setup(): Unit ={
     if(node == null) return
     // Run.animate {
     //   val c =  RenderGraph.compositor
@@ -53,7 +53,7 @@ class Become(node:RenderNode) {
   def now = {
     setup()
   }
-  def over(dur:FiniteDuration){
+  def over(dur:FiniteDuration): Unit ={
     if(node == null) return
     setup()
     // Schedule.over(dur){ case t => 
@@ -84,42 +84,42 @@ object RenderGraph {
     roots += RootNode
   }
 
-  def +=(n:RenderNode){ addNode(n) }
-  def addNode(n:RenderNode){
+  def +=(n:RenderNode): Unit ={ addNode(n) }
+  def addNode(n:RenderNode): Unit ={
     roots += n
     // n.renderer.scene.init()
   }
-  def prependNode(n:RenderNode){
+  def prependNode(n:RenderNode): Unit ={
     roots.prepend(n)
     // n.renderer.scene.init()
   }
 
-  def -=(n:RenderNode){ removeNode(n) }
-  def removeNode(n:RenderNode){
+  def -=(n:RenderNode): Unit ={ removeNode(n) }
+  def removeNode(n:RenderNode): Unit ={
     //TODO cleanup inputs outputs
     roots -= n
   }
 
-  def animate(dt:Float){
+  def animate(dt:Float): Unit ={
     roots.foreach( (n) => animateChildren(n,dt) )
   }
-  def animateChildren(node:RenderNode, dt:Float){
+  def animateChildren(node:RenderNode, dt:Float): Unit ={
    node.animate(dt)
    node.outputs.foreach( (n) => if(n != node) animateChildren(n,dt) )
   }
 
-  def resize(vp:Viewport){
+  def resize(vp:Viewport): Unit ={
     roots.foreach( (n) => resizeChildren(n,vp))
   }
-  def resizeChildren(node:RenderNode, vp:Viewport){
+  def resizeChildren(node:RenderNode, vp:Viewport): Unit ={
    node.resize(vp)
    node.outputs.foreach( (n) => if(n != node) resizeChildren(n,vp) )
   }
 
-  def render(){
+  def render(): Unit ={
     roots.foreach( (n) => renderChildren(n) )
   }
-  def renderChildren(node:RenderNode){
+  def renderChildren(node:RenderNode): Unit ={
     // println("node: " + node.getClass.getName)
     node.render()
     node.outputs.foreach( (n) => if( n != node) renderChildren(n) )

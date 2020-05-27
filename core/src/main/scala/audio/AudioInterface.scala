@@ -53,19 +53,19 @@ trait AudioInterface {
   def init() = Audio.interface = Some(this)
   
   // start audio
-  def start(){}
+  def start(): Unit ={}
 
   // stop audio
-  def stop(){}
+  def stop(): Unit ={}
 
   // set master gain
-  def gain(g:Float){ gain = g }
+  def setGain(g:Float) =  gain = g 
 
   // audio passed through automatically
-  def playThru(b:Boolean){ playThru = b}
+  def playThrough(b:Boolean) = playThru = b
 
   // when recording, record input directly
-  def recordThru(b:Boolean){ recordThru = b}
+  def recordThrough(b:Boolean) = recordThru = b
 
   def toggleRecording() = {
     if( !recording ){

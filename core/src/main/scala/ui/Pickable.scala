@@ -45,7 +45,7 @@ trait Pickable {
     // depth first event propogation, so we can know to ignore events handled by children
     if(hit.t.isDefined || !containChildren){
       val ray = transformRayLocal(e.ray)
-      childs = children.map { _.pickEvent(PickEvent(e.event, ray)) }
+      childs = children.map { _.pickEvent(PickEvent(e.event, ray)) }.toSeq
     }
 
     // XXX events probably need to be handled differently, ie unpick should probably always propogate?
@@ -59,7 +59,7 @@ trait Pickable {
 
   def transformRayLocal(ray:Ray) = {
     val model = Matrix.translation(pose.pos) * Mat4().fromQuat(pose.quat) * Matrix.scaling(scale)
-    val invertable = model.invert
+    val invertable = model.invert()
     val m = Mat4()
     invertable match {
       case Some(mat) => m.set(mat)

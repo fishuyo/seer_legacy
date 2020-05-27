@@ -24,14 +24,14 @@ object Texture {
     t
   }
   def apply(file:FileHandle) = {
-		val t = new GdxTexture(new GdxTex(file))
+    val t = new GdxTexture(new GdxTex(file))
     t
-	}
+  }
 
-	def apply(p:Pixmap) = {
-		val t = new GdxTexture(new GdxTex(p))
+  def apply(p:Pixmap) = {
+    val t = new GdxTexture(new GdxTex(p))
     t
-	}
+  }
 
   def apply(w:Int,h:Int,format:Int=Graphics().gl.GL_RGBA) = {
     val t = new Texture(w,h)
@@ -43,7 +43,7 @@ object Texture {
 
   def apply(image:Image) = {
     val t = new ImageTexture(image)
-    t.init
+    t.init()
     t
   }
 
@@ -81,13 +81,13 @@ class Texture(var w:Int,var h:Int) {
   // params()
   // update()
 
-  def init(){
+  def init(): Unit ={
     handle = getGLHandle()
     params()
     update()
   }
 
-  def allocate(ww:Int, hh:Int){
+  def allocate(ww:Int, hh:Int): Unit ={
     width = ww; height = hh;
     buffer = BufferUtils.newByteBuffer(4*w*h)
   }
@@ -98,13 +98,13 @@ class Texture(var w:Int,var h:Int) {
     buf.get(0)
   }
 
-  def bind(i:Int=0){
+  def bind(i:Int=0): Unit ={
     Graphics().gl.glActiveTexture(Graphics().gl.GL_TEXTURE0+i)
     Graphics().gl.glEnable(target)
     Graphics().gl.glBindTexture(target, handle)    
   }
 
-  def params(){
+  def params(): Unit ={
     bind()
     // Graphics().gl.glBindTexture(target, handle);
     Graphics().gl.glTexParameterf(target, Graphics().gl.GL_TEXTURE_MAG_FILTER, filterMag)
@@ -118,7 +118,7 @@ class Texture(var w:Int,var h:Int) {
     // Graphics().gl.glBindTexture(target, 0);
   }
 
-  def update(){
+  def update(): Unit ={
     buffer.rewind
     bind()
     // Graphics().gl.glPixelStorei(Graphics().gl.GL_UNPACK_ALIGNMENT, 1);
@@ -127,7 +127,7 @@ class Texture(var w:Int,var h:Int) {
     // println(Graphics().gl.glGetError())
   }
 
-  def dispose(){
+  def dispose(): Unit ={
     if (handle != 0) {
       val buffer = BufferUtils.newIntBuffer(1)
       buffer.put(0, handle);
@@ -149,7 +149,7 @@ class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
   
   def floatBuffer = buffer.asInstanceOf[FloatBuffer]
 
-  override def allocate(ww:Int,hh:Int){
+  override def allocate(ww:Int,hh:Int): Unit ={
     width = ww; height = hh;
     buffer = BufferUtils.newFloatBuffer(4*w*h)
   }
@@ -174,7 +174,7 @@ class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
 
   override def byteBuffer = image.buffer
 
-  override def update(){
+  override def update(): Unit ={
     bind()
     // Graphics().gl.glPixelStorei(Graphics().gl.GL_UNPACK_ALIGNMENT, 1);
     image.buffer.rewind

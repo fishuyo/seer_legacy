@@ -19,7 +19,7 @@ object JackAudio extends AudioInterface {
   var outPorts = Array[JackPort]()
 
   val callback = new JackProcessCallback {
-  	def process(client:JackClient, nframes:Int) = {
+    def process(client:JackClient, nframes:Int) = {
       
       try{ inPorts(0).getFloatBuffer.get(in(0)) }
       catch{ case e:Exception => ()}
@@ -30,8 +30,8 @@ object JackAudio extends AudioInterface {
         for( i <- (0 until bufferSize)) out(c)(i) = 0f
 
       // call audio callbacks
-      ioBuffer.reset
-        sources.foreach{ case s=> s.audioIO( ioBuffer ); ioBuffer.reset }
+      ioBuffer.reset()
+      sources.foreach{ case s=> s.audioIO( ioBuffer ); ioBuffer.reset() }
 
       // if playThru set add input to output
       if( playThru ) AudioPass.audioIO( ioBuffer ) //in,out,channelsOut,bufferSize)
@@ -55,10 +55,10 @@ object JackAudio extends AudioInterface {
         outFile.write(out,0,bufferSize)
       }
       true
-  	}
+    }
   }
 
-  override def init(){
+  override def init() = {
     var o = EnumSet.of(JackOptions.JackNullOption)
     var s = EnumSet.of(JackStatus.JackFailure)
     val client = jack.openClient("seer", o, s)
@@ -84,7 +84,7 @@ object JackAudio extends AudioInterface {
       println(s"JACK: connecting ${src.getName} to $dst")
     }
 
-    super.init
+    super.init()
   }
 
   // override def start() = JPA.startStream 

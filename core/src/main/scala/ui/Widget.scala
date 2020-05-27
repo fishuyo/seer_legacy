@@ -3,6 +3,7 @@ package com.fishuyo.seer
 package ui
 
 import spatial._
+import collection.mutable.ListBuffer
 
 /**
   * Widget represents a graphical UI object that generates some kind of output data stream
@@ -15,15 +16,15 @@ class Widget(var position:Vec2, var bounds:Vec2) extends Pickable {
   pose.pos.set(Vec3(position,0))
   scale.set(Vec3(bounds,1f))
   // var parent:Option[Widget] = None
-  override val children = collection.mutable.ListBuffer[Widget]() 
+  val wchildren = ListBuffer[Widget]() 
 
   var movable = true
   var name = ""
   var style = ""
   // var x,y,w,h = 0f  //Vecs?
 
-  def +=(w:Widget){
-    children += w
+  def +=(w:Widget): Unit ={
+    wchildren += w
     w.parent = Some(this)
   }
 
@@ -87,9 +88,10 @@ class Slider(pos:Vec2, bnds:Vec2 = Vec2(0.33f,1f)) extends QuadWidget(pos,bnds) 
     }
   }
 
-  def getValue = children.head.value.asInstanceOf[Float]
+  def getValue = wchildren.head.asInstanceOf[Widget].value.asInstanceOf[Float]
   def setValue(v:Float) = {
-    children.head.value = v
-    children.head.position.y = v * (1f-children.head.bounds.y)
+    val w = wchildren.head.asInstanceOf[Widget]
+    w.value = v
+    w.position.y = v * (1f-w.bounds.y)
   } 
 }

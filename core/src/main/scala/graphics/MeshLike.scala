@@ -10,35 +10,35 @@ import collection.mutable.ArrayBuffer
 /** MeshLike trait represents 3d mesh data interface */
 class MeshLike extends Drawable with Serializable {
 
-	val vertices = new ArrayBuffer[Vec3]
-	val normals = new ArrayBuffer[Vec3]
-	val texCoords = new ArrayBuffer[Vec2]
-	val colors = new ArrayBuffer[RGBA]
-	val indices = new ArrayBuffer[Int]
-	val wireIndices = new ArrayBuffer[Int]
+  val vertices = new ArrayBuffer[Vec3]
+  val normals = new ArrayBuffer[Vec3]
+  val texCoords = new ArrayBuffer[Vec2]
+  val colors = new ArrayBuffer[RGBA]
+  val indices = new ArrayBuffer[Int]
+  val wireIndices = new ArrayBuffer[Int]
 
-	var primitive = Triangles
+  var primitive = Triangles
 
-	var isStatic = false
-	var maxVertices = 0
-	var maxIndices = 0
+  var isStatic = false
+  var maxVertices = 0
+  var maxIndices = 0
 
-	var hasNormals = false
-	var hasTexCoords = false
-	var hasColors = false
+  var hasNormals = false
+  var hasTexCoords = false
+  var hasColors = false
 
-	/** Update implementation vertices from buffers */
-	def update(){}
+  /** Update implementation vertices from buffers */
+  def update(): Unit ={}
 
-	def clear(){
-		vertices.clear
-		normals.clear
-		texCoords.clear
-		colors.clear
-		indices.clear
-	}
+  def clear(): Unit ={
+    vertices.clear
+    normals.clear
+    texCoords.clear
+    colors.clear
+    indices.clear
+  }
 
-	def normalize() = {
+  def normalize() = {
     var min = Vec3( java.lang.Double.MAX_VALUE )
     var max = Vec3( java.lang.Double.MIN_VALUE )
     vertices.foreach( {
@@ -60,29 +60,29 @@ class MeshLike extends Drawable with Serializable {
     this
   }
 
-	def recalculateNormals(){
-		// make sure normals same size as vertices
-		if( normals.length < vertices.length){
-			normals.clear()
-			vertices.foreach( (v) => normals += Vec3())
-		}
+  def recalculateNormals(): Unit ={
+    // make sure normals same size as vertices
+    if( normals.length < vertices.length){
+      normals.clear()
+      vertices.foreach( (v) => normals += Vec3())
+    }
 
-		// if indices present
-		if( indices.length > 0 && indices.length % 3 == 0 ){ //primitive == Triangles ){
+    // if indices present
+    if( indices.length > 0 && indices.length % 3 == 0 ){ //primitive == Triangles ){
 
-			val count = new Array[Float](vertices.length)
-			// for each face (3 indices)
-	  	val l = indices.grouped(3)
-		  l.foreach( (xs) => {
-		  	val vs = xs.map(vertices(_))
-		  	val n = (vs(1)-vs(0) cross vs(2)-vs(0)).normalize
-		  	xs.foreach( (x) => { // sum normals for vertex
-		  		normals(x) += n 
-		  		count(x) += 1 
-		  	})
-		  })
+      val count = new Array[Float](vertices.length)
+      // for each face (3 indices)
+      val l = indices.grouped(3)
+      l.foreach( (xs) => {
+        val vs = xs.map(vertices(_))
+        val n = (vs(1)-vs(0) cross vs(2)-vs(0)).normalize()
+        xs.foreach( (x) => { // sum normals for vertex
+          normals(x) += n 
+          count(x) += 1 
+        })
+      })
 
-		  normals.zip(count).foreach{ case (n,c) =>
+      normals.zip(count).foreach{ case (n,c) =>
         if(c > 0) n /= c
         if( n.x.isNaN){
           // println("NAAN!") // XXX FIX THIS
@@ -90,31 +90,31 @@ class MeshLike extends Drawable with Serializable {
         }
       }
 
-	  } else if( vertices.length > 0 && vertices.length % 3 == 0 ){
+    } else if( vertices.length > 0 && vertices.length % 3 == 0 ){
 
-			val count = new Array[Float](vertices.length)
-			// for each face (3 indices)
-			var indx = 0
-	  	val l = vertices.grouped(3)
-		  l.foreach( (vs) => {
-		  	val n = (vs(1)-vs(0) cross vs(2)-vs(0)).normalize
-		  	for( i <- 0 until 3){
-		  		normals(indx) += n 
-		  		count(indx) += 1 
-		  		indx += 1
-		  	}
-		  })
+      val count = new Array[Float](vertices.length)
+      // for each face (3 indices)
+      var indx = 0
+      val l = vertices.grouped(3)
+      l.foreach( (vs) => {
+        val n = (vs(1)-vs(0) cross vs(2)-vs(0)).normalize()
+        for( i <- 0 until 3){
+          normals(indx) += n 
+          count(indx) += 1 
+          indx += 1
+        }
+      })
 
-		  normals.zip(count).foreach{ case (n,c) => n /= c }
+      normals.zip(count).foreach{ case (n,c) => n /= c }
 
-	  } else {
-	  	println("calc normals not implemented")
+    } else {
+      println("calc normals not implemented")
 
-	  	// val l = mesh.vertices.grouped(3)
-		  
-		  // l.foreach( (xs) => {
-		  // })
-	  }
-	}
+      // val l = mesh.vertices.grouped(3)
+      
+      // l.foreach( (xs) => {
+      // })
+    }
+  }
 
 }

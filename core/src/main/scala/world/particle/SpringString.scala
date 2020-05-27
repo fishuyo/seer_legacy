@@ -26,7 +26,7 @@ class SpringString(val pos:Vec3, val numSegments:Int=4, val dist:Float=0.1f, val
     springs += s 
   }
 
-  override def animate(dt:Float){
+  override def animate(dt:Float): Unit ={
     for( s <- (0 until 3) ){ 
       springs.foreach( _.solve() )
       pins.foreach( _.solve() )
