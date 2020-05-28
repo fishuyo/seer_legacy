@@ -2,10 +2,10 @@ import sbt._
 
 object Dependencies {
   object versions {
-    val akka = "2.5.12" //"2.4.17"
+    val akka = "2.6.5" //"2.5.12" //"2.4.17"
     val gdx = "1.9.10" //-SNAPSHOT"
     val lwjgl = "3.1.3"
-    val chill = "0.9.3" //"0.9.2" //"0.5.2" //"0.8.0"
+    val chill = "0.9.5" //"0.9.2" //"0.5.2" //"0.8.0"
   }
 
   object akka {
@@ -20,11 +20,17 @@ object Dependencies {
     val chillAkka = "com.twitter" %% "chill-akka" % versions.chill
   }
 
-  val spire = "org.spire-math" %% "spire" % "0.13.0"
+  object breeze {
+    val breeze = "org.nlp" %% "breeze" % "1.0"
+    val natives = "org.nlp" %% "breeze-natives" % "1.0"
+    val viz = "org.nlp" %% "breeze-viz" % "1.0"
+  }
+
+  val spire = "org.typelevel" %% "spire" % "0.17.0-M1" //"org.spire-math" %% "spire" % "0.17.0"
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
 
-  val scodec = "org.scodec" %% "scodec-core" % "1.10.3"
+  // val scodec = "org.scodec" %% "scodec-core" % "1.10.3"
 
   /** Core Dependencies */
   val core = Seq(
@@ -32,16 +38,17 @@ object Dependencies {
     akka.actor,
     akka.remote,
     // akka.stream,
-    "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
+    // "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
+    "io.altoo" %% "akka-kryo-serialization" % "1.1.5",
     spire,
     twitter.chill,
     twitter.chillBijection,
     twitter.chillAkka,
-    "de.sciss" %% "scalaaudiofile" % "1.4.7",
-    "de.sciss" %% "scalaosc" % "1.1.6",
+    "de.sciss" %% "audiofile" % "1.5.4",
+    "de.sciss" %% "scalaosc" % "1.2.1",
     "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
-    "com.lihaoyi" %% "scalarx" % "0.3.2",
-    "com.beachape.filemanagement" %% "schwatcher" % "0.3.2",
+    "com.lihaoyi" %% "scalarx" % "0.4.2",
+    "com.beachape.filemanagement" %% "schwatcher" % "0.3.5",
     "javax.vecmath" % "vecmath" % "1.5.2"
   )
 

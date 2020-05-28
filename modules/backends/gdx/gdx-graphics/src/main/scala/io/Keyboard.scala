@@ -108,7 +108,7 @@ class Keyboard extends InputAdapter {
 
 
   override def keyTyped(k:Char) = {
-    key.Internal.value = '\u0000' // make rx propogate even if same key
+    // key.Internal.value = '\u0000' // make rx propogate even if same key
     key() = k
     typedCallbacks.foreach((f) => f(k))
     downCallbacks.foreach(_.orElse(nullfunc).apply(k))
