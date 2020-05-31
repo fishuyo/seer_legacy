@@ -14,11 +14,11 @@ import scala.io.Source
 
 import scala.language.dynamics
 
-import reflect.runtime.universe._
-import reflect.runtime.currentMirror
-import tools.reflect.ToolBox
+// import reflect.runtime.universe._
+// import reflect.runtime.currentMirror
+// import tools.reflect.ToolBox
 
-import com.twitter.util.Eval
+// import com.twitter.util.Eval
 
 import akka.actor._
 import akka.event.Logging
@@ -42,10 +42,12 @@ object ScriptLoaderActor {
   case object Unload
   case object Status
 
+  def props = propsDotty
   // def props = propsEval
-  def props = propsToolbox
-  def propsEval = Props(new ScriptLoaderActor(new EvalScriptLoader()))
-  def propsToolbox = Props(new ScriptLoaderActor(new ToolboxScriptLoader()))
+  // def props = propsToolbox
+  def propsDotty = Props(new ScriptLoaderActor(new DottyScriptLoader()))
+  // def propsEval = Props(new ScriptLoaderActor(new EvalScriptLoader()))
+  // def propsToolbox = Props(new ScriptLoaderActor(new ToolboxScriptLoader()))
 }
 /**
  * ScriptLoaderActor, each responsible for compiling and running
@@ -94,7 +96,7 @@ trait ScriptLoader {
     importString + code
   }
 
-  def reload(){
+  def reload() = {
     try{
       obj match {
         case s:SeerScript => s.preUnload()
@@ -105,22 +107,22 @@ trait ScriptLoader {
       val ret = compile()
       ret match{
         case s:Script =>
-          unload
+          unload()
           obj = ret
           s.load()
           loaded = true
         case s:SeerScript =>
-          unload
+          unload()
           obj = ret
           s.load()
           loaded = true
         case a:ActorRef =>
-          unload
+          unload()
           obj = ret
           a ! "load"
           loaded = true
         case l:List[ActorRef] =>
-          unload
+          unload()
           obj = ret
           l.foreach{ case a => a ! "load" }
           loaded = true
@@ -130,7 +132,7 @@ trait ScriptLoader {
           val id = s"live.$simple.${util.Random.int()}"
           // println( s"got class: $simple")
           val a = System().actorOf( SeerActor.props(c), id )
-          unload
+          unload()
           obj = a
           a ! SeerActor.Name(id)
           a ! "load"
@@ -141,13 +143,13 @@ trait ScriptLoader {
     } catch { case e:Exception => 
       loaded = false
       println("Exception in script: " + e.getMessage)
-      // e.printStackTrace 
+      e.printStackTrace 
       val frame = e.getStackTrace.find{ e => e.getMethodName.contains("load") }.get
       errors = Seq((frame.getLineNumber, "RuntimeError: " + e.toString))
       // unload
     }
   }
-  def unload(){
+  def unload() = {
     obj match {
       case s:Script => 
         s.unload()
@@ -172,55 +174,80 @@ trait ScriptLoader {
     }
   }
 
-  def checkErrors(){}
+  def checkErrors() = {}
   def compile():AnyRef
+}
+
+import scala.quoted._
+import scala.quoted.staging._
+import dotty.tools.dotc.util._
+import dotty.tools.dotc.parsing._
+import dotty.tools.dotc.core.Contexts._ //NoContext.given_Context
+
+class DottyScriptLoader extends ScriptLoader {
+  // make available the necessary toolbox for runtime code generation
+  // given Toolbox = Toolbox.make(getClass.getClassLoader)
+
+  def compile() = {
+    implicit val context:Context = (new ContextBase).initialCtx
+    val source = getCode()
+    val sf = SourceFile.virtual("test", source)
+    val p = new Parsers.Parser(sf) //Parsers.parser(sf)
+    val tree = p.parse()
+    // val tree = toolbox.parse(source)
+    // val script = toolbox.eval(tree).asInstanceOf[AnyRef]
+    // script
+    println(tree)
+    println(com.fishuyo.seer.util.Random.int())
+    p
+  }
 }
 
 /**
   * Toolbox implementation of a ScriptLoader
   */
-class ToolboxScriptLoader extends ScriptLoader {
-  val toolbox = ScriptManager.toolbox //currentMirror.mkToolBox() 
+// class ToolboxScriptLoader extends ScriptLoader {
+//   val toolbox = ScriptManager.toolbox //currentMirror.mkToolBox() 
 
-  def compile() = {
-    val source = getCode()
-    val tree = toolbox.parse(source)
-    val script = toolbox.eval(tree).asInstanceOf[AnyRef]
-    script
-  }
+//   def compile() = {
+//     val source = getCode()
+//     val tree = toolbox.parse(source)
+//     val script = toolbox.eval(tree).asInstanceOf[AnyRef]
+//     script
+//   }
   
-  override def checkErrors() = {
-    if(toolbox.frontEnd.hasErrors){
-      val errs = toolbox.frontEnd.infos.map { case info =>
-        val line = info.pos.line
-        val msg = s"""
-          ${info.msg}
-          ${info.pos.lineContent}
-          ${info.pos.lineCaret} 
-        """
-        (line,msg)
-      }.toSeq
-      errors = errs
-    } else errors = Seq()
-  }
+//   override def checkErrors() = {
+//     if(toolbox.frontEnd.hasErrors){
+//       val errs = toolbox.frontEnd.infos.map { case info =>
+//         val line = info.pos.line
+//         val msg = s"""
+//           ${info.msg}
+//           ${info.pos.lineContent}
+//           ${info.pos.lineCaret} 
+//         """
+//         (line,msg)
+//       }.toSeq
+//       errors = errs
+//     } else errors = Seq()
+//   }
 
-}
+// }
 
 /**
   * Twitter Eval implementation of a ScriptLoader
   */
-object EvalScriptLoader {
-  val eval = new Eval()
-  def apply() = eval
-}
-class EvalScriptLoader extends ScriptLoader {
-  def compile() = {
-    val source = getCode()
-    val script = EvalScriptLoader.eval[AnyRef](source)  //.inPlace[AnyRef](source)
-    // val script = Eval[AnyRef](source,false)
-    script
-  }
-}
+// object EvalScriptLoader {
+//   val eval = new Eval()
+//   def apply() = eval
+// }
+// class EvalScriptLoader extends ScriptLoader {
+//   def compile() = {
+//     val source = getCode()
+//     val script = EvalScriptLoader.eval[AnyRef](source)  //.inPlace[AnyRef](source)
+//     // val script = Eval[AnyRef](source,false)
+//     script
+//   }
+// }
 
 
 

@@ -32,7 +32,7 @@ object Settings {
     ),
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     cancelable in Global := true,
-    exportJars := true,
+    //exportJars := true,
     pomIncludeRepository := { _ =>
       false
     },

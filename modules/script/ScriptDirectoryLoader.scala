@@ -44,13 +44,13 @@ class ScriptDirectoryLoaderActor extends Actor with ActorLogging {
 
       if(reloadOnChange) Monitor(path){ (p) => 
         log.info(s"FileChanged: $p")
-        val name = p.toFile.getName
+        val name = p.name
         if(scripts.contains(name))
           scripts(name) ! Reload
         else{
           val loader = context.actorOf(ScriptLoaderActor.props, name)
           scripts(name) = loader
-          loader ! Path(p.toFile.getPath,false)
+          loader ! Path(p.path.toString,false)
           loader ! Load
         }
       }

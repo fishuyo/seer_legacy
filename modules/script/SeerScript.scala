@@ -19,13 +19,13 @@ class SeerScript extends Animatable with AudioSource {
   // node.renderer.scene.push(this)
   // node.renderer.clear = false
 
-  def load(){
+  def load() = {
     Scene.push(this)
     Audio().push(this)
   }
-  def unload(){
+  def unload() = {
     Scene.remove(this)
     Audio().sources -= this
   }
-  def preUnload(){}
+  def preUnload() = {}
 }

@@ -9,8 +9,9 @@ import scala.io.Source
 import scala.language.dynamics
 
 // import reflect.runtime.universe._
-import reflect.runtime.currentMirror
-import tools.reflect.ToolBox
+
+// import reflect.runtime.currentMirror
+// import tools.reflect.ToolBox
 
 import akka.actor._
 import akka.event.Logging
@@ -34,10 +35,10 @@ object ScriptManager {
   case class Create(name:String="")
   case object Reset
 
-  val toolbox = currentMirror.mkToolBox() 
+  // val toolbox = currentMirror.mkToolBox() 
   val manager = System().actorOf( Props[ScriptManagerActor], name="ScriptManager" )
   
-  implicit val timeout = Timeout(4 seconds)
+  implicit val timeout:Timeout = Timeout(4 seconds)
 
   val imports = ListBuffer[String]()
   imports += "com.fishuyo.seer._"
@@ -71,10 +72,10 @@ object ScriptManager {
   }
 
   def reset = manager ! Reset
-  def reset(address:Address) = System().actorSelection(address + "/user/ScriptManager") ! Reset
+  def reset(address:Address) = System().actorSelection(address.toString + "/user/ScriptManager") ! Reset
 
-  def remote(address:Address)(path:String, reloadOnChange:Boolean=true){
-    val remoteManager = System().actorSelection(address + "/user/ScriptManager")
+  def remote(address:Address)(path:String, reloadOnChange:Boolean=true) = {
+    val remoteManager = System().actorSelection(address.toString + "/user/ScriptManager")
 
     val file = new File(path)
     if(file.isDirectory){
@@ -126,7 +127,7 @@ class ScriptManagerActor extends Actor with ActorLogging {
 
   override val supervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute, loggingEnabled=false) {
-      case _:scala.tools.reflect.ToolBoxError => logToolboxErrorLocation(); Resume
+      // case _:scala.tools.reflect.ToolBoxError => logToolboxErrorLocation(); Resume
       case t => super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => Escalate)
     }
 
@@ -171,20 +172,7 @@ class ScriptManagerActor extends Actor with ActorLogging {
     case x => () //log.warning("Received unknown message: {}", x)
   }
 
-  def logToolboxErrorLocation(){
-    if(toolbox.frontEnd.hasErrors){
-      toolbox.frontEnd.infos.foreach{ case info =>
-        val line = info.pos.line - imports.length //+ 1
-        val msg = s"""
-          ${info.msg}
-          at line ${line}:${info.pos.column}
-          ${info.pos.lineContent}
-          ${info.pos.lineCaret} 
-        """
-        log.error(msg)
-      }
-    }
-  }
+  
 }
 
 

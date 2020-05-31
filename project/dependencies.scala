@@ -49,6 +49,8 @@ object Dependencies {
     "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
     "com.lihaoyi" %% "scalarx" % "0.4.2",
     // "com.beachape.filemanagement" %% "schwatcher" % "0.3.5",
+    "com.github.pathikrit" %% "better-files" % "3.9.1",
+    "com.github.pathikrit"  %% "better-files-akka"  % "3.9.1",
     "javax.vecmath" % "vecmath" % "1.5.2"
   )
 

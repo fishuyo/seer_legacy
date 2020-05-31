@@ -1,8 +1,32 @@
 
-// package com.fishuyo.seer
-// package actor
+package com.fishuyo.seer
+package actor
 
-// import akka.actor._
+import akka.actor._
+
+import better.files._, FileWatcher._
+import java.nio.file.{Path, StandardWatchEventKinds => EventType, WatchEvent}
+
+
+object Monitor {
+
+  implicit val system:ActorSystem = System()
+
+  def apply(path:String, rec:Boolean=false)(f:(File)=>Unit): Unit = {
+    
+    val watch = path.toFile.newWatcher(recursive = rec)
+    
+    watch ! when(events = EventType.ENTRY_CREATE, EventType.ENTRY_MODIFY) {
+      case (_, file) => f(file)
+    }
+  }
+
+  def stop(path:String, rec:Boolean=false): Unit ={
+  }
+
+  def kill(): Unit ={
+  }
+}
 
 // import com.beachape.filemanagement.MonitorActor
 // import com.beachape.filemanagement.RegistryTypes._

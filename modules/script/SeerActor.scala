@@ -12,6 +12,7 @@ import akka.actor._
 import akka.event.Logging
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object SeerActor {
   def props(c:Class[_]) = Props(c)
@@ -22,7 +23,7 @@ object SeerActor {
 class SeerActor extends Actor with ActorLogging with Animatable with AudioSource {
   import SeerActor._
 
-  implicit var name = "default"
+  implicit var name:String = "default"
   var active = true
 
   var scene:Scene = Scene //graphics.Scene()
@@ -33,7 +34,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
   // updateRenderer()
 
   val Out = AudioScene()
-  var audioXFadeTime = 1f
+  var audioXFadeTime = 1.0
   Out += this
 
   def receive = {
@@ -44,13 +45,13 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     case Name(n) => name = n
   }
 
-  def shader(name:String){
+  def shader(name:String) = {
     val s = Shader(name)
     Renderer().shader = s
-    s.begin
+    s.begin()
   }
 
-  def load(){
+  def load() = {
     Run.animate {
       // val c =  RenderGraph.compositor
       // node.>>(1)(c)
@@ -61,7 +62,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     Out.gain = Ramp(0f,1f,(44100 * audioXFadeTime).toInt )
     Audio().push(Out)
   }
-  def unload(){
+  def unload() = {
     Run.animate {
       // val c =  RenderGraph.compositor
       // node.>>(0)(c)
@@ -71,18 +72,18 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     }
     Out.gain = Ramp(Out.gain.value, 0f, (44100 * audioXFadeTime).toInt)
     time.Schedule.after(audioXFadeTime seconds){ 
-      Out.sources.clear 
+      Out.sources.clear() 
       Audio().sources -= Out
     }
-    if(_keyboard.isDefined) _keyboard.get.remove
-    if(_mouse.isDefined) _mouse.get.remove
-    if(_schedule.isDefined) _schedule.get.clear
+    if(_keyboard.isDefined) _keyboard.get.remove()
+    if(_mouse.isDefined) _mouse.get.remove()
+    if(_schedule.isDefined) _schedule.get.clear()
     // if(_openni.isDefined) _openni.get.remove
 
     // shader.stopMonitor() ??
   }
 
-  def preunload(){}
+  def preunload() = {}
 
   var _keyboard:Option[Keyboard] = None
   var _mouse:Option[Mouse] = None
