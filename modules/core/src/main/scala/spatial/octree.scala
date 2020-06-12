@@ -16,7 +16,7 @@ object Octree {
   def apply[T]( p:Octree[T], c:Vec3, halfsize:Float ) = new Octree[T](p, c, halfsize)
 }
 
-class Octree[T]( val parent:Octree[T], c:Vec3, hsize:Float) extends AABB(c,hsize) {
+class Octree[T]( val parent:Octree[T], c:Vec3, val halfsize:Float) extends AABB(c - Vec3(halfsize), c + Vec3(halfsize)) {
 
   var minSize = .1f
   var depth = 0
