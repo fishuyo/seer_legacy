@@ -111,7 +111,7 @@ class PickableExample extends Pickable { //val model:Model) {
     selected
   }
   override def unpick(hit:Hit, childs:Seq[Boolean]) = {
-    if(!hover) selected = false
+    selected = false
     false
   }
 

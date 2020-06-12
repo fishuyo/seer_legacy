@@ -129,8 +129,8 @@ trait ScriptLoader {
           val r(simple) = c.getName
           val id = s"live.$simple.${util.Random.int()}"
           // println( s"got class: $simple")
+          unload          
           val a = System().actorOf( SeerActor.props(c), id )
-          unload
           obj = a
           a ! SeerActor.Name(id)
           a ! "load"

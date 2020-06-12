@@ -81,7 +81,7 @@ class Renderer {
     if(!resize) return
     viewport = vp
     if(camera.viewportHeight == 1f){
-      // camera.viewportWidth = vp.aspect
+      camera.viewportWidth = vp.aspect
     }else{
       camera match {
         case ortho:OrthographicCamera =>
