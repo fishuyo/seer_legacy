@@ -11,11 +11,18 @@ install simple build tool (sbt): [http://www.scala-sbt.org/](http://www.scala-sb
 
 On macOS using homebrew: `brew install sbt`
 
+Running an example:
 ~~~~
 cd seer
 sbt
 project examples
 run
+~~~
+
+then choose an example from list, or specify directly with:
+
+~~~
+runMain com.fishuyo.seer.examples.audio.SimpleSynth
 ~~~~
 
 
