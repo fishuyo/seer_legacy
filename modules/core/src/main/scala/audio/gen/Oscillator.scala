@@ -23,8 +23,11 @@ class Osc(var f:Gen) extends Gen{
 /**
   * sin wave oscillator
   */
-object Sine { def apply(f:Float=440f, a:Float=1f) = new Sine(f,a) }
-class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
+object Sine { 
+  def apply(f:Gen, a:Float=1f) = { val s = new Sine(0,a); s.f = f; s }
+  def apply(f:Float, a:Float) = new Sine(f,a)
+}
+class Sine(f:Float, var a:Float) extends Osc(f) {
   override def apply() = {
     super.apply()
     value = math.sin(phase * 2*math.Pi).toFloat * a
@@ -35,7 +38,11 @@ class Sine(f:Float=440f, var a:Float=1f) extends Osc(f) {
 /**
   * Triangle wave oscillator ^
   */
-class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
+object Tri { 
+  def apply(f:Gen, a:Float=1f) = { val t = new Tri(0,a); t.f = f; t}
+  def apply(f:Float, a:Float) = new Tri(f,a)
+}
+class Tri(f:Float, var a:Float) extends Osc(f) {
   override def apply() = {
     super.apply()
     value = (1f - 4f * math.abs((phase + 0.25f) % 1 - 0.5f)) * a
@@ -46,7 +53,11 @@ class Tri(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
 /**
   * Saw /|/
   */
-class Saw(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
+object Saw { 
+  def apply(f:Gen, a:Float=1f) = { val s = new Saw(0,a); s.f = f; s}
+  def apply(f:Float, a:Float) = new Saw(f,a)
+}
+class Saw(f:Float, var a:Float) extends Osc(f) {
   override def apply() = {
     super.apply()
     value = (((phase / 2f + 0.25f) % 0.5f - 0.25f) * 4f) * a
@@ -54,7 +65,11 @@ class Saw(f:Float = 440f, var a:Float = 1f) extends Osc(f) {
   }
 }
 
-class Square(f:Float = 100f, var a:Float = 1f) extends Osc(f) {
+object Square { 
+  def apply(f:Gen, a:Float=1f) = { val s = new Square(0,a); s.f = f; s}
+  def apply(f:Float, a:Float) = new Square(f,a)
+}
+class Square(f:Float, var a:Float) extends Osc(f) {
   override def apply() = {
     super.apply()
     value = (math.round(phase) - 0.5f)*2*a
