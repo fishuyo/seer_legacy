@@ -17,13 +17,15 @@ cd seer
 sbt
 project examples
 run
-~~~
+~~~~
 
 then choose an example from list, or specify directly with:
 
-~~~
+~~~~
 runMain com.fishuyo.seer.examples.audio.SimpleSynth
 ~~~~
 
+You can make modifications to the running code by editing the file: `seer/examples/scripts/audio/synth.scala`
 
+It will take a few seconds to recompile.
 
