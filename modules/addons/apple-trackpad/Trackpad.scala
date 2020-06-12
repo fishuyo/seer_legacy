@@ -32,13 +32,13 @@ class TrackpadState {
 object Trackpad extends Trackpad {
   def apply() = new Trackpad
   
-  val countSlow = Var(0)
-  var timeout = Timer(30 millis)
-  val obs1 = Trackpad.count.trigger{     
-      timeout.kill()
-      timeout = Timer(30 millis)
-      timeout.triggerLater { countSlow() = Trackpad.count.now; timeout.kill() }
-  }
+  // val countSlow = Var(0)
+  // var timeout = Timer(30 millis)
+  // val obs1 = Trackpad.count.trigger{     
+  //     timeout.kill()
+  //     timeout = Timer(30 millis)
+  //     timeout.triggerLater { countSlow() = Trackpad.count.now; timeout.kill() }
+  // }
  
 }
 
@@ -183,6 +183,7 @@ class Trackpad extends Observer {
   }
 
   def bind(f:(TrackpadState)=>Unit) = callbacksNew += f
+  def listen(f:(TrackpadState)=>Unit) = callbacksNew += f
   // def bindP(f:PartialFunction[TrackpadState,Unit]) = callbacksNew += f
 
   // def bind( s:String, f:Callback ) = callbacks(s) = f :: callbacks.getOrElseUpdate(s,List())
