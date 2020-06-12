@@ -3,18 +3,21 @@ package com.fishuyo.seer
 package spatial
 
 object AABB {
-  def apply( min:Vec3, max:Vec3 ) = new AABB(min,max)
-  def apply( cen:Vec3, halfsize:Float ) = new AABB(cen,halfsize)
+  def apply(min:Vec3, max:Vec3) = new AABB(min,max)
+  def apply(cen:Vec3, halfsize:Float) = new AABB(cen - Vec3(halfsize), cen + Vec3(halfsize))
 }
 
-class AABB( var min:Vec3, var max:Vec3 ) {
+class AABB(val min:Vec3, val max:Vec3) {
 
-  var center:Vec3 = min.lerp(max, .5f)
-  var halfsize = math.abs(center.x - min.x).toFloat
+  val center:Vec3 = min.lerp(max, 0.5f)
+  val dim:Vec3 = max - min
+  // var halfsize = math.abs(center.x - min.x).toFloat
 
-  //println( "AABB created center: " + a + " " + b + " "+c+" "+halfsize)
-
-  def this( cen:Vec3, halfsize:Float ) = this( cen - Vec3(halfsize), cen + Vec3(halfsize))
+  def set(mn:Vec3,mx:Vec3) = {
+    min.set(mn); max.set(mx)
+    dim.set(max - min)
+    center.set(min + dim * 0.5f)
+  }
 
   def contains( p:Vec3 ):Boolean = {
     if( p.x < min.x || p.x > max.x) return false
