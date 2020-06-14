@@ -142,7 +142,11 @@ class UserLoop {
   def saveKryo(){
     import java.io._
     val form = new java.text.SimpleDateFormat("yyyy-MM-dd-HH.mm.ss")
+<<<<<<< HEAD
     val filename = form.format(new java.util.Date()) + ".bin" 
+=======
+    val filename = form.format(new java.util.Date()) + ".k.bin" 
+>>>>>>> devel
 
     val bytes = KryoInjection(frames)
     val bos = new BufferedOutputStream(new FileOutputStream(filename))

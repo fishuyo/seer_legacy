@@ -55,7 +55,7 @@ trait Gen extends AudioSource {
 
   def >>(g:Gen):Gen = g match {
     // case scene if scene.getClass == classOf[AudioScene] => scene += self; new Gen{ def apply()=0f } // return dummy Gen.. hack..temporary
-    case Audio.out => Audio().sources += self; new Gen{ def apply()=0f }    // return dummy Gen.. hacky
+    case Audio.out => Audio().sources += self; self;  
     case _ => new Gen{ def apply() = g(self.apply()) }
   }
 
@@ -104,12 +104,17 @@ class PulseTrain(var width:Gen) extends Gen {
 
 class Line(var begin:Float=0f, var end:Float=1f, var len:Float=44100) extends Add((end-begin)/len)
 
-object Ramp { def apply(s:Float,e:Float,l:Int) = new Ramp(s,e,l)}
+object Ramp { 
+  def apply(v:Float) = new Ramp(v,v,100)
+  def apply(v:Float,l:Int) = new Ramp(v,v,l)
+  def apply(s:Float,e:Float,l:Int) = new Ramp(s,e,l)
+}
 class Ramp(var start:Float, var end:Float, var len:Int) extends Gen {
   var add = (end-start) / len
   value = start
 
-  def set(e:Float, l:Int) = {
+  def set(e:Float):Unit = set(e,len)
+  def set(e:Float, l:Int):Unit = {
     start = value; end = e; len = l;
     add = (end-start) / len
   }

@@ -25,7 +25,9 @@ class Envelope(val segments:Int) extends Gen {
 
   var func = util.Ease.expoOut _
 
-  def reset(): Unit ={
+  
+  def reset() = {
+    value = values(0)
     done = false
     pos = 0
     segmentIndices = lengths.map(_ * Audio().sampleRate).map(_.toInt).scanLeft(0)(_+_)
@@ -49,7 +51,7 @@ class Envelope(val segments:Int) extends Gen {
       value = ramp()
       value
     } else { 
-      value = 0f
+      // value = 0f
       value
     }
   }

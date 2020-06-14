@@ -58,7 +58,7 @@ object UserRecord extends SeerApp {
     case '\t' => loop.reverse()
     case 'i' => speed *=2; loop.setSpeed(speed)
     case 'k' => speed /=2; loop.setSpeed(speed)
-    case 'o' => loop.save()
+    case 'o' => loop.saveKryo()
     case 'l' => 
       loop.load("2018-05-21-20.46.19.bin")
 

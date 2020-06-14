@@ -81,7 +81,8 @@ object OpenNI {
   def setPointCloudThinning(factor:Int){
     var v = factor
     if(v < 1) v = 1
-    TrackerListener.pointCloudThinFactor = v
+    TrackerListener.thinFactor = v
+    PointCloud.thinFactor = v
   }
 
   val frameCallbacks = ListBuffer[PartialFunction[Frame,Unit]]()
@@ -108,7 +109,9 @@ object OpenNI {
 }
 
 sealed trait Frame { def image:Image }
-case class DepthFrame(image:Image) extends Frame
+case class DepthFrame(image:Image) extends Frame {
+  def toPoints() = PointCloud.fromImage(image)
+}
 case class ColorFrame(image:Image) extends Frame
 
 object FrameListener extends VideoStream.NewFrameListener {
@@ -121,7 +124,7 @@ object FrameListener extends VideoStream.NewFrameListener {
         val image = new Image(data, frame.getWidth, frame.getHeight, 3, 1)
         OpenNI.frameCallbacks.foreach(_(ColorFrame(image)))
 
-      case _ =>
+      case PixelFormat.DEPTH_1_MM =>
         val image = new Image(data, frame.getWidth, frame.getHeight, 1, 2)
         OpenNI.frameCallbacks.foreach(_(DepthFrame(image)))
     }
@@ -129,10 +132,51 @@ object FrameListener extends VideoStream.NewFrameListener {
   }
 }
 
+object PointCloud {
+  var thinFactor = 2
+  var thinOffset = 0
+
+  def fromImage(depthImage:Image):ArrayBuffer[Vec3] = {
+    val w = depthImage.w
+    val h = depthImage.h
+    val depthData = depthImage.buffer
+    fromByteBuffer(depthData, w, h)
+  }
+
+  def fromDepthFrameRef(depthFrame:VideoFrameRef):ArrayBuffer[Vec3] = {
+    val w = depthFrame.getWidth
+    val h = depthFrame.getHeight
+    val depthData:ByteBuffer = depthFrame.getData().order(ByteOrder.LITTLE_ENDIAN)
+    fromByteBuffer(depthData, w, h)
+  }
+
+  def fromByteBuffer(depthData:ByteBuffer, w:Int, h:Int):ArrayBuffer[Vec3] = {
+    val buffer = ArrayBuffer[Vec3]()
+
+    var pos = 0
+    while(depthData.remaining() > 0) {
+      val y = pos / w
+      val x = pos % w
+      val z = depthData.getShort()
+
+      if(z != 0
+        && x % thinFactor == thinOffset
+        && y % thinFactor == thinOffset ){
+        val p = CoordinateConverter.convertDepthToWorld(OpenNI.depthStream.get, x, y, z)
+        buffer += point3DtoVec3(p)
+      }
+      pos += 1
+    }
+    buffer
+  }
+
+  def point3DtoVec3(p:org.openni.Point3D[java.lang.Float]) = Vec3(-p.getX(),p.getY(),-p.getZ()) /= 1000f
+  def point3DtoVec3(p:com.primesense.nite.Point3D[java.lang.Float]) = Vec3(-p.getX(),p.getY(),-p.getZ()) /= 1000f
+}
+
 object TrackerListener extends UserTracker.NewFrameListener {
-  var enablePointClouds = true //TODO handle this
-  var pointCloudThinFactor = 2
-  var rem = 0
+  var thinFactor = 2
+  var thinOffset = 0
   val pointBuffers = HashMap[Int,ArrayBuffer[Vec3]]()
 
   def onNewFrame(tracker:UserTracker){          
@@ -175,7 +219,6 @@ object TrackerListener extends UserTracker.NewFrameListener {
       u
     }
 
-    //TODO flag to enable this
     /** Read Depth data and convert to point clouds for each user */
     var depthFrame:VideoFrameRef = frame.getDepthFrame()
     if (depthFrame != null) {
@@ -200,8 +243,8 @@ object TrackerListener extends UserTracker.NewFrameListener {
         maskImage.buffer.put((userId*128).toByte)
 
         if(z != 0 && userId > 0
-          && x % pointCloudThinFactor == rem
-          && y % pointCloudThinFactor == rem ){
+          && x % thinFactor == thinOffset
+          && y % thinFactor == thinOffset ){
           val p = CoordinateConverter.convertDepthToWorld(OpenNI.depthStream.get, x, y, z)
           buffer += point3DtoVec3(p)
         }

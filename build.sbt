@@ -46,9 +46,18 @@ lazy val jackaudio = project
   .settings(Settings.common: _*)
 
 /**
+ * Addon Modules
+ */
+
+lazy val trackpad = project
+  .in(file("modules/addons/apple-trackpad"))
+  .dependsOn(core.jvm)
+  .settings(Settings.common: _*)
+
+/**
   * Examples
   */
 lazy val examples = project
   .in(file("examples"))
-  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script)
+  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script, trackpad)
   .settings(Settings.app: _*)
