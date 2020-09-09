@@ -1,5 +1,5 @@
 // eww.. wrapping wrapper wrappers
-package com.fishuyo.seer.graphics
+package seer.graphics
 
 import java.nio.Buffer
 import java.nio.FloatBuffer 

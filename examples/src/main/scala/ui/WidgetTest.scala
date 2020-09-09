@@ -1,6 +1,6 @@
 
 
-package com.fishuyo.seer
+package seer
 package examples.ui
 
 import graphics._
@@ -10,7 +10,7 @@ import io._
 
 object WidgetTest extends SeerApp { 
 
-  val s = new Slider(Vec2(0,0), Vec2(1,1))
+  val s = new Slider(0,0,1,1)
 
   override def animate(dt:Float){
     implicit def f2i(f:Float) = f.toInt

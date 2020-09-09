@@ -3,7 +3,7 @@
   * https://github.com/twitter/util/blob/master/util-core/src/main/scala/com/twitter/util/RingBuffer.scala
   */
 
-package com.fishuyo.seer
+package seer
 package types
 
 import collection.mutable.ArrayBuffer

@@ -1,4 +1,4 @@
-package com.fishuyo.seer
+package seer
 
 import graphics._
 import io._

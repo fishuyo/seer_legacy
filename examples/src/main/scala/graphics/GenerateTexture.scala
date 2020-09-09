@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package examples.graphics
 
 import graphics._

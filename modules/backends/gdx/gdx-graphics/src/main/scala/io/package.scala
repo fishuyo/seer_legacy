@@ -1,6 +1,6 @@
 
 
-package com.fishuyo.seer
+package seer
 
 import rx._
 

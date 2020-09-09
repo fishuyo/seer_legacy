@@ -17,7 +17,7 @@ lazy val script = project
 
   
 /**
-  * Gdx backend
+  * Backend
   */
 lazy val gdx_graphics = project
   .in(file("modules/backends/gdx/gdx-graphics"))
@@ -30,6 +30,14 @@ lazy val gdx_app_desktop = project
   .dependsOn(gdx_graphics)
   .settings(Settings.common: _*)
   .settings(libraryDependencies ++= Dependencies.gdxAppDesktop)
+
+lazy val backend_lwjgl = project
+  .in(file("modules/backends/lwjgl/lwjgl-graphics"))
+  .dependsOn(gdx_graphics)
+  .settings(Settings.app: _*)
+  .settings(libraryDependencies ++= Dependencies.gdxAppDesktop)
+
+
 
 /**
   * Audio backends

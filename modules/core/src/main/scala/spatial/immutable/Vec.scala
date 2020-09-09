@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package spatial.immutable
 
 object Vec3 {

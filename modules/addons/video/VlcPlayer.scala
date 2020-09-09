@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package video
 
 import graphics.Texture

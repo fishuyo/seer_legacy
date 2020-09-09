@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package ui
 
 import spatial._
@@ -32,6 +32,8 @@ trait Pickable {
 
   var parent:Option[_ <: Pickable] = None
   val children:ListBuffer[_ <: Pickable] = ListBuffer[Pickable]()
+
+  // def getChildren() = children
 
   def intersect(r:Ray):Option[Float]
 

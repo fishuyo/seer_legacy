@@ -54,12 +54,14 @@ object Dependencies {
 
   /** libGDX backend dependencies */
   val gdx = Seq(
-    "com.badlogicgames.gdx" % "gdx" % versions.gdx
+    "com.badlogicgames.gdx" % "gdx" % versions.gdx,
+    "com.badlogicgames.gdx" % "gdx-freetype" % versions.gdx
     // parsers
   )
   val gdxAppDesktop = Seq(
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % versions.gdx,
-    "com.badlogicgames.gdx" % "gdx-platform" % versions.gdx classifier "natives-desktop"
+    "com.badlogicgames.gdx" % "gdx-platform" % versions.gdx classifier "natives-desktop",
+    "com.badlogicgames.gdx" % "gdx-freetype-platform" % versions.gdx classifier "natives-desktop"
   )
 
   /** Addon Dependencies */

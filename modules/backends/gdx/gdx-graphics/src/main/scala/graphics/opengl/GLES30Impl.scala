@@ -1,4 +1,4 @@
-package com.fishuyo.seer.graphics
+package seer.graphics
 
 
 class GLES30Impl extends GLES20Impl with GLES30 {

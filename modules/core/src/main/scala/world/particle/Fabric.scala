@@ -1,6 +1,6 @@
 
 
-// package com.fishuyo.seer
+// package seer
 // package objects
 
 // import spatial._

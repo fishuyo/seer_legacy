@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package io
 
 import com.badlogic.gdx.Gdx

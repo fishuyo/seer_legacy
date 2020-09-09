@@ -1,4 +1,4 @@
-package com.fishuyo.seer
+package seer
 package script
 
 import actor._
@@ -40,15 +40,15 @@ object ScriptManager {
   implicit val timeout = Timeout(4 seconds)
 
   val imports = ListBuffer[String]()
-  imports += "com.fishuyo.seer._"
-  imports += "com.fishuyo.seer.script._"
-  imports += "com.fishuyo.seer.actor._"
-  imports += "com.fishuyo.seer.spatial._"
-  imports += "com.fishuyo.seer.graphics._"
-  imports += "com.fishuyo.seer.audio._"
-  imports += "com.fishuyo.seer.io._"
-  imports += "com.fishuyo.seer.util._"
-  imports += "com.fishuyo.seer.particle._"
+  imports += "seer._"
+  imports += "seer.script._"
+  imports += "seer.actor._"
+  imports += "seer.spatial._"
+  imports += "seer.graphics._"
+  imports += "seer.audio._"
+  imports += "seer.io._"
+  imports += "seer.util._"
+  imports += "seer.particle._"
   imports += "scala.concurrent.duration._"
   imports += "collection.mutable.ListBuffer"
   imports += "collection.mutable.ArrayBuffer"

@@ -1,4 +1,4 @@
-package com.fishuyo.seer
+package seer
 package script
 
 import actor._

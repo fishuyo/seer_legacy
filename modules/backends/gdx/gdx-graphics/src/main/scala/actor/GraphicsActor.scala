@@ -1,7 +1,7 @@
 
 // based on Code from Viktor Klang: https://gist.github.com/viktorklang/2422443
 
-package com.fishuyo.seer.actor
+package seer.actor
 
 import akka.actor._
 import akka.event.Logging

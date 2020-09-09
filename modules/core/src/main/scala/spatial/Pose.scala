@@ -5,7 +5,7 @@
 	Pablo Colapinto, 2010, wolftype@gmail.com
 */
 
-package com.fishuyo.seer
+package seer
 package spatial
 
 object Pose {

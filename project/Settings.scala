@@ -7,7 +7,7 @@ object Settings {
   val scalaV = "2.12.10"
 
   lazy val common = Seq(
-    organization := "com.fishuyo.seer",
+    organization := "seer",
     version := seerV,
     scalaVersion := scalaV,
     updateOptions := updateOptions.value.withCachedResolution(true),

@@ -4,7 +4,7 @@
 *
 */
 
-package com.fishuyo.seer
+package seer
 package spatial
 
 object Quat {

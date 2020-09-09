@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package util
 
 import graphics._
@@ -54,14 +54,14 @@ class Schedule {
 	val system = System()
 	import system.dispatcher
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+@deprecated("use package seer.time", "Beep boop")
 	def after(t:FiniteDuration)(f: =>Unit) = {
 		val e = System().scheduler.scheduleOnce(t)(f)
 		events += e
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+@deprecated("use package seer.time", "Beep boop")
 	def every(t:FiniteDuration,t0:FiniteDuration = -1.seconds)(f: =>Unit) = {
 		val wait = if(t0 == -1.seconds) t else t0
 		val e = System().scheduler.schedule(wait,t)(f)
@@ -69,7 +69,7 @@ class Schedule {
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+@deprecated("use package seer.time", "Beep boop")
 	def over(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
@@ -110,7 +110,7 @@ class Schedule {
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+@deprecated("use package seer.time", "Beep boop")
 	def cycle(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len
@@ -129,7 +129,7 @@ class Schedule {
 		e
 	}
 
-@deprecated("use package com.fishuyo.seer.time", "Beep boop")
+@deprecated("use package seer.time", "Beep boop")
 	def oscillate(len:FiniteDuration)(f:(Float)=>Unit) = {
 		val e = new Schedulable {
 			duration = len

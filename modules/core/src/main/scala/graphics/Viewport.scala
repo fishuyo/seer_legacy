@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer.graphics
+package seer.graphics
 
 object Viewport {
 	def apply( w:Int=800, h:Int=600 ) = new Viewport(0,0,w,h)

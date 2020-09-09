@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package spatial.numerics
 
 import scala.math.Numeric._

@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package actor
 
 import akka.actor._
@@ -62,8 +62,8 @@ object ActorSystemManager {
         }
         serialization-bindings {
           "java.io.Serializable" = kryo
-          "com.fishuyo.seer.spatial.Vec3" = kryo
-          "com.fishuyo.seer.openni.User" = kryo
+          "seer.spatial.Vec3" = kryo
+          "seer.openni.User" = kryo
         }
       }
       remote {
@@ -106,7 +106,7 @@ object ActorSystemManager {
     //   kryo = "com.twitter.chill.akka.AkkaSerializer"
     // }
     // akka.actor.serialization-bindings {
-    //  "com.fishuyo.seer.spatial.Vec3" = kryo
+    //  "seer.spatial.Vec3" = kryo
     // }
   // """)
 
@@ -134,15 +134,15 @@ object ActorSystemManager {
     akka.actor.serialization-bindings {
       "scala.Product" = kryo
       "scala.collection.mutable.ArrayBuffer" = kryo
-      "com.fishuyo.seer.graphics.MeshLike" = kryo
-      "com.fishuyo.seer.spatial.Vec3" = kryo
+      "seer.graphics.MeshLike" = kryo
+      "seer.spatial.Vec3" = kryo
     }
   """)
 
   val config = ConfigFactory.parseString("""
     seer-dispatcher {
       type = "Dispatcher"
-      executor = "com.fishuyo.seer.actor.SeerEventThreadExecutorServiceConfigurator"
+      executor = "seer.actor.SeerEventThreadExecutorServiceConfigurator"
       throughput = 1
     }
   """)
@@ -290,13 +290,13 @@ object ActorSystemManager {
       # all other.
       classes = [
         "scala.Tuple2",
-        "com.fishuyo.seer.openni.User",
+        "seer.openni.User",
         "scala.collection.mutable.ArrayBuffer",
-        "com.fishuyo.seer.spatial.Vec3",
-        "com.fishuyo.seer.openni.Skeleton",
+        "seer.spatial.Vec3",
+        "seer.openni.Skeleton",
         "scala.collection.mutable.HashMap",
-        "com.fishuyo.seer.openni.Bone",
-        "com.fishuyo.seer.spatial.Quat"
+        "seer.openni.Bone",
+        "seer.spatial.Quat"
       ]
   }
   """

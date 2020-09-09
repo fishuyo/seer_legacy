@@ -1,4 +1,4 @@
-package com.fishuyo.seer
+package seer
 package examples.audio
 
 import audio._

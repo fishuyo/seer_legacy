@@ -1,4 +1,4 @@
-package com.fishuyo.seer
+package seer
 
 import java.net.InetAddress
 

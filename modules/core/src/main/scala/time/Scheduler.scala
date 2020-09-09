@@ -1,5 +1,5 @@
 
-package com.fishuyo.seer
+package seer
 package time
 
 import graphics._
@@ -23,6 +23,7 @@ class Schedulable extends Cancellable with Animatable{
 
   Scene.push(this)
 
+  def reset(d:FiniteDuration) = updateDuration(duration)
   def updateDuration(d:FiniteDuration){
     if(d == 0.seconds) return
     val tt = d*percent

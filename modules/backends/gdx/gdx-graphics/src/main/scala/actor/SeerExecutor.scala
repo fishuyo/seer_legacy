@@ -1,7 +1,7 @@
 
 // based on Code from Viktor Klang: https://gist.github.com/viktorklang/2422443
 
-package com.fishuyo.seer.actor
+package seer.actor
 
 import akka.dispatch.{ DispatcherPrerequisites, ExecutorServiceFactory, ExecutorServiceConfigurator }
 import com.typesafe.config.Config
@@ -29,7 +29,7 @@ class SeerEventThreadExecutorServiceConfigurator(config: Config, prerequisites: 
 // Then we simply need to create a dispatcher configuration in our application.conf
 // seer-dispatcher {
 //   type = "Dispatcher"
-//   executor = "com.fishuyo.seer.actor.SeerEventThreadExecutorServiceConfigurator"
+//   executor = "seer.actor.SeerEventThreadExecutorServiceConfigurator"
 //   throughput = 1
 // }
 

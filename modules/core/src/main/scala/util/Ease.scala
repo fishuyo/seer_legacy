@@ -3,7 +3,7 @@
    * Easing functions thanks to: http://gizma.com/easing/
    */
 
-  package com.fishuyo.seer
+  package seer
   package util
 
   object Ease {
