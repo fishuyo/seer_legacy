@@ -369,7 +369,8 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
   
   override def audioIO( io:AudioIOBuffer ){
     // in:Array[Float], out:Array[Array[Float]], numOut:Int, count:Int ) = {
-    val in = io.inputSamples(0)
+    var in = io.inputSamples(0)
+    if(recOut) in = io.outputSamples(1)
     val out = io.outputSamples
     val numOut = io.channelsOut
     val count = io.bufferSize
