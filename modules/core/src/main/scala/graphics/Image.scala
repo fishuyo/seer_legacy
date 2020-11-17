@@ -5,6 +5,8 @@ package graphics
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+import java.awt.image.BufferedImage
+
 object Image {
   def apply(w:Int,h:Int,chans:Int=4,bpc:Int=1) = {
     val buffer = ByteBuffer.allocateDirect(chans*bpc*w*h)
@@ -36,7 +38,7 @@ class Image(val buffer:ByteBuffer, val w:Int, val h:Int, val channels:Int, val b
     }
   }
 
-  def apply(x:Int, y:Int) = buffer.get(bytesPerPixel*(y*w+x))
+  def apply(x:Int, y:Int, offset:Int=0) = buffer.get(bytesPerPixel*(y*w+x) + offset)
   def update(x:Int, y:Int, value:Byte) = buffer.put(bytesPerPixel*(y*w+x), value)
 
   def getRGBA(x:Int, y:Int) = {
@@ -63,6 +65,29 @@ class Image(val buffer:ByteBuffer, val w:Int, val h:Int, val channels:Int, val b
   def setFloat(x:Int, y:Int, v:Float) = {
     buffer.position(bytesPerPixel*(y*w+x))
     buffer.putFloat(v)
+  }
+
+  def save(path:String, alpha:Boolean=true) = {
+    val image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    val file = new java.io.File(path)
+    val format = "PNG"
+
+    for(x <- 0 until w){
+        for(y <- 0 until h){
+            val i = (x + (w * y)) * bytesPerPixel;
+            val r = buffer.get(i) & 0xFF;
+            val g = buffer.get(i + 1) & 0xFF;
+            val b = buffer.get(i + 2) & 0xFF;
+            var a = buffer.get(i + 3) & 0xFF;
+            if(!alpha) a = 0xFF
+            image.setRGB(x, h - (y + 1), (a << 24) | (r << 16) | (g << 8) | b);
+        }
+    }
+      
+    println(s"writing file ${file.getAbsolutePath}")
+    try {
+        javax.imageio.ImageIO.write(image, format, file);
+    } catch { case e:Exception => e.printStackTrace() }
   }
 
 

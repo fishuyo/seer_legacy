@@ -39,20 +39,20 @@ class Synth extends SeerActor {
   }
 
   // Apple multitouch trackpad interaction
-  // Trackpad.clear
-  // Trackpad.listen { case event =>
+  Trackpad.clear
+  Trackpad.listen { case event =>
     
-  //   event.fingers.zipWithIndex.foreach{ case (f,i) =>
+    event.fingers.zipWithIndex.foreach{ case (f,i) =>
       
-  //     val (env,gain,freq,modF,modD,synth) = synths(f.id)
+      val (env,gain,freq,modF,modD,synth) = synths(f.id)
 
-  //     freq.set(f.pos.x * 1400f + 10f)
-  //     gain.set(f.size * 0.055f)
-  //     modF.set(f.pos.y * 10f)
-  //     // modD.set(f.angle * 8f)
-  //     if(f.state == "down") env.reset
-  //   }
-  // }
+      freq.set(f.pos.x * 1400f + 10f)
+      gain.set(f.size * 0.055f)
+      modF.set(f.pos.y * 10f)
+      // modD.set(f.angle * 8f)
+      if(f.state == "down") env.reset
+    }
+  }
 
   // Graphics
   val spheres = synths.map{ case s => Sphere() }

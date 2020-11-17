@@ -24,6 +24,8 @@ object Vec3 {
     def toFloat(x: Vec3) = x.mag()
     def toDouble(x: Vec3) = x.mag().toDouble
     def compare(x:Vec3,y:Vec3) = (x.mag() - y.mag()).toInt
+    def parseString(str:String) = None
+
   }
 }
 
@@ -77,6 +79,7 @@ object Vec2 {
     def toFloat(x: Vec2) = x.mag()
     def toDouble(x: Vec2) = x.mag().toDouble
     def compare(x:Vec2,y:Vec2) = (x.mag() - y.mag()).toInt
+    def parseString(str:String) = None
   }
 }
 

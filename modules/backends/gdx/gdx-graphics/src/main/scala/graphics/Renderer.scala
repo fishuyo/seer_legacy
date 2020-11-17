@@ -7,7 +7,7 @@ import spatial.Vec3
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 // import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.utils.viewport._
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 
 
 /**
@@ -145,5 +145,16 @@ class Renderer {
     }
   }
 
+  def capture() = {
+    Graphics().gl.glReadBuffer(GL20.GL_FRONT);
+    val width = viewport.w.toInt
+    val height= viewport.h.toInt
+    // val bpp = 4; // Assuming a 32-bit display with a byte each for red, green, blue, and alpha.
+    // val buffer = BufferUtils.createByteBuffer(width * height * bpp);
+    val image = Image(width,height,4,1)
+
+    Graphics().gl.glReadPixels(0, 0, width, height, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, image.buffer);
+    image
+  }
 
 }

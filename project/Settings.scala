@@ -4,7 +4,7 @@ import Keys._
 object Settings {
 
   val seerV = "0.1-SNAPSHOT"
-  val scalaV = "2.12.10"
+  val scalaV = "2.13.3" //"2.12.10"
 
   lazy val common = Seq(
     organization := "seer",
@@ -76,6 +76,7 @@ object Settings {
     if (System.getProperty("os.name").contains("Mac"))
       Seq(
         javaOptions in run += "-XstartOnFirstThread",
+        javaOptions in run += "-Djava.awt.headless=true",
         envVars := Map("DYLD_LIBRARY_PATH" -> file("lib").getAbsolutePath)
       )
     else Seq()

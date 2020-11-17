@@ -79,6 +79,8 @@ object Vec3 {
     def toFloat(x: Vec3) = x.mag()
     def toDouble(x: Vec3) = x.mag().toDouble
     def compare(x:Vec3,y:Vec3) = (x.mag() - y.mag()).toInt
+    def parseString(str:String) = None
+
   }
 }
 
@@ -120,8 +122,10 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
   def cross(v: Vec3) = Vec3( y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x )
   def magSq() = this dot this
   def mag() = math.sqrt( magSq() ).toFloat
+  def sum() = x+y+z
   def normalize() = { this *= (1.0f / mag()); this } 
   def normalized() = this * (1.0f / mag() )
+  def manhattan() = this * (1.0f/ sum())
 
   def zero() = { x=0; y=0; z=0; this }
   def isZero() = {x == 0f && y == 0f && z == 0f}
@@ -149,6 +153,12 @@ class Vec3( var x: Float, var y: Float, var z: Float ) extends Serializable {
     max
   }
 
+  def xyz = this 
+  def xzy = Vec3(x,z,y)
+  def yzx = Vec3(y,z,x)
+  def yxz = Vec3(y,x,z)
+  def zxy = Vec3(z,x,y)
+  def zyx = Vec3(z,y,x)
   def xy = Vec2(x,y)
   def xz = Vec2(x,z)
   def yz = Vec2(y,z)
@@ -231,6 +241,8 @@ object Vec2 {
     def toFloat(x: Vec2) = x.mag()
     def toDouble(x: Vec2) = x.mag().toDouble
     def compare(x:Vec2,y:Vec2) = (x.mag() - y.mag()).toInt
+    def parseString(str:String) = None
+
   }
 }
 

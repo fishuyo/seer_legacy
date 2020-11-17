@@ -87,7 +87,7 @@ object ScriptManager {
         actor ! Code(code)
         actor ! Load
         if(reloadOnChange) Monitor(f.getPath){ (p) => 
-          var code = Source.fromFile(f).mkString
+          var code = Source.fromFile(p.toJava).mkString
           actor ! Code(code)
           actor ! Reload
         }
@@ -100,7 +100,7 @@ object ScriptManager {
       var code = Source.fromFile(file).mkString
       actor ! Code(code)
       actor ! Load
-      if(reloadOnChange) Monitor(path){ (p) => 
+      if(reloadOnChange) Monitor(path){ (f) => 
         var code = Source.fromFile(file).mkString
         actor ! Code(code)
         actor ! Reload

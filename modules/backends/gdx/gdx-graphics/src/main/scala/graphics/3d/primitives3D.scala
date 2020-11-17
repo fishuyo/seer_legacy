@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Queue
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics.
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 import com.badlogic.gdx.graphics.g3d.loader._

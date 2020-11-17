@@ -1,11 +1,12 @@
 package seer.graphics
 
+import com.badlogic.gdx.Gdx
 
 class GLES30Impl extends GLES20Impl with GLES30 {
   
   // C function void glReadBuffer ( GLenum mode )
 
-  def glReadBuffer (mode:Int): Unit = {}
+  def glReadBuffer (mode:Int): Unit = {} //Gdx.gl30.glReadBuffer(mode)
 
   // C function void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum `type`, const GLvoid
 // *indices )

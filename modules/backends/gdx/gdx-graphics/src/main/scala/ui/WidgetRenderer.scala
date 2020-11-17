@@ -37,6 +37,7 @@ object WidgetRenderer {
     w match {
       case q:Rectangle =>
         if(q.hover) mat.color.set(1,0,0,1)
+        else if(q.selected) mat.color.set(1,0,1,1)
         else mat.color.set(1,1,1,1)
         if(w.style.startsWith("fill")) quadFilled.draw
         else quad.draw
@@ -46,7 +47,7 @@ object WidgetRenderer {
       //   quadFilled.draw //translate(Vec3(w.position,0)).scale(Vec3(w.bounds,1)).draw
       case _ =>
     }
-    w.children.foreach(draw(_))
+    w.getChildren().foreach(draw(_))
     MatrixStack.pop
   }
 

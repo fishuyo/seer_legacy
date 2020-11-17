@@ -8,7 +8,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("modules/core"))
   .settings(Settings.common: _*)
-  .jvmSettings(libraryDependencies ++= Dependencies.core)
+  .jvmSettings(libraryDependencies ++= Dependencies.coreJvm.value)
+  .jsSettings(libraryDependencies ++= Dependencies.coreJs.value)
 
 lazy val script = project
   .in(file("modules/script"))
@@ -37,7 +38,11 @@ lazy val backend_lwjgl = project
   .settings(Settings.app: _*)
   .settings(libraryDependencies ++= Dependencies.gdxAppDesktop)
 
-
+lazy val backend_webgl = project.enablePlugins(ScalaJSPlugin)
+  .in(file("modules/backends/web/webgl-graphics"))
+  .settings(Settings.common: _*)
+  .settings(scalaJSUseMainModuleInitializer := true)
+  .dependsOn(core.js)
 
 /**
   * Audio backends

@@ -152,18 +152,18 @@ class Curve(start:Float, end:Float, len:Int, f:Function[Float,Float]=Ease.quad) 
 }
 
 
-class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen {
-  val ring = new types.LoopBuffer[Float](maxDelay)
+// class Delay(var delay:Gen=100f, var c:Gen=0.9f, maxDelay:Int=44100) extends Gen {
+//   val ring = new types.LoopBuffer[Float](maxDelay)
 
-  override def apply(in:Float) = {
-    val d = delay().toInt
-    if(d > 0 && d <= maxDelay) ring.count_ = d
-    val s = in + ring() * c()
-    ring() = s //in + s * c()
-    s 
-  }
-  def apply = apply(0f)
-} 
+//   override def apply(in:Float) = {
+//     val d = delay().toInt
+//     if(d > 0 && d <= maxDelay) ring.count_ = d
+//     val s = in + ring() * c()
+//     ring() = s //in + s * c()
+//     s 
+//   }
+//   def apply = apply(0f)
+// } 
 
 
 class StereoPanner(in:Gen, var pan:Gen = 0.5f) extends Gen {

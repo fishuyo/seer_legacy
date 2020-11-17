@@ -2,13 +2,12 @@
 package seer
 package graphics
 import spatial._
-import spatial._
 
 
-import scala.collection.immutable.Stack
+// import scala.collection.immutable.Stack
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 
@@ -33,7 +32,7 @@ object Model {
     model
   }
 
-  def loadOBJ(s:String) = Obj(s)
+  // def loadOBJ(s:String) = Obj(s)
 }
 
 class Model extends Drawable { // with geometry.Pickable {

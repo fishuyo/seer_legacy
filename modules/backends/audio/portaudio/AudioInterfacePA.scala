@@ -51,7 +51,7 @@ object PortAudio extends AudioInterface {
           // if recordThru set and not already done add input to output
           if( recordThru && !playThru ) AudioPass.audioIO( ioBuffer ) //in,out,channelsOut,bufferSize)
 
-          outFile.write(out,0,bufferSize)
+          // outFile.write(out,0,bufferSize)
         }
 
   	}

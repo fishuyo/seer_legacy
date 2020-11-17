@@ -6,9 +6,9 @@ import spatial._
 
 import scala.collection.mutable.Queue
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
-import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
+// import com.badlogic.gdx.Gdx
+// import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 /* 
 * Plot stream of size data points scaled by range

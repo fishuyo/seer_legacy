@@ -71,13 +71,13 @@ trait Pickable {
     else true
   }
 
-  def transformRayLocal(ray:Ray) = {
+  def transformRayLocal(ray:Ray): Ray = {
     val model = Matrix.translation(pose.pos) * Mat4().fromQuat(pose.quat) * Matrix.scaling(scale)
     val invertable = model.invert
     val m = Mat4()
     invertable match {
       case Some(mat) => m.set(mat)
-      case _ => m.set(model)
+      case _ => return ray
     }
     // m.set(model)
     val o = m.transform(ray.o, 1)

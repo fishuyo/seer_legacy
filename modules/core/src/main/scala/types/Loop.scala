@@ -1,10 +1,10 @@
 
-package seer
-package types
+// package seer
+// package types
 
 
-class Loop[T:scala.reflect.ClassTag](val maxSize:Int) extends Generator[T] {
-  val buffer = new LoopBuffer[T](maxSize)
+// class Loop[T:scala.reflect.ClassTag](val maxSize:Int) extends Generator[T] {
+//   val buffer = new LoopBuffer[T](maxSize)
 
-  def apply() = buffer()
-}
+//   def apply() = buffer()
+// }

@@ -4,7 +4,7 @@ package audio
 
 import collection.mutable.ListBuffer
 
-import de.sciss.synth.io._
+// import de.sciss.synth.io._
 
 
 object Audio {
@@ -36,7 +36,7 @@ trait AudioInterface {
   var recordThru = true
   var recording = false
 
-  var outFile:AudioFile = null
+  // var outFile:AudioFile = null
 
   val sources = new ListBuffer[AudioSource]
 
@@ -68,22 +68,23 @@ trait AudioInterface {
   def recordThru(b:Boolean){ recordThru = b}
 
   def toggleRecording() = {
-    if( !recording ){
-      try{
-        val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
-        var path = "recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
-        // if( name != "") path = name
-        // Gdx.files.external("SeerData/audio").file().mkdirs()
-        var file = new java.io.File(path) //Gdx.files.external(path).file()
-        outFile = AudioFile.openWrite(file, outSpec)
-        recording = true
-        println("recording started..")
-      } catch { case e:Exception => println(e) }
-    } else {
-      recording = false
-      outFile.close
-      println("recording stopped.")
-    }
+    println("record disabled TODO implement compatible with scalajs")
+  //   if( !recording ){
+  //     try{
+  //       val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, channelsOut, sampleRate.toDouble, None, 0)
+  //       var path = "recording-" + (new java.util.Date()).toLocaleString().replace(' ','-').replace(':','-') + ".wav" 
+  //       // if( name != "") path = name
+  //       // Gdx.files.external("SeerData/audio").file().mkdirs()
+  //       var file = new java.io.File(path) //Gdx.files.external(path).file()
+  //       outFile = AudioFile.openWrite(file, outSpec)
+  //       recording = true
+  //       println("recording started..")
+  //     } catch { case e:Exception => println(e) }
+  //   } else {
+  //     recording = false
+  //     outFile.close
+  //     println("recording stopped.")
+  //   }
   }
 }
 

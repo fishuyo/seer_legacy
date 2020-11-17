@@ -43,7 +43,7 @@ class Parameter[T: ClassTag](initialValue:T, path:String){
     actorRef ! f 
   }
 
-  def setCachedValue(v:T) = { cachedValue = v; println(s"setCachedValue: $v") }
+  def setCachedValue(v:T) = { cachedValue = v }
   def updateCachedValue() = {    
     implicit val t = Timeout(1.second)
     val f = actorRef ? "get" 
@@ -89,7 +89,6 @@ class ParameterActor[T: ClassTag](initialValue:T) extends Actor {
   def receive = {
     case "get" => sender() ! value
     case newValue:T => 
-      println(s"old value: $value -- new value: $newValue")
       value = newValue
       instances.foreach(_.setCachedValue(value))
       changeCallbacks.foreach(_(value))

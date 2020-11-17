@@ -1,23 +1,12 @@
 import sbt._
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 
 object Dependencies {
   object versions {
     val akka = "2.6.5" //"2.5.12" //"2.4.17"
     val gdx = "1.9.10" //-SNAPSHOT"
     val lwjgl = "3.1.3"
-    val chill = "0.9.5" //"0.9.2" //"0.5.2" //"0.8.0"
-  }
-
-  object akka {
-    val actor = "com.typesafe.akka" %% "akka-actor" % versions.akka
-    val remote = "com.typesafe.akka" %% "akka-remote" % versions.akka
-    val stream = "com.typesafe.akka" %% "akka-stream" % versions.akka
-  }
-
-  object twitter {
-    val chill = "com.twitter" %% "chill" % versions.chill
-    val chillBijection = "com.twitter" %% "chill-bijection" % versions.chill
-    val chillAkka = "com.twitter" %% "chill-akka" % versions.chill
+    val chill = "0.9.5" 
   }
 
   object breeze {
@@ -26,31 +15,40 @@ object Dependencies {
     val viz = "org.nlp" %% "breeze-viz" % "1.0"
   }
 
-  val spire = "org.typelevel" %% "spire" % "0.17.0-M1" //"org.spire-math" %% "spire" % "0.17.0"
-
-  val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
-
+  // val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
   // val scodec = "org.scodec" %% "scodec-core" % "1.10.3"
 
   /** Core Dependencies */
-  val core = Seq(
-    // "org.scalameta" %% "scalameta" % "4.1.0",
-    akka.actor,
-    akka.remote,
-    // akka.stream,
-    // "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
+  val core = Def.setting(Seq(
+    "com.chuusai" %%% "shapeless" % "2.3.3",
+    "org.typelevel" %%% "spire" % "0.17.0-RC1",
+    "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
+    "com.lihaoyi" %%% "scalarx" % "0.4.3",
+    "javax.vecmath" % "vecmath" % "1.5.2"
+  ))
+
+  val coreJvm = Def.setting(core.value ++ Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "com.typesafe.akka" %% "akka-remote" % versions.akka,
+    // "com.typesafe.akka" %% "akka-stream" % versions.akka,
     "io.altoo" %% "akka-kryo-serialization" % "1.1.5",
-    spire,
-    twitter.chill,
-    twitter.chillBijection,
-    twitter.chillAkka,
+    "com.twitter" %% "chill" % versions.chill,
+    "com.twitter" %% "chill-bijection" % versions.chill,
+    "com.twitter" %% "chill-akka" % versions.chill,
     "de.sciss" %% "audiofile" % "1.5.4",
     "de.sciss" %% "scalaosc" % "1.2.1",
-    "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
-    "com.lihaoyi" %% "scalarx" % "0.4.2",
-    "com.beachape.filemanagement" %% "schwatcher" % "0.3.5",
-    "javax.vecmath" % "vecmath" % "1.5.2"
-  )
+    // "com.beachape.filemanagement" %% "schwatcher" % "0.3.5",
+    "com.github.pathikrit" %% "better-files" % "3.9.1",
+    "com.github.pathikrit" %% "better-files-akka" % "3.9.1",
+    "io.methvin" % "directory-watcher" % "0.10.1",
+    "io.methvin" %% "directory-watcher-better-files" % "0.10.1",
+  ))
+
+  val coreJs = Def.setting(core.value ++ Seq(
+    "org.akka-js" %%% "akkajsactor" % "2.2.6.9",
+    // "org.akka-js" %%% "akkajsactorstream" % "2.2.6.9",
+    "org.scala-js" %%% "scalajs-dom" % "1.1.0"
+  ))
 
   /** libGDX backend dependencies */
   val gdx = Seq(

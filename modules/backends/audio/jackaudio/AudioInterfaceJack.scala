@@ -52,7 +52,7 @@ object JackAudio extends AudioInterface {
       if(recording){
         // if recordThru set and not already done add input to output
         if( recordThru && !playThru ) AudioPass.audioIO( ioBuffer ) //in,out,channelsOut,bufferSize)
-        outFile.write(out,0,bufferSize)
+        // outFile.write(out,0,bufferSize)
       }
       true
   	}

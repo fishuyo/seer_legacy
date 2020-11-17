@@ -2,7 +2,7 @@
 package seer
 package audio
 
-import types.RingBuffer
+// import types.RingBuffer
 
 import collection.mutable.ListBuffer
 
@@ -86,34 +86,34 @@ object AudioPass extends AudioSource {
   }
 }
 
-object AudioPassInputLatencyCorrection extends AudioSource {
-  val ms = (Audio().sampleRate * .200f).toInt
-  val b = Array(new RingBuffer[Float](ms), new RingBuffer[Float](ms))
+// object AudioPassInputLatencyCorrection extends AudioSource {
+//   val ms = (Audio().sampleRate * .200f).toInt
+//   val b = Array(new RingBuffer[Float](ms), new RingBuffer[Float](ms))
 
-  var latency = 0.06f
-  var offset = 0
+//   var latency = 0.06f
+//   var offset = 0
 
-  def resetLatency(f:Float){
-    latency = f
-    offset = (Audio().sampleRate * latency).toInt
-  }
+//   def resetLatency(f:Float){
+//     latency = f
+//     offset = (Audio().sampleRate * latency).toInt
+//   }
 
-  override def audioIO( io:AudioIOBuffer ){
-    while( io() ){
-      b(0) += io.out(0)
-      b(1) += io.out(1)
+//   override def audioIO( io:AudioIOBuffer ){
+//     while( io() ){
+//       b(0) += io.out(0)
+//       b(1) += io.out(1)
 
-      if( offset == 0){
-        val s = io.in(0) * .5f
-        io.outSet(0)(s + b(0).next)
-        io.outSet(1)(s + b(1).next)
+//       if( offset == 0){
+//         val s = io.in(0) * .5f
+//         io.outSet(0)(s + b(0).next)
+//         io.outSet(1)(s + b(1).next)
       
-      } else {
-        offset -= 1
-        io.outSet(0)(0f)
-        io.outSet(1)(0f)
-      }
-    }
-  }
-}
+//       } else {
+//         offset -= 1
+//         io.outSet(0)(0f)
+//         io.outSet(1)(0f)
+//       }
+//     }
+//   }
+// }
 

@@ -4,7 +4,7 @@ package graphics
 
 class GraphicsImpl extends Graphics {
 
-  val gl:GLES30 = new GLES30Impl //.asInstanceOf[GLES30]
+  val gl:GLES30 = new GLES30Impl
 
 }
 

@@ -19,7 +19,7 @@ object Sines extends SeerApp {
   var i = 0
 
   // add a sine wave to the audio graph every second
-  val event = Schedule.every(1 second){
+  val event = Schedule.every(1.second){
     i += 1
 
     val freq = 440f + 4f * Random.int(-100,100)()
@@ -37,7 +37,7 @@ object Sines extends SeerApp {
   }
 
   // after 20 seconds stop adding sine waves
-  Schedule.after(20 seconds){
+  Schedule.after(20.seconds){
     event.cancel
     println(s"Stopping after adding $i sine waves.")
   }

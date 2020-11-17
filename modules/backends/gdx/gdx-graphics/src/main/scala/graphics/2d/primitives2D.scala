@@ -4,9 +4,9 @@ package graphics
 
 import spatial._
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
-import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
+// import com.badlogic.gdx.Gdx
+// import com.badlogic.gdx.graphics._
+// import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 object Plane extends ModelGenerator {
   override def generateMesh():Mesh = generateMesh(2,2,2,2,Quat())

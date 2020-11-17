@@ -27,8 +27,8 @@ trait OSCReceiver {
   var rcv = UDP.Receiver(cfg) 
 
   // callback functions
-	var callbacks = Map[String,(Any*)=>Unit]()
-	val ghandlers = new ListBuffer[(String,Any*)=>Unit]()
+	var callbacks = Map[String,(Seq[Any])=>Unit]()
+	val ghandlers = new ListBuffer[(String,Seq[Any])=>Unit]()
 	val phandlers = new ListBuffer[PartialFunction[Message,Unit]]()
 
 	// dummy function
@@ -38,9 +38,9 @@ trait OSCReceiver {
 	def clear() = { callbacks.clear(); ghandlers.clear(); phandlers.clear() }
 
 	/** Bind new callback function to OSC address */
-	def bind( s:String, f:(Any*)=>Unit) = callbacks += s -> f
+	def bind( s:String, f:(Seq[Any])=>Unit) = callbacks += s -> f
 
-	def bind(f:(String,Any*)=>Unit) = ghandlers += f
+	def bind(f:(String,Seq[Any])=>Unit) = ghandlers += f
 	def bindp(f:PartialFunction[Message,Unit]) = phandlers += f
 
 	/** Start listening for OSC message on given port */
@@ -116,13 +116,14 @@ trait OSCSender {
 
 	/** Send OSC message to prviously connected ip */
 	def send(msg:Message){
-		if( bundle ){ 
-			messageBuffer += msg
-			if( messageBuffer.length > maxBundleLength){ 
-				endBundle()
-				startBundle()
-			}
-		} else out ! msg
+		// if( bundle ){ 
+			// messageBuffer += msg
+			// if( messageBuffer.length > maxBundleLength){ 
+			// 	endBundle()
+			// 	startBundle()
+			// }
+		// } else out ! msg
+		out ! msg
 	}
 
 	def send(address:String, value:Any){
@@ -148,13 +149,13 @@ trait OSCSender {
 		send(address,value)                        
 	}
 
-	def startBundle(count:Int=30){ maxBundleLength = count; bundle = true }
-	def endBundle(){
-		bundle = false
-		if( messageBuffer.length > 0){
-			// println("sending bundle size " + messageBuffer.length)
-			out ! Bundle.now( messageBuffer : _* )
-			messageBuffer.clear
-		}
-	}
+	// def startBundle(count:Int=30){ maxBundleLength = count; bundle = true }
+	// def endBundle(){
+	// 	bundle = false
+	// 	if( messageBuffer.length > 0){
+	// 		// println("sending bundle size " + messageBuffer.length)
+	// 		out ! Bundle.now( messageBuffer)
+	// 		messageBuffer.clear
+	// 	}
+	// }
 }

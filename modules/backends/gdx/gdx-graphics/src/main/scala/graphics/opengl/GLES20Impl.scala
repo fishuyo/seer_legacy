@@ -78,7 +78,7 @@ class GLES20Impl extends GLES20 {
 
   def glPolygonOffset (factor:Float, units:Float):Unit = {}
 
-  def glReadPixels (x:Int, y:Int, width:Int, height:Int, format:Int, `type`:Int, pixels:Buffer):Unit = {}
+  def glReadPixels (x:Int, y:Int, width:Int, height:Int, format:Int, `type`:Int, pixels:Buffer):Unit = Gdx.gl.glReadPixels(x,y,width, height, format, `type`, pixels)
 
   def glScissor (x:Int, y:Int, width:Int, height:Int):Unit = Gdx.gl.glScissor(x,y,width,height)
 

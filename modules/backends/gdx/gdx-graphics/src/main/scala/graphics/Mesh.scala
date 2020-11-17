@@ -7,7 +7,8 @@ import spatial._
 import collection.mutable.ArrayBuffer
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics._
+import com.badlogic.gdx.graphics.VertexAttribute
+import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.{Mesh => GdxMesh}
 
 import com.badlogic.gdx.graphics.g3d.loader._

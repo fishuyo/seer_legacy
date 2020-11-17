@@ -16,7 +16,7 @@ object EaseTest extends SeerApp {
   val modelsIn = for(i <- 0 until 8) yield Sphere().scale(0.1f)
   val modelsOut = for(i <- 0 until 8) yield Sphere().scale(0.1f)
 
-  Schedule.oscillate(2 seconds){ case t =>
+  Schedule.oscillate(2.seconds){ case t =>
     // in/out
     for(i <- 0 until 8){
       val d = i match {

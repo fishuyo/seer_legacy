@@ -27,6 +27,8 @@ package object graphics {
 	val Subtract = 0x800A;
 	val ReverseSubtract = 0x800B;
 
+	def rgb(r:Int,g:Int,b:Int) = RGBA(r.toFloat/255, g.toFloat/255, b.toFloat/255, 1)
+	
 	implicit def RGBA2Float(c:RGBA) = c.toGray
 	implicit def RGB2RGBA(c:RGB) = RGBA(c.r,c.g,c.b,1)
 	implicit def RGBA2RGB(c:RGBA) = RGB(c.r,c.g,c.b)

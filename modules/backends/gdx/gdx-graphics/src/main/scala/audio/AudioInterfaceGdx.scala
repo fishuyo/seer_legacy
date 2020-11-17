@@ -127,7 +127,7 @@ class GdxAudioActor extends Actor {
 
       if(recording){
         // if recordThru set and not already done add input to output
-        if( GdxAudio.recordThru && !GdxAudio.playThru ) AudioPassInputLatencyCorrection.audioIO( ioBuffer )
+        // if( GdxAudio.recordThru && !GdxAudio.playThru ) AudioPassInputLatencyCorrection.audioIO( ioBuffer )
 
         writer ! Write(ioBuffer.outputSamples.map(_.clone)) 
         // outFile.write(out,0,bufferSize)
@@ -141,7 +141,7 @@ class GdxAudioActor extends Actor {
     if( !recording ){
       writer = System().actorOf(Props( new AudioFileWriterActor()))
       writer ! Open(path)
-      AudioPassInputLatencyCorrection.resetLatency(0.03f)
+      // AudioPassInputLatencyCorrection.resetLatency(0.03f)
       recording = true
     } else {
       writer ! "close"

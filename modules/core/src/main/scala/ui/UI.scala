@@ -6,12 +6,12 @@ import actor._
 import spatial._
 import collection.mutable.ListBuffer
 import scala.reflect.ClassTag
-import scala.collection.mutable
 
 object UI {
 
   def panel(x:Float=0f, y:Float=0f, w:Float=1f, h:Float=1f) = new Panel(x,y,w,h)
   def slider(x:Float=0f, y:Float=0f, w:Float=1f, h:Float=1f) = new Slider(x,y,w,h)
+  def xy(x:Float=0f, y:Float=0f, w:Float=1f, h:Float=1f) = new SliderXY(x,y,w,h)
   
 
 
@@ -22,13 +22,14 @@ object UI {
   * Widget, a pickable shape of some sort, composable, nestable, in order to build up UI components
   */
 trait Widget extends Pickable {
-  var (x,y,w,h) = (0f,0f,0f,0f)
+  var (x,y,w,h) = (0f,0f,1f,1f)
   
   // var parent:Option[Widget] = None
   override val children = ListBuffer[Widget]()
-  // override def getChildren() = children
+  def getChildren() = children //.asInstanceOf[ListBuffer[Widget]]
 
-  var movable = true
+  var movable = false
+  var resizable = false
   var containChildren = false
   var name = ""
   var style = ""
@@ -43,11 +44,11 @@ trait Widget extends Pickable {
 
   def updatePose() = {
     pose.pos.set(x,y,0)
-    scale.set(w,h,0)
+    scale.set(w,h,1f)
   }
 
   def +=(w:Widget){
-    children += w
+    getChildren() += w
     w.parent = Some(this)
   }
 
@@ -66,7 +67,8 @@ trait Widget extends Pickable {
         if(hit.isDefined){
           selectDist = hit.t.get
           selectOffset = pose.pos.xy - hit.pos.get.xy
-        } 
+        }
+        // println(s"Pick: $this $selected")
         selected
 
       case Unpick =>
@@ -78,8 +80,10 @@ trait Widget extends Pickable {
           val xy = hit.ray(selectDist).xy + selectOffset
           pose.pos.set( Vec3(xy, 0f) )
           x = xy.x; y = xy.y
-        }
-        true
+          // println(s"Drag: $this $x")
+          // updatePose()
+          true
+        } else false
       case _ => false
     }
     
@@ -100,6 +104,11 @@ class WidgetData[T: ClassTag] extends Widget {
     param.foreach{ _.set(tmp) }
   }
 
+  def setNormalized(v:T) = {
+    value = v
+    updatePose()
+  }
+
   def range(mn:T, mx:T)(implicit n: Fractional[T]) = {
     import n._
     xform = Some((v:T) => v  * (mx - mn) + mn )
@@ -110,7 +119,7 @@ class WidgetData[T: ClassTag] extends Widget {
   def bind(p:Parameter[T]) = {
     param = Some(p)
     // change slider on param change
-    p.onChange((v:T) => value = v)
+    p.onChange((v:T) => setNormalized(v))
     this
   }
 }
@@ -119,14 +128,16 @@ trait Rectangle extends Widget
 
 
 sealed trait Layout 
+case object LayoutNone extends Layout
 case object LayoutX extends Layout
 case object LayoutY extends Layout
 case class LayoutGrid(nr:Int=0, nc:Int=0) extends Layout
 
-class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget {
-  var layout:Layout = LayoutY
+class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget with Rectangle {
+  var layout:Layout = LayoutNone
   var pad = 0.01f
   setPosition(_x,_y,_w,_h)
+  movable = true
 
   def padding(f:Float) = { pad = f; this }
   def layoutX() = { layout = LayoutX; this }
@@ -135,15 +146,16 @@ class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget {
 
   override def updatePose(): Unit = {
     pose.pos.set(x,y,0)
-    scale.set(w,h,0)
+    scale.set(w,h,1f)
     positionChildren()
   }
 
   def positionChildren() = {
-    val d = 1f / children.size
+    val d = 1f / getChildren().size
     layout match {
+      case LayoutNone => // do nothing
       case LayoutX =>
-        children.zipWithIndex.foreach { case (c,i) =>
+        getChildren().zipWithIndex.foreach { case (c,i) =>
           c.x = d*i + pad
           c.y = 0f + pad //y
           c.w = d - 2*pad
@@ -152,7 +164,7 @@ class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget {
         }
   
       case LayoutY =>
-        children.zipWithIndex.foreach { case (c,i) =>
+        getChildren().zipWithIndex.foreach { case (c,i) =>
           c.x = 0f + pad
           c.y = d*i + pad
           c.w = 1f - 2*pad
@@ -161,14 +173,20 @@ class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget {
         }
 
       case LayoutGrid(nr,nc) =>
+        val n = getChildren().size
         var (rows, cols) = (nr,nc)
-        if(rows == 0 && cols == 0){ 
-          rows = math.round(math.sqrt(children.size)).toInt
-          cols = math.ceil(children.size/rows).toInt
+        (rows,cols) match {
+          case (0,0) =>
+            rows = math.round(math.sqrt(n)).toInt
+            cols = math.ceil(n/rows).toInt
+          case (0,c) => rows = math.ceil(n.toFloat/c).toInt
+          case (r,0) => cols = math.ceil(n.toFloat/r).toInt
+          case _ =>
         }
+
         val nw = 1f / cols
         val nh = 1f / rows
-        children.zipWithIndex.foreach { case (c,i) =>
+        getChildren().zipWithIndex.foreach { case (c,i) =>
           val ix = i % cols
           val iy = i / cols
           c.x = nw*ix + pad
@@ -185,9 +203,10 @@ class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget {
 class Slider(_x:Float, _y:Float, _w:Float, _h:Float) extends WidgetData[Float] with Rectangle{ self =>
   setPosition(_x,_y,_w,_h)
 
-  movable = false
+  // add child widget for slider handle
   this += new Rectangle {
     setPosition(0,0,1,0.1f)
+    movable = true
     style = "fill"
     override def onEvent(e:PickEvent, hit:Hit) = {
       var ret = super.onEvent(e,hit)
@@ -197,26 +216,82 @@ class Slider(_x:Float, _y:Float, _w:Float, _h:Float) extends WidgetData[Float] w
           if(y < 0f) y = 0f
           else if(y + h > 1f) y = 1f - h
           setValue( y / (1f - h) )
-          // updatePose()
-          // self->updatePose()
-          // println(value)
           ret = selected
         case _ =>
       }
       ret
     }
   }
+  
+  // TODO handle drag event outside of slider handle
+  override def onEvent(e:PickEvent, hit:Hit) = {
+    var ret = super.onEvent(e,hit)
+    e.event match {
+      case Drag =>
+      case _ =>
+    }
+    ret
+  }
 
   override def updatePose() = {
     pose.pos.set(x,y,0)
     scale.set(w,h,1)
-    if(!children.isEmpty){
+    if(!getChildren().isEmpty){
       var tmp = value
       ixform.foreach{ case f => tmp = f(tmp) }
-      children.head.y = tmp * (1f-children.head.h)
-      children.head.updatePose()
+      getChildren().head.y = tmp * (1f-getChildren().head.h)
+      getChildren().head.updatePose()
     }
   }
 
 }
 
+
+class SliderXY(_x:Float, _y:Float, _w:Float, _h:Float) extends WidgetData[Vec2] with Rectangle{ self =>
+  setPosition(_x,_y,_w,_h)
+  setValue(Vec2())
+
+  // add child widget for slider handle
+  this += new Rectangle {
+    setPosition(0f,0f,0.1f,0.1f)
+    movable = true
+    style = "fill"
+    override def onEvent(e:PickEvent, hit:Hit) = {
+      var ret = super.onEvent(e,hit)
+      e.event match {
+        case Drag =>
+          if(x < 0f) x = 0f
+          else if(x + w > 1f) x = 1f - w
+          if(y < 0f) y = 0f
+          else if(y + h > 1f) y = 1f - h
+          setValue( Vec2(x/(1f-w), y/(1f-h)) )
+          ret = selected
+        case _ =>
+      }
+      ret
+    }
+  }
+  
+  // TODO handle drag event outside of slider handle
+  override def onEvent(e:PickEvent, hit:Hit) = {
+    var ret = super.onEvent(e,hit)
+    e.event match {
+      case Drag =>
+      case _ =>
+    }
+    ret
+  }
+
+  override def updatePose() = {
+    pose.pos.set(x,y,0)
+    scale.set(w,h,1)
+    if(!getChildren().isEmpty){
+      var tmp = value
+      ixform.foreach{ case f => tmp = f(tmp) }
+      getChildren().head.x = tmp.x * (1f-getChildren().head.w)
+      getChildren().head.y = tmp.y * (1f-getChildren().head.h)
+      getChildren().head.updatePose()
+    }
+  }
+
+}

@@ -25,7 +25,8 @@ trait NavCamera extends GdxCamera {
     update()
   }
 
-  def ray(x:Int,y:Int) = {
+  def ray(x:Float, y:Float):Ray = ray(x.toInt, y.toInt)
+  def ray(x:Int,y:Int):Ray = {
     val r = this.getPickRay(x,y)
     Ray( Vec3(r.origin.x,r.origin.y,r.origin.z), Vec3(r.direction.x,r.direction.y,r.direction.z))
   }

@@ -24,6 +24,7 @@ class RenderNode(var renderer:Renderer = new Renderer()) {
   }
 
   def bindBuffer(i:Int) = buffer.get.getColorBufferTexture().bind(i)
+  def tex() = buffer.get.getColorBufferTexture()
 
   def bindTarget() = if( buffer.isDefined ) buffer.get.begin()
   def unbindTarget() = if( buffer.isDefined ) buffer.get.end(0,0,Gdx.graphics.getBackBufferWidth(),Gdx.graphics.getBackBufferHeight())

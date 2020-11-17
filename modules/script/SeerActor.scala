@@ -70,7 +70,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
       scene -= this 
     }
     Out.gain = Ramp(Out.gain.value, 0f, (44100 * audioXFadeTime).toInt)
-    time.Schedule.after(audioXFadeTime seconds){ 
+    time.Schedule.after(audioXFadeTime.seconds){ 
       Out.sources.clear 
       Audio().sources -= Out
     }
