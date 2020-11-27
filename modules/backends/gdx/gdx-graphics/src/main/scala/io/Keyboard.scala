@@ -15,10 +15,10 @@ import com.badlogic.gdx.input._
 
 import rx._
 
-import actor._
-import akka.actor._
-import akka.stream._
-import akka.stream.scaladsl._
+// import actor._
+// import akka.actor._
+// import akka.stream._
+// import akka.stream.scaladsl._
 import scala.concurrent._
 
 object Keyboard extends Keyboard {
@@ -39,8 +39,8 @@ object Keyboard extends Keyboard {
 
 class Keyboard extends InputAdapter {
 
-  implicit val system = System()
-  implicit val materializer = ActorMaterializer()
+  // implicit val system = System()
+  // implicit val materializer = ActorMaterializer()
 
   // var _promise = Promise[Option[(Char,Char)]]()
   // def promise = _promise
@@ -63,17 +63,17 @@ class Keyboard extends InputAdapter {
 
   use()
 
-  val keyStream = Source
-    .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
-    .mapMaterializedValue(bindKeyEvent)
+  // val keyStream = Source
+  //   .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
+  //   .mapMaterializedValue(bindKeyEvent)
 
   // keyStream.map { c => println(c); c }.runWith( Sink.ignore )
 
-  def bindKeyEvent(a:ActorRef){
-    this.listen {
-      case c => a ! c
-    }
-  }
+  // def bindKeyEvent(a:ActorRef){
+  //   this.listen {
+  //     case c => a ! c
+  //   }
+  // }
 
   def clear() = { observing.foreach( _.kill() ); observing = List(); typedCallbacks = List[(Char)=>Unit]()}
   def use() = Inputs.add(this)

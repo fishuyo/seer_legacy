@@ -6,6 +6,7 @@ import graphics._
 import audio._
 import io._
 import util._ 
+import time._
 // import openni._
 
 import akka.actor._
@@ -90,7 +91,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
 
   def Keyboard = _keyboard.getOrElse({_keyboard = Some(io.Keyboard()); _keyboard.get })
   def Mouse = _mouse.getOrElse({_mouse = Some(io.Mouse()); _mouse.get })
-  def Schedule = _schedule.getOrElse({_schedule = Some(util.Schedule()); _schedule.get })
+  def Schedule = _schedule.getOrElse({_schedule = Some(time.Schedule()); _schedule.get })
 
   // def Scene(name:String) = {
     // scene = Scene(name)

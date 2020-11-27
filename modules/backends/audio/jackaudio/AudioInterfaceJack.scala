@@ -2,10 +2,6 @@
 package seer
 package audio
 
-import akka.actor._
-import akka.actor.Props
-import com.typesafe.config.ConfigFactory
-
 import collection.mutable.ListBuffer
 
 import de.sciss.synth.io._

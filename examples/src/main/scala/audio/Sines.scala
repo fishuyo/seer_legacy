@@ -4,6 +4,8 @@ package examples.audio
 
 import graphics._
 import audio._
+import time._
+import spatial._
 import util._
 
 import concurrent.duration._

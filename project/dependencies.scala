@@ -15,16 +15,42 @@ object Dependencies {
     val viz = "org.nlp" %% "breeze-viz" % "1.0"
   }
 
-  // val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.7.2"
-  // val scodec = "org.scodec" %% "scodec-core" % "1.10.3"
-
   /** Core Dependencies */
+  val spatial = Def.setting(Seq(
+    "org.typelevel" %%% "spire" % "0.17.0-RC1",
+    "javax.vecmath" % "vecmath" % "1.5.2"
+  ))
+
+  val audio = Def.setting(Seq(
+    "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
+    "de.sciss" %% "audiofile" % "1.5.4"
+  ))
+
+  val runtime = Def.setting(Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "com.typesafe.akka" %% "akka-remote" % versions.akka,
+    // "com.typesafe.akka" %% "akka-stream" % versions.akka,
+
+    "io.altoo" %% "akka-kryo-serialization" % "1.1.5",
+    "com.twitter" %% "chill" % versions.chill,
+    "com.twitter" %% "chill-bijection" % versions.chill,
+    "com.twitter" %% "chill-akka" % versions.chill,
+
+    "com.github.pathikrit" %% "better-files" % "3.9.1",
+    "com.github.pathikrit" %% "better-files-akka" % "3.9.1",
+    "io.methvin" % "directory-watcher" % "0.10.1",
+    "io.methvin" %% "directory-watcher-better-files" % "0.10.1",
+
+    "de.sciss" %% "scalaosc" % "1.2.1"
+  ))
+
+
   val core = Def.setting(Seq(
     "com.chuusai" %%% "shapeless" % "2.3.3",
-    "org.typelevel" %%% "spire" % "0.17.0-RC1",
-    "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
+    // "org.typelevel" %%% "spire" % "0.17.0-RC1",
+    // "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
     "com.lihaoyi" %%% "scalarx" % "0.4.3",
-    "javax.vecmath" % "vecmath" % "1.5.2"
+    // "javax.vecmath" % "vecmath" % "1.5.2"
   ))
 
   val coreJvm = Def.setting(core.value ++ Seq(
@@ -35,13 +61,13 @@ object Dependencies {
     "com.twitter" %% "chill" % versions.chill,
     "com.twitter" %% "chill-bijection" % versions.chill,
     "com.twitter" %% "chill-akka" % versions.chill,
-    "de.sciss" %% "audiofile" % "1.5.4",
+    // "de.sciss" %% "audiofile" % "1.5.4",
     "de.sciss" %% "scalaosc" % "1.2.1",
     // "com.beachape.filemanagement" %% "schwatcher" % "0.3.5",
     "com.github.pathikrit" %% "better-files" % "3.9.1",
     "com.github.pathikrit" %% "better-files-akka" % "3.9.1",
     "io.methvin" % "directory-watcher" % "0.10.1",
-    "io.methvin" %% "directory-watcher-better-files" % "0.10.1",
+    "io.methvin" %% "directory-watcher-better-files" % "0.10.1"
   ))
 
   val coreJs = Def.setting(core.value ++ Seq(
@@ -49,6 +75,11 @@ object Dependencies {
     // "org.akka-js" %%% "akkajsactorstream" % "2.2.6.9",
     "org.scala-js" %%% "scalajs-dom" % "1.1.0"
   ))
+
+  val rx = Def.setting(Seq(
+    "com.lihaoyi" %%% "scalarx" % "0.4.3"
+  ))
+
 
   /** libGDX backend dependencies */
   val gdx = Seq(

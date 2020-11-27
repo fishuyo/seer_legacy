@@ -3,17 +3,69 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 /**
   * Core Modules
   */
+
+lazy val util = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/util"))
+  .settings(Settings.common: _*)
+
+lazy val spatial = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/spatial"))
+  .settings(Settings.common: _*)
+  .settings(libraryDependencies ++= Dependencies.spatial.value)
+
+lazy val audio = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/audio"))
+  .settings(Settings.common: _*)
+  .settings(libraryDependencies ++= Dependencies.audio.value)
+  .dependsOn(spatial)
+
+lazy val graphics = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/graphics"))
+  .settings(Settings.common: _*)
+  .dependsOn(spatial)
+
+lazy val runtime = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/runtime"))
+  .settings(Settings.common: _*)
+  .settings(libraryDependencies ++= Dependencies.runtime.value)
+  .dependsOn(spatial, audio, graphics)
+
+lazy val ui = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/ui"))
+  .settings(Settings.common: _*)
+  .dependsOn(spatial, runtime)
+
+lazy val worldmaking = crossProject(JVMPlatform, JSPlatform)
+  .withoutSuffixFor(JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("modules/core/worldmaking"))
+  .settings(Settings.common: _*)
+  .dependsOn(spatial, graphics)
+
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .withoutSuffixFor(JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("modules/core"))
   .settings(Settings.common: _*)
-  .jvmSettings(libraryDependencies ++= Dependencies.coreJvm.value)
-  .jsSettings(libraryDependencies ++= Dependencies.coreJs.value)
+  .aggregate(util, spatial, audio, graphics, runtime, ui, worldmaking)
+  // .jvmSettings(libraryDependencies ++= Dependencies.coreJvm.value)
+  // .jsSettings(libraryDependencies ++= Dependencies.coreJs.value)
 
 lazy val script = project
   .in(file("modules/script"))
-  .dependsOn(core.jvm, gdx_graphics)
+  .dependsOn(runtime.jvm, gdx_graphics)
   .settings(Settings.common: _*)
 
   
@@ -22,9 +74,10 @@ lazy val script = project
   */
 lazy val gdx_graphics = project
   .in(file("modules/backends/gdx/gdx-graphics"))
-  .dependsOn(core.jvm)
+  .dependsOn(spatial.jvm, audio.jvm, graphics.jvm, ui.jvm, worldmaking.jvm)
   .settings(Settings.common: _*)
   .settings(libraryDependencies ++= Dependencies.gdx)
+  .settings(libraryDependencies ++= Dependencies.rx.value)
 
 lazy val gdx_app_desktop = project
   .in(file("modules/backends/gdx/gdx-app-desktop"))
@@ -49,12 +102,12 @@ lazy val backend_webgl = project.enablePlugins(ScalaJSPlugin)
   */
 lazy val portaudio = project
   .in(file("modules/backends/audio/portaudio"))
-  .dependsOn(core.jvm)
+  .dependsOn(audio.jvm)
   .settings(Settings.common: _*)
 
 lazy val jackaudio = project
   .in(file("modules/backends/audio/jackaudio"))
-  .dependsOn(core.jvm)
+  .dependsOn(audio.jvm)
   .settings(Settings.common: _*)
 
 /**
@@ -63,8 +116,9 @@ lazy val jackaudio = project
 
 lazy val trackpad = project
   .in(file("modules/addons/apple-trackpad"))
-  .dependsOn(core.jvm)
+  .dependsOn(spatial.jvm)
   .settings(Settings.common: _*)
+  .settings(libraryDependencies ++= Dependencies.rx.value)
 
 /**
   * Examples

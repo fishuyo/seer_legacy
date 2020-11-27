@@ -5,6 +5,7 @@ package examples.graphics
 
 import graphics._
 import spatial._
+import time._
 import util._
 
 import concurrent.duration._
