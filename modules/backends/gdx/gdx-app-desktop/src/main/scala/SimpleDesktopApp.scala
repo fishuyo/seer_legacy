@@ -69,7 +69,7 @@ object DesktopApp {
 
     cfg.setTitle("seer")
     cfg.setWindowedMode(Window.w0,Window.h0)
-    cfg.setBackBufferConfig(8,8,8,8, 16, 0, 4)
+    cfg.setBackBufferConfig(8,8,8,8, 16, 0, 0)
     // cfg.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Pixels)
     // cfg.useOpenGL3(true,3,2)
     // cfg.width = Window.w0

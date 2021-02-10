@@ -63,10 +63,16 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   // .jvmSettings(libraryDependencies ++= Dependencies.coreJvm.value)
   // .jsSettings(libraryDependencies ++= Dependencies.coreJs.value)
 
+lazy val flow = project
+  .in(file("modules/flow"))
+  .dependsOn(runtime.jvm)
+  .settings(Settings.common: _*)
+
 lazy val script = project
   .in(file("modules/script"))
-  .dependsOn(runtime.jvm, gdx_graphics)
+  .dependsOn(runtime.jvm, gdx_graphics, flow) // TODO remove gdx_graphics dependency
   .settings(Settings.common: _*)
+
 
   
 /**
@@ -120,10 +126,15 @@ lazy val trackpad = project
   .settings(Settings.common: _*)
   .settings(libraryDependencies ++= Dependencies.rx.value)
 
+lazy val openni2 =  RootProject(file("modules/addons/openni2"))
+lazy val video =  RootProject(file("modules/addons/video"))
+lazy val javacv =  RootProject(file("modules/addons/javacv"))
+
 /**
   * Examples
   */
 lazy val examples = project
   .in(file("examples"))
-  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script, trackpad)
+  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script, trackpad, openni2, video, javacv)
   .settings(Settings.app: _*)
+

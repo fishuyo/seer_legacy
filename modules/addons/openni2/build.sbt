@@ -1,13 +1,13 @@
 /*
  * Seer Modules - Project Refs
  */
-val core = ProjectRef(file("../../.."), "core")
+val runtime = ProjectRef(file("../../.."), "runtime")
 val app = ProjectRef(file("../../.."), "gdx_app_desktop")
 
 val openni2 = project.in(file("."))
-  .dependsOn(core)
+  .dependsOn(runtime)
   .settings(Settings.common: _*)
-  .settings(libraryDependencies += "org.scodec" %% "scodec-core" % "1.10.3")
+  .settings(libraryDependencies += "org.scodec" %% "scodec-core" % "1.11.7")
   // .settings(compile in Compile := ((compile in Compile).dependsOn(getLibs)).value)
 
 val examples = project.in(file("examples"))

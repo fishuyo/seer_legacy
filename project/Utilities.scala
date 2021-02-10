@@ -21,6 +21,12 @@ object Utilities {
     zipFile
   }
 
+  def getHid(dest:File){
+    if(dest.exists) return
+    val file = download("purejavahidapi.jar")
+  }
+
+
   def getGlulogic(dest:File){
     if(dest.exists) return
     val zipFile = download("glulogic.zip")

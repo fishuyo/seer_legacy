@@ -21,7 +21,6 @@ class AudioIOBuffer(
     index < bufferSize
   }
   def reset() = index = -1
-  // def zero()
 
   def in(c:Int=0) = inputSamples(c)(index)
   def out(c:Int) = outputSamples(c)(index)
@@ -32,6 +31,12 @@ class AudioIOBuffer(
     val g = gain()
     outputSamples(0)(s) *= g
     outputSamples(1)(s) *= g
+  }
+
+  def multiply(c:Int, gain:Float) = {
+    for(s <- 0 until bufferSize){
+      outputSamples(c)(s) *= gain
+    }
   }
 
   def +=(buffer:AudioIOBuffer) = for(s <- 0 until bufferSize){
@@ -51,8 +56,9 @@ class AudioIOBuffer(
 }
 
 trait AudioSource {
+  var location = spatial.Vec3()
   def audioIO( io:AudioIOBuffer ){}
-  // def audioIO( in:Array[Float], out:Array[Array[Float]], numOut:Int, numSamples:Int){}
+  // def apply():Float = 0f
 }
 
 object AudioScene {

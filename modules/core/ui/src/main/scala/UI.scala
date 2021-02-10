@@ -77,6 +77,7 @@ trait Widget extends Pickable {
         
       case Drag => 
         if(selected && movable) {
+          if(hit.isDefined) selectDist = hit.t.get
           val xy = hit.ray(selectDist).xy + selectOffset
           pose.pos.set( Vec3(xy, 0f) )
           x = xy.x; y = xy.y
@@ -118,6 +119,7 @@ class WidgetData[T: ClassTag] extends Widget {
 
   def bind(p:Parameter[T]) = {
     param = Some(p)
+    setNormalized(p())
     // change slider on param change
     p.onChange((v:T) => setNormalized(v))
     this
@@ -135,7 +137,7 @@ case class LayoutGrid(nr:Int=0, nc:Int=0) extends Layout
 
 class Panel(_x:Float, _y:Float, _w:Float, _h:Float) extends Widget with Rectangle {
   var layout:Layout = LayoutNone
-  var pad = 0.01f
+  var pad = 0.015f
   setPosition(_x,_y,_w,_h)
   movable = true
 

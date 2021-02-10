@@ -1,8 +1,6 @@
 
 package seer
-// package core //switch to core package?
 package actor
-
 
 import akka.actor._
 import akka.util._
@@ -13,6 +11,13 @@ import concurrent.Await
 import scala.util.Success
 import concurrent.duration._
 import akka.pattern.ask
+
+
+object Var {
+  def apply[T: ClassTag](path:String, v:T) = {
+    new Parameter(v,path)
+  }
+}
 
 
 object Parameter {

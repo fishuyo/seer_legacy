@@ -48,11 +48,14 @@ object ScriptManager {
   imports += "seer.audio._"
   imports += "seer.io._"
   imports += "seer.util._"
-  imports += "seer.particle._"
   imports += "scala.concurrent.duration._"
   imports += "collection.mutable.ListBuffer"
   imports += "collection.mutable.ArrayBuffer"
   imports += "collection.mutable.HashMap"
+  imports += "akka.actor._"
+  imports += "akka.stream._"
+  imports += "akka.stream.scaladsl._"
+  imports += "seer.flow._"
 
   def apply() = Await.result(manager ? Create(), 3 seconds).asInstanceOf[ActorRef]
 

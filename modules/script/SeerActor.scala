@@ -7,11 +7,15 @@ import audio._
 import io._
 import util._ 
 import time._
+import actor._
+import flow._
 // import openni._
 
 import akka.actor._
 import akka.event.Logging
 
+import akka.stream._
+import akka.stream.scaladsl._
 import scala.concurrent.duration._
 
 object SeerActor {
@@ -20,11 +24,26 @@ object SeerActor {
   case class Name(n:String)
 }
 
+
+
+
+
 class SeerActor extends Actor with ActorLogging with Animatable with AudioSource {
   import SeerActor._
 
   implicit var name = "default"
   var active = true
+
+  implicit val system = System()
+  implicit val materializer = ActorMaterializer()
+
+  implicit def source2io[T,M](src:Source[T,M]) = IOSource(src)
+  implicit val kill = KillSwitches.shared("script")
+
+  // implicit def d2f(d:Double) = d.toFloat
+
+  val Print = Sink.foreach(println(_:Any))
+
 
   var scene:Scene = Scene //graphics.Scene()
   // var camera:NavCamera = Camera
@@ -81,6 +100,7 @@ class SeerActor extends Actor with ActorLogging with Animatable with AudioSource
     // if(_openni.isDefined) _openni.get.remove
 
     // shader.stopMonitor() ??
+    kill.shutdown
   }
 
   def preunload(){}

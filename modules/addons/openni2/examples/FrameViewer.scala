@@ -23,6 +23,7 @@ object FrameViewer extends SeerApp {
         quad.scale.set(-1,-img.aspect,1)
         quad.material.loadTexture(texture)
       } else {
+        // println("d") // doesn't freeze when printing... why.. XXX
         texture.image.set(img)
         texture.update
       }
