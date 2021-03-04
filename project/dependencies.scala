@@ -23,7 +23,7 @@ object Dependencies {
 
   val audio = Def.setting(Seq(
     "net.sourceforge.jtransforms" % "jtransforms" % "2.4.0",
-    "de.sciss" %% "audiofile" % "1.5.4"
+    "de.sciss" %%% "audiofile" % "2.3.3"
   ))
 
   val runtime = Def.setting(Seq(
@@ -41,7 +41,9 @@ object Dependencies {
     "io.methvin" % "directory-watcher" % "0.10.1",
     "io.methvin" %% "directory-watcher-better-files" % "0.10.1",
 
-    "de.sciss" %% "scalaosc" % "1.2.1"
+    "de.sciss" %% "scalaosc" % "1.2.1",
+    "com.lihaoyi" %% "os-lib" % "0.7.2"
+
   ))
 
 
@@ -61,7 +63,6 @@ object Dependencies {
     "com.twitter" %% "chill" % versions.chill,
     "com.twitter" %% "chill-bijection" % versions.chill,
     "com.twitter" %% "chill-akka" % versions.chill,
-    // "de.sciss" %% "audiofile" % "1.5.4",
     "de.sciss" %% "scalaosc" % "1.2.1",
     // "com.beachape.filemanagement" %% "schwatcher" % "0.3.5",
     "com.github.pathikrit" %% "better-files" % "3.9.1",

@@ -12,6 +12,7 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.input._
+import com.badlogic.gdx.Gdx
 
 import rx._
 
@@ -37,86 +38,43 @@ object Keyboard extends Keyboard {
   def bindNav(nav:Nav) = Inputs += new KeyboardNavInput(nav)
 }
 
+// case class KeyboardEvent(key:String, modifiers:String)
+
 class Keyboard extends InputAdapter {
-
-  // implicit val system = System()
-  // implicit val materializer = ActorMaterializer()
-
-  // var _promise = Promise[Option[(Char,Char)]]()
-  // def promise = _promise
-
-  // val keypress = Source.unfoldAsync('\u0000'){
-  //   case s => 
-  //     promise.future
-  // }
-  // keypress.map { c => println(c); c }.runWith( Sink.ignore )
 
   val key = Var('\u0000')
   val up = Var('\u0000')
   val down = Var('\u0000')
-  var observing = List[Obs]()
 
-  var callbacks = Map[Char,List[()=>Unit]]()
-  var typedCallbacks = List[(Char)=>Unit]()
   val downCallbacks = ListBuffer[PartialFunction[Char,Unit]]()
+  val eventCallbacks = ListBuffer[PartialFunction[String,Unit]]()
   val nullfunc:PartialFunction[Char,Unit] = { case _ => () }
+  val nullfuncs:PartialFunction[String,Unit] = { case _ => () }
 
   use()
 
-  // val keyStream = Source
-  //   .actorRef[Char](bufferSize = 0, OverflowStrategy.fail)
-  //   .mapMaterializedValue(bindKeyEvent)
-
-  // keyStream.map { c => println(c); c }.runWith( Sink.ignore )
-
-  // def bindKeyEvent(a:ActorRef){
-  //   this.listen {
-  //     case c => a ! c
-  //   }
-  // }
-
-  def clear() = { observing.foreach( _.kill() ); observing = List(); typedCallbacks = List[(Char)=>Unit]()}
+  def clear() = { downCallbacks.clear; eventCallbacks.clear}
   def use() = Inputs.add(this)
   def remove() = Inputs.remove(this)
 
   def listen(f:PartialFunction[Char,Unit]) = downCallbacks += f
-  def onKeyDown(f:PartialFunction[Char,Unit]) = downCallbacks += f
-
-
-
-  def bind(s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner){
-    val k = s.charAt(0)
-    observing = key.trigger {
-      // println(key.now)
-      if( key.now == k ) try{ 
-        f()
-      }catch{ case e:Exception => println(e) }
-    } :: observing
-  }
-
-  def bindDown( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
-    val k = s.charAt(0)
-    observing = down.trigger { if( down.now == k ) f() } :: observing
-  }
-  def bindUp( s:String, f: ()=>Unit)(implicit ctx: Ctx.Owner) = {
-    val k = s.charAt(0)
-    observing = up.trigger { if( up.now == k ) f() } :: observing
-  }
-  def bindTyped(f:(Char=>Unit)){
-    typedCallbacks = f :: typedCallbacks
-  }
-
+  def event(f:PartialFunction[String,Unit]) = eventCallbacks += f
 
   override def keyTyped(k:Char) = {
     // key.Internal.value = '\u0000' // make rx propogate even if same key
     key() = k
-    typedCallbacks.foreach((f) => f(k))
     downCallbacks.foreach(_.orElse(nullfunc).apply(k))
-    // val p = promise
-    // _promise = Promise[Option[(Char,Char)]]()
-    // p.success(Some(k,k))
+
+    // var event = "" //collection.mutable.ListBuffer[String]()
+    // if(Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)){
+    //   println(s"hi: $k")
+    //   event += s"shift-$k"
+    // } else
+    //   event += k.toString
+    // eventCallbacks.foreach(_.orElse(nullfuncs).apply(event))
     false
   }
+  
   override def keyDown(k:Int) = {
     var c = '\u0000'
     if(k >= Keys.A && k <= Keys.Z) c = (k+68).toChar
@@ -124,6 +82,7 @@ class Keyboard extends InputAdapter {
     down() = c
     false
   }
+
   override def keyUp(k:Int) = {
     val c = (k+68).toChar
     up() = c

@@ -3,7 +3,7 @@ package audio
 
 import types._
 
-import de.sciss.synth.io._
+import de.sciss.audiofile.{AudioFile => SAudioFile }
 
 
 class LoopBuffer( var maxSize:Int = 0) extends Gen {
@@ -309,6 +309,17 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
 
   allocate(numSamples)
 
+  def this(path:String) = {
+    this(1f, 44100)
+    load(path)
+  }
+
+  def this(samples:Array[Float]) = {
+    this(1f, 44100)
+    b.append(samples, samples.length, 0)
+    numSamples = b.curSize
+  }
+
   def apply() = {
     if( playing && numSamples > 0){
       if( reversing ){
@@ -452,32 +463,27 @@ class Loop( var seconds:Float=0f, var sampleRate:Int=44100) extends Gen {
     }//end else if(playing)
   }
 
-  def save( path:String ){
-    val outSpec = new AudioFileSpec(fileType = AudioFileType.Wave, sampleFormat = SampleFormat.Int16, 1, sampleRate.toDouble, None, 0)
-    var file = new java.io.File(path) //Gdx.files.external(path).file()
-    file.mkdirs()
-    val outFile = AudioFile.openWrite(file, outSpec)
-    outFile.write( Array(b.samples), 0, b.curSize )
-    outFile.close
+  def save( path:String ) = {
+    AudioFile.write(path, b.samples.map(_.toDouble))
   }
 
-  def load(path:String){
-    var file =  new java.io.File(path) // Gdx.files.external(path).file()
-    val in = AudioFile.openRead(file)
+  def load(path:String) = {
+    var file =  new java.io.File(path) 
+    val in = SAudioFile.openRead(file)
 
-    // create a buffer
-    val bufSz   = 8192  // perform operations in blocks of this size
-    val buf     = in.buffer(bufSz)
-
+    val size = 8192 
+    val buf = in.buffer(size)
+    
     clear
     var remain  = in.numFrames
     while (remain > 0) {
-      val chunk = math.min(bufSz, remain).toInt
+      val chunk = math.min(size, remain).toInt
       in.read(buf, 0, chunk)
-      b.append( buf(0), chunk )
+      b.append(buf(0).map(_.toFloat), chunk)
       remain -= chunk
     }
     in.close
+    numSamples = b.curSize
     dirty = true
   }
 

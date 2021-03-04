@@ -56,12 +56,15 @@ class VlcPlayer(val uri:String) extends RenderCallback { self =>
       }
       override def newMedia(mediaPlayer:MediaPlayer){
         loaded = true
+        // mediaPlayer.stop()
+        mediaPlayer.setVolume(0)
       }
   }
 
   mediaPlayerComponent.getMediaPlayer().setRepeat(true)
   mediaPlayerComponent.getMediaPlayer().setPlaySubItems(true);
-  mediaPlayerComponent.getMediaPlayer().playMedia(uri)
+  // mediaPlayerComponent.getMediaPlayer().playMedia(uri)
+  mediaPlayerComponent.getMediaPlayer().prepareMedia(uri)
 
   override def display( mediaPlayer:DirectMediaPlayer, nativeBuffer:Array[Memory], bufferFormat:BufferFormat ) {
     // if( texture == null){
@@ -76,21 +79,18 @@ class VlcPlayer(val uri:String) extends RenderCallback { self =>
     
   }
 
-  def load(uri:String) = mediaPlayerComponent.getMediaPlayer().playMedia(uri)
+  def load(uri:String) = mediaPlayerComponent.getMediaPlayer().prepareMedia(uri)
   
   def isLoaded() = ( width != 0 )
-
+  def play() = mediaPlayerComponent.getMediaPlayer().play()
+  def stop() = mediaPlayerComponent.getMediaPlayer().stop()
+  def setPosition(pos:Float) = mediaPlayerComponent.getMediaPlayer().setPosition(pos)
   def setRate(rate:Float) = mediaPlayerComponent.getMediaPlayer().setRate(rate)
   def setVolume(volume:Float) = mediaPlayerComponent.getMediaPlayer().setVolume((volume*100f).toInt)
   def setAudioChannel(channel:Int) = mediaPlayerComponent.getMediaPlayer().setAudioChannel(channel)
 
   def togglePlaying() = mediaPlayerComponent.getMediaPlayer().pause()
-  def play(b:Boolean){ 
-    if(playing != b){
-      mediaPlayerComponent.getMediaPlayer().setPause(!b)
-      playing = b
-    }
-  }
+  def setPause(b:Boolean) = mediaPlayerComponent.getMediaPlayer().setPause(b)
 
   def dispose(){
     mediaPlayerComponent.release()

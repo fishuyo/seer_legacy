@@ -14,11 +14,11 @@ class AudioSpatializerStereo(width:Float = 0.5f) extends AudioSpatializer {
 
     sources.foreach { case src =>
       var rpos = src.location - listener.pos
-      rpos = listener.quat.rotate(rpos)
-      val (gainL, gainR) = pan(rpos)
-      var atten = 1f - rpos.mag()/5.0f
-      if(atten < 0f) atten = 0f
-      atten = atten * atten
+      var atten = 1.0f / (1.0f + rpos.mag())
+      atten = math.pow(atten, 2.0).toFloat
+
+      rpos = listener.quat.inverse.rotate(rpos)
+      val (gainL, gainR) = pan(rpos.normalized)
 
       buf.zero()
       buf.reset()
@@ -26,10 +26,7 @@ class AudioSpatializerStereo(width:Float = 0.5f) extends AudioSpatializer {
       buf.multiply(0, atten * gainL)
       buf.multiply(1, atten * gainR)
       io += buf
-
     }
-
-
 
   }
   

@@ -50,6 +50,11 @@ class UserLoop {
 
   def setSpeed(v:Float) = speed = v
 
+  def now():Buffer[User] = {
+    if( frames.length > 0 && playing) frames(frame.toInt)
+    else Buffer[User]()
+  }
+
   def io(in:Seq[User], out:Buffer[User]){
 
     if(recording) frames += in.toBuffer

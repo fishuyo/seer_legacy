@@ -50,7 +50,7 @@ class BasicMaterial extends Material {
 	var shininess = 0
 
 	def loadTexture(path:String){
-		loadTexture(Texture(path))
+		loadTexture(Texture.load(path).get)
 	}
 	def loadTexture(t:Texture){
 		texture = Some(t)

@@ -11,6 +11,10 @@ import io.methvin.better.files._
 // import java.nio.file.StandardWatchEventKinds._
 // import com.sun.nio.file._
 
+// class RMonitor(file:File) extends RecursiveFileMonitor(file) {
+//   override def close() = { this.getListener() }
+// }
+
 object Monitor {
 
   val watchers = collection.mutable.HashMap[String,RecursiveFileMonitor]()
@@ -39,9 +43,14 @@ object Monitor {
   }
 
   def stop(path:String, rec:Boolean=false){
-    val w = watchers(path)
-    w.stop()
-    watchers.remove(path)
+    try {
+      if(watchers.contains(path)){
+        val w = watchers(path)
+        w.close() // calls watchservice.close
+        // w.stop() // same as close
+        watchers.remove(path)
+      }
+    } catch { case e:Exception => println(e)}
     // monitorActor ! UnRegisterCallback(
     //   ENTRY_MODIFY,
     //   recursive = rec,

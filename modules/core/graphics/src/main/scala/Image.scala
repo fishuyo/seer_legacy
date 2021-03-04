@@ -13,6 +13,22 @@ object Image {
     buffer.order(ByteOrder.nativeOrder())
     new Image(buffer,w,h,chans,bpc)
   }
+
+  def load(path:String): Option[Image] = {
+    println(s"loading file $path")
+    try {
+      val image = javax.imageio.ImageIO.read(new java.io.File(path))
+      val img = Image(image.getWidth(), image.getHeight(), 3, 1)
+      for(x <- 0 until image.getWidth(); y <- 0 until image.getHeight()){
+          val c = image.getRGB(x,y)
+          img(x,y,0) = ((c >> 16) & 0xFF).toByte
+          img(x,y,1) = ((c >> 8) & 0xFF).toByte
+          img(x,y,2) = (c & 0xFF).toByte
+      }
+      return Some(img)
+    } catch { case e:Exception => println("error loading file.") }
+    return None
+  }
 }
 
 class Image(val buffer:ByteBuffer, val w:Int, val h:Int, val channels:Int, val bytesPerChannel:Int) {
@@ -40,6 +56,7 @@ class Image(val buffer:ByteBuffer, val w:Int, val h:Int, val channels:Int, val b
 
   def apply(x:Int, y:Int, offset:Int=0) = buffer.get(bytesPerPixel*(y*w+x) + offset)
   def update(x:Int, y:Int, value:Byte) = buffer.put(bytesPerPixel*(y*w+x), value)
+  def update(x:Int, y:Int, c:Int, value:Byte) = buffer.put(bytesPerPixel*(y*w+x) + bytesPerChannel*c, value)
 
   def getRGBA(x:Int, y:Int) = {
     buffer.position(bytesPerPixel*(y*w+x))

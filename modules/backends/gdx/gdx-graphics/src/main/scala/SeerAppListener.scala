@@ -30,14 +30,6 @@ object Time {
 
 class SeerAppListener extends ApplicationListener {
 
-  // var width = Window.w0
-  // var height = Window.h0
-  // var aspect = Window.a0
-
-  // var scene = Scene
-  // var camera = Camera 
-  // var input = Inputs
-  
   var frameCount = 0
 
   var fixedTimeStep = false
@@ -54,10 +46,8 @@ class SeerAppListener extends ApplicationListener {
   // };
   // Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-  // var paused = false
 
   def create(){
-    // println("App create.")
     Graphics() = new GraphicsImpl
     Gdx.input.setInputProcessor( Inputs )
 
@@ -69,9 +59,7 @@ class SeerAppListener extends ApplicationListener {
     RootNode.renderer.scene.init()
   }
 
-  def render(){
-    // if(paused) return
-    
+  def render(){    
     var dt = Gdx.graphics.getDeltaTime()
     if(dt < 0.016) Thread.sleep(((0.016-dt)*1000).toLong)
 
@@ -106,6 +94,7 @@ class SeerAppListener extends ApplicationListener {
     // aspect = width * 1f / height
     // camera.viewportWidth = aspect
   }
+  
   def pause(){
     println("App pause.")
   }

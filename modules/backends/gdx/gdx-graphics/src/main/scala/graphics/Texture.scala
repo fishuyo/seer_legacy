@@ -17,12 +17,15 @@ import java.io.FileInputStream
 
 object Texture {
 
-  def apply(path:String) = {
-    val file = Gdx.files.internal(path)
-    println(file.path())
-    val t = new GdxTexture(new GdxTex(file))
-    t
+  def load(path:String):Option[Texture] = {
+    try{
+      val file = Gdx.files.internal(path)
+      val t = new GdxTexture(new GdxTex(file))
+      return Some(t)
+    } catch { case e => println(s"error loading $path")}
+    None
   }
+
   def apply(file:FileHandle) = {
 		val t = new GdxTexture(new GdxTex(file))
     t
@@ -55,8 +58,8 @@ object Texture {
 }
 
 
-class Texture(var w:Int,var h:Int) {
-  var (width, height) = (w,h)
+class Texture(var w:Int, var h:Int) {
+  // var (width, height) = (w,h)
 
   var buffer:Buffer = _
 
@@ -88,7 +91,7 @@ class Texture(var w:Int,var h:Int) {
   }
 
   def allocate(ww:Int, hh:Int){
-    width = ww; height = hh;
+    w = ww; h = hh;
     buffer = BufferUtils.newByteBuffer(4*w*h)
   }
 
@@ -127,6 +130,8 @@ class Texture(var w:Int,var h:Int) {
     // println(Graphics().gl.glGetError())
   }
 
+  def bgr() = format = 0x80E0 //Graphics().gl.GL_BGR
+
   def dispose(){
     if (handle != 0) {
       val buffer = BufferUtils.newIntBuffer(1)
@@ -150,7 +155,7 @@ class FloatTexture(w:Int,h:Int) extends Texture(w,h) {
   def floatBuffer = buffer.asInstanceOf[FloatBuffer]
 
   override def allocate(ww:Int,hh:Int){
-    width = ww; height = hh;
+    w = ww; h = hh;
     buffer = BufferUtils.newFloatBuffer(4*w*h)
   }
 }
@@ -186,6 +191,8 @@ class ImageTexture(val image:Image) extends Texture(image.w, image.h) {
 
 
 class GdxTexture(val gdxTexture:GdxTex) extends Texture(0,0){
+  w = gdxTexture.getWidth()
+  h = gdxTexture.getHeight() 
 
   override def bind(i:Int=0) = gdxTexture.bind(i)
   override def params() = {}

@@ -47,7 +47,7 @@ class ScriptDirectoryLoaderActor extends Actor with ActorLogging {
         val name = p.toJava.getName
         if(scripts.contains(name))
           scripts(name) ! Reload
-        else{
+        else if(name.endsWith(".scala")){
           val loader = context.actorOf(ScriptLoaderActor.props, name)
           scripts(name) = loader
           loader ! Path(p.toJava.getPath,false)

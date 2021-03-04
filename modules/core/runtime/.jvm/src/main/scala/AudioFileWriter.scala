@@ -9,7 +9,7 @@ import akka.actor.Props
 import akka.event.Logging
 import akka.actor.ActorSystem
 
-import de.sciss.synth.io._
+import de.sciss.audiofile._
 
 import collection.mutable.ArrayBuffer
 
@@ -29,7 +29,7 @@ class AudioFileWriterActor extends Actor {
 
   def receive = {
     case Open(path) => open(path)
-    case Write(samples) => outFile.foreach( _.write(samples,0,samples(0).length))
+    case Write(samples) => outFile.foreach( _.write(samples.map(_.map(_.toDouble)),0,samples(0).length))
     // case WriteBuffer(io,in,l) => writeBufferWithLatencyCorrection(io,in,l)
     case "close" => close()
   }

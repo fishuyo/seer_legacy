@@ -6,13 +6,17 @@ import akka.actor._
 import akka.util._
 import scala.reflect.ClassTag
 import collection.mutable.ListBuffer
+import collection.mutable.ArrayBuffer
 import collection.mutable.HashSet
 import concurrent.Await
 import scala.util.Success
 import concurrent.duration._
 import akka.pattern.ask
 
+import com.twitter.chill.KryoInjection
 
+
+// XXX careful with mutable objects..
 object Var {
   def apply[T: ClassTag](path:String, v:T) = {
     new Parameter(v,path)
@@ -25,6 +29,13 @@ object Parameter {
     new Parameter(v,path)
   }
 
+  def save(name:String, path:String) = {
+    System().actorSelection(s"/user/p.$path") ! ParameterActor.Save(name)
+  }
+
+  def load(name:String, path:String) = {
+    System().actorSelection(s"/user/p.$path") ! ParameterActor.Load(name)
+  }
 }
 
 class Parameter[T: ClassTag](initialValue:T, path:String){
@@ -58,12 +69,15 @@ class Parameter[T: ClassTag](initialValue:T, path:String){
     }
   }
   
+  def save(name:String) = actorRef ! ParameterActor.Save(name)
+  def load(name:String) = actorRef ! ParameterActor.Load(name)
 }
 
 
 
 object ParameterActor {
   case class Save(name:String)
+  case class Load(name:String)
 
   // def props[T](v:T) = Props[Parameter[T]](v)
   def props[T: ClassTag](v:T) = Props(new ParameterActor[T](v))
@@ -86,10 +100,12 @@ object ParameterActor {
 class ParameterActor[T: ClassTag](initialValue:T) extends Actor {
   import ParameterActor._
 
+  println(s"new param actor: ${self.path.name}")
+  
   var value:T = initialValue
   
   val instances = HashSet[Parameter[T]]()
-  var changeCallbacks:ListBuffer[T=>Unit] = ListBuffer()
+  var changeCallbacks:ArrayBuffer[T=>Unit] = ArrayBuffer()
 
   def receive = {
     case "get" => sender() ! value
@@ -101,9 +117,44 @@ class ParameterActor[T: ClassTag](initialValue:T) extends Actor {
     case p:Parameter[T] => instances += p
 
     case f:(T=>Unit) => if(!changeCallbacks.contains(f)) changeCallbacks += f
+    case ("remove", f:(T=>Unit)) => changeCallbacks -= f
     case "clearCallbacks" => changeCallbacks.clear
 
-    case Save(name) => 
+    case Save(name) => Preset.save(name, self.path.name, value)
+    case Load(name) => Preset.load[T](name, self.path.name).foreach(self ! _)
+
+  }
+
+}
+
+
+object Preset {
+  val pwd = os.pwd / "_presets"
+
+  def save[T: ClassTag](name:String, path:String, value:T) = {
+    try{
+      val wd = pwd / name
+      os.makeDir.all(wd)
+      val bytes = KryoInjection(value)
+      os.write.over(wd / path, bytes)
+    } catch {
+      case e:Exception => println(s"Error saving preset for: $name $path")
+    }
+  }
+
+  def load[T: ClassTag](name:String, path:String):Option[T] = {
+    try{
+      val wd = pwd / name
+      val bytes = os.read.bytes(wd / path)
+      val decode = KryoInjection.invert(bytes)
+      decode match {
+        case Success(v:T) => return Some(v)
+        case m => println(s"Preset load invert failed: $name $path $m  ${m.getClass.getSimpleName}"); return None
+      }
+    } catch {
+      case e:Exception => println(s"Error loading preset for: $name $path")
+    }
+    None
   }
 
 }

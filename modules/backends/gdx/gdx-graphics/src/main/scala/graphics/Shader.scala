@@ -100,8 +100,8 @@ class Shader {
   }
 
   def setFiles(vertPath:String, fragPath:String, create:Boolean = true) = {
-    vertFile = Some(File(vertPath))
-    fragFile = Some(File(fragPath))
+    vertFile = Some(Gdx.files.internal(vertPath))
+    fragFile = Some(Gdx.files.internal(fragPath))
     if(create){
       if(!vertFile.get.exists){
         vertFile.get.file.createNewFile

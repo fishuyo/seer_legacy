@@ -48,14 +48,14 @@ object Text {
       pos: Vec2,
       width: Float,
       halign: Int = Center
-  ) {
+  ) = {
     MatrixStack.push()
 
     // MatrixStack.rotate(quat)
     MatrixStack.scale(font.scale)
     // MatrixStack.translate(pos);
 
-    font.font.draw(
+    val res = font.font.draw(
       sb,
       text,
       pos.x / font.scale,
@@ -72,16 +72,17 @@ object Text {
     s().setUniformf("smoothing", font.smoothing)
     s().setUniformf("color", font.color.r, font.color.g, font.color.b)
     MatrixStack.pop()
+    res
   }
 
-  def draw(font: Font, text: String, pos: Vec2) {
+  def draw(font: Font, text: String, pos: Vec2) = {
     MatrixStack.push()
 
     // MatrixStack.rotate(quat)
     MatrixStack.scale(font.scale)
     // MatrixStack.translate(pos);
 
-    font.font.draw(sb, text, pos.x / font.scale, pos.y / font.scale)
+    val res = font.font.draw(sb, text, pos.x / font.scale, pos.y / font.scale)
     // font.draw(sb, text, pos.x * 0.01f / scale, pos.y * 0.01f / scale);
     // font.draw(sb, text, x, y);
 
@@ -90,6 +91,7 @@ object Text {
     s().setUniformf("smoothing", font.smoothing)
     s().setUniformf("color", font.color.r, font.color.g, font.color.b)
     MatrixStack.pop()
+    res
   }
 }
 

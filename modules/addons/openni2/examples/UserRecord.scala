@@ -50,7 +50,7 @@ object UserRecord extends SeerApp {
 
   var speed = 1f
 
-  Keyboard.onKeyDown {
+  Keyboard.listen {
     case 'r' => loop.toggleRecord()
     case 't' => loop.togglePlay()
     case 'x' => loop.stack()
