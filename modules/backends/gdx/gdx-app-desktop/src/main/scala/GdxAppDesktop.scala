@@ -18,18 +18,12 @@ import org.lwjgl.glfw.GLFW
 
 object GdxAppDesktop {
 
-  var displayMode:Option[Long] = _
-
   var fullscreen = false
   var nativesLoaded = false
 
   var app:ApplicationListener = _ 
 
   Inputs.addProcessor(FullscreenKey)
-
-  // for use to get fullscreen effect accross multiple monitors
-  var usingCanvas = false
-  var restoring = false
 
   // load gdx libs and other common natives
   def loadLibs(){
@@ -41,7 +35,6 @@ object GdxAppDesktop {
       unsafeAddDir("../lib")
       unsafeAddDir("../../lib")
       unsafeAddDir("../../../lib")
-      // unsafeAddDir("../../../../lib")
       println("loaded.")
     } catch { case e:Exception => println(e) } 
     nativesLoaded = true
@@ -49,11 +42,9 @@ object GdxAppDesktop {
 
   // create and run the lwjgl application
   def run() = {
-    
     app = new SeerAppListener
-
+    
     val cfg = new Lwjgl3ApplicationConfiguration()
-
     cfg.setTitle("seer")
     cfg.setWindowedMode(Window.w0,Window.h0)
     cfg.setBackBufferConfig(8,8,8,8, 16, 0, 0)
@@ -64,7 +55,7 @@ object GdxAppDesktop {
     // GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
     // GLFW.glfwWindowHint(GLFW.GLFW_FOCUSED, GLFW.GLFW_FALSE)
     // GLFW.glfwWindowHint(GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE)
-    println("GLFW Version: " + GLFW.glfwGetVersionString())
+    // println("GLFW Version: " + GLFW.glfwGetVersionString())
 
     new Lwjgl3Application( app, cfg )
   }
@@ -80,25 +71,12 @@ object GdxAppDesktop {
         Gdx.graphics.setWindowedMode( Window.w0, Window.h0)
         app.resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight())
       }else{
-        // val monitors = Gdx.graphics.getMonitors()
-        // monitors.foreach{ case m => println(s"${m.name} ${m.virtualX} ${m.virtualY}")}
-        // println(s"${mode.width} ${mode.height}")
-        println("isFullscreen: " + Gdx.graphics.isFullscreen())
-        // val g = Gdx.graphics.asInstanceOf[com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics]
-        // val w = g.getWindow()
-        // val method = w.getClass().getDeclaredMethod("getWindowHandle"); //g.getWindow().getWindowHandle()
-        // method.setAccessible(true);
-        // val h = method.invoke(w).asInstanceOf[Long];
-        // GLFW.glfwSetWindowPos(h, 1440, 0);
         GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
         val mode = Gdx.graphics.getDisplayMode()
         Gdx.graphics.setFullscreenMode(mode)
         app.resize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight())
         GLFW.glfwWindowHint(GLFW.GLFW_AUTO_ICONIFY, GLFW.GLFW_FALSE)
-        // println(mode)
-        // Gdx.graphics.setDisplayMode( mode )
       }
-
     fullscreen = !fullscreen
   }
 

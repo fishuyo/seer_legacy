@@ -31,21 +31,9 @@ object Time {
 class SeerAppListener extends ApplicationListener {
 
   var frameCount = 0
-
   var fixedTimeStep = false
   var timeStep = 1/60f
   var dtAccum = 0f
-
-  // val shutdownHook = new Thread() {
-  //   override def run(){
-  //     println("Shutdown Hook.")
-  //     Gdx.app.exit()
-  //     // System.exit(0)
-  //     // Runtime.getRuntime().halt(0);
-  //   }
-  // };
-  // Runtime.getRuntime().addShutdownHook(shutdownHook);
-
 
   def create(){
     Graphics() = new GraphicsImpl

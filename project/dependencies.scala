@@ -94,6 +94,7 @@ object Dependencies {
     "com.badlogicgames.gdx" % "gdx-freetype-platform" % versions.gdx classifier "natives-desktop"
   )
 
+
   /** Addon Dependencies */
   val openvr = Seq(
     "org.lwjgl" % "lwjgl-openvr" % versions.lwjgl,

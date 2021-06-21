@@ -101,7 +101,8 @@ lazy val backend_webgl = project.enablePlugins(ScalaJSPlugin)
   .in(file("modules/backends/web/webgl-graphics"))
   .settings(Settings.common: _*)
   .settings(scalaJSUseMainModuleInitializer := true)
-  .dependsOn(core.js)
+  .settings(libraryDependencies ++= Dependencies.coreJs.value)
+  .dependsOn(graphics.js)
 
 /**
   * Audio backends
@@ -130,11 +131,16 @@ lazy val openni2 =  RootProject(file("modules/addons/openni2"))
 lazy val video =  RootProject(file("modules/addons/video"))
 lazy val javacv =  RootProject(file("modules/addons/javacv"))
 
+lazy val vrpn = project
+  .in(file("modules/addons/vrpn"))
+  .dependsOn(spatial.jvm)
+  .settings(Settings.common: _*)
+
 /**
   * Examples
   */
 lazy val examples = project
   .in(file("examples"))
-  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script, trackpad, openni2, video, javacv)
+  .dependsOn(gdx_app_desktop, portaudio, jackaudio, script, trackpad, openni2, video, javacv, vrpn)
   .settings(Settings.app: _*)
 
