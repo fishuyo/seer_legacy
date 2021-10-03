@@ -12,6 +12,7 @@ object Pose {
 	def apply():Pose = apply(Vec3(),Quat())
 	def apply(p:Pose):Pose = apply(Vec3(p.pos),Quat(p.quat))
 	def apply( pos:Vec3=Vec3(0), quat:Quat=Quat(1,0,0,0)) = new Pose(pos,quat)
+  def apply(mat:Mat4) = new Pose(mat.toVec3(), mat.toQuat())
 }
 /** Class Pose represents a position and orientation in 3d space */
 class Pose( var pos:Vec3=Vec3(0), var quat:Quat=Quat(1,0,0,0) ) extends Serializable {

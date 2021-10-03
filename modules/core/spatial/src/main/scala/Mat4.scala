@@ -149,6 +149,8 @@ class Mat4 extends Matrix(4) {
   def toQuat() = Quat().fromMatrix(this)
   def fromQuat(q:Quat) = q.toMatrix(this)
 
+  def toVec3() = Vec3(apply(12), apply(13), apply(14))
+
   def transform(v:Vec3, w:Float) = {
     val r = Matrix.multiply(this, Array(v.x,v.y,v.z,w))
     Vec3(r(0),r(1),r(2))
