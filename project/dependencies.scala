@@ -38,6 +38,8 @@ object Dependencies {
     akka.actor,
     akka.remote,
     // akka.stream,
+    "io.aeron" % "aeron-driver" % "1.27.0",
+    "io.aeron" % "aeron-client" % "1.27.0",
     // "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
     "io.altoo" %% "akka-kryo-serialization" % "1.1.5",
     spire,

@@ -51,13 +51,13 @@ object ActorSystemManager {
 
 
   def config_artery(hostname:String=Hostname(), port:Int=2552) = ConfigFactory.parseString(s"""
+    $kryo
     akka {
       actor {
         provider = remote
         allow-java-serialization = off
-        $kryo
         serializers {
-          kryo = "com.romix.akka.serialization.kryo.KryoSerializer"
+          kryo = "io.altoo.akka.serialization.kryo.KryoSerializer"
           #kryo = "com.twitter.chill.akka.AkkaSerializer"
         }
         serialization-bindings {
@@ -79,7 +79,7 @@ object ActorSystemManager {
           }
         }
       }
-      extensions = ["com.romix.akka.serialization.kryo.KryoSerializationExtension$$"]
+      #extensions = ["com.romix.akka.serialization.kryo.KryoSerializationExtension$$"]
     }
   """)
 
@@ -149,7 +149,7 @@ object ActorSystemManager {
 
 
   val kryo = """
-    kryo  {
+    akka-kryo-serialization  {
       type = "graph"
 
       # Possible values for idstrategy are:
@@ -179,8 +179,8 @@ object ActorSystemManager {
       # class in the "mappings" and "classes" sections. This strategy was
       # added in version 0.4.1 and will not work with the previous versions
 
-      #idstrategy = "incremental"
-      idstrategy = "automatic"
+      #idstrategy = "default"
+      id-strategy = "automatic"
 
       # Define a default queue builder, by default ConcurrentLinkedQueue is used.
       # Create your own queue builder by implementing the trait QueueBuilder,
