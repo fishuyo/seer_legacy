@@ -1,19 +1,18 @@
 
-package seer
-package runtime
+// package seer
+// package runtime
 
 
-trait RuntimeModule {
-  def init()
-  def cleanup()
-}
+// trait RuntimeModule {
+//   def start()
+//   def step()
+//   def stop()
+// }
 
 
-trait ModuleSync extends RuntimeModule {
-  def step()
-}
+// class Core extends RuntimeModule {
+
+  
 
 
-trait ModuleAsync extends RuntimeModule {
-
-}
+// }

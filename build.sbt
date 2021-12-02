@@ -98,10 +98,17 @@ lazy val backend_lwjgl = project
   .settings(libraryDependencies ++= Dependencies.gdxAppDesktop)
 
 lazy val backend_webgl = project.enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalablyTypedConverterPlugin)
   .in(file("modules/backends/web/webgl-graphics"))
   .settings(Settings.common: _*)
   .settings(scalaJSUseMainModuleInitializer := true)
   .settings(libraryDependencies ++= Dependencies.coreJs.value)
+  .settings(
+    Compile / npmDependencies ++= Seq(
+      "@types/webgl2" -> "0.0.6"
+    ),
+    useYarn := true
+  )
   .dependsOn(graphics.js)
 
 /**

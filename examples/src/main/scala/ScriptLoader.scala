@@ -7,8 +7,8 @@ import audio._
 import actor._
 
 object ScriptLoader extends SeerApp {
-  PortAudio.init()
-  PortAudio.start()
+  // PortAudio.init()
+  // PortAudio.start()
 
   override def parseArgs(args:Array[String]){
     if(args.length == 0){

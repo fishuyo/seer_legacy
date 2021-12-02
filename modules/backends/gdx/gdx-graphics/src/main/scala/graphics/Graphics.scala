@@ -2,13 +2,10 @@
 package seer
 package graphics
 
+
 class GraphicsImpl extends Graphics {
-
   val gl:GLES30 = new GLES30Impl
-
 }
-
-
 
 object Run{
   def animate(f: =>Unit) = new AnimateOnce(f)

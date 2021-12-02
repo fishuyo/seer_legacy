@@ -9,7 +9,6 @@ object Graphics {
   def update(g:Graphics) = interface = Some(g)
 }
 
-
 trait Graphics {
   def gl:GLES30
 }
