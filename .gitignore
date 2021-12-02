@@ -1,6 +1,7 @@
 lib/
 libs/
 target/
+**.bin
 
 .vscode/
 .bloop/
